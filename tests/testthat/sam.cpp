@@ -103,7 +103,6 @@ Type objective_function<Type>::operator() ()
   DATA_IARRAY(sigmaN_key); //ages x years
   DATA_IVECTOR(rho_key); //length: years
   DATA_INTEGER(rec_age); //length: years
-  DATA_SCALAR(gamma); //smoothing parameter for Mesnil HS (recMode=6)
 
   PARAMETER_ARRAY(logF); // logF (ages x years x fleets array)
   PARAMETER_ARRAY(logN);  // logN (ages x years matrix)
@@ -262,7 +261,7 @@ Type objective_function<Type>::operator() ()
           predR(t) += rec_a(reca_key(t));
           devianceR(t) += logN(i,t)-log(predR(t));
           break;
-
+          
           case 1: //Random walk
           init_year=1;
           if(t>init_year-1){
@@ -270,7 +269,7 @@ Type objective_function<Type>::operator() ()
             devianceR(t) += logN(i,t)-log(predR(t));
           }
           break;
-
+          
           case 2: //Proportional to SSB (density independent)
           init_year=rec_age;
             if(t>init_year-1){
@@ -278,41 +277,23 @@ Type objective_function<Type>::operator() ()
               devianceR(t) += logN(i,t)-log(predR(t));
             }
             break;
-
+            
           case 3: //Beverton-Holt
           init_year=rec_age;
           if(t>init_year-1){
-            predR(t) += rec_a(reca_key(t))*SSB(t-rec_age)/(1+rec_b(recb_key(t))*SSB(t-rec_age));
+            predR(t) += rec_a(reca_key(t))*SSB(t)/(1+rec_b(recb_key(t))*SSB(t));
             devianceR(t) += logN(i,t)-log(predR(t));
           }
           break;
-
+          
         case 4: //Ricker
           init_year=rec_age;
           if(t>init_year-1){
-            predR(t) += rec_a(reca_key(t))*SSB(t-rec_age)*exp(-rec_b(recb_key(t))*SSB(t-rec_age));
+            predR(t) += rec_a(reca_key(t))*SSB(t)*exp(-rec_b(recb_key(t))*SSB(t));
             devianceR(t) += logN(i,t)-log(predR(t));
           }
           break;
-
-          case 5: //HS
-            init_year=rec_age;
-            if(t>init_year-1){
-              predR(t) += CppAD::CondExpLt(rec_b(recb_key(t)),SSB(t-rec_age),rec_a(reca_key(t))*rec_b(recb_key(t)),rec_a(reca_key(t))*SSB(t-rec_age));
-              devianceR(t) += logN(i,t)-log(predR(t));
-            }
-            break;
-
-            case 6: //Mesnil
-              init_year=rec_age;
-              if(t>init_year-1){
-                predR(t) += SSB(t-rec_age)+pow(pow(rec_b(recb_key(t)),Type(2.0))+Type(0.25)*pow(gamma,Type(2.0)),Type(0.5));
-                predR(t) += pow(pow(SSB(t-rec_age)-rec_b(recb_key(t)),Type(2.0))+Type(0.25)*pow(gamma,Type(2.0)),Type(0.5));
-                predR(t) *= Type(0.5)*rec_a(reca_key(t));
-                devianceR(t) += logN(i,t)-log(predR(t));
-              }
-              break;
-
+          
           default:
           std::cout << "This recMode is not implemented. Input must be 0 to 6." << std::endl;
           exit(EXIT_FAILURE);
