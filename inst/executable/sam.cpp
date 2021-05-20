@@ -39,6 +39,11 @@ Type f(Type x){return Type(2)/(Type(1) + exp(-Type(2) * x)) - Type(1);}
 template <class Type>
 Type square(Type x){return x*x;}
 
+// sqrt
+template<class Type>
+Type sqrt(Type x){
+  return pow(x,Type(0.5));
+}
 
 template<class Type>
 Type objective_function<Type>::operator() ()
@@ -69,6 +74,8 @@ Type objective_function<Type>::operator() ()
   DATA_ARRAY(keyVarLogN);
   DATA_ARRAY(keyVarObs);
   DATA_INTEGER(stockRecruitmentModelCode);
+  DATA_SCALAR(scale);
+  DATA_SCALAR(gamma);
   // DATA_VECTOR(fbarRange);
 
   PARAMETER_VECTOR(logQ);
@@ -166,7 +173,7 @@ Type objective_function<Type>::operator() ()
 
   for(int i=0;i<timeSteps;i++){ // calc ssb
     ssb(i)=0.0;
-    for(int j=0; j<stateDimN; ++j){
+    for(int j=0; j<stateDimN; ++j){ 
       ssb(i)+=exp(logN(j,i))*exp(-exp(logF((keyLogFsta(0,j)),i))*propF(i,j)-natMor(i,j)*propM(i,j))*propMat(i,j)*stockMeanWeight(i,j);  // ssbを??????
       // ssb(i)+=exp(logN(j,i))*propMat(i,j)*stockMeanWeight(i,j);  // ssbを??????
     }
@@ -186,7 +193,10 @@ Type objective_function<Type>::operator() ()
   vector<Type> predN(stateDimN);  // logNの予測値
   vector<Type> recResid(timeSteps); //再生産関係からの残差
 
-  int start_timeStep=1;
+  int start_timeStep=1+minAge;
+  if(stockRecruitmentModelCode==0){ // if RW
+    start_timeStep=1;
+    }
   //Now take care of N
   matrix<Type> nvar(stateDimN,stateDimN);  // logNのvcov
   for(int k=0; k<stateDimN; ++k){
@@ -214,19 +224,27 @@ Type objective_function<Type>::operator() ()
     }else{
       if(stockRecruitmentModelCode==1){//ricker
         // predN(0)=rec_loga+log(ssb(i-1))-exp(rec_logb)*ssb(i-1);
-        predN0(0)=rec_loga+log(ssb(i))-exp(rec_logb)*ssb(i);
+        predN0(0)=rec_loga+log(ssb(i-minAge))-exp(rec_logb)*ssb(i-minAge);
       }else{
         if(stockRecruitmentModelCode==2){//BH
           // predN(0)=rec_loga+log(ssb(i-1))-log(1.0+exp(rec_logb)*ssb(i-1));
-          predN0(0)=rec_loga+log(ssb(i))-log(1.0+exp(rec_logb)*ssb(i));
+          predN0(0)=rec_loga+log(ssb(i-minAge))-log(Type(1.0)+exp(rec_logb)*ssb(i-minAge));
         }else{
           if(stockRecruitmentModelCode==3){ //HS
-            vector<Type> rec_pred_HS(2);
-            rec_pred_HS(0)=rec_loga+rec_logb;
-            rec_pred_HS(1)=rec_loga+log(ssb(i));
-            predN0=min(rec_pred_HS);
+            predN0(0)=CppAD::CondExpLt(rec_logb,log(ssb(i-minAge)),rec_loga+rec_logb,rec_loga+log(ssb(i-minAge)));
+            // vector<Type> rec_pred_HS(2);
+            // rec_pred_HS(0)=rec_loga+rec_logb;
+            // rec_pred_HS(1)=rec_loga+log(ssb(i-minAge));
+            // 
+            // predN0=min(rec_pred_HS);
           } else {
-            error("SR model code not recognized");
+            if(stockRecruitmentModelCode==4){ //Mesnil HS
+              predN0(0)=ssb(i-minAge)+sqrt(square(exp(rec_logb))+square(gamma)/Type(4.0))-sqrt(square(ssb(i-minAge)-exp(rec_logb))+square(gamma)/Type(4.0));
+              predN0(0)*=exp(rec_loga)/Type(2.0);
+              predN0(0)=log(predN0(0));
+            }else{
+              error("SR model code not recognized");
+              }
           }
         }
       }
@@ -257,14 +275,15 @@ Type objective_function<Type>::operator() ()
 
 
   // Now finally match to observations
-  int f, ft, a, y;
+  int f, ft, a, y, amax;
   int minYear=CppAD::Integer((obs(0,0)));
   Type predObs=0, zz, var;
   for(int i=0;i<nobs;i++){
     y=CppAD::Integer(obs(i,0))-minYear;   // 年のラベル
     f=CppAD::Integer(obs(i,1));    //  fleetのラベル
-    ft=CppAD::Integer(fleetTypes(f-1));   // fleet typeが何にあたるか???0=caa???2=survey biomass data, 3=survey SSB data, 4=survey recruitment data, 5=survey SSBm data???
+    ft=CppAD::Integer(fleetTypes(f-1));   // fleet typeが何にあたるか?0=caa, 2=survey biomass data, 3=survey SSB data, 4=survey recruitment data, 5=survey SSBm data
     a=CppAD::Integer(obs(i,2))-minAge;  // age
+    amax=CppAD::Integer(obs(i,4))-minAge; //maxage
     if(a<(stateDimN-1)){
       zz=exp(logF((keyLogFsta(0,a)),y))+natMor(y,a);  // total mortality
     }else{
@@ -281,7 +300,7 @@ Type objective_function<Type>::operator() ()
         }
       }
     }else{
-      if(ft==1){// comm fleet
+      if(ft==1){//Not used (same as ft==4)
          predObs=logN(a,y)-zz*sampleTimes(f-1);
           if(CppAD::Integer(keyLogB(f-1,a))>(-1)){
             predObs*=exp(logB(CppAD::Integer(keyLogB(f-1,a))));
@@ -291,7 +310,12 @@ Type objective_function<Type>::operator() ()
           }
       }else{
         if(ft==2){// survey (biomass)
-          predObs=logN(a,y)+log(stockMeanWeight(iy(i),a));
+          predObs=0.0;
+          for(int j=a; j<amax+1; ++j){
+            predObs=+exp(logN(j,y))*stockMeanWeight(iy(i),j);
+            }
+          predObs=log(predObs)-log(scale);
+          // predObs=logN(a,y)+log(stockMeanWeight(iy(i),a));
           if(CppAD::Integer(keyLogB(f-1,a))>(-1)){
             predObs*=exp(logB(CppAD::Integer(keyLogB(f-1,a))));
           }
@@ -303,7 +327,7 @@ Type objective_function<Type>::operator() ()
             for(int j=0; j<stateDimN; ++j){
               predObs+=exp(logN(a+j,y))*propMat2(iy(i),j)*stockMeanWeight(iy(i),j); //
             }
-            predObs=log(predObs);
+            predObs=log(predObs)-log(scale);
             if(CppAD::Integer(keyLogB(f-1,a))>(-1)){
               predObs*=exp(logB(CppAD::Integer(keyLogB(f-1,a))));
             }
@@ -311,8 +335,13 @@ Type objective_function<Type>::operator() ()
               predObs+=logQ(CppAD::Integer(keyLogQ(f-1,a)));
             }
           }else{
-            if(ft==4){// Recruitment survey
-              predObs=logN(a,y)-zz*sampleTimes(f-1);
+            if(ft==4){// Number (e.g.,Recruitment) survey
+              predObs=0.0;
+              for(int j=a; j<amax+1; ++j){
+                predObs=+exp(logN(j,y));
+              }
+              predObs=log(predObs)-log(scale);
+              // predObs=logN(a,y)-zz*sampleTimes(f-1);
               if(CppAD::Integer(keyLogB(f-1,a))>(-1)){
                 predObs*=exp(logB(CppAD::Integer(keyLogB(f-1,a))));
               }
@@ -320,7 +349,7 @@ Type objective_function<Type>::operator() ()
                 predObs+=logQ(CppAD::Integer(keyLogQ(f-1,a)));
               }
             }else{
-              if (ft==5){
+              if (ft==5){ //Not used
                 for(int j=0; j<stateDimN; ++j){
                   predObs+=exp(logN(a+j,y))*exp(-exp(logF((keyLogFsta(0,j)),iy(i)))-natMor(iy(i),j))*propMat2(iy(i),j)*stockMeanWeight(iy(i),j);
                 }
