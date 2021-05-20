@@ -77,6 +77,7 @@ Type objective_function<Type>::operator() ()
   DATA_SCALAR(scale);
   DATA_SCALAR(gamma);
   // DATA_VECTOR(fbarRange);
+  DATA_INTEGER(sel_def) // selectivity defenition: devided by maxF(0), meanF(1), maxage(2)
 
   PARAMETER_VECTOR(logQ);
   PARAMETER_VECTOR(logB);
@@ -170,7 +171,6 @@ Type objective_function<Type>::operator() ()
     }
   }
 
-
   for(int i=0;i<timeSteps;i++){ // calc ssb
     ssb(i)=0.0;
     for(int j=0; j<stateDimN; ++j){ 
@@ -179,16 +179,32 @@ Type objective_function<Type>::operator() ()
     }
     logssb(i)=log(ssb(i));  // log(ssb)
   }
-
-  // for(int i=0;i<timeSteps;i++){ // calc total biomass
-  //   B_total(i)=0.0;
-  //   for(int j=0; j<stateDimN; ++j){
-  //     B_total(i)+=exp(logN(j,i))*exp(-exp(logF((keyLogFsta(0,j)),i))*propF(i,j)-natMor(i,j)*propM(i,j))*propMat(i,j)*stockMeanWeight(i,j);  // ssbを??????
-  //     // ssb(i)+=exp(logN(j,i))*propMat(i,j)*stockMeanWeight(i,j);  // ssbを??????
-  //   }
-  //   logssb(i)=log(ssb(i));  // log(ssb)
-  // }
-
+  
+  array<Type> saa(stateDimN,timeSteps); //selectivity at age
+  vector<Type> Sel1(timeSteps);
+  vector<Type> FY(stateDimN);
+  for (int y=0;y<timeSteps;y++){
+    for (int i=0;i<stateDimN;i++) {
+      if(i<stateDimN-1){
+        FY(i)=exp_logF(i,y);
+      }else{
+        FY(i)=alpha*exp_logF(i-1,y);
+        }
+    }
+    if (sel_def==0) { //max
+      Sel1(y)=max(FY);
+    }else{
+      if (sel_def==1) { //mean
+        Sel1(y)=sum(FY)/stateDimN;
+      }else{//maxage
+        Sel1(y)=FY(stateDimN-1);
+      }
+    }
+    for (int i=0;i<stateDimN;i++){
+      saa(i,y)=FY(i)/Sel1(y);
+    }
+  }
+    
   vector<Type> predN0(stateDimN);  // logNの予測値
   vector<Type> predN(stateDimN);  // logNの予測値
   vector<Type> recResid(timeSteps); //再生産関係からの残差
@@ -250,7 +266,7 @@ Type objective_function<Type>::operator() ()
       }
     }
     recResid(i)=logN(0,i)-predN0(0);
-    if(i==start_timeStep) {
+    if(i==0) {
       predN(0)=predN0(0);
     } else {
       predN(0)=predN0(0)+phi1*recResid(i-1);
@@ -360,7 +376,24 @@ Type objective_function<Type>::operator() ()
                 if(CppAD::Integer(keyLogQ(f-1,a))>(-1)){
                   predObs+=logQ(CppAD::Integer(keyLogQ(f-1,a)));
                 }
-              }
+              }else{
+                if (ft==6){ // Biomass X selectivity
+                  predObs=0.0;
+                  for(int j=a; j<amax+1; ++j){
+                    predObs=+exp(logN(j,y))*stockMeanWeight(iy(i),j)*saa(j,y);
+                  }
+                  predObs=log(predObs)-log(scale);
+                  // predObs=logN(a,y)+log(stockMeanWeight(iy(i),a));
+                  if(CppAD::Integer(keyLogB(f-1,a))>(-1)){
+                    predObs*=exp(logB(CppAD::Integer(keyLogB(f-1,a))));
+                  }
+                  if(CppAD::Integer(keyLogQ(f-1,a))>(-1)){
+                    predObs+=logQ(CppAD::Integer(keyLogQ(f-1,a)));
+                  }
+                }else{
+                  error("fleet type code not recognized");
+                  }
+                }
             }
           }
         }

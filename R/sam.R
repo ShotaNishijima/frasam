@@ -48,7 +48,8 @@ sam <- function(dat,
                 map.add = NULL,
                 p0.list = NULL,
                 scale=1000,
-                gamma=10
+                gamma=10,
+                sel.def="max"
                 # retro.years = 0,
 ){
 
@@ -99,6 +100,10 @@ sam <- function(dat,
     if (abund[i] == "B") data$fleetTypes[i+1] <- 2
     if (abund[i] == "SSB") data$fleetTypes[i+1] <- 3
     if (abund[i] == "N") data$fleetTypes[i+1] <- 4
+    if (abund[i] == "Bs") data$fleetTypes[i+1] <- 6
+    if (!(abund[i] %in% c("B","SSB","N","Bs"))) {
+      stop("abund code not recognized")
+    }
   }
 
   data$noYears <- ncol(waa)
@@ -142,8 +147,20 @@ sam <- function(dat,
   if (SR == "RW") SR.mode <- 0 #Random walk
   if (SR == "HS") SR.mode <- 3 #Hockey-stick
   if (SR == "Mesnil") SR.mode <- 4 #Hockey-stick
-
   data$stockRecruitmentModelCode <- matrix(SR.mode)
+  
+  data$scale <- scale
+  data$gamma <- gamma
+  if(sel.def=="max"){
+    data$sel_def <- 0
+  }
+  if(sel.def=="mean"){
+    data$sel_def <- 1
+  }
+  if(sel.def=="maxage"){
+    data$sel_def <- 2
+  }
+  
   data$nlogF = max(data$keyLogFsta)+1
   data$nlogN = as.numeric(data$maxAge-data$minAge)+1
   # data$AR <- AR
@@ -155,9 +172,6 @@ sam <- function(dat,
     data$Fprocess_weight[which(as.numeric(colnames(dat$waa)) %in% remove.Fprocess.year)] <- 0
   }
   data$F_RW_order <- RW.Forder
-  data$scale <- scale
-  data$gamma <- gamma
-
 
   U_init = rbind(
     matrix(5,nrow=ncol1,ncol=data$noYears),
@@ -273,7 +287,15 @@ sam <- function(dat,
     # faa <- exp(logF)
     baa <- naa*t(data$stockMeanWeight)
     ssb <- baa*t(data$propMat)
-    saa <- sweep(faa,2,apply(faa,2,max),FUN="/")
+    if(sel.def=="max"){
+      saa <- sweep(faa,2,apply(faa,2,max),FUN="/")
+    }
+    if(sel.def=="mean"){
+      saa <- sweep(faa,2,apply(faa,2,mean),FUN="/")
+    }
+    if(sel.def=="maxage"){
+      saa <- sweep(faa,2,faa[nrow(faa),],FUN="/")
+    }
     zaa <- faa+t(data$natMor)
     caa <- faa/zaa*naa*(1-exp(-zaa))
 
@@ -281,9 +303,11 @@ sam <- function(dat,
     if (is.SR){
       # SR
 
-      SR.name <- ifelse(as.numeric(data$stockRecruitmentModelCode)>1,
-                        ifelse(as.numeric(data$stockRecruitmentModelCode)>2,"HS","BH"),
-                        "RI")
+      SR.name <- case_when(as.numeric(data$stockRecruitmentModelCode)==0 ~ "RW",
+                           as.numeric(data$stockRecruitmentModelCode)==1 ~ "RI",
+                           as.numeric(data$stockRecruitmentModelCode)==2 ~ "BH",
+                           as.numeric(data$stockRecruitmentModelCode)==3 ~ "HS",
+                           as.numeric(data$stockRecruitmentModelCode)==4 ~ "Mesnil")
     # 
       a <- exp(rep$par.fixed[names(rep$par.fixed)=="rec_loga"])
       b <- exp(rep$par.fixed[names(rep$par.fixed)=="rec_logb"])
@@ -405,9 +429,25 @@ sam <- function(dat,
     pred.index <- data.frame(matrix(0,nrow=nrow(dat$index),ncol=ncol(dat$waa)))
     colnames(pred.index) <- colnames(dat$waa)
     for (i in 1:nrow(pred.index)){
-      if (abund[i]=="N") pred.index[i,] <- as.numeric(naa[index.age[i]+1,])
-      if (abund[i]=="B") pred.index[i,] <- as.numeric(baa[index.age[i]+1,])
+      if (abund[i]=="N") {
+        pred.index[i,] <- 0
+        for (j in index.age[i]:max.age[i]) {
+          pred.index[i,] <- pred.index[i,]+as.numeric(naa[j+1,])
+        }
+      }
+      if (abund[i]=="B") {
+        pred.index[i,] <- 0
+        for (j in index.age[i]:max.age[i]) {
+          pred.index[i,] <- pred.index[i,]+as.numeric(baa[j+1,])
+        }
+      }
       if (abund[i]=="SSB") pred.index[i,] <- as.numeric(colSums(ssb))
+      if (abund[i]=="Bs") {
+        pred.index[i,] <- 0
+        for (j in index.age[i]:max.age[i]) {
+          pred.index[i,] <- pred.index[i,]+as.numeric(baa[j+1,]*saa[j+1,])
+        }
+      }
       if (is.na(b1[i])) {
         pred.index[i,] <- q1[i]*pred.index[i,]
         } else {
@@ -424,6 +464,7 @@ sam <- function(dat,
   # brp1$tmbdata <- data
   brp1$par_list = obj$env$parList(opt$par)
   brp1$init <- params
+  brp1$map <- map
   
   return(brp1)
 }
