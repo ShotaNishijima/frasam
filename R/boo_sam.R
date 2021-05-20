@@ -4,16 +4,16 @@
 
 
 
-boo_sam <- function(Res,n=100,set.seed=1,est=TRUE,method="p"){
+boo_sam <- function(Res,n=100,seed=1,est=TRUE,method="p",use_p0=TRUE){
 
   if(is.numeric(set.seed)) set.seed(set.seed)
 
   Res$input$bias.correct.sd <- FALSE
   Res0 <- Res
-  if (Res$input$bias.correct) {
-    Res$input$bias.correct <- FALSE
-    Res <- do.call(sam, Res$input)
-  }
+  # if (Res$input$bias.correct) {
+  #   Res$input$bias.correct <- FALSE
+  #   Res <- do.call(sam, Res$input)
+  # }
 
   if (est) {
     boot.list <- list()
@@ -55,6 +55,7 @@ boo_sam <- function(Res,n=100,set.seed=1,est=TRUE,method="p"){
         sim.res <- Res0
         sim.res$input$dat <- sim.dat
         sim.res$input$silent = TRUE
+        sim.res$input$p0.list <- Res0$par_list
         sim.res <- try(do.call(sam, sim.res$input))
         if (class(sim.res) != "try-error") break
       }
