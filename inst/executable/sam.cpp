@@ -356,7 +356,7 @@ Type objective_function<Type>::operator() ()
               for(int j=a; j<amax+1; ++j){
                 predObs=+exp(logN(j,y));
               }
-              predObs=log(predObs)-log(scale);
+              predObs=log(predObs);
               // predObs=logN(a,y)-zz*sampleTimes(f-1);
               if(CppAD::Integer(keyLogB(f-1,a))>(-1)){
                 predObs*=exp(logB(CppAD::Integer(keyLogB(f-1,a))));

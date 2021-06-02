@@ -9,6 +9,7 @@
 #' @param min.age Indexの最低年齢 (\code{frasyr::vpa()}と同じで最小の年齢を0とする)
 #' @param max.age Indexの最高年齢 (\code{frasyr::vpa()}と同じで最小の年齢を0とする)
 #' @param SR 再生産関係："RW", "BH", "RI", "HS" or "Mesnil"
+#' @export
 
 sam <- function(dat,
                 last.catch.zero = FALSE,
@@ -49,7 +50,8 @@ sam <- function(dat,
                 p0.list = NULL,
                 scale=1000,
                 gamma=10,
-                sel.def="max"
+                sel.def="max",
+                use.index = NULL
                 # retro.years = 0,
 ){
 
@@ -66,6 +68,14 @@ sam <- function(dat,
   waa <- dat$waa
   M <- dat$M
   index <- dat$index
+  
+  if (!is.null(use.index)) {
+    index <- index[use.index,]
+    abund <- abund[use.index]
+    if (isTRUE(b.est)) {
+      b.fix <- b.fix[use.index]
+    }
+  }
 
   obs <- cbind(expand.grid(as.numeric(rownames(caa)),as.numeric(colnames(caa))),1,unlist(caa))[,c(2,3,1,4)]
   obs <- cbind(obs,obs[,3])
@@ -256,7 +266,7 @@ sam <- function(dat,
   is.SR <- ifelse(SR.mode==0, FALSE, TRUE)
   par_list = obj$env$parList(opt$par)
 
-  BioRefPt <- function(data, rep, opt, ref.year, is.SR){
+  BioRefPt <- function(data, rep, opt, ref.year, is.SR, obj){
     if (is.null(rep$unbiased)) {
       NF <- matrix(rep$par.random,nrow=max(data$keyLogFsta)+1 + data$maxAge-data$minAge+1,ncol=data$noYears)
       logN <- NF[1:data$nlogN,]
@@ -309,8 +319,11 @@ sam <- function(dat,
                            as.numeric(data$stockRecruitmentModelCode)==3 ~ "HS",
                            as.numeric(data$stockRecruitmentModelCode)==4 ~ "Mesnil")
     # 
-      a <- exp(rep$par.fixed[names(rep$par.fixed)=="rec_loga"])
-      b <- exp(rep$par.fixed[names(rep$par.fixed)=="rec_logb"])
+      # a <- exp(rep$par.fixed[names(rep$par.fixed)=="rec_loga"])
+      # b <- exp(rep$par.fixed[names(rep$par.fixed)=="rec_logb"])
+      a <- exp(obj$env$parList()[["rec_loga"]])
+      b <- exp(obj$env$parList()[["rec_logb"]])
+      
     # 
     #   # B0
     # 
@@ -426,7 +439,7 @@ sam <- function(dat,
     rho1 <- ifelse(as.numeric(data$rhoMode) > 1, 1/(1+exp(-as.numeric(rep$par.fixed[names(rep$par.fixed) == "logit_rho"]))),as.numeric(data$rhoMode))
     phi<-numeric(1)
     if (AR>0) phi[1] = rep$value[names(rep$value)=="phi1"][1]
-    pred.index <- data.frame(matrix(0,nrow=nrow(dat$index),ncol=ncol(dat$waa)))
+    pred.index <- data.frame(matrix(0,nrow=nrow(index),ncol=ncol(dat$waa)))
     colnames(pred.index) <- colnames(dat$waa)
     for (i in 1:nrow(pred.index)){
       if (abund[i]=="N") {
@@ -438,14 +451,14 @@ sam <- function(dat,
       if (abund[i]=="B") {
         pred.index[i,] <- 0
         for (j in index.age[i]:max.age[i]) {
-          pred.index[i,] <- pred.index[i,]+as.numeric(baa[j+1,])
+          pred.index[i,] <- pred.index[i,]+as.numeric(baa[j+1,])/scale
         }
       }
-      if (abund[i]=="SSB") pred.index[i,] <- as.numeric(colSums(ssb))
+      if (abund[i]=="SSB") pred.index[i,] <- as.numeric(colSums(ssb))/scale
       if (abund[i]=="Bs") {
         pred.index[i,] <- 0
         for (j in index.age[i]:max.age[i]) {
-          pred.index[i,] <- pred.index[i,]+as.numeric(baa[j+1,]*saa[j+1,])
+          pred.index[i,] <- pred.index[i,]+as.numeric(baa[j+1,]*saa[j+1,])/scale
         }
       }
       if (is.na(b1[i])) {
@@ -459,12 +472,15 @@ sam <- function(dat,
     return(output)
   }
 
-  brp1 <- BioRefPt(data, rep, opt, ref.year, is.SR)
+  brp1 <- BioRefPt(data, rep, opt, ref.year, is.SR, obj)
   brp1$input <- arglist
   # brp1$tmbdata <- data
   brp1$par_list = obj$env$parList(opt$par)
   brp1$init <- params
   brp1$map <- map
   
+  class(brp1) <- "sam"
+  
   return(brp1)
 }
+

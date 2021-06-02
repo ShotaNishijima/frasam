@@ -3,13 +3,21 @@
 ### Retrospective Analysis including Forecasting ###
 ####################################################
 
-retro_sam <- function(res, n=5, stat="mean", b.fix=TRUE){
+#'レトロスペクティブ解析を実施する
+#'
+#' @export
+
+retro_sam <- function(res, n=5, stat="mean", b.fix=TRUE,remove_short_index=TRUE, map_add = NULL){
   res.c <- res
   res.c$input$bias.correct.sd = FALSE
   Res <- list()
   obj.n <- obj.b <- obj.s <- obj.r <- obj.f <- NULL
   obj.n2 <- obj.b2 <- obj.s2 <- obj.r2 <- obj.f2 <- NULL
   max.a <- nrow(res$naa)
+  
+  if ("rec_logb" %in% names(map_add)) {
+    res.c$input$b.init <- as.numeric(res$rec.par["b"])
+  }
 
   if (isTRUE(b.fix)){
     res.c$input$b.fix <- res$b
@@ -26,16 +34,43 @@ retro_sam <- function(res, n=5, stat="mean", b.fix=TRUE){
       }
     }
     res.c$input$dat$index <- res.c$input$dat$index[,-nc,drop=FALSE]
+    
     res.c$input$dat$catch.prop <- res.c$input$dat$catch.prop[,-nc]
 
     if (res$input$last.catch.zero){
       res.c$input$dat$caa[,ncol(res.c$input$dat$caa)] <- 0
     }
+    
     res.c$input$p0.list <- res.c$par_list
     # res.c$input$retro.years <- i
-    res1 <- do.call(sam,res.c$input)
+    if (isTRUE(remove_short_index)) {
+      index_n = apply(res.c$input$dat$index,1,function(x) length(x)-sum(is.na(x)))
+      use.index = 1:nrow(res.c$input$dat$index)
+      if (is.null(res.c$input$use.index)) {
+        use.index = use.index[index_n > 2] 
+      } else {
+        use.index = intersect(res.c$input$use.index,use.index[index_n > 2])
+      }
+      res.c$input$use.index <- use.index
+    }
+    
+    if (!is.null(map_add)) res.c$input$map.add <- map_add
+
+    # res1 <- do.call(sam,res.c$input)
+    res1 <- try(do.call(sam,res.c$input),silent=TRUE)
+    if (class(res1) == "try-error") {
+      if (i>1) {
+        res.c$input$p0.list <- res2$par_list
+        res1 <- try(do.call(sam,res.c$input),silent=TRUE)
+      }
+    }
+    if (class(res1) == "try-error") {
+      res.c$input$p0.list <- NULL
+      res1 <- do.call(sam,res.c$input)
+    }
 
     Res[[i]] <- res1
+    res2 <- res1
     Y <- nc-1
 
     obj.n <- c(obj.n, (sum(res1$naa[,Y])-sum(res$naa[,Y]))/sum(res$naa[,Y]))

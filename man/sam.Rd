@@ -43,7 +43,8 @@ sam(
   p0.list = NULL,
   scale = 1000,
   gamma = 10,
-  sel.def = "max"
+  sel.def = "max",
+  use.index = NULL
 )
 }
 \arguments{

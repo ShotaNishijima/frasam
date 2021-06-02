@@ -6,7 +6,11 @@
 
 convert_sam_tibble <- function(samres) {
 
-  total.catch <- colSums(samres$caa*samres$input$dat$waa,na.rm=T)
+  if (class(samres) == "vpa") {
+    total.catch <- colSums(samres$input$dat$caa*samres$input$dat$waa,na.rm=T)
+  } else{
+    total.catch <- colSums(samres$caa*samres$input$dat$waa,na.rm=T)
+  }
   U <- total.catch/colSums(samres$baa, na.rm=T)
 
   SSB <- convert_vector(colSums(samres$ssb,na.rm=T),"SSB") %>%
