@@ -51,15 +51,17 @@ sam <- function(dat,
                 scale=1000,
                 gamma=10,
                 sel.def="max",
-                use.index = NULL
+                use.index = NULL,
+                upper = NULL,
+                lower = NULL
                 # retro.years = 0,
 ){
 
   argname <- ls()
   arglist <- lapply(argname,function(xx) eval(parse(text=xx)))
   names(arglist) <- argname
-  
-  index.age <- min.age 
+
+  index.age <- min.age
 
   caa <- dat$caa
   if (last.catch.zero) caa[ncol(caa)] <- NULL
@@ -68,7 +70,7 @@ sam <- function(dat,
   waa <- dat$waa
   M <- dat$M
   index <- dat$index
-  
+
   if (!is.null(use.index)) {
     index <- index[use.index,]
     abund <- abund[use.index]
@@ -86,14 +88,14 @@ sam <- function(dat,
     index2 <- cbind(i+1,as.numeric(names(index1)[!is.na(index1)]),index.age[i],c(index1[!is.na(index1)]),max.age[i])[,c(2,1,3,4,5)]
     obs <- rbind(as.matrix(obs), index2)
   }
-  
+
   colnames(obs) <- c("year","fleet","age","obs","maxage")
   rownames(obs) <- NULL
 
   obs <- as.matrix(obs)
   obs[,"age"] <- obs[,"age"]+rec.age
   obs[,"maxage"] <- obs[,"maxage"]+rec.age
-  
+
   if (tmb.run) {
     library(TMB)
     compile(paste(cpp.file.name, ".cpp", sep = ""))
@@ -158,7 +160,7 @@ sam <- function(dat,
   if (SR == "HS") SR.mode <- 3 #Hockey-stick
   if (SR == "Mesnil") SR.mode <- 4 #Hockey-stick
   data$stockRecruitmentModelCode <- matrix(SR.mode)
-  
+
   data$scale <- scale
   data$gamma <- gamma
   if(sel.def=="max"){
@@ -170,7 +172,7 @@ sam <- function(dat,
   if(sel.def=="maxage"){
     data$sel_def <- 2
   }
-  
+
   data$nlogF = max(data$keyLogFsta)+1
   data$nlogN = as.numeric(data$maxAge-data$minAge)+1
   # data$AR <- AR
@@ -252,8 +254,8 @@ sam <- function(dat,
 
   obj <- TMB::MakeADFun(data, params, map = map, random=c("U"), DLL=cpp.file.name,silent=silent)
 
-  lower <- obj$par*0-Inf
-  upper <- obj$par*0+Inf
+  if (is.null(lower)) lower <- obj$par*0-Inf
+  if (is.null(upper)) upper <- obj$par*0+Inf
 
   opt <- nlminb(obj$par, obj$fn, obj$gr, lower=lower, upper=upper)
   if (opt$convergence!=0) warning("May not converge")
@@ -261,7 +263,7 @@ sam <- function(dat,
   if (max(rep$gradient.fixed)>1e-2) warning("Large maximum gradient component")
 
   # stop("Finish Optimization")
-  
+
   SR.name <- "RW"
   is.SR <- ifelse(SR.mode==0, FALSE, TRUE)
   par_list = obj$env$parList(opt$par)
@@ -318,104 +320,104 @@ sam <- function(dat,
                            as.numeric(data$stockRecruitmentModelCode)==2 ~ "BH",
                            as.numeric(data$stockRecruitmentModelCode)==3 ~ "HS",
                            as.numeric(data$stockRecruitmentModelCode)==4 ~ "Mesnil")
-    # 
+    #
       # a <- exp(rep$par.fixed[names(rep$par.fixed)=="rec_loga"])
       # b <- exp(rep$par.fixed[names(rep$par.fixed)=="rec_logb"])
       a <- exp(obj$env$parList()[["rec_loga"]])
       b <- exp(obj$env$parList()[["rec_logb"]])
-      
-    # 
+
+    #
     #   # B0
-    # 
+    #
     #   rN0 <- rbind(1,exp(-apply(data$natM,1,cumsum)))
     #   rN0[data$nlogN,] <- rN0[data$nlogN,]/(1-rN0[data$nlogN+1,])
     #   rN0 <- rN0[1:data$nlogN,]
-    # 
+    #
     #   ssb0 <- rN0*t(data$stockMeanWeight)*t(data$propMat)
-    # 
+    #
     #   if (SR.name=="BH") R0 <- (a*colSums(ssb0)-1)/(b*colSums(ssb0))
     #   if (SR.name=="RI") R0 <- log(a*colSums(ssb0))/(b*colSums(ssb0))
     #   if (SR.name=="HS") R0 <- sapply(1:ncol(ssb0), function(i){
     #     uniroot(function(x){-2*x/a+x*colSums(ssb0)[i]+sqrt(1/b^2+data$gamma^2/4)-sqrt((x*colSums(ssb0)[i]-1/b)^2+data$gamma^2/4)}, c(0.001,max(naa[1,])*10))$root
     #     })
-    # 
+    #
     #   N0 <- sweep(rN0,2,R0,FUN="*")
-    # 
+    #
     #   B0 <- N0*t(data$stockMeanWeight)
-    # 
+    #
     #   SSB0 <- sweep(ssb0,2,R0,FUN="*")
-    # 
+    #
     #   mR0 <- mean(R0[ref.year1])
     #   mN0 <- sum(rowMeans(N0[,ref.year1]))
     #   mB0 <- sum(rowMeans(B0[,ref.year1]))
     #   mSSB0 <- sum(rowMeans(SSB0[,ref.year1]))
-    # 
+    #
     #   BRP0 <- c(mR0,mN0,mB0,mSSB0)
     #   names(BRP0) <- c("R0","N0","B0","SSB0")
-    # 
+    #
     #   # steepness
-    # 
+    #
     #   if (SR.name == "BH") h <- 0.2*(1+b*mSSB0)/(1+0.2*b*mSSB0)
     #   if (SR.name == "RI") h <- 0.2*exp(0.8*b*mSSB0)
     #   if (SR.name == "HS") h <- 1-b/mSSB0
-    # 
+    #
       rec.par <- c(a,b)
       names(rec.par) <- c("a","b")
-    # 
+    #
     #   # MSY
-    # 
+    #
     #   FAA <- exp(logF)
     #   SAA <- sweep(FAA, 2, colSums(FAA), FUN="/")
     #   mM <- rowMeans(t(data$natM)[,ref.year1])
     #   mSAA <- rowMeans(SAA[,ref.year1])
     #   mWAA <- rowMeans(t(data$stockMeanWeight)[,ref.year1])
     #   mMAA <- rowMeans(t(data$propMat)[,ref.year1])
-    # 
+    #
     #   Fr <- exp(10)
-    # 
+    #
     #   msy.func <- function(p){
     #     Fr <- exp(p)
-    # 
+    #
     #     rN <- c(1,exp(-cumsum(mM+Fr*mSAA)))
     #     rN[data$nlogN] <- rN[data$nlogN]/(1-rN[data$nlogN+1])
     #     rN <- rN[1:data$nlogN]
-    # 
+    #
     #     ssb1 <- rN*mWAA*mMAA
-    # 
+    #
     #     if (SR.name=="BH") R1 <- (a*sum(ssb1, na.rm=TRUE)-1)/(b*sum(ssb1,na.rm=TRUE))
     #     if (SR.name=="RI") R1 <- log(a*sum(ssb1, na.rm=TRUE))/(b*sum(ssb1, na.rm=TRUE))
     #     if (SR.name=="HS") {
     #       R1 <- try(uniroot(function(x){-2*x/a+x*sum(ssb1, na.rm=TRUE)+sqrt(1/b^2+data$gamma^2/4)-sqrt((x*sum(ssb1, na.rm=TRUE)-1/b)^2+data$gamma^2/4)}, c(0.001,max(naa[1,])*10))$root,silent=TRUE)
     #       if (class(R1)=="try-error") R1 <- 0
     #     }
-    # 
+    #
     #     zz <- mM+Fr*mSAA
     #     catch <- sum(Fr*mSAA/zz*R1*rN*mWAA*(1-exp(-zz)))
     #     return(-catch)
     #   }
-    # 
+    #
     #   msy.res <- optimize(msy.func,c(-10,10))
     #   Fmsy <- exp(msy.res$minimum)
     #   MSY <- -msy.res$objective
-    # 
+    #
     #   rN <- c(1,exp(-cumsum(mM+Fmsy*mSAA)))
     #   rN[data$nlogN] <- rN[data$nlogN]/(1-rN[data$nlogN+1])
     #   rN <- rN[1:data$nlogN]
-    # 
+    #
     #   ssb.msy <- rN*mWAA*mMAA
-    # 
+    #
     #   if (SR.name=="BH") Rmsy <- (a*sum(ssb.msy)-1)/(b*sum(ssb.msy))
     #   if (SR.name=="RI") Rmsy <- log(a*sum(ssb.msy))/(b*sum(ssb.msy))
     #   if (SR.name=="HS") Rmsy <- uniroot(function(x){-2*x/a+x*sum(ssb.msy)+sqrt(1/b^2+data$gamma^2/4)-sqrt((x*sum(ssb.msy)-1/b)^2+data$gamma^2/4)}, c(0.001,max(naa[1,])*10))$root
-    # 
+    #
     #   Nmsy <- sum(Rmsy*rN)
     #   Bmsy <- sum(Rmsy*rN*mWAA)
     #   SSBmsy <- sum(Rmsy*rN*mWAA*mMAA)
-    # 
+    #
     #   BRPmsy <- c(Fmsy, Nmsy, Bmsy, SSBmsy, Rmsy, MSY)
     #   names(BRPmsy) <- c("Fmsy","Nmsy", "Bmsy", "SSBmsy", "Rmsy", "MSY")
     }
-    
+
     loglik <- -opt$objective
     aic <- 2*opt$objective+2*length(opt$par)
 
@@ -478,9 +480,9 @@ sam <- function(dat,
   brp1$par_list = obj$env$parList(opt$par)
   brp1$init <- params
   brp1$map <- map
-  
+
   class(brp1) <- "sam"
-  
+
   return(brp1)
 }
 
