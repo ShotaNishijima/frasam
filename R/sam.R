@@ -56,7 +56,10 @@ sam <- function(dat,
                 upper = NULL,
                 lower = NULL,
                 index.key = NULL,
-                index.b.key = NULL
+                index.b.key = NULL,
+                b_random = FALSE,
+                b_range = NULL,
+                lambda = 0
                 # retro.years = 0,
 ){
 
@@ -190,6 +193,11 @@ sam <- function(dat,
   if(sel.def=="maxage"){
     data$sel_def <- 2
   }
+  if(isTRUE(b_random)){
+    data$b_random <- 1
+  }else{
+    data$b_random <- 0
+  }
 
   data$nlogF = max(data$keyLogFsta)+1
   data$nlogN = as.numeric(data$maxAge-data$minAge)+1
@@ -202,6 +210,7 @@ sam <- function(dat,
     data$Fprocess_weight[which(as.numeric(colnames(dat$waa)) %in% remove.Fprocess.year)] <- 0
   }
   data$F_RW_order <- RW.Forder
+  data$lambda <- lambda
 
   U_init = rbind(
     matrix(5,nrow=ncol1,ncol=data$noYears),
@@ -245,18 +254,22 @@ sam <- function(dat,
       # logPowSSB    = if(any(data$fleetTypes == 4))        {numeric(0)} else {numeric(0)},
       # logSdSSB     = if(any(data$fleetTypes %in% c(3,4))) {numeric(0)} else {numeric(0)},
       U = U_init,
-      trans_phi1 = 0
+      trans_phi1 = 0,
+      logSD_b = log(0.3)
     )
   } else {
     params <- p0.list
   }
 
   map <- list()
-  if (!isTRUE(b.est)) map$logB <- factor(rep(NA,nindex)) else {
-    if (!is.null(b.fix)) {
-      map$logB <- 0:max(data$keyLogB)
-      for (i in 1:nindex) if (!is.na(b.fix[i])) map$logB[i] <- NA
-      map$logB <- factor(map$logB)
+  if (!isTRUE(b_random)) {
+    map$logSD_b <- factor(NA)
+    if (!isTRUE(b.est)) map$logB <- factor(rep(NA,nindex)) else {
+      if (!is.null(b.fix)) {
+        map$logB <- 0:max(data$keyLogB)
+        for (i in 1:nindex) if (!is.na(b.fix[i])) map$logB[i] <- NA
+        map$logB <- factor(map$logB)
+      }
     }
   }
 
@@ -281,10 +294,24 @@ sam <- function(dat,
     }
   }
 
-  obj <- TMB::MakeADFun(data, params, map = map, random=c("U"), DLL=cpp.file.name,silent=silent)
+  if(isTRUE(b_random)) {
+    obj <- TMB::MakeADFun(data, params, map = map, random=c("U","logB"), DLL=cpp.file.name,silent=silent)
+  }else{
+    obj <- TMB::MakeADFun(data, params, map = map, random=c("U"), DLL=cpp.file.name,silent=silent)
+  }
 
   if (is.null(lower)) lower <- obj$par*0-Inf
   if (is.null(upper)) upper <- obj$par*0+Inf
+
+  # lower <- obj$par*0-Inf
+  # upper <- obj$par*0+Inf
+  if (!is.null(b_range) & "rec_logb" %in% names(obj$par)) {
+    lower["rec_logb"] <- log(b_range[1])
+    upper["rec_logb"] <- log(b_range[2])
+    if (params$rec_logb < log(b_range[1]) | params$rec_logb > log(b_range[2])) {
+      stop("Set the initial value of 'rec_logb' within 'b_range'")
+    }
+  }
 
   opt <- nlminb(obj$par, obj$fn, obj$gr, lower=lower, upper=upper)
   if (opt$convergence!=0) warning("May not converge")
@@ -299,7 +326,7 @@ sam <- function(dat,
 
   BioRefPt <- function(data, rep, opt, ref.year, is.SR, obj){
     if (is.null(rep$unbiased)) {
-      NF <- matrix(rep$par.random,nrow=max(data$keyLogFsta)+1 + data$maxAge-data$minAge+1,ncol=data$noYears)
+      NF <- matrix(rep$par.random[names(rep$par.random)=="U"],nrow=max(data$keyLogFsta)+1 + data$maxAge-data$minAge+1,ncol=data$noYears)
       logN <- NF[1:data$nlogN,]
       logF <- NF[(data$nlogN+1):(data$nlogN+data$nlogF),]
       logF <- logF[data$keyLogFsta[1,]+1,]
@@ -453,16 +480,20 @@ sam <- function(dat,
     aic <- 2*opt$objective+2*length(opt$par)
 
     q1 <- exp(as.numeric(rep$par.fixed[names(rep$par.fixed) == "logQ"]))
-    if(!isTRUE(b.est)) b1 <- rep(1,nindex) else {
-      b1 <- exp(obj$env$parList()[["logB"]])
-      # if(is.null(b.fix)) b1 <- exp(as.numeric(rep$par.fixed[names(rep$par.fixed) == "logB"]))
-      # if(!is.null(b.fix)) {
-      #   b1 <- b.fix
-      #   b1[is.na(b1)] <- exp(as.numeric(rep$par.fixed[names(rep$par.fixed) == "logB"]))
-      # }
-      if(!is.null(index.b.key)) {
-        # b1 <- exp(obj$env$parList()[["logB"]])
-        b1 <- b1[index.b.key-min(index.b.key)+1]
+    if (isTRUE(b_random)){
+      b1 <- exp(as.numeric(rep$par.random[names(rep$par.random) == "logB"]))
+    }else{
+      if(!isTRUE(b.est)) b1 <- rep(1,nindex) else {
+        b1 <- exp(obj$env$parList()[["logB"]])
+        # if(is.null(b.fix)) b1 <- exp(as.numeric(rep$par.fixed[names(rep$par.fixed) == "logB"]))
+        # if(!is.null(b.fix)) {
+        #   b1 <- b.fix
+        #   b1[is.na(b1)] <- exp(as.numeric(rep$par.fixed[names(rep$par.fixed) == "logB"]))
+        # }
+        if(!is.null(index.b.key)) {
+          # b1 <- exp(obj$env$parList()[["logB"]])
+          b1 <- b1[index.b.key-min(index.b.key)+1]
+        }
       }
     }
     sigma0 <- exp(as.numeric(rep$par.fixed[names(rep$par.fixed) == "logSdLogObs"]))
