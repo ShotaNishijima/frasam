@@ -9,6 +9,7 @@
 #' @param min.age Indexの最低年齢 (\code{frasyr::vpa()}と同じで最小の年齢を0とする)
 #' @param max.age Indexの最高年齢 (\code{frasyr::vpa()}と同じで最小の年齢を0とする)
 #' @param SR 再生産関係："RW", "BH", "RI", "HS", "Mesnil", or "Const"
+#' @param index.key Indexのsigmaの制約
 #' @export
 
 sam <- function(dat,
@@ -53,7 +54,9 @@ sam <- function(dat,
                 sel.def="max",
                 use.index = NULL,
                 upper = NULL,
-                lower = NULL
+                lower = NULL,
+                index.key = NULL,
+                index.b.key = NULL
                 # retro.years = 0,
 ){
 
@@ -141,7 +144,17 @@ sam <- function(dat,
 
   data$keyLogFsta[1,] <- c(0:(data$maxAge-1-rec.age),(data$maxAge-1-rec.age))
   for (i in 1:nindex) data$keyLogQ[i+1,index.age[i]+1] <- i-1
-  if (b.est) for (i in 1:nindex) data$keyLogB[i+1,index.age[i]+1] <- i-1
+  if (isTRUE(b.est)) {
+    if(is.null(index.b.key)) {
+      for (i in 1:nindex) {
+        data$keyLogB[i+1,index.age[i]+1] <- i-1
+      }
+    }else{
+      for (i in 1:nindex) {
+        data$keyLogB[i+1,index.age[i]+1] <- index.b.key[i]-min(index.b.key)
+      }
+    }
+  }
 
   data$keyVarObs[1,] <- varC
   if (est.method == "ls") {
@@ -149,6 +162,9 @@ sam <- function(dat,
   }
   if (est.method == "ml") {
     for (i in 1:nindex) data$keyVarObs[i+1,index.age[i]+1] <- max(varC)+i
+  }
+  if (!is.null(index.key)) {
+    for (i in 1:nindex) data$keyVarObs[i+1,index.age[i]+1] <- max(varC)+index.key[i]-min(index.key)+1
   }
 
   data$keyVarF[1,] <- varF
@@ -204,11 +220,13 @@ sam <- function(dat,
       }
     }
   }
+  logB_init = sapply(1:nindex, function(i) ifelse(is.na(b.fix[i]), 0, log(b.fix[i])))
+  if(!is.null(index.b.key)) logB_init <- logB_init[unique(index.b.key-min(index.b.key)+1)]
 
   if (is.null(p0.list)){
     params <- list(
       logQ      = if (is.null(q.init)) rep(-5,nindex) else log(q.init),
-      logB      = sapply(1:nindex, function(i) ifelse(is.na(b.fix[i]), 0, log(b.fix[i]))),
+      logB      = logB_init,
       logSdLogFsta = if (is.null(sdFsta.init)) rep(-0.693147,max(data$keyVarF)+1) else log(sdFsta.init),
       logSdLogN    = logSdLogN_init,
       logSdLogObs  = if (is.null(sdLogObs.init)) rep(-0.356675,max(data$keyVarObs)+1) else log(sdLogObs.init),
@@ -436,16 +454,22 @@ sam <- function(dat,
 
     q1 <- exp(as.numeric(rep$par.fixed[names(rep$par.fixed) == "logQ"]))
     if(!isTRUE(b.est)) b1 <- rep(1,nindex) else {
-      if(is.null(b.fix)) b1 <- exp(as.numeric(rep$par.fixed[names(rep$par.fixed) == "logB"]))
-      if(!is.null(b.fix)) {
-        b1 <- b.fix
-        b1[is.na(b1)] <- exp(as.numeric(rep$par.fixed[names(rep$par.fixed) == "logB"]))
+      b1 <- exp(obj$env$parList()[["logB"]])
+      # if(is.null(b.fix)) b1 <- exp(as.numeric(rep$par.fixed[names(rep$par.fixed) == "logB"]))
+      # if(!is.null(b.fix)) {
+      #   b1 <- b.fix
+      #   b1[is.na(b1)] <- exp(as.numeric(rep$par.fixed[names(rep$par.fixed) == "logB"]))
+      # }
+      if(!is.null(index.b.key)) {
+        # b1 <- exp(obj$env$parList()[["logB"]])
+        b1 <- b1[index.b.key-min(index.b.key)+1]
       }
     }
     sigma0 <- exp(as.numeric(rep$par.fixed[names(rep$par.fixed) == "logSdLogObs"]))
     sigma1 <- sigma0[1:(max(data$keyVarObs[1,])+1)]
     sigma1 <- sapply(1:ncol1, function(i) sigma1[data$keyVarObs[1,i]+1])
     sigma2 <- sigma0[(max(data$keyVarObs[1,])+2):length(sigma0)]
+    if(!is.null(index.key)) sigma2 <- sigma2[index.key-min(index.key)+1]
     sigma3 <- exp(as.numeric(par_list[["logSdLogFsta"]]))
     sigma3 <- sapply(1:ncol1, function(i) sigma3[data$keyVarF[1,i]+1])
     sigma4 <- exp(obj$env$parList(opt$par)$logSdLogN)

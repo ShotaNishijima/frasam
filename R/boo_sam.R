@@ -15,7 +15,7 @@ boo_sam <- function(Res,n=100,seed=1,est=TRUE,method="p",use_p0=TRUE){
   #   Res <- do.call(sam, Res$input)
   # }
 
-  if (est) {
+  if (isTRUE(est)) {
     boot.list <- list()
     pred.index <- Res$pred.index
     pred.caa <- Res$caa
@@ -65,10 +65,10 @@ boo_sam <- function(Res,n=100,seed=1,est=TRUE,method="p",use_p0=TRUE){
     boot.list
   } else {
     require(MASS)
-    if (!isTRUE(Res$input$get.random.vcov)) {
-      Res$input$get.random.vcov <- TRUE
-      Res <- do.call(sam, Res$input)
-    }
+    # if (!isTRUE(Res$input$get.random.vcov)) {
+    #   Res$input$get.random.vcov <- TRUE
+    #   Res <- do.call(sam, Res$input)
+    # }
     if(is.null(Res$rep$unbiased)) {
       mu0 <- Res$rep$value
     } else {mu0 <- Res$rep$unbiased$value}
