@@ -77,7 +77,8 @@ Type objective_function<Type>::operator() ()
   DATA_SCALAR(scale);
   DATA_SCALAR(gamma);
   // DATA_VECTOR(fbarRange);
-  DATA_INTEGER(sel_def) // selectivity defenition: devided by maxF(0), meanF(1), maxage(2)
+  DATA_INTEGER(sel_def); // selectivity defenition: devided by maxF(0), meanF(1), maxage(2)
+  DATA_INTEGER(b_random); // if 1, b estimated by random effects
 
   PARAMETER_VECTOR(logQ);
   PARAMETER_VECTOR(logB);
@@ -88,7 +89,8 @@ Type objective_function<Type>::operator() ()
   PARAMETER(rec_logb);
   PARAMETER(logit_rho);
   PARAMETER_ARRAY(U);
-  PARAMETER(trans_phi1); //　#recruitment autocorreltion
+  PARAMETER(trans_phi1); //　#recruitment autocorrelation
+  PARAMETER(logSD_b);
 
   DATA_IVECTOR(iy);
   DATA_INTEGER(nlogF);
@@ -97,6 +99,7 @@ Type objective_function<Type>::operator() ()
   DATA_SCALAR(alpha);
   DATA_VECTOR(Fprocess_weight);
   DATA_SCALAR(F_RW_order); //0: first order, 1: second order
+  DATA_SCALAR(lambda);
 
   array<Type> logF(nlogF,U.cols()); // logF (6 x 50 matrix)
   array<Type> logN(nlogN,U.cols()); // logN (7 x 50 matrix)
@@ -405,12 +408,19 @@ Type objective_function<Type>::operator() ()
       obs(i,3) = exp( rnorm(predObs, sqrt(var)) ) ;
     }
   }
+  
+  if(b_random==1){
+    ans+=-sum(dnorm(logB,0,exp(logSD_b),true));
+    // for(int i=0;i<logB.size();i++){
+    //   ans+=-dnorm(logB(i),0,exp(logSD_b),true);
+    //   }
+    }
 
   for(int i=0;i<timeSteps;i++){
     B_total(i)=0.0;
     F_mean(i)=0.0;
     Catch_biomass(i)=0.0;
-    for(int j=0; j<stateDimN; ++j){
+    for(int j=0; j<stateDimN; j++){
       B_total(i)+=exp(logN(j,i))*stockMeanWeight(i,j);
       F_mean(i)+=exp(logF((keyLogFsta(0,j)),i));
       if (j<(stateDimN-1)) {
@@ -424,6 +434,11 @@ Type objective_function<Type>::operator() ()
     F_mean(i)/=stateDimN;
     Exploitation_rate(i)=Catch_biomass(i)/B_total(i);
   }
+  
+  ans = (Type(1.0)-lambda)*ans;
+  for(int i=0; i<logB.size(); i++){
+    ans += lambda*logB(i)*logB(i);
+    }
 
   SIMULATE {
     REPORT(logF);
