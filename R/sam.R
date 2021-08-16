@@ -8,7 +8,7 @@
 #' @param rec.age 加入年齢 (default: 0)
 #' @param min.age Indexの最低年齢 (\code{frasyr::vpa()}と同じで最小の年齢を0とする)
 #' @param max.age Indexの最高年齢 (\code{frasyr::vpa()}と同じで最小の年齢を0とする)
-#' @param SR 再生産関係："RW", "BH", "RI", "HS" or "Mesnil"
+#' @param SR 再生産関係："RW", "BH", "RI", "HS", "Mesnil", or "Const"
 #' @export
 
 sam <- function(dat,
@@ -159,6 +159,8 @@ sam <- function(dat,
   if (SR == "RW") SR.mode <- 0 #Random walk
   if (SR == "HS") SR.mode <- 3 #Hockey-stick
   if (SR == "Mesnil") SR.mode <- 4 #Hockey-stick
+  if (SR == "Const") SR.mode <- 5 # Constant R0(=a)
+  if (SR == "Prop") SR.mode <- 6
   data$stockRecruitmentModelCode <- matrix(SR.mode)
 
   data$scale <- scale
@@ -192,6 +194,7 @@ sam <- function(dat,
 
   logSdLogN_init = if (is.null(sdLogN.init)) rep(0.356675,max(data$keyVarLogN)+1) else log(sdLogN.init)
 
+  if(SR == "Const") logSdLogN_init[1] <- log(2)
   if (!is.null(varN.fix)) {
     map_logSdLogN = 0:max(data$keyVarLogN)
     for(i in 1:(max(data$keyVarLogN)+1)) {
@@ -209,7 +212,14 @@ sam <- function(dat,
       logSdLogFsta = if (is.null(sdFsta.init)) rep(-0.693147,max(data$keyVarF)+1) else log(sdFsta.init),
       logSdLogN    = logSdLogN_init,
       logSdLogObs  = if (is.null(sdLogObs.init)) rep(-0.356675,max(data$keyVarObs)+1) else log(sdLogObs.init),
-      rec_loga     = if (is.null(a.init)) -4 else log(a.init),
+      rec_loga     = if (is.null(a.init)) { if (SR == "Const") {
+        8
+      } else{
+        -4
+      }
+        } else {
+          log(a.init)
+          },
       rec_logb     = if (is.null(b.init)) {if (SR=="HS" | SR=="Mesnil") 13.5 else -14} else {log(b.init)},
       logit_rho  = if (is.null(rho.init)) 0 else log(rho.init/(1-rho.init)),
       # logScale     = numeric(data$noScaledYears),
@@ -237,6 +247,7 @@ sam <- function(dat,
     map$trans_phi1 <- factor(NA)
   } else {
     if (AR==0) map$trans_phi1 <- factor(NA)
+    if (SR=="Const" | SR=="Prop") map$rec_logb <- factor(NA)
     # if (AR==1) map$phi2 <- factor(NA)
   }
 
@@ -325,6 +336,8 @@ sam <- function(dat,
       # b <- exp(rep$par.fixed[names(rep$par.fixed)=="rec_logb"])
       a <- exp(obj$env$parList()[["rec_loga"]])
       b <- exp(obj$env$parList()[["rec_logb"]])
+      if (SR.mode==5) b <- NA
+      if (SR.mode==6) b <- 0
 
     #
     #   # B0

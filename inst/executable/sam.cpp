@@ -135,8 +135,8 @@ Type objective_function<Type>::operator() ()
 
   for(int i=0; i<stateDimF; ++i){
     for(int j=0; j<stateDimF; ++j){
-      if(i!=j){if(rhoMode==0){fcor(i,j)=0.01;
-      }else{if(rhoMode==1){fcor(i,j)=0.99;
+      if(i!=j){if(rhoMode==0){fcor(i,j)=0.000001;
+      }else{if(rhoMode==1){fcor(i,j)=0.999999;
       }else{
         if(rhoMode==2){fcor(i,j)=1/(1+exp(-logit_rho));
         }else{
@@ -173,13 +173,13 @@ Type objective_function<Type>::operator() ()
 
   for(int i=0;i<timeSteps;i++){ // calc ssb
     ssb(i)=0.0;
-    for(int j=0; j<stateDimN; ++j){ 
+    for(int j=0; j<stateDimN; ++j){
       ssb(i)+=exp(logN(j,i))*exp(-exp(logF((keyLogFsta(0,j)),i))*propF(i,j)-natMor(i,j)*propM(i,j))*propMat(i,j)*stockMeanWeight(i,j);  // ssbを??????
       // ssb(i)+=exp(logN(j,i))*propMat(i,j)*stockMeanWeight(i,j);  // ssbを??????
     }
     logssb(i)=log(ssb(i));  // log(ssb)
   }
-  
+
   array<Type> saa(stateDimN,timeSteps); //selectivity at age
   vector<Type> Sel1(timeSteps);
   vector<Type> FY(stateDimN);
@@ -204,7 +204,7 @@ Type objective_function<Type>::operator() ()
       saa(i,y)=FY(i)/Sel1(y);
     }
   }
-    
+
   vector<Type> predN0(stateDimN);  // logNの予測値
   vector<Type> predN(stateDimN);  // logNの予測値
   vector<Type> recResid(timeSteps); //再生産関係からの残差
@@ -251,7 +251,7 @@ Type objective_function<Type>::operator() ()
             // vector<Type> rec_pred_HS(2);
             // rec_pred_HS(0)=rec_loga+rec_logb;
             // rec_pred_HS(1)=rec_loga+log(ssb(i-minAge));
-            // 
+            //
             // predN0=min(rec_pred_HS);
           } else {
             if(stockRecruitmentModelCode==4){ //Mesnil HS
@@ -259,7 +259,15 @@ Type objective_function<Type>::operator() ()
               predN0(0)*=exp(rec_loga)/Type(2.0);
               predN0(0)=log(predN0(0));
             }else{
-              error("SR model code not recognized");
+              if(stockRecruitmentModelCode==5){ //Constant R0
+                predN0(0)=rec_loga;
+              }else{
+                if(stockRecruitmentModelCode==6){ //Proportional to SSB (no density-dependence)
+                  predN0(0)=rec_loga+log(ssb(i-minAge));
+                }else{
+                  error("SR model code not recognized");
+                }
+              }
               }
           }
         }
