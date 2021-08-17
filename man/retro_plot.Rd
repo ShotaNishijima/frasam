@@ -17,8 +17,6 @@ retro_plot(
 }
 \arguments{
 \item{res}{フルデータを使った解析結果 (vpa or sam)}
-
-\item{retro_res}{}
 }
 \description{
 レトロスペクティブ解析の結果をプロットする
