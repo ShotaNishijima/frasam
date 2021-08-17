@@ -59,7 +59,8 @@ sam <- function(dat,
                 index.b.key = NULL,
                 b_random = FALSE,
                 b_range = NULL,
-                lambda = 0
+                lambda = 0,
+                FreeADFun = FALSE
                 # retro.years = 0,
 ){
 
@@ -82,6 +83,13 @@ sam <- function(dat,
     abund <- abund[use.index]
     if (isTRUE(b.est)) {
       b.fix <- b.fix[use.index]
+    }
+  }
+
+  for(i in 1:length(abund)) {
+    if (abund[i]=="SSB") {
+      index.age[i] <- rec.age
+      max.age[i] <- rec.age + nrow(waa)-1
     }
   }
 
@@ -294,10 +302,15 @@ sam <- function(dat,
     }
   }
 
+  # stop("Tentative Stop!!")
+
   if(isTRUE(b_random)) {
     obj <- TMB::MakeADFun(data, params, map = map, random=c("U","logB"), DLL=cpp.file.name,silent=silent)
   }else{
     obj <- TMB::MakeADFun(data, params, map = map, random=c("U"), DLL=cpp.file.name,silent=silent)
+  }
+  if(isTRUE(FreeADFun)) {
+    TMB::FreeADFun(obj)
   }
 
   if (is.null(lower)) lower <- obj$par*0-Inf
