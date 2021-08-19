@@ -10,7 +10,8 @@ retro_sam(
   stat = "mean",
   b.fix = TRUE,
   remove_short_index = TRUE,
-  map_add = NULL
+  map_add = NULL,
+  p0_retro_list = NULL
 )
 }
 \description{

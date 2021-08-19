@@ -7,20 +7,21 @@
 #'
 #' @export
 
-retro_sam <- function(res, n=5, stat="mean", b.fix=TRUE,remove_short_index=TRUE, map_add = NULL){
+retro_sam <- function(res, n=5, stat="mean", b.fix=TRUE,remove_short_index=TRUE, map_add = NULL, p0_retro_list = NULL){
   res.c <- res
   res.c$input$bias.correct.sd = FALSE
   Res <- list()
   obj.n <- obj.b <- obj.s <- obj.r <- obj.f <- NULL
   obj.n2 <- obj.b2 <- obj.s2 <- obj.r2 <- obj.f2 <- NULL
   max.a <- nrow(res$naa)
-  
+
   if ("rec_logb" %in% names(map_add)) {
     res.c$input$b.init <- as.numeric(res$rec.par["b"])
   }
 
   if (isTRUE(b.fix)){
-    res.c$input$b.fix <- res$b
+    # res.c$input$b.fix <- res$b
+    res.c$input$b.fix <- exp(res$obj$env$parList()[["logB"]])
     # res.c$input$b.est <- FALSE
   }
 
@@ -34,39 +35,67 @@ retro_sam <- function(res, n=5, stat="mean", b.fix=TRUE,remove_short_index=TRUE,
       }
     }
     res.c$input$dat$index <- res.c$input$dat$index[,-nc,drop=FALSE]
-    
+
     res.c$input$dat$catch.prop <- res.c$input$dat$catch.prop[,-nc]
 
     if (res$input$last.catch.zero){
       res.c$input$dat$caa[,ncol(res.c$input$dat$caa)] <- 0
     }
-    
+
     res.c$input$p0.list <- res.c$par_list
     # res.c$input$retro.years <- i
     if (isTRUE(remove_short_index)) {
       index_n = apply(res.c$input$dat$index,1,function(x) length(x)-sum(is.na(x)))
       use.index = 1:nrow(res.c$input$dat$index)
       if (is.null(res.c$input$use.index)) {
-        use.index = use.index[index_n > 2] 
+        use.index = use.index[index_n > 2]
       } else {
         use.index = intersect(res.c$input$use.index,use.index[index_n > 2])
       }
       res.c$input$use.index <- use.index
+      if (!is.null(res.c$input$index.key)) {
+        res.c$input$index.key <- res.c$input$index.key[use.index]-min(res.c$input$index.key[use.index])+1
+      }
+      if (!is.null(res.c$input$index.b.key)) {
+        res.c$input$index.b.key <- res.c$input$index.b.key[use.index]-min(res.c$input$index.b.key[use.index])
+      }
+      res.c$input$b.fix <- res.c$input$b.fix[unique(res.c$input$index.b.key)+1]
     }
-    
+
     if (!is.null(map_add)) res.c$input$map.add <- map_add
 
     # res1 <- do.call(sam,res.c$input)
-    res1 <- try(do.call(sam,res.c$input),silent=TRUE)
+    if (is.null(p0_retro_list)) {
+      res1 <- try(do.call(sam,res.c$input),silent=TRUE)
+    } else {
+      res.c$input$p0.list <- p0_retro_list[[i]]
+      res1 <- try(do.call(sam,res.c$input),silent=TRUE)
+    }
+
+    if (class(res1) == "try-error") {
+      res.c$input$p0.list <- res.c$par_list
+      res.c$input$p0.list[["logQ"]] <- res.c$par_list[["logQ"]][use.index]
+      res.c$input$p0.list[["logB"]] <- res.c$par_list[["logB"]][use.index]
+      # res.c$input$b.fix %>% log
+      res.c$input$p0.list[["logSdLogObs"]] <- c(unique(log(res.c$sigma.logC)),unique(log(res.c$sigma)[use.index]))
+      res1 <- try(do.call(sam,res.c$input),silent=TRUE)
+    }
     if (class(res1) == "try-error") {
       if (i>1) {
         res.c$input$p0.list <- res2$par_list
+        res.c$input$p0.list[["logQ"]] <- res2$par_list[["logQ"]][use.index]
+        res.c$input$p0.list[["logB"]] <- res2$par_list[["logB"]][use.index]
+        # res.c$input$b.fix %>% log
+        res.c$input$p0.list[["logSdLogObs"]] <- c(unique(log(res2$sigma.logC)),unique(log(res2$sigma)[use.index]))
         res1 <- try(do.call(sam,res.c$input),silent=TRUE)
       }
     }
     if (class(res1) == "try-error") {
       res.c$input$p0.list <- NULL
-      res1 <- do.call(sam,res.c$input)
+      res1 <- try(do.call(sam,res.c$input))
+      if (class(res1) == "try-error") {
+        stop(paste0("Error at trial #",i))
+      }
     }
 
     Res[[i]] <- res1
