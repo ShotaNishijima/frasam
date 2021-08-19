@@ -46,7 +46,12 @@ sam(
   sel.def = "max",
   use.index = NULL,
   upper = NULL,
-  lower = NULL
+  lower = NULL,
+  index.key = NULL,
+  index.b.key = NULL,
+  b_random = FALSE,
+  b_range = NULL,
+  lambda = 0
 )
 }
 \arguments{
@@ -59,6 +64,8 @@ sam(
 \item{max.age}{Indexの最高年齢 (\code{frasyr::vpa()}と同じで最小の年齢を0とする)}
 
 \item{SR}{再生産関係："RW", "BH", "RI", "HS", "Mesnil", or "Const"}
+
+\item{index.key}{Indexのsigmaの制約}
 }
 \description{
 SAMによる資源計算を実施する

@@ -69,6 +69,14 @@ sam <- function(dat,
 
   index.age <- min.age
 
+  if(isTRUE(b.est)){
+    if (!is.null(index.b.key)) {
+      if (length(unique(index.b.key)) != length(b.fix)){
+        stop("'length(unique(index.b.key)) == length(b.fix)' must be satisfied")
+      }
+    }
+  }
+
   caa <- dat$caa
   if (last.catch.zero) caa[ncol(caa)] <- NULL
 
