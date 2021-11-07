@@ -66,7 +66,7 @@ get_predSR <- function(samres,max.ssb.pred=1.3){
 plot_samvpa <- function(vpa_sam_list,CI=0.95,scenario_name=NULL,
                      alpha=0.4,size=1,base_size=16,log_scale=FALSE,
                      legend_name="Scenario",legend_nrow=1, legend_position="top",
-                     what.plot = c("biomass","SSB","Recruitment","U")
+                     what.plot = c("biomass","SSB","Recruitment","U"),years = NULL
 ){
 
   g0 = frasyr::plot_vpa(vpa_sam_list)
@@ -96,12 +96,13 @@ plot_samvpa <- function(vpa_sam_list,CI=0.95,scenario_name=NULL,
     # mutate(model = if_else(id=="1","VPA","SAM")) %>%
     mutate(stat_f = factor(stat2,levels=what.plot_f,labels=what.plot_f))
   # data2$stat_f %>% unique()
+  # nrow(data2)
   if (!is.null(scenario_name)) {
-    data2 = data2 %>% mutate(model = scenario_name[as.numeric(data2$id)])
+    data2 = data2 %>% mutate(model = scenario_name[sapply(1:nrow(data2), function(i) which(data2$id[i]==unique(data2$id)))])
   } else{
-    scenario_name = as.character(1:length(vpa_sam_list))
+    scenario_name = unique(as.character(data2$id))
     # data2 = data2 %>% mutate(model = id)
-    data2 = data2 %>% mutate(model = scenario_name[as.numeric(data2$id)])
+    data2 = data2 %>% mutate(model = scenario_name[sapply(1:nrow(data2), function(i) which(data2$id[i]==unique(data2$id)))])
   }
 
   CVdata_all = tibble()
@@ -176,6 +177,8 @@ plot_samvpa <- function(vpa_sam_list,CI=0.95,scenario_name=NULL,
     arrange(model,stat_f,Year) %>%
     mutate(Model = factor(model,levels=scenario_name))
 
+  if (!is.null(years)) data3 = data3 %>% dplyr::filter(Year %in% years)
+
   if (CI==0) {
     g1 = ggplot(data=data3,aes(x=Year,y=value))
   }else{
@@ -220,8 +223,16 @@ retro_plot = function(res,retro_res,start_year=NULL,scale=1000, forecast=FALSE,
   }
 
   res_tibble = convert_sam_tibble(res) %>% mutate(id = 0)
+  maxyear = res_tibble$year %>% max
+  if (class(res)=="vpa" & isTRUE(res$input$last.catch.zero)) res_tibble = res_tibble %>% dplyr::filter(year<maxyear)
+
   for (i in 1:length(retro_res$Res)) {
-    res_tibble <- full_join(res_tibble, convert_sam_tibble(retro_res$Res[[i]]) %>% mutate(id = i))
+    if (class(res)=="vpa" & isTRUE(res$input$last.catch.zero)) {
+      res_tibble <- full_join(res_tibble, convert_sam_tibble(retro_res$Res[[i]]) %>%
+                                mutate(id = i) %>% dplyr::filter(year<maxyear-i))
+    } else {
+      res_tibble <- full_join(res_tibble, convert_sam_tibble(retro_res$Res[[i]]) %>% mutate(id = i))
+    }
   }
 
   res_tibble -> data
