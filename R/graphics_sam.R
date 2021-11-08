@@ -169,6 +169,7 @@ plot_samvpa <- function(vpa_sam_list,CI=0.95,scenario_name=NULL,
     dplyr::select(-stat)
 
   CVdata_all = CVdata_all %>% dplyr::select(-stat)
+  # CVdata_all
 
   data3 = full_join(data2,CVdata_all) %>%
     mutate(stat_f = factor(stat_f,levels=stat_order)) %>%
