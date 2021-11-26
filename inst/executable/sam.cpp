@@ -416,7 +416,7 @@ Type objective_function<Type>::operator() ()
       obs(i,3) = exp( rnorm(predObs, sqrt(var)) ) ;
     }
   }
-  
+
   if(b_random==1){
     ans+=-sum(dnorm(logB,0,exp(logSD_b),true));
     // for(int i=0;i<logB.size();i++){
@@ -442,7 +442,7 @@ Type objective_function<Type>::operator() ()
     F_mean(i)/=stateDimN;
     Exploitation_rate(i)=Catch_biomass(i)/B_total(i);
   }
-  
+
   ans = (Type(1.0)-lambda)*ans;
   for(int i=0; i<logB.size(); i++){
     ans += lambda*logB(i)*logB(i);
