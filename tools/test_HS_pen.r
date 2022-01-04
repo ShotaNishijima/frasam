@@ -50,3 +50,20 @@ cbind(opt$par,opt2$par,opt3$par)
 
 sqrt(opt$objective/50)
 res$pars
+
+
+# obj4 = MakeADFun(data=list(SSB=SSB,R=R),parameters=list(a=0.1,b=1000),random=c("b"))
+# obj4 = MakeADFun(data=list(SSB=SSB,R=R),parameters=list(a=0.1,b=500),random=c("b"))
+obj4 = MakeADFun(data=list(SSB=SSB,R=R),parameters=list(a=0.1,b=50),random=c("b"))
+opt4 = nlminb(obj4$par,obj4$fn,obj4$gr)
+opt4
+obj4$env$parList()["b"]
+opt$par
+
+
+obj5 = MakeADFun(data=list(SSB=SSB,R=R),parameters=list(a=0.1,b=500),random=c("a"))
+opt5 = nlminb(obj5$par,obj5$fn,obj5$gr)
+opt5
+obj5$env$parList()[c("a","b")]
+opt$par
+
