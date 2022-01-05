@@ -11,8 +11,11 @@ library(TMB)
 use_sam_tmb("HS_pen",overwrite=TRUE)
 
 set.seed(123)
+# set.seed(1)
+
 SSB = runif(50,100,1000)
-R = exp(rnorm(50,log(SSB*0.1),0.5))
+# R = exp(rnorm(50,log(SSB*0.1),0.5))
+R = exp(rnorm(50,log(pmin(SSB*0.1,500*0.1)),0.5))
 
 plot(R~SSB)
 
@@ -39,7 +42,7 @@ opt2$par
 # (opt2$par["b"]-max(SSB))^2
 opt$par
 c(opt$objective,opt2$objective)
-
+res$pars
 
 obj3 = MakeADFun(data=list(SSB=SSB,R=R),parameters=list(a=0.1,b=50),random=NULL)
 opt3 = nlminb(obj3$par,obj3$fn,obj3$gr)
