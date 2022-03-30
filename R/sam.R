@@ -296,7 +296,7 @@ sam <- function(dat,
   if(!is.null(varN.fix)) map$logSdLogN <- factor(map_logSdLogN)
 
   if (!is.null(map.add)) {
-    tmp = messir::make_named_list(map.add)
+    tmp = make_named_list(map.add)
     for(i in 1:length(tmp$map.add)) {
       map[[names(tmp$map.add)[i]]] <- map.add[[i]]
     }
