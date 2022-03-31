@@ -52,7 +52,9 @@ sam(
   b_random = FALSE,
   b_range = NULL,
   lambda = 0,
-  FreeADFun = FALSE
+  FreeADFun = FALSE,
+  add_random = NULL,
+  lambda_Mesnil = 0
 )
 }
 \arguments{
