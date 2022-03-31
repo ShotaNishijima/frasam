@@ -100,6 +100,7 @@ Type objective_function<Type>::operator() ()
   DATA_VECTOR(Fprocess_weight);
   DATA_SCALAR(F_RW_order); //0: first order, 1: second order
   DATA_SCALAR(lambda);
+  DATA_SCALAR(lambda_Mesnil);
 
   array<Type> logF(nlogF,U.cols()); // logF (6 x 50 matrix)
   array<Type> logN(nlogN,U.cols()); // logN (7 x 50 matrix)
@@ -447,6 +448,31 @@ Type objective_function<Type>::operator() ()
   for(int i=0; i<logB.size(); i++){
     ans += lambda*logB(i)*logB(i);
     }
+
+  // Penalty for HS
+  if(stockRecruitmentModelCode == 3){
+    vector <Type> ssb_vector = ssb.rowwise().sum() ;
+    Type maxSSB = max(ssb_vector) ;
+    Type minSSB = min(ssb_vector) ;
+    Type pen = 0 ;
+    pen += CppAD::CondExpLt(exp(rec_logb), maxSSB, Type(0.0), square(rec_logb-log(maxSSB))) ;
+    pen += CppAD::CondExpLt(minSSB, exp(rec_logb), Type(0.0), square(log(minSSB)-rec_logb)) ;
+    pen *= lambda_Mesnil ;
+    ans += pen ;
+  }
+
+  // Penalty for Mesnil
+  if(stockRecruitmentModelCode == 4){
+    vector <Type> ssb_vector = ssb.rowwise().sum() ;
+    Type maxSSB = max(ssb_vector) ;
+    Type minSSB = min(ssb_vector) ;
+    Type pen = 0 ;
+    pen += CppAD::CondExpLt(exp(rec_logb), maxSSB, Type(0.0), square(rec_logb-log(maxSSB))) ;
+    pen += CppAD::CondExpLt(minSSB, exp(rec_logb), Type(0.0), square(log(minSSB)-rec_logb)) ;
+    pen *= lambda_Mesnil ;
+    ans += pen ;
+  }
+
 
   SIMULATE {
     REPORT(logF);
