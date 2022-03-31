@@ -60,7 +60,8 @@ sam <- function(dat,
                 b_random = FALSE,
                 b_range = NULL,
                 lambda = 0,
-                FreeADFun = FALSE
+                FreeADFun = FALSE,
+                add_random = NULL
                 # retro.years = 0,
 ){
 
@@ -311,12 +312,20 @@ sam <- function(dat,
   }
 
   # stop("Tentative Stop!!")
+  random = c("U")
 
   if(isTRUE(b_random)) {
-    obj <- TMB::MakeADFun(data, params, map = map, random=c("U","logB"), DLL=cpp.file.name,silent=silent)
-  }else{
-    obj <- TMB::MakeADFun(data, params, map = map, random=c("U"), DLL=cpp.file.name,silent=silent)
+    random = c(random,"logB")
+    # obj <- TMB::MakeADFun(data, params, map = map, random=c("U","logB"), DLL=cpp.file.name,silent=silent)
   }
+  if(!is.null(add_random)) {
+    random = c(random,add_random)
+  }
+
+    # obj <- TMB::MakeADFun(data, params, map = map, random=c("U"), DLL=cpp.file.name,silent=silent)
+    obj <- TMB::MakeADFun(data, params, map = map, random=random, DLL=cpp.file.name,silent=silent)
+
+
   if(isTRUE(FreeADFun)) {
     TMB::FreeADFun(obj)
   }
