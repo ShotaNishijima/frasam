@@ -2,6 +2,8 @@
 
 export(caa_plot)
 export(convert_sam_tibble)
+export(est_fixed)
+export(est_mixed)
 export(get_predSR)
 export(index_plot)
 export(make_named_list)

@@ -59,3 +59,42 @@ samprofile <- function(samres,param_name,which_param=1,param_range=NULL,length=5
 
   return (list(obj_tbl=obj_tbl,par_tbl=par_tbl,obj_list=obj,opt_list=opt))
 }
+
+
+#' SAMの固定効果だけを推定する関数
+#'
+#' @param tmbdata tmbdata
+#' @param par_init パラメータの初期値
+#' @param map 推定しない（初期値で固定する）パラメータ
+#' @param random ランダム効果で推定するパラメータ
+#' @param cpp.file.name cppファイルの名前（初期設定："sam"）
+#'
+#' @encoding UTF-8
+#'
+#' @export
+
+est_fixed <- function(tmbdata,par_init,map,random="U",cpp.file.name="sam",silent=TRUE) {
+
+  obj_tmp = TMB::MakeADFun(tmbdata,par_init,map=map,random=random,DLL=cpp.file.name,silent=silent)
+  opt_tmp = nlminb(obj_tmp$par, obj_tmp$fn, obj_tmp$gr)
+
+
+  return(list(obj=obj_tmp,opt=opt_tmp))
+}
+
+#' TMB::MakeADFunに必要な引数から固定効果とランダム効果を推定する関数
+#'
+#' @inheritParams est_fixed
+#' @param bias_correct 平均値のバイアス補正をするかどうか
+#'
+#' @encoding UTF-8
+#'
+#' @export
+
+est_mixed <- function(tmbdata,par_init,map,random="U",cpp.file.name="sam",silent=TRUE,bias_correct=TRUE) {
+
+  tmp = est_fixed(tmbdata,par_init,map=map,random=random,cpp.file.name=cpp.file.name,silent=silent)
+  rep = TMB::sdreport(tmp$obj)
+
+  return(list(obj=tmp$obj,opt=tmp$opt,rep=rep))
+}
