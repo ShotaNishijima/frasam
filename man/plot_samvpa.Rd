@@ -16,7 +16,8 @@ plot_samvpa(
   legend_name = "Scenario",
   legend_nrow = 1,
   legend_position = "top",
-  what.plot = c("biomass", "SSB", "Recruitment", "U")
+  what.plot = c("biomass", "SSB", "Recruitment", "U"),
+  years = NULL
 )
 }
 \arguments{
