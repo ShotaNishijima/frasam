@@ -9,7 +9,7 @@ retro_sam(
   n = 5,
   stat = "mean",
   b.fix = TRUE,
-  remove_short_index = TRUE,
+  remove_short_index = -1,
   map_add = NULL,
   p0_retro_list = NULL
 )

@@ -7,7 +7,7 @@
 #'
 #' @export
 
-retro_sam <- function(res, n=5, stat="mean", b.fix=TRUE,remove_short_index=TRUE, map_add = NULL, p0_retro_list = NULL){
+retro_sam <- function(res, n=5, stat="mean", b.fix=TRUE,remove_short_index=-1, map_add = NULL, p0_retro_list = NULL){
   res.c <- res
   res.c$input$bias.correct.sd = FALSE
   Res <- list()
@@ -44,13 +44,13 @@ retro_sam <- function(res, n=5, stat="mean", b.fix=TRUE,remove_short_index=TRUE,
 
     res.c$input$p0.list <- res.c$par_list
     # res.c$input$retro.years <- i
-    if (isTRUE(remove_short_index)) {
+    if (remove_short_index>0) {
       index_n = apply(res.c$input$dat$index,1,function(x) length(x)-sum(is.na(x)))
       use.index = 1:nrow(res.c$input$dat$index)
       if (is.null(res.c$input$use.index)) {
-        use.index = use.index[index_n > 2]
+        use.index = use.index[index_n > remove_short_index]
       } else {
-        use.index = intersect(res.c$input$use.index,use.index[index_n > 2])
+        use.index = intersect(res.c$input$use.index,use.index[index_n > remove_short_index])
       }
       res.c$input$use.index <- use.index
       if (!is.null(res.c$input$index.key)) {
@@ -60,6 +60,12 @@ retro_sam <- function(res, n=5, stat="mean", b.fix=TRUE,remove_short_index=TRUE,
         res.c$input$index.b.key <- res.c$input$index.b.key[use.index]-min(res.c$input$index.b.key[use.index])
       }
       res.c$input$b.fix <- res.c$input$b.fix[unique(res.c$input$index.b.key)+1]
+      if (!is.null(res.c$input$p0.list)) {
+        res.c$input$p0.list$logB <- res.c$input$p0.list$logB[unique(res.c$input$index.b.key)+1]
+      }
+      res.c$input$p0.list$logSdLogObs <- c(res.c$input$p0.list$logSdLogObs[unique(res.c$input$varC)+1],
+                                           res.c$input$p0.list$logSdLogObs[max(unique(res.c$input$varC))+1+unique(res.c$input$index.key)])
+
     }
 
     if (!is.null(map_add)) res.c$input$map.add <- map_add
