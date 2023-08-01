@@ -106,7 +106,7 @@ retro_sam <- function(res, n=5, stat="mean", b.fix=TRUE,remove_short_index=-1, m
 
     Res[[i]] <- res1
     res2 <- res1
-    Y <- nc-1
+    if (res$input$last.catch.zero) Y <- nc-2 else Y <- nc-1
 
     obj.n <- c(obj.n, (sum(res1$naa[,Y])-sum(res$naa[,Y]))/sum(res$naa[,Y]))
     obj.b <- c(obj.b, (sum(res1$baa[,Y])-sum(res$baa[,Y]))/sum(res$baa[,Y]))
