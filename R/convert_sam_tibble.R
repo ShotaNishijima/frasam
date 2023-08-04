@@ -57,7 +57,8 @@ convert_sam_tibble <- function(samres) {
                          FAA,
                          convert_df(samres$input$dat$waa,"weight"),
                          convert_df(samres$input$dat$maa,"maturity"),
-                         convert_df(samres$input$dat$caa,"catch_number"),
+                         # convert_df(samres$input$dat$caa,"catch_number"),
+                         convert_df(samres$caa,"catch_number"),
                          convert_df(samres$input$dat$M,  "natural_mortality"),
                          Recruitment,
                          Fratio) %>%

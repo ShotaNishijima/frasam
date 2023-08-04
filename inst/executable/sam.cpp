@@ -306,6 +306,7 @@ Type objective_function<Type>::operator() ()
   int f, ft, a, y, amax;
   int minYear=CppAD::Integer((obs(0,0)));
   Type predObs=0, zz, var;
+  vector<Type> pred_log(nobs); //
   for(int i=0;i<nobs;i++){
     y=CppAD::Integer(obs(i,0))-minYear;   // 年のラベル
     f=CppAD::Integer(obs(i,1));    //  fleetのラベル
@@ -340,7 +341,9 @@ Type objective_function<Type>::operator() ()
         if(ft==2){// survey (biomass)
           predObs=0.0;
           for(int j=a; j<amax+1; ++j){
-            predObs=+exp(logN(j,y))*stockMeanWeight(iy(i),j);
+          // for(int j=0; j<stateDimN; ++j){
+            // predObs=+exp(logN(j,y))*stockMeanWeight(iy(i),j);
+            predObs+=exp(logN(j,y))*stockMeanWeight(iy(i),j); //
             }
           predObs=log(predObs)-log(scale);
           // predObs=logN(a,y)+log(stockMeanWeight(iy(i),a));
@@ -352,8 +355,9 @@ Type objective_function<Type>::operator() ()
           }
         }else{
           if(ft==3){// SSB survey
+            predObs=0.0;
             for(int j=0; j<stateDimN; ++j){
-              predObs+=exp(logN(a+j,y))*propMat2(iy(i),j)*stockMeanWeight(iy(i),j); //
+              predObs+=exp(logN(j,y))*propMat2(iy(i),j)*stockMeanWeight(iy(i),j); //
             }
             predObs=log(predObs)-log(scale);
             if(CppAD::Integer(keyLogB(f-1,a))>(-1)){
@@ -392,7 +396,8 @@ Type objective_function<Type>::operator() ()
                 if (ft==6){ // Biomass X selectivity
                   predObs=0.0;
                   for(int j=a; j<amax+1; ++j){
-                    predObs=+exp(logN(j,y))*stockMeanWeight(iy(i),j)*saa(j,y);
+                    // predObs=+exp(logN(j,y))*stockMeanWeight(iy(i),j)*saa(j,y);
+                    predObs+=exp(logN(j,y))*stockMeanWeight(iy(i),j)*saa(j,y); //
                   }
                   predObs=log(predObs)-log(scale);
                   // predObs=logN(a,y)+log(stockMeanWeight(iy(i),a));
@@ -413,6 +418,7 @@ Type objective_function<Type>::operator() ()
     }
     var=varLogObs(CppAD::Integer(keyVarObs(f-1,a)));
     ans+=-dnorm(log(obs(i,3)),predObs,sqrt(var),true);
+    pred_log(i) = predObs;
     SIMULATE {
       obs(i,3) = exp( rnorm(predObs, sqrt(var)) ) ;
     }
@@ -489,6 +495,13 @@ Type objective_function<Type>::operator() ()
   ADREPORT(phi1);
   ADREPORT(Catch_biomass);
   ADREPORT(Exploitation_rate);
+
+  REPORT(logF);
+  REPORT(logN);
+  REPORT(pred_log);
+  REPORT(saa); //selectivity at age
+  REPORT(Sel1);
+  // REPORT(FY);
 
   return ans;
 }
