@@ -528,7 +528,8 @@ sam <- function(dat,
         }
       }
     }
-    sigma0 <- exp(as.numeric(rep$par.fixed[names(rep$par.fixed) == "logSdLogObs"]))
+    # sigma0 <- exp(as.numeric(rep$par.fixed[names(rep$par.fixed) == "logSdLogObs"]))
+    sigma0 <- exp(as.numeric(par_list[["logSdLogObs"]]))
     sigma1 <- sigma0[1:(max(data$keyVarObs[1,])+1)]
     sigma1 <- sapply(1:ncol1, function(i) sigma1[data$keyVarObs[1,i]+1])
     sigma2 <- sigma0[(max(data$keyVarObs[1,])+2):length(sigma0)]

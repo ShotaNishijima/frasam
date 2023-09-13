@@ -290,6 +290,7 @@ index_plot = function(samvpa_list,model_name=NULL, fleet_no = NULL,
     nmodel = 1
     dat = samvpa_list$input$dat
     samvpa_list[[1]] <- samvpa_list
+    dat_index = samvpa_list[[1]]$input$dat$index
   }
   if(is.null(model_name)) model_name = as.character(1:nmodel)
   index_obs = as_tibble(dat_index) %>%
