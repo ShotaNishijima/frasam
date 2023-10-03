@@ -345,8 +345,8 @@ sam <- function(dat,
     }
   }
 
-  opt <- nlminb(obj$par, obj$fn, obj$gr, lower=lower, upper=upper)
-  if (opt$convergence!=0) warning("May not converge")
+    opt <- nlminb(obj$par, obj$fn, obj$gr, lower=lower, upper=upper)
+    if (opt$convergence!=0) warning("May not converge")
   rep <- TMB::sdreport(obj,bias.correct = bias.correct,bias.correct.control = list(sd=bias.correct.sd), getReportCovariance=get.random.vcov)
   if (max(rep$gradient.fixed)>1e-2) warning("Large maximum gradient component")
 
