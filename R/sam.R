@@ -62,7 +62,9 @@ sam <- function(dat,
                 lambda = 0,
                 FreeADFun = FALSE,
                 add_random = NULL,
-                lambda_Mesnil = 0
+                lambda_Mesnil = 0,
+                tmbdata = NULL,
+                map = NULL
                 # retro.years = 0,
 ){
 
@@ -72,164 +74,172 @@ sam <- function(dat,
 
   index.age <- min.age
 
-  if(isTRUE(b.est)){
-    if (!is.null(index.b.key)) {
-      if (length(unique(index.b.key)) != length(b.fix)){
-        stop("'length(unique(index.b.key)) == length(b.fix)' must be satisfied")
+  if (is.null(tmbdata)) {
+    if(isTRUE(b.est)){
+      if (!is.null(index.b.key)) {
+        if (length(unique(index.b.key)) != length(b.fix)){
+          stop("'length(unique(index.b.key)) == length(b.fix)' must be satisfied")
+        }
       }
     }
-  }
 
-  caa <- dat$caa
-  if (last.catch.zero) caa[ncol(caa)] <- NULL
+    caa <- dat$caa
+    if (last.catch.zero) caa[ncol(caa)] <- NULL
 
-  maa <- dat$maa
-  waa <- dat$waa
-  M <- dat$M
-  index <- dat$index
+    maa <- dat$maa
+    waa <- dat$waa
+    M <- dat$M
+    index <- dat$index
 
-  if (!is.null(use.index)) {
-    index <- index[use.index,]
-    abund <- abund[use.index]
+    if (!is.null(use.index)) {
+      index <- index[use.index,]
+      abund <- abund[use.index]
+      if (isTRUE(b.est)) {
+        b.fix <- b.fix[use.index]
+      }
+    }
+
+    for(i in 1:length(abund)) {
+      if (abund[i]=="SSB") {
+        index.age[i] <- rec.age
+        max.age[i] <- rec.age + nrow(waa)-1
+      }
+    }
+
+    obs <- cbind(expand.grid(as.numeric(rownames(caa)),as.numeric(colnames(caa))),1,unlist(caa))[,c(2,3,1,4)]
+    obs <- cbind(obs,obs[,3])
+
+    nindex <- nrow(index)
+    for (i in 1:nindex){
+      index1 <- index[i,]
+      index2 <- cbind(i+1,as.numeric(names(index1)[!is.na(index1)]),index.age[i],c(index1[!is.na(index1)]),max.age[i])[,c(2,1,3,4,5)]
+      obs <- rbind(as.matrix(obs), index2)
+    }
+
+    colnames(obs) <- c("year","fleet","age","obs","maxage")
+    rownames(obs) <- NULL
+
+    obs <- as.matrix(obs)
+    obs[,"age"] <- obs[,"age"]+rec.age
+    obs[,"maxage"] <- obs[,"maxage"]+rec.age
+
+    if (tmb.run) {
+      library(TMB)
+      compile(paste(cpp.file.name, ".cpp", sep = ""))
+      dyn.load(dynlib(cpp.file.name))
+    }
+
+    data <- list()
+
+    data$obs <- obs
+    data$noFleets <- max(obs[,2])
+    data$fleetTypes <- data$sampleTimes <- numeric(nindex+1)
+    for (i in 1:nindex) {
+      if (is.null(abund[i])) data$fleetTypes[i+1] <- data$freetTypes[i]
+      if (abund[i] == "B") data$fleetTypes[i+1] <- 2
+      if (abund[i] == "SSB") data$fleetTypes[i+1] <- 3
+      if (abund[i] == "N") data$fleetTypes[i+1] <- 4
+      if (abund[i] == "Bs") data$fleetTypes[i+1] <- 6
+      if (!(abund[i] %in% c("B","SSB","N","Bs"))) {
+        stop("abund code not recognized")
+      }
+    }
+
+    data$noYears <- ncol(waa)
+    data$years <- as.numeric(colnames(waa))
+    # if (retro.years>0) {
+    #   for(i in 1:retro.years) data$years <- c(data$years,max(data$years)+1)
+    # }
+    data$iy <- data$obs[,1]-min(data$years) #year since the first year
+    data$nobs <- nrow(data$obs)
+    # colnames(maa) <- colnames(waa) <- colnames(M) <- range(data$obs[,1])[1]:((range(data$obs[,1])[2])+retro.years)
+    data$propMat <- data$propMat2 <- as.matrix(t(maa))
+    data$stockMeanWeight <- data$catchMeanWeight <- as.matrix(t(waa))
+    data$natMor <- as.matrix(t(M))
+    data$minAge <- as.matrix(rec.age)
+    data$maxAge <- as.matrix(rec.age+nrow(caa)-1) #cppファイルには使わないデータ
+    data$maxAgePlusGroup <- ifelse(isTRUE(plus.group), 1, 0)
+    data$rhoMode <- rho.mode
+    ncol1 <- as.numeric(data$maxAge-data$minAge+1)
+    data$landFrac <- data$disMeanWeight <- data$landMeanWeight <- data$propF <- data$propM <- matrix(0, nrow=data$noYears, ncol=ncol1)
+
+    basemat <- matrix(-1, ncol = ncol1, nrow = max(data$obs[,2]))
+    data$keyLogFsta <- data$keyLogQ <- data$keyLogB <- data$keyVarObs <- data$keyVarF <- data$keyVarLogN <- basemat
+
+    data$keyLogFsta[1,] <- c(0:(data$maxAge-1-rec.age),(data$maxAge-1-rec.age))
+    for (i in 1:nindex) data$keyLogQ[i+1,index.age[i]+1] <- i-1
     if (isTRUE(b.est)) {
-      b.fix <- b.fix[use.index]
-    }
-  }
-
-  for(i in 1:length(abund)) {
-    if (abund[i]=="SSB") {
-      index.age[i] <- rec.age
-      max.age[i] <- rec.age + nrow(waa)-1
-    }
-  }
-
-  obs <- cbind(expand.grid(as.numeric(rownames(caa)),as.numeric(colnames(caa))),1,unlist(caa))[,c(2,3,1,4)]
-  obs <- cbind(obs,obs[,3])
-
-  nindex <- nrow(index)
-  for (i in 1:nindex){
-    index1 <- index[i,]
-    index2 <- cbind(i+1,as.numeric(names(index1)[!is.na(index1)]),index.age[i],c(index1[!is.na(index1)]),max.age[i])[,c(2,1,3,4,5)]
-    obs <- rbind(as.matrix(obs), index2)
-  }
-
-  colnames(obs) <- c("year","fleet","age","obs","maxage")
-  rownames(obs) <- NULL
-
-  obs <- as.matrix(obs)
-  obs[,"age"] <- obs[,"age"]+rec.age
-  obs[,"maxage"] <- obs[,"maxage"]+rec.age
-
-  if (tmb.run) {
-    library(TMB)
-    compile(paste(cpp.file.name, ".cpp", sep = ""))
-    dyn.load(dynlib(cpp.file.name))
-  }
-
-  data <- list()
-
-  data$obs <- obs
-  data$noFleets <- max(obs[,2])
-  data$fleetTypes <- data$sampleTimes <- numeric(nindex+1)
-  for (i in 1:nindex) {
-    if (is.null(abund[i])) data$fleetTypes[i+1] <- data$freetTypes[i]
-    if (abund[i] == "B") data$fleetTypes[i+1] <- 2
-    if (abund[i] == "SSB") data$fleetTypes[i+1] <- 3
-    if (abund[i] == "N") data$fleetTypes[i+1] <- 4
-    if (abund[i] == "Bs") data$fleetTypes[i+1] <- 6
-    if (!(abund[i] %in% c("B","SSB","N","Bs"))) {
-      stop("abund code not recognized")
-    }
-  }
-
-  data$noYears <- ncol(waa)
-  data$years <- as.numeric(colnames(waa))
-  # if (retro.years>0) {
-  #   for(i in 1:retro.years) data$years <- c(data$years,max(data$years)+1)
-  # }
-  data$iy <- data$obs[,1]-min(data$years) #year since the first year
-  data$nobs <- nrow(data$obs)
-  # colnames(maa) <- colnames(waa) <- colnames(M) <- range(data$obs[,1])[1]:((range(data$obs[,1])[2])+retro.years)
-  data$propMat <- data$propMat2 <- as.matrix(t(maa))
-  data$stockMeanWeight <- data$catchMeanWeight <- as.matrix(t(waa))
-  data$natMor <- as.matrix(t(M))
-  data$minAge <- as.matrix(rec.age)
-  data$maxAge <- as.matrix(rec.age+nrow(caa)-1) #cppファイルには使わないデータ
-  data$maxAgePlusGroup <- ifelse(isTRUE(plus.group), 1, 0)
-  data$rhoMode <- rho.mode
-  ncol1 <- as.numeric(data$maxAge-data$minAge+1)
-  data$landFrac <- data$disMeanWeight <- data$landMeanWeight <- data$propF <- data$propM <- matrix(0, nrow=data$noYears, ncol=ncol1)
-
-  basemat <- matrix(-1, ncol = ncol1, nrow = max(data$obs[,2]))
-  data$keyLogFsta <- data$keyLogQ <- data$keyLogB <- data$keyVarObs <- data$keyVarF <- data$keyVarLogN <- basemat
-
-  data$keyLogFsta[1,] <- c(0:(data$maxAge-1-rec.age),(data$maxAge-1-rec.age))
-  for (i in 1:nindex) data$keyLogQ[i+1,index.age[i]+1] <- i-1
-  if (isTRUE(b.est)) {
-    if(is.null(index.b.key)) {
-      for (i in 1:nindex) {
-        data$keyLogB[i+1,index.age[i]+1] <- i-1
+      if(is.null(index.b.key)) {
+        for (i in 1:nindex) {
+          data$keyLogB[i+1,index.age[i]+1] <- i-1
+        }
+      }else{
+        for (i in 1:nindex) {
+          data$keyLogB[i+1,index.age[i]+1] <- index.b.key[i]-min(index.b.key)
+        }
       }
+    }
+
+    data$keyVarObs[1,] <- varC
+    if (est.method == "ls") {
+      for (i in 1:nindex) data$keyVarObs[i+1,index.age[i]+1] <- max(varC)+1
+    }
+    if (est.method == "ml") {
+      for (i in 1:nindex) data$keyVarObs[i+1,index.age[i]+1] <- max(varC)+i
+    }
+    if (!is.null(index.key)) {
+      for (i in 1:nindex) data$keyVarObs[i+1,index.age[i]+1] <- max(varC)+index.key[i]-min(index.key)+1
+    }
+
+    data$keyVarF[1,] <- varF
+    data$keyVarLogN[1,] <- varN
+
+    if (SR == "BH") SR.mode <- 2 #Beverton-Holt
+    if (SR == "RI") SR.mode <- 1 #Ricker
+    if (SR == "RW") SR.mode <- 0 #Random walk
+    if (SR == "HS") SR.mode <- 3 #Hockey-stick
+    if (SR == "Mesnil") SR.mode <- 4 #Hockey-stick
+    if (SR == "Const") SR.mode <- 5 # Constant R0(=a)
+    if (SR == "Prop") SR.mode <- 6
+    data$stockRecruitmentModelCode <- matrix(SR.mode)
+
+    data$scale <- scale
+    data$gamma <- gamma
+    if(sel.def=="max"){
+      data$sel_def <- 0
+    }
+    if(sel.def=="mean"){
+      data$sel_def <- 1
+    }
+    if(sel.def=="maxage"){
+      data$sel_def <- 2
+    }
+    if(isTRUE(b_random)){
+      data$b_random <- 1
     }else{
-      for (i in 1:nindex) {
-        data$keyLogB[i+1,index.age[i]+1] <- index.b.key[i]-min(index.b.key)
-      }
+      data$b_random <- 0
     }
-  }
 
-  data$keyVarObs[1,] <- varC
-  if (est.method == "ls") {
-    for (i in 1:nindex) data$keyVarObs[i+1,index.age[i]+1] <- max(varC)+1
-  }
-  if (est.method == "ml") {
-    for (i in 1:nindex) data$keyVarObs[i+1,index.age[i]+1] <- max(varC)+i
-  }
-  if (!is.null(index.key)) {
-    for (i in 1:nindex) data$keyVarObs[i+1,index.age[i]+1] <- max(varC)+index.key[i]-min(index.key)+1
-  }
+    data$nlogF = max(data$keyLogFsta)+1
+    data$nlogN = as.numeric(data$maxAge-data$minAge)+1
+    # data$AR <- AR
+    data$alpha <- alpha
+    # data$MA <- MA
 
-  data$keyVarF[1,] <- varF
-  data$keyVarLogN[1,] <- varN
-
-  if (SR == "BH") SR.mode <- 2 #Beverton-Holt
-  if (SR == "RI") SR.mode <- 1 #Ricker
-  if (SR == "RW") SR.mode <- 0 #Random walk
-  if (SR == "HS") SR.mode <- 3 #Hockey-stick
-  if (SR == "Mesnil") SR.mode <- 4 #Hockey-stick
-  if (SR == "Const") SR.mode <- 5 # Constant R0(=a)
-  if (SR == "Prop") SR.mode <- 6
-  data$stockRecruitmentModelCode <- matrix(SR.mode)
-
-  data$scale <- scale
-  data$gamma <- gamma
-  if(sel.def=="max"){
-    data$sel_def <- 0
+    data$Fprocess_weight = rep(1,ncol(waa))
+    if (!is.null(remove.Fprocess.year)) {
+      data$Fprocess_weight[which(as.numeric(colnames(dat$waa)) %in% remove.Fprocess.year)] <- 0
+    }
+    data$F_RW_order <- RW.Forder
+    data$lambda <- lambda
+    data$lambda_Mesnil <- lambda_Mesnil
+  } else {
+    message("'dat' and related arguments are ignored when using 'tmbdata'")
+    data = tmbdata
+    ncol1 <- as.numeric(data$maxAge-data$minAge+1)
+    nindex = max(data$obs[,"fleet"]-1)
+    SR.mode = as.numeric(data$stockRecruitmentModelCode)
   }
-  if(sel.def=="mean"){
-    data$sel_def <- 1
-  }
-  if(sel.def=="maxage"){
-    data$sel_def <- 2
-  }
-  if(isTRUE(b_random)){
-    data$b_random <- 1
-  }else{
-    data$b_random <- 0
-  }
-
-  data$nlogF = max(data$keyLogFsta)+1
-  data$nlogN = as.numeric(data$maxAge-data$minAge)+1
-  # data$AR <- AR
-  data$alpha <- alpha
-  # data$MA <- MA
-
-  data$Fprocess_weight = rep(1,ncol(waa))
-  if (!is.null(remove.Fprocess.year)) {
-    data$Fprocess_weight[which(as.numeric(colnames(dat$waa)) %in% remove.Fprocess.year)] <- 0
-  }
-  data$F_RW_order <- RW.Forder
-  data$lambda <- lambda
-  data$lambda_Mesnil <- lambda_Mesnil
 
   U_init = rbind(
     matrix(5,nrow=ncol1,ncol=data$noYears),
@@ -280,36 +290,38 @@ sam <- function(dat,
     params <- p0.list
   }
 
-  map <- list()
-  if (!isTRUE(b_random)) {
-    map$logSD_b <- factor(NA)
-    if (!isTRUE(b.est)) map$logB <- factor(rep(NA,nindex)) else {
-      if (!is.null(b.fix)) {
-        map$logB <- 0:max(data$keyLogB)
-        for (i in 1:nindex) if (!is.na(b.fix[i])) map$logB[i] <- NA
-        map$logB <- factor(map$logB)
+  if(is.null(map)) {
+    map <- list()
+    if (!isTRUE(b_random)) {
+      map$logSD_b <- factor(NA)
+      if (!isTRUE(b.est)) map$logB <- factor(rep(NA,nindex)) else {
+        if (!is.null(b.fix)) {
+          map$logB <- 0:max(data$keyLogB)
+          for (i in 1:nindex) if (!is.na(b.fix[i])) map$logB[i] <- NA
+          map$logB <- factor(map$logB)
+        }
       }
     }
-  }
 
-  if (SR=="RW") {
-    map$rec_loga <- map$rec_logb <- factor(NA)
-    map$trans_phi1 <- factor(NA)
-  } else {
-    if (AR==0) map$trans_phi1 <- factor(NA)
-    if (SR=="Const" | SR=="Prop") map$rec_logb <- factor(NA)
-    # if (AR==1) map$phi2 <- factor(NA)
-  }
+    if (SR=="RW") {
+      map$rec_loga <- map$rec_logb <- factor(NA)
+      map$trans_phi1 <- factor(NA)
+    } else {
+      if (AR==0) map$trans_phi1 <- factor(NA)
+      if (SR=="Const" | SR=="Prop") map$rec_logb <- factor(NA)
+      # if (AR==1) map$phi2 <- factor(NA)
+    }
 
-  if (rho.mode==0) map$logit_rho <- factor(NA)
-  if (rho.mode==1) map$logit_rho <- factor(NA)
+    if (rho.mode==0) map$logit_rho <- factor(NA)
+    if (rho.mode==1) map$logit_rho <- factor(NA)
 
-  if(!is.null(varN.fix)) map$logSdLogN <- factor(map_logSdLogN)
+    if(!is.null(varN.fix)) map$logSdLogN <- factor(map_logSdLogN)
 
-  if (!is.null(map.add)) {
-    tmp = make_named_list(map.add)
-    for(i in 1:length(tmp$map.add)) {
-      map[[names(tmp$map.add)[i]]] <- map.add[[i]]
+    if (!is.null(map.add)) {
+      tmp = make_named_list(map.add)
+      for(i in 1:length(tmp$map.add)) {
+        map[[names(tmp$map.add)[i]]] <- map.add[[i]]
+      }
     }
   }
 
@@ -542,8 +554,8 @@ sam <- function(dat,
     rho1 <- ifelse(as.numeric(data$rhoMode) > 1, 1/(1+exp(-as.numeric(rep$par.fixed[names(rep$par.fixed) == "logit_rho"]))),as.numeric(data$rhoMode))
     phi<-numeric(1)
     if (AR>0) phi[1] = rep$value[names(rep$value)=="phi1"][1]
-    pred.index <- data.frame(matrix(0,nrow=nrow(index),ncol=ncol(dat$waa)))
-    colnames(pred.index) <- colnames(dat$waa)
+    pred.index <- data.frame(matrix(0,nrow=nindex,ncol=nrow(data$stockMeanWeight)))
+    colnames(pred.index) <- rownames(data$stockMeanWeight)
     for (i in 1:nrow(pred.index)){
       if (abund[i]=="N") {
         pred.index[i,] <- 0
