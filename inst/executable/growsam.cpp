@@ -359,14 +359,14 @@ Type objective_function<Type>::operator() ()
     }else{
       if(stockRecruitmentModelCode==1){//ricker
         // predN(0)=rec_loga+log(ssb(i-1))-exp(rec_logb)*ssb(i-1);
-        predN0(0)=rec_loga+log(ssb(i-minAge))-exp(rec_logb)*ssb(i-minAge);
+        predN0(0)=rec_loga+log(ssb(i-minAge)/scale)-exp(rec_logb)*(ssb(i-minAge)/scale); //scaling SR (2023/10/10)
       }else{
         if(stockRecruitmentModelCode==2){//BH
           // predN(0)=rec_loga+log(ssb(i-1))-log(1.0+exp(rec_logb)*ssb(i-1));
-          predN0(0)=rec_loga+log(ssb(i-minAge))-log(Type(1.0)+exp(rec_logb)*ssb(i-minAge));
+          predN0(0)=rec_loga+log(ssb(i-minAge)/scale)-log(Type(1.0)+exp(rec_logb)*(ssb(i-minAge)/scale));
         }else{
           if(stockRecruitmentModelCode==3){ //HS
-            predN0(0)=CppAD::CondExpLt(rec_logb,log(ssb(i-minAge)),rec_loga+rec_logb,rec_loga+log(ssb(i-minAge)));
+            predN0(0)=CppAD::CondExpLt(rec_logb,log(ssb(i-minAge)/scale),rec_loga+rec_logb,rec_loga+log(ssb(i-minAge)/scale));
             // vector<Type> rec_pred_HS(2);
             // rec_pred_HS(0)=rec_loga+rec_logb;
             // rec_pred_HS(1)=rec_loga+log(ssb(i-minAge));
@@ -374,7 +374,7 @@ Type objective_function<Type>::operator() ()
             // predN0=min(rec_pred_HS);
           } else {
             if(stockRecruitmentModelCode==4){ //Mesnil HS
-              predN0(0)=ssb(i-minAge)+sqrt(square(exp(rec_logb))+square(gamma)/Type(4.0))-sqrt(square(ssb(i-minAge)-exp(rec_logb))+square(gamma)/Type(4.0));
+              predN0(0)=ssb(i-minAge)/scale+sqrt(square(exp(rec_logb))+square(gamma)/Type(4.0))-sqrt(square(ssb(i-minAge)/scale-exp(rec_logb))+square(gamma)/Type(4.0));
               predN0(0)*=exp(rec_loga)/Type(2.0);
               predN0(0)=log(predN0(0));
             }else{
@@ -382,10 +382,10 @@ Type objective_function<Type>::operator() ()
                 predN0(0)=rec_loga;
               }else{
                 if(stockRecruitmentModelCode==6){ //Proportional to SSB (no density-dependence)
-                  predN0(0)=rec_loga+log(ssb(i-minAge));
+                  predN0(0)=rec_loga+log(ssb(i-minAge)/scale);
                 }else{
                   if(stockRecruitmentModelCode==7){ //HO model (HSの角が丸くなったモデル)
-                    predN0(0)=CppAD::CondExpLt(rec_logb,log(ssb(i-minAge)),rec_loga+rec_logb,rec_loga+rec_logb+(Type(1.0)-pow(ssb(i-minAge)/exp(rec_logb),exp(rec_logk)))*(log(ssb(i-minAge))-rec_logb));
+                    predN0(0)=CppAD::CondExpLt(rec_logb,log(ssb(i-minAge)/scale),rec_loga+rec_logb,rec_loga+rec_logb+(Type(1.0)-pow((ssb(i-minAge)/scale)/exp(rec_logb),exp(rec_logk)))*(log(ssb(i-minAge)/scale)-rec_logb));
                   }else{
                     error("SR model code not recognized");
                   }
@@ -396,6 +396,7 @@ Type objective_function<Type>::operator() ()
         }
       }
     }
+    predN0(0)+=log(scale_number); //scaling SR (2023/10/10)
     recResid(i)=logN(0,i)-predN0(0);
     if(i==0) {
       predN(0)=predN0(0);

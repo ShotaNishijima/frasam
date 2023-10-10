@@ -7,7 +7,7 @@
 sam(
   dat,
   last.catch.zero = FALSE,
-  cpp.file.name = "sam",
+  cpp.file.name = "glowsam",
   tmb.run = FALSE,
   abund = c("B"),
   rec.age = 0,
@@ -54,7 +54,20 @@ sam(
   lambda = 0,
   FreeADFun = FALSE,
   add_random = NULL,
-  lambda_Mesnil = 0
+  lambda_Mesnil = 0,
+  tmbdata = NULL,
+  map = NULL,
+  model_wm = c(FALSE, FALSE),
+  w0_factor = c("none", "SSB")[1],
+  weight_factor = c("none", "N_total")[1],
+  family_w = c("lognormal", "gamma")[2],
+  maturity_factor = c("none", "cohort_plus")[1],
+  scale_number = 1000,
+  weight_weight = NULL,
+  maturity_weight = NULL,
+  g_fix = NULL,
+  CV_w_fix = NULL,
+  w_link = "log"
 )
 }
 \arguments{
@@ -69,6 +82,8 @@ sam(
 \item{SR}{再生産関係："RW", "BH", "RI", "HS", "Mesnil", or "Const"}
 
 \item{index.key}{Indexのsigmaの制約}
+
+\item{model_wm}{weightとmaturityの成長をモデリングするかどうか}
 }
 \description{
 SAMによる資源計算を実施する

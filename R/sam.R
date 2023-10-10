@@ -10,11 +10,14 @@
 #' @param max.age Indexの最高年齢 (\code{frasyr::vpa()}と同じで最小の年齢を0とする)
 #' @param SR 再生産関係："RW", "BH", "RI", "HS", "Mesnil", or "Const"
 #' @param index.key Indexのsigmaの制約
+#' @param model_wm weightとmaturityの成長をモデリングするかどうか
+#' @importFrom glmmTMB glmmTMB
+#'
 #' @export
 
 sam <- function(dat,
                 last.catch.zero = FALSE,
-                cpp.file.name = "sam",
+                cpp.file.name = "growsam",
                 tmb.run = FALSE,
                 abund = c("B"),
                 rec.age = 0,
@@ -64,7 +67,19 @@ sam <- function(dat,
                 add_random = NULL,
                 lambda_Mesnil = 0,
                 tmbdata = NULL,
-                map = NULL
+                map = NULL,
+                model_wm = c(FALSE,FALSE),
+                w0_factor =c("none","SSB")[1],
+                weight_factor = c("none","N_total")[1],
+                family_w = c("lognormal","gamma")[2],
+                maturity_factor = c("none","cohort_plus")[1],
+                scale_number=1000,
+                weight_weight = NULL,
+                maturity_weight = NULL,
+                g_fix = NULL,
+                CV_w_fix = NULL,
+                w_link = "log",
+                sep_omicron=TRUE
                 # retro.years = 0,
 ){
 
@@ -201,6 +216,7 @@ sam <- function(dat,
     if (SR == "Mesnil") SR.mode <- 4 #Hockey-stick
     if (SR == "Const") SR.mode <- 5 # Constant R0(=a)
     if (SR == "Prop") SR.mode <- 6
+    if (SR == "HO") SR.mode <- 7
     data$stockRecruitmentModelCode <- matrix(SR.mode)
 
     data$scale <- scale
@@ -233,6 +249,58 @@ sam <- function(dat,
     data$F_RW_order <- RW.Forder
     data$lambda <- lambda
     data$lambda_Mesnil <- lambda_Mesnil
+
+    data$model_weight_maturity <- 2*(as.numeric(model_wm)-0.5)
+    data$scale_number <- scale_number
+    if (family_w == "lognormal") {
+      dist_wobs = 0
+    } else {
+      if (family_w == "gamma") {
+        dist_wobs = 1
+      } else {
+        stop("'family_w' not recognized")
+      }
+    }
+    data$dist_wobs = dist_wobs
+    if(is.null(weight_weight)) {
+      weight_weight = matrix(1,ncol=ncol(dat$waa),nrow=nrow(dat$waa))
+      if (isTRUE(last.catch.zero)) weight_weight[,ncol(dat$waa)] <- 0
+    }
+    if(!isTRUE(all( dim(weight_weight) == dim(dat$waa)))) {
+      stop("'weight_weight' has a wrong dimension!")
+    }
+    data$weight_weight <- weight_weight
+    if(is.null(maturity_weight)) {
+      maturity_weight = matrix(1,ncol=ncol(dat$maa),nrow=nrow(dat$maa))
+      if (isTRUE(last.catch.zero)) maturity_weight[,ncol(dat$maa)] <- 0
+    }
+    if(!isTRUE(all( dim(maturity_weight) == dim(dat$maa)))) {
+      stop("'maturity_weight' has a wrong dimension!")
+    }
+    data$maturity_weight <- maturity_weight
+    if(is.null(g_fix)) {
+      g <- 1
+      g_fix <- c()
+      for(i in 1:nrow(dat$maa)) {
+        if(sd(as.numeric(dat$maa[i,]),na.rm=TRUE)==0) {
+          g_fix <- c(g_fix,mean(as.numeric(dat$maa[i,]),na.rm=FALSE))
+        } else {
+          g_fix <- c(g_fix,-g)
+          g <- g + 1
+        }
+      }
+    }
+    data$g_fix <- g_fix
+    if(w_link=="id"){
+      alpha_w_link = 0
+    } else {
+      if (w_link=="log") {
+        alpha_w_link = 1
+      } else {
+        stop("'alpha_w_link' not recognized")
+      }
+    }
+    data$alpha_w_link <- alpha_w_link
   } else {
     message("'dat' and related arguments are ignored when using 'tmbdata'")
     data = tmbdata
@@ -240,6 +308,91 @@ sam <- function(dat,
     nindex = max(data$obs[,"fleet"]-1)
     SR.mode = as.numeric(data$stockRecruitmentModelCode)
   }
+
+  if(isTRUE(model_wm[1])) {
+    waa_dat = expand.grid(Age=as.numeric(rownames(dat$waa)),
+                          Year=as.numeric(colnames(dat$waa))) %>%
+      dplyr::mutate(Weight=as.numeric(unlist(dat$waa)),
+                    Maturity=as.numeric(unlist(dat$maa)))
+    A = max(waa_dat$Age)
+    waa_prev = sapply(1:nrow(waa_dat), function(i) {
+      if (waa_dat$Age[i]==0 | waa_dat$Year[i]==min(waa_dat$Year)) {
+        value <- NA
+      } else {
+        if (waa_dat$Age[i]<A) {
+          value <- as.numeric(
+            vpares$input$dat$waa[waa_dat$Age[i],as.character(waa_dat$Year[i]-1)])
+        } else {
+          value1 <- as.numeric(
+            vpares$input$dat$waa[waa_dat$Age[i],as.character(waa_dat$Year[i]-1)])
+          value2 <- as.numeric(
+            vpares$input$dat$waa[waa_dat$Age[i]+1,as.character(waa_dat$Year[i]-1)]) # plus group
+          n1 <- as.numeric(
+            dat$caa[waa_dat$Age[i],as.character(waa_dat$Year[i]-1)])
+          n2 <- as.numeric(
+            dat$caa[waa_dat$Age[i]+1,as.character(waa_dat$Year[i]-1)]) # plus group
+          value <- (value1*n1+value2*n2)/(n1+n2)
+        }
+      }
+      value
+    })
+    maa_prev = sapply(1:nrow(waa_dat), function(i) {
+      if (waa_dat$Age[i]==0 | waa_dat$Year[i]==min(waa_dat$Year)) {
+        value <- NA
+      } else {
+        value <- as.numeric(
+          dat$maa[waa_dat$Age[i],as.character(waa_dat$Year[i]-1)])
+      }
+      value
+    })
+    delta_mat = function(Maturity,Maturity_prev) (Maturity-Maturity_prev)/(1-Maturity_prev)
+
+    waa_dat = waa_dat %>%
+      mutate(Weight_prev=waa_prev,
+             Maturity_prev=maa_prev) %>%
+      mutate(YearClass=Year-Age)
+    waa_dat2 = waa_dat %>% filter(Age>min(Age) & Year > min(Year))
+
+    waa_dat %>% filter(Age %in% c(0,1))
+    maa_dat = waa_dat %>% filter(Age %in% (which(g_fix<0)-1)) %>%
+      mutate(y=delta_mat(Maturity,Maturity_prev)) %>%
+      na.omit()
+
+    modw = glm(Weight~1+Weight_prev,data=waa_dat2,family=Gamma("identity"))
+    alpha_w = as.numeric(coef(modw)[1])
+    if (w_link=="log") alpha_w = log(alpha_w)
+    rho_w = as.numeric(coef(modw)[2])
+    logCV_w <- log(sqrt(summary(modw)$dispersion))
+    beta_w0 = waa_dat %>% dplyr::filter(Age==min(Age)) %>% dplyr::pull(.,Weight) %>% mean %>% log
+    if (weight_factor!="none") {
+      alpha_w = c(alpha_w,0)
+    }
+    if (w0_factor!="none") {
+    beta_w0 = c(beta_w0,0)
+    }
+    # tmp = waa_dat %>% filter(Age==min(Age)) %>% pull(.,Weight) %>% log %>% sd
+    # logCV_w <- c(log(tmp),logCV_w)
+    if(!is.null(CV_w_fix)) logCV_w = rep_len(CV_w_fix,length(logCV_w))
+  } else {
+    alpha_w = 0
+    rho_w = 0
+    logCV_w <- 0
+    beta_w0 = 0
+  }
+
+  if (isTRUE(model_wm[2])) {
+    # browser()
+    mod_mat0 = glmmTMB(y~factor(Age) + 0,data=maa_dat,family=ordbeta)
+    alpha_g = mod_mat0$fit$par[names(mod_mat0$fit$par)=="beta"] %>% as.numeric()
+    psi = as.numeric(mod_mat0$fit$par[names(mod_mat0$fit$par)=="psi"])
+    logdisp = as.numeric(mod_mat0$fit$par[names(mod_mat0$fit$par)=="betad"])[1]
+  } else {
+    alpha_g <- 0
+    psi = rep(0,2)
+    logdisp = 0
+  }
+  logwaa = as.matrix(log(dat$waa))
+  beta_g = rep(0,length(alpha_g))
 
   U_init = rbind(
     matrix(5,nrow=ncol1,ncol=data$noYears),
@@ -276,7 +429,7 @@ sam <- function(dat,
         } else {
           log(a.init)
           },
-      rec_logb     = if (is.null(b.init)) {if (SR=="HS" | SR=="Mesnil") 13.5 else -14} else {log(b.init)},
+      rec_logb     = if (is.null(b.init)) {if (SR %in% c("HS","Mesnil","HO")) 7 else -8} else {log(b.init)},
       logit_rho  = if (is.null(rho.init)) 0 else log(rho.init/(1-rho.init)),
       # logScale     = numeric(data$noScaledYears),
       # logScaleSSB  = if(any(data$fleetTypes %in% c(3,4))) {numeric(0)} else {numeric(0)},
@@ -284,7 +437,18 @@ sam <- function(dat,
       # logSdSSB     = if(any(data$fleetTypes %in% c(3,4))) {numeric(0)} else {numeric(0)},
       U = U_init,
       trans_phi1 = 0,
-      logSD_b = log(0.3)
+      logSD_b = log(0.3),
+      logwaa = logwaa,
+      beta_w0 = beta_w0,
+      alpha_w = alpha_w,
+      rho_w = rho_w,
+      omicron = if(isTRUE(sep_omicron)) c(log(0.1),log(0.1)) else log(0.1),
+      logCV_w = logCV_w,
+      alpha_g = alpha_g,
+      psi = psi,
+      logdisp = logdisp,
+      beta_g = beta_g,
+      rec_logk = log(1)
     )
   } else {
     params <- p0.list
@@ -317,6 +481,28 @@ sam <- function(dat,
 
     if(!is.null(varN.fix)) map$logSdLogN <- factor(map_logSdLogN)
 
+    if(!isTRUE(model_wm[1])) {
+      map$logwaa <- factor(matrix(NA,ncol=ncol(dat$waa),nrow=nrow(dat$waa)))
+      map$alpha_w <- rep(factor(NA),length(params$alpha_w))
+      map$beta_w0 <- rep(factor(NA),length(params$beta_w0))
+      map$rho_w <- rep(factor(NA),length(params$rho_w))
+      map$omicron <- rep(factor(NA),length(params$omicron))
+      map$logCV_w <- rep(factor(NA),length(params$logCV_w))
+    }
+    if(!isTRUE(model_wm[2])) {
+      map$alpha_g = rep(factor(NA),length(params$alpha_g))
+      map$psi = c(factor(NA),factor(NA))
+      map$logdisp = factor(NA)
+      map$beta_g = rep(factor(NA),length(params$beta_g))
+    } else {
+      if (maturity_factor=="none") {
+        map$beta_g = rep(factor(NA),length(params$beta_g))
+      }
+    }
+    if (SR != "HO") map$rec_logk <- factor(NA)
+
+    if(!is.null(CV_w_fix)) map$logCV_w = rep(factor(NA),length(logCV_w))
+
     if (!is.null(map.add)) {
       tmp = make_named_list(map.add)
       for(i in 1:length(tmp$map.add)) {
@@ -326,7 +512,7 @@ sam <- function(dat,
   }
 
   # stop("Tentative Stop!!")
-  random = c("U")
+  random = c("U","logwaa")
 
   if(isTRUE(b_random)) {
     random = c(random,"logB")
@@ -375,9 +561,11 @@ sam <- function(dat,
       logF <- NF[(data$nlogN+1):(data$nlogN+data$nlogF),]
       logF <- logF[data$keyLogFsta[1,]+1,]
       logF[nrow(logF),] <- log(data$alpha)+logF[nrow(logF),]
-
-      colnames(logN) <- colnames(logF) <- data$years
-      rownames(logN) <- rownames(logF) <- data$minAge:data$maxAge
+      tmp = rep$value[names(rep$value)=="stockMeanWeight_true"]
+      waa_est = t(matrix(tmp,nrow=ncol(logN)))
+      # waa_obs = dat$waa
+      colnames(logN) <- colnames(logF) <- colnames(waa_est) <- data$years
+      rownames(logN) <- rownames(logF) <- rownames(waa_est) <- data$minAge:data$maxAge
       naa <- exp(logN)
       faa <- exp(logF)
     } else {
@@ -387,17 +575,20 @@ sam <- function(dat,
       faa <- matrix(rep$unbiased$value[names(rep$unbiased$value)=="exp_logF"],ncol=data$noYears)
       faa <- faa[data$keyLogFsta[1,]+1,]
       faa[nrow(faa),] <- data$alpha*faa[nrow(faa),]
-      colnames(naa) <- colnames(faa) <- data$years
-      rownames(naa) <- rownames(faa) <- data$minAge:data$maxAge
+      tmp = rep$unbiased$value[names(rep$value)=="stockMeanWeight_true"]
+      waa_est = t(matrix(tmp,nrow=ncol(naa)))
+      colnames(naa) <- colnames(faa) <- colnames(waa_est) <- data$years
+      rownames(naa) <- rownames(faa) <- rownames(waa_est) <- data$minAge:data$maxAge
       logN <- log(naa)
       logF <- log(faa)
     }
+    waa_obs = dat$waa
 
     ref.year1 <- data$noYears-ref.year+1
 
     # naa <- exp(logN)
     # faa <- exp(logF)
-    baa <- naa*t(data$stockMeanWeight)
+    baa <- naa*waa_est
     ssb <- baa*t(data$propMat)
     if(sel.def=="max"){
       saa <- sweep(faa,2,apply(faa,2,max),FUN="/")
@@ -427,6 +618,7 @@ sam <- function(dat,
       b <- exp(obj$env$parList()[["rec_logb"]])
       if (SR.mode==5) b <- NA
       if (SR.mode==6) b <- 0
+      if (SR.mode==7) k <- exp(obj$env$parList()[["rec_logk"]])
 
     #
     #   # B0
@@ -465,6 +657,10 @@ sam <- function(dat,
     #
       rec.par <- c(a,b)
       names(rec.par) <- c("a","b")
+      if(SR.mode==7) {
+        rec.par <- c(rec.par,k)
+        names(rec.par[3]) <- "k"
+      }
     #
     #   # MSY
     #
@@ -583,7 +779,7 @@ sam <- function(dat,
           }
     }
 
-    output <- list(data=data, obj=obj, opt=opt, rep=rep, q=q1, b=b1, sigma=sigma2, sigma.logC=sigma1, sigma.logFsta=sigma3, sigma.logN=sigma4, rho=rho1, phi=phi, loglik=loglik,aic=aic,N=exp(logN),F=exp(logF),ref.year=rev(ref.year1),SR=SR.name,rec.par=rec.par, BRP0=BRP0,BRPmsy=BRPmsy,naa=naa,faa=faa,baa=baa,ssb=ssb,saa=saa,zaa=zaa,caa=caa,pred.index=pred.index)
+    output <- list(data=data, obj=obj, opt=opt, rep=rep, q=q1, b=b1, sigma=sigma2, sigma.logC=sigma1, sigma.logFsta=sigma3, sigma.logN=sigma4, rho=rho1, phi=phi, loglik=loglik,aic=aic,N=exp(logN),F=exp(logF),ref.year=rev(ref.year1),SR=SR.name,rec.par=rec.par, BRP0=BRP0,BRPmsy=BRPmsy,naa=naa,faa=faa,baa=baa,ssb=ssb,saa=saa,zaa=zaa,caa=caa,pred.index=pred.index,waa_est=waa_est)
     return(output)
   }
 

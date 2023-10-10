@@ -21,5 +21,6 @@ Imports:
     tibble,
     tidyr
 Suggests:
-    testthat
-RoxygenNote: 7.1.2
+    testthat,
+    glmmTMB
+RoxygenNote: 7.2.3
