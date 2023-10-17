@@ -244,8 +244,8 @@ retro_plot = function(res,retro_res,start_year=NULL,scale=1000, forecast=FALSE,
     ungroup() %>%
     mutate(value = if_else(stat == "fishing_mortality",value,value/scale)) %>%
     mutate(terminal_year = max(data$year)-id)
-  if (isTRUE(forecast) & class(res)=="sam") {
-    data2 = data2 %>% mutate(terminal_year = terminal_year+1)  }
+  if (!(isTRUE(forecast) & class(res)=="sam")) {
+    data2 = data2 %>% mutate(terminal_year = terminal_year-1)  }
   data2 = data2 %>% dplyr::filter(year <= terminal_year) %>%
     mutate(stat_f = factor(stat,levels=c("biomass","SSB","Recruitment","fishing_mortality"),labels=c("Biomass","SSB","Recruitment","F"))) %>%
     filter(year >= start_year) %>%

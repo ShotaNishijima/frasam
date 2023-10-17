@@ -25,6 +25,7 @@ retro_sam <- function(res, n=5, stat="mean", b.fix=TRUE,remove_short_index=-1, m
     # res.c$input$b.est <- FALSE
   }
 
+  # i <- 1
   for (i in 1:n){
     nc <- ncol(res.c$input$dat$caa)
 
@@ -38,15 +39,18 @@ retro_sam <- function(res, n=5, stat="mean", b.fix=TRUE,remove_short_index=-1, m
 
     res.c$input$dat$catch.prop <- res.c$input$dat$catch.prop[,-nc]
 
+    nc2 <- nc
     if (res$input$last.catch.zero){
       res.c$input$dat$caa[,ncol(res.c$input$dat$caa)] <- 0
+      nc2 <- nc2-1
     }
 
     res.c$input$p0.list <- res.c$par_list
+    use.index = 1:nrow(res.c$input$dat$index)
     # res.c$input$retro.years <- i
     if (remove_short_index>0) {
       index_n = apply(res.c$input$dat$index,1,function(x) length(x)-sum(is.na(x)))
-      use.index = 1:nrow(res.c$input$dat$index)
+      # use.index = 1:nrow(res.c$input$dat$index)
       if (is.null(res.c$input$use.index)) {
         use.index = use.index[index_n > remove_short_index]
       } else {
@@ -69,6 +73,15 @@ retro_sam <- function(res, n=5, stat="mean", b.fix=TRUE,remove_short_index=-1, m
     }
 
     if (!is.null(map_add)) res.c$input$map.add <- map_add
+
+    if (isTRUE(input$model_wm[1])) {
+      if (i==1) res.c$input$weight_weight <- res.c$data$weight_weight
+      res.c$input$weight_weight[,nc2] <- 0
+    }
+    if (isTRUE(input$model_wm[2])) {
+      if (i==1) res.c$input$maturity_weight <- res.c$data$maturity_weight
+      res.c$input$maturity_weight[,nc2] <- 0
+    }
 
     # res1 <- do.call(sam,res.c$input)
     if (is.null(p0_retro_list)) {

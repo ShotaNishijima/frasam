@@ -79,7 +79,8 @@ sam <- function(dat,
                 g_fix = NULL,
                 CV_w_fix = NULL,
                 w_link = "log",
-                sep_omicron=TRUE
+                sep_omicron=TRUE,
+                growth_regime = NULL
                 # retro.years = 0,
 ){
 
@@ -301,6 +302,15 @@ sam <- function(dat,
       }
     }
     data$alpha_w_link <- alpha_w_link
+    if (is.null(growth_regime)) {
+      growth_regime = rep(0,ncol(dat$waa))
+    } else {
+      if (length(growth_regime) != ncol(dat$waa)) {
+        stop("The length of 'growth regime' must be the number of years")
+        growth_regime <- growth_regime - min(growth_regime)
+      }
+    }
+    data$gr <- growth_regime
   } else {
     message("'dat' and related arguments are ignored when using 'tmbdata'")
     data = tmbdata
@@ -309,7 +319,7 @@ sam <- function(dat,
     SR.mode = as.numeric(data$stockRecruitmentModelCode)
   }
 
-  if(isTRUE(model_wm[1])) {
+  if(isTRUE(model_wm[1]) && is.null(p0.list)) {
     waa_dat = expand.grid(Age=as.numeric(rownames(dat$waa)),
                           Year=as.numeric(colnames(dat$waa))) %>%
       dplyr::mutate(Weight=as.numeric(unlist(dat$waa)),
@@ -321,12 +331,12 @@ sam <- function(dat,
       } else {
         if (waa_dat$Age[i]<A) {
           value <- as.numeric(
-            vpares$input$dat$waa[waa_dat$Age[i],as.character(waa_dat$Year[i]-1)])
+            dat$waa[waa_dat$Age[i],as.character(waa_dat$Year[i]-1)])
         } else {
           value1 <- as.numeric(
-            vpares$input$dat$waa[waa_dat$Age[i],as.character(waa_dat$Year[i]-1)])
+            dat$waa[waa_dat$Age[i],as.character(waa_dat$Year[i]-1)])
           value2 <- as.numeric(
-            vpares$input$dat$waa[waa_dat$Age[i]+1,as.character(waa_dat$Year[i]-1)]) # plus group
+            dat$waa[waa_dat$Age[i]+1,as.character(waa_dat$Year[i]-1)]) # plus group
           n1 <- as.numeric(
             dat$caa[waa_dat$Age[i],as.character(waa_dat$Year[i]-1)])
           n2 <- as.numeric(
@@ -359,40 +369,44 @@ sam <- function(dat,
       na.omit()
 
     modw = glm(Weight~1+Weight_prev,data=waa_dat2,family=Gamma("identity"))
-    alpha_w = as.numeric(coef(modw)[1])
+    nr = max(growth_regime)+1 #number of growth regime
+    alpha_w = matrix(rep(as.numeric(coef(modw)[1]),nr),nrow=1)
     if (w_link=="log") alpha_w = log(alpha_w)
-    rho_w = as.numeric(coef(modw)[2])
+    rho_w = matrix(rep(as.numeric(coef(modw)[2]),nr),nrow=1)
     logCV_w <- log(sqrt(summary(modw)$dispersion))
     beta_w0 = waa_dat %>% dplyr::filter(Age==min(Age)) %>% dplyr::pull(.,Weight) %>% mean %>% log
+    beta_w0 = matrix(rep(beta_w0,nr),nrow=1)
     if (weight_factor!="none") {
-      alpha_w = c(alpha_w,0)
+      alpha_w = rbind(alpha_w,0)
     }
     if (w0_factor!="none") {
-    beta_w0 = c(beta_w0,0)
+    beta_w0 = rbind(beta_w0,0)
     }
     # tmp = waa_dat %>% filter(Age==min(Age)) %>% pull(.,Weight) %>% log %>% sd
     # logCV_w <- c(log(tmp),logCV_w)
     if(!is.null(CV_w_fix)) logCV_w = rep_len(CV_w_fix,length(logCV_w))
   } else {
-    alpha_w = 0
-    rho_w = 0
+    nr=1
+    alpha_w = matrix(0)
+    rho_w = matrix(0)
     logCV_w <- 0
-    beta_w0 = 0
+    beta_w0 = matrix(0)
   }
 
-  if (isTRUE(model_wm[2])) {
+  if (isTRUE(model_wm[2]) && is.null(p0.list)) {
     # browser()
     mod_mat0 = glmmTMB(y~factor(Age) + 0,data=maa_dat,family=ordbeta)
     alpha_g = mod_mat0$fit$par[names(mod_mat0$fit$par)=="beta"] %>% as.numeric()
+    alpha_g = matrix(rep(alpha_g,nr),ncol=nr)
     psi = as.numeric(mod_mat0$fit$par[names(mod_mat0$fit$par)=="psi"])
     logdisp = as.numeric(mod_mat0$fit$par[names(mod_mat0$fit$par)=="betad"])[1]
   } else {
-    alpha_g <- 0
+    alpha_g <- matrix(0)
     psi = rep(0,2)
     logdisp = 0
   }
   logwaa = as.matrix(log(dat$waa))
-  beta_g = rep(0,length(alpha_g))
+  beta_g = matrix(0,nrow=nrow(alpha_g),ncol=ncol(alpha_g))
 
   U_init = rbind(
     matrix(5,nrow=ncol1,ncol=data$noYears),
@@ -483,20 +497,20 @@ sam <- function(dat,
 
     if(!isTRUE(model_wm[1])) {
       map$logwaa <- factor(matrix(NA,ncol=ncol(dat$waa),nrow=nrow(dat$waa)))
-      map$alpha_w <- rep(factor(NA),length(params$alpha_w))
-      map$beta_w0 <- rep(factor(NA),length(params$beta_w0))
-      map$rho_w <- rep(factor(NA),length(params$rho_w))
+      map$alpha_w <- rep(factor(NA),prod(dim(params$alpha_w)))
+      map$beta_w0 <- rep(factor(NA),prod(dim(params$beta_w0)))
+      map$rho_w <- rep(factor(NA),prod(dim(params$rho_w)))
       map$omicron <- rep(factor(NA),length(params$omicron))
       map$logCV_w <- rep(factor(NA),length(params$logCV_w))
     }
     if(!isTRUE(model_wm[2])) {
-      map$alpha_g = rep(factor(NA),length(params$alpha_g))
+      map$alpha_g = rep(factor(NA),prod(dim(params$alpha_g)))
       map$psi = c(factor(NA),factor(NA))
       map$logdisp = factor(NA)
-      map$beta_g = rep(factor(NA),length(params$beta_g))
+      map$beta_g = rep(factor(NA),prod(dim(params$beta_g)))
     } else {
       if (maturity_factor=="none") {
-        map$beta_g = rep(factor(NA),length(params$beta_g))
+        map$beta_g = rep(factor(NA),prod(dim(params$beta_g)))
       }
     }
     if (SR != "HO") map$rec_logk <- factor(NA)
@@ -659,7 +673,7 @@ sam <- function(dat,
       names(rec.par) <- c("a","b")
       if(SR.mode==7) {
         rec.par <- c(rec.par,k)
-        names(rec.par[3]) <- "k"
+        names(rec.par)[3] <- "k"
       }
     #
     #   # MSY

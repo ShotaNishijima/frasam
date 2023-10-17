@@ -173,17 +173,17 @@ Type objective_function<Type>::operator() ()
   PARAMETER(logSD_b);
 
   PARAMETER_ARRAY(logwaa); // row: age, column: year (行列がstockMeanWeightと逆であることに注意！)
-  PARAMETER_VECTOR(beta_w0);
-  PARAMETER_VECTOR(alpha_w);
-  PARAMETER_VECTOR(rho_w);
+  PARAMETER_ARRAY(beta_w0);
+  PARAMETER_ARRAY(alpha_w);
+  PARAMETER_ARRAY(rho_w);
   PARAMETER_VECTOR(omicron); // log(SD) for process error in weight growth
   // PARAMETER(iota); // log(SD) for process error in maturity growth
   PARAMETER_VECTOR(logCV_w); // CV for observation error in weight (for age0 and older)
 
-  PARAMETER_VECTOR(alpha_g); // intercept of maturity modeling
+  PARAMETER_ARRAY(alpha_g); // intercept of maturity modeling
   PARAMETER_VECTOR(psi);
   PARAMETER(logdisp); // dispersion parameter (phi) in log space for beta distribution
-  PARAMETER_VECTOR(beta_g); // slope of maturity modeling for density dependence
+  PARAMETER_ARRAY(beta_g); // slope of maturity modeling for density dependence
 
   PARAMETER(rec_logk); // additional parameter for HO (Hiroshi Okamura) model
 
@@ -203,6 +203,7 @@ Type objective_function<Type>::operator() ()
   DATA_ARRAY(maturity_weight);  // 体重データのモデリングの時に使用する重み（レトロの時に重みをゼロにするために使用）
   DATA_VECTOR(g_fix); // its length is the number of age classes. Non-negative value (0-1) represents the fixed value of maturity at age while a negative value (e.g., -1)indicates estimating maturity.
   DATA_INTEGER(alpha_w_link); //0: id link, 1: log link
+  DATA_IVECTOR(gr) // growth regime. Its length should be the number of years
 
   array<Type> logF(nlogF,U.cols()); // logF (6 x 50 matrix)
   array<Type> logN(nlogN,U.cols()); // logN (7 x 50 matrix)
@@ -395,8 +396,8 @@ Type objective_function<Type>::operator() ()
           }
         }
       }
+      predN0(0)+=log(scale_number); //scaling SR (2023/10/10)
     }
-    predN0(0)+=log(scale_number); //scaling SR (2023/10/10)
     recResid(i)=logN(0,i)-predN0(0);
     if(i==0) {
       predN(0)=predN0(0);
@@ -645,15 +646,15 @@ Type objective_function<Type>::operator() ()
     // process model for weight
     for(int j=1;j<logwaa.cols();j++){ //最初の年は除く（2年目から）
       for(int i=0;i<logwaa.rows();i++){
-        alpha_w_total=alpha_w(0);
+        alpha_w_total=alpha_w(0,gr(j));
         if(alpha_w.size()>1){
-          alpha_w_total+=alpha_w(1)*N_sum(j);
+          alpha_w_total+=alpha_w(1,gr(j))*N_sum(j);
         }
         if(alpha_w_link==1) alpha_w_total = exp(alpha_w_total);
-        rho_w_total=rho_w(0);
-        beta_w0_total=beta_w0(0);
+        rho_w_total=rho_w(0,gr(j));
+        beta_w0_total=beta_w0(0,gr(j));
         if(beta_w0.size()>1){
-          beta_w0_total+=beta_w0(1)*ssb(j)/scale;
+          beta_w0_total+=beta_w0(1,gr(j))*ssb(j)/scale;
           // beta_w0_total+=beta_w0(1)*exp_logN(0,j)/scale_number;
           // beta_w0_total+=beta_w0(1)*ssn(j)/scale_number;
         }
@@ -702,7 +703,7 @@ Type objective_function<Type>::operator() ()
   maa_pred.fill(-1);
   maa_diff.fill(-1);
   Type multi_g;
-  array<Type> N_mat(alpha_g.size(),propMat.rows());
+  array<Type> N_mat(alpha_g.rows(),propMat.rows());
   N_mat.fill(0.0);
   Type disp=exp(logdisp);
   Type s1, s2, s3;
@@ -713,8 +714,8 @@ Type objective_function<Type>::operator() ()
         maa(i,j)=propMat(j,i);
         if(g_fix(i)<0.0){
           a=CppAD::Integer(-g_fix(i))-1;
+          N_mat(a,j)+=exp_logN(i-1,j);
           N_mat(a,j)+=exp_logN(i,j);
-          N_mat(a,j)+=exp_logN(i+1,j);
           N_mat(a,j)/=scale_number;
         }
       }
@@ -725,8 +726,8 @@ Type objective_function<Type>::operator() ()
         maa_diff(i,j)=(maa(i,j)-maa(i-1,j-1))/(Type(1.0)-maa(i-1,j-1));
         if(g_fix(i)<0.0){
           a=CppAD::Integer(-g_fix(i))-1;
-          multi_g=alpha_g(a);
-          multi_g+=beta_g(a)*N_mat(a,j-1);
+          multi_g=alpha_g(a,gr(j));
+          multi_g+=beta_g(a,gr(j))*N_mat(a,j-1);
           maa_pred(i,j)=maa(i-1,j-1)+invlogit(multi_g)*(Type(1.0)-maa(i-1,j-1));
           if (maa_diff(i,j) == 0.0) {
             // ans_g += -log1m_inverse_linkfun(logit(maa_pred(i,j)) - psi(0), logit_link);
@@ -783,6 +784,7 @@ Type objective_function<Type>::operator() ()
   REPORT(maa_pred);
   REPORT(ans_w);
   REPORT(ans_g);
+  REPORT(N_mat);
   // REPORT(FY);
 
   return ans;
