@@ -654,9 +654,8 @@ Type objective_function<Type>::operator() ()
         rho_w_total=rho_w(0,gr(j));
         beta_w0_total=beta_w0(0,gr(j));
         if(beta_w0.size()>1){
-          beta_w0_total+=beta_w0(1,gr(j))*ssb(j)/scale;
-          // beta_w0_total+=beta_w0(1)*exp_logN(0,j)/scale_number;
-          // beta_w0_total+=beta_w0(1)*ssn(j)/scale_number;
+          // beta_w0_total+=beta_w0(1,gr(j))*ssb(j)/scale;
+          beta_w0_total+=beta_w0(1,gr(j))*ssn(j)/scale_number;
         }
         if(i==0){ // age 0
           logwaa_pred(i,j)=beta_w0_total;
