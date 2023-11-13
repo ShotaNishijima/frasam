@@ -34,15 +34,19 @@ get_predSR <- function(samres,max.ssb.pred=1.3){
   a = samres$rec.par["a"]
   b = samres$rec.par["b"]
   gamma = samres$input$gamma
+  if(!is.null(samres$par_list[["rec_logk"]])) k = exp(samres$par_list[["rec_logk"]])
 
   if (SR=="HS") SRF <- function(x,a,b) ifelse(x>b,b*a,x*a)
   if (SR=="BH") SRF <- function(x,a,b) a*x/(1+b*x)
   if (SR=="RI") SRF <- function(x,a,b) a*x*exp(-b*x)
   if (SR=="Mesnil") SRF <- function(x,a,b) 0.5*a*(x+sqrt(b^2+gamma^2/4)-sqrt((x-b)^2+gamma^2/4))
+  if (SR=="BHS") SRF <- function(x,a,b) ifelse(x<b,a*b*(x/b)^(1-(x/b)^k),a*b)
 
-  assertthat::assert_that(SR %in% c("HS","BH","RI","Mesnil"))
+  assertthat::assert_that(SR %in% c("HS","BH","RI","Mesnil","BHS"))
 
-  data_SR = get.SRdata(samres) %>% as.data.frame()
+  data_SR = frasyr::get.SRdata(samres) %>% as.data.frame()
+  data_SR$SSB <- data_SR$SSB/samres$input$scale
+  data_SR$R <- data_SR$R/samres$input$scale_number
 
   ssb_c = seq(from=0,to=max(data_SR$SSB)*max.ssb.pred,length=100)
   R_c = purrr::map_dbl(ssb_c,SRF,a=a,b=b)
@@ -237,6 +241,7 @@ retro_plot = function(res,retro_res,start_year=NULL,scale=1000, forecast=FALSE,
   }
 
   res_tibble -> data
+  # browser()
   if (is.null(start_year)) start_year <- max(as.numeric(colnames(res$faa)))-15
   data2 = data %>% dplyr::filter(stat %in% c("SSB","biomass","Recruitment","fishing_mortality")) %>%
     group_by(id,year,stat) %>%
@@ -244,8 +249,8 @@ retro_plot = function(res,retro_res,start_year=NULL,scale=1000, forecast=FALSE,
     ungroup() %>%
     mutate(value = if_else(stat == "fishing_mortality",value,value/scale)) %>%
     mutate(terminal_year = max(data$year)-id)
-  if (!(isTRUE(forecast) & class(res)=="sam")) {
-    data2 = data2 %>% mutate(terminal_year = terminal_year-1)  }
+  # if (!(isTRUE(forecast) & class(res)[1]=="sam")) {
+  #   data2 = data2 %>% mutate(terminal_year = terminal_year-1)  }
   data2 = data2 %>% dplyr::filter(year <= terminal_year) %>%
     mutate(stat_f = factor(stat,levels=c("biomass","SSB","Recruitment","fishing_mortality"),labels=c("Biomass","SSB","Recruitment","F"))) %>%
     filter(year >= start_year) %>%

@@ -198,13 +198,15 @@ sam <- function(dat,
 
     data$keyVarObs[1,] <- varC
     if (est.method == "ls") {
+      if(!is.null(index.key)) warning("'index.key' does not work when est.method='ls'. Use est.method='ml'.")
       for (i in 1:nindex) data$keyVarObs[i+1,index.age[i]+1] <- max(varC)+1
-    }
-    if (est.method == "ml") {
-      for (i in 1:nindex) data$keyVarObs[i+1,index.age[i]+1] <- max(varC)+i
-    }
-    if (!is.null(index.key)) {
-      for (i in 1:nindex) data$keyVarObs[i+1,index.age[i]+1] <- max(varC)+index.key[i]-min(index.key)+1
+    } else {
+      if (est.method == "ml") {
+        for (i in 1:nindex) data$keyVarObs[i+1,index.age[i]+1] <- max(varC)+i
+      }
+      if (!is.null(index.key)) {
+        for (i in 1:nindex) data$keyVarObs[i+1,index.age[i]+1] <- max(varC)+index.key[i]-min(index.key)+1
+      }
     }
 
     data$keyVarF[1,] <- varF
@@ -217,7 +219,7 @@ sam <- function(dat,
     if (SR == "Mesnil") SR.mode <- 4 #Hockey-stick
     if (SR == "Const") SR.mode <- 5 # Constant R0(=a)
     if (SR == "Prop") SR.mode <- 6
-    if (SR == "HO") SR.mode <- 7
+    if (SR == "BHS") SR.mode <- 7
     data$stockRecruitmentModelCode <- matrix(SR.mode)
 
     data$scale <- scale
@@ -443,7 +445,7 @@ sam <- function(dat,
         } else {
           log(a.init)
           },
-      rec_logb     = if (is.null(b.init)) {if (SR %in% c("HS","Mesnil","HO")) 7 else -8} else {log(b.init)},
+      rec_logb     = if (is.null(b.init)) {if (SR %in% c("HS","Mesnil","BHS")) 7 else -8} else {log(b.init)},
       logit_rho  = if (is.null(rho.init)) 0 else log(rho.init/(1-rho.init)),
       # logScale     = numeric(data$noScaledYears),
       # logScaleSSB  = if(any(data$fleetTypes %in% c(3,4))) {numeric(0)} else {numeric(0)},
@@ -513,7 +515,7 @@ sam <- function(dat,
         map$beta_g = rep(factor(NA),prod(dim(params$beta_g)))
       }
     }
-    if (SR != "HO") map$rec_logk <- factor(NA)
+    if (SR != "BHS") map$rec_logk <- factor(NA)
 
     if(!is.null(CV_w_fix)) map$logCV_w = rep(factor(NA),length(logCV_w))
 
@@ -624,7 +626,8 @@ sam <- function(dat,
                            as.numeric(data$stockRecruitmentModelCode)==1 ~ "RI",
                            as.numeric(data$stockRecruitmentModelCode)==2 ~ "BH",
                            as.numeric(data$stockRecruitmentModelCode)==3 ~ "HS",
-                           as.numeric(data$stockRecruitmentModelCode)==4 ~ "Mesnil")
+                           as.numeric(data$stockRecruitmentModelCode)==4 ~ "Mesnil",
+                           as.numeric(data$stockRecruitmentModelCode)==7 ~ "BHS")
     #
       # a <- exp(rep$par.fixed[names(rep$par.fixed)=="rec_loga"])
       # b <- exp(rep$par.fixed[names(rep$par.fixed)=="rec_logb"])

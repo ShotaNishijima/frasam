@@ -74,11 +74,11 @@ retro_sam <- function(res, n=5, stat="mean", b.fix=TRUE,remove_short_index=-1, m
 
     if (!is.null(map_add)) res.c$input$map.add <- map_add
 
-    if (isTRUE(input$model_wm[1])) {
+    if (isTRUE(res.c$input$model_wm[1])) {
       if (i==1) res.c$input$weight_weight <- res.c$data$weight_weight
       res.c$input$weight_weight[,nc2] <- 0
     }
-    if (isTRUE(input$model_wm[2])) {
+    if (isTRUE(res.c$input$model_wm[2])) {
       if (i==1) res.c$input$maturity_weight <- res.c$data$maturity_weight
       res.c$input$maturity_weight[,nc2] <- 0
     }

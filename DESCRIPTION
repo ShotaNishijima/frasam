@@ -15,12 +15,12 @@ Imports:
     assertthat,
     dplyr,
     ggplot2,
+    glmmTMB,
     magrittr,
     purrr,
     stringr,
     tibble,
     tidyr
 Suggests:
-    testthat,
-    glmmTMB
+    testthat
 RoxygenNote: 7.2.3
