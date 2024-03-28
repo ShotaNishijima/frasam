@@ -29,7 +29,7 @@ NULL
 #' @param samres samの結果オブジェクト
 #' @export
 #'
-get_predSR <- function(samres,max.ssb.pred=1.3){
+get_predSR <- function(samres,max.ssb.pred=1.3,length=100){
   SR = samres$SR
   a = samres$rec.par["a"]
   b = samres$rec.par["b"]
@@ -48,7 +48,7 @@ get_predSR <- function(samres,max.ssb.pred=1.3){
   data_SR$SSB <- data_SR$SSB/samres$input$scale
   data_SR$R <- data_SR$R/samres$input$scale_number
 
-  ssb_c = seq(from=0,to=max(data_SR$SSB)*max.ssb.pred,length=100)
+  ssb_c = seq(from=0,to=max(data_SR$SSB)*max.ssb.pred,length=length)
   R_c = purrr::map_dbl(ssb_c,SRF,a=a,b=b)
   pred_data = data.frame(SSB=ssb_c,R=R_c)
 
@@ -219,7 +219,7 @@ plot_samvpa <- function(vpa_sam_list,CI=0.95,scenario_name=NULL,
 #' @export
 
 retro_plot = function(res,retro_res,start_year=NULL,scale=1000, forecast=FALSE,
-                      base_size=16, plot_mohn=TRUE, mohn_position = "upperleft") {
+                      base_size=14, plot_mohn=TRUE, mohn_position = "upperleft") {
 
   mohn_res = retro_res$mohn
   if (isTRUE(forecast)) {
@@ -229,10 +229,10 @@ retro_plot = function(res,retro_res,start_year=NULL,scale=1000, forecast=FALSE,
 
   res_tibble = convert_sam_tibble(res) %>% mutate(id = 0)
   maxyear = res_tibble$year %>% max
-  if (class(res)=="vpa" & isTRUE(res$input$last.catch.zero)) res_tibble = res_tibble %>% dplyr::filter(year<maxyear)
+  if (isTRUE(res$input$last.catch.zero)) res_tibble = res_tibble %>% dplyr::filter(year<maxyear)
 
   for (i in 1:length(retro_res$Res)) {
-    if (class(res)=="vpa" & isTRUE(res$input$last.catch.zero)) {
+    if (isTRUE(res$input$last.catch.zero)) {
       res_tibble <- full_join(res_tibble, convert_sam_tibble(retro_res$Res[[i]]) %>%
                                 mutate(id = i) %>% dplyr::filter(year<maxyear-i))
     } else {
@@ -414,4 +414,17 @@ caa_plot = function(samres,
 
   return( list(caa = g_caa,resid=g_caa_resid) )
 
+}
+
+#' 再生産関係についてプロットする関数
+#'
+#' @export
+
+plot_SR_simple = function(samres,length=1000,base_size=14,...) {
+  get_SR = get_predSR(samres,length=length,...)
+  g_SR = ggplot(data=NULL,aes(x=SSB,y=R))+
+    geom_point(data=get_SR$est,colour="darkgray",size=2,alpha=0.5)+
+    geom_path(data=get_SR$pred,linewidth=1)+
+    theme_bw(base_size=base_size)
+  return( g_SR )
 }

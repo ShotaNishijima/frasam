@@ -576,11 +576,11 @@ Type objective_function<Type>::operator() ()
     ans += lambda*logB(i)*logB(i);
     }
 
-  // Penalty for HS
-  if(stockRecruitmentModelCode == 3){
+  // Penalty for HS, Mesnil or BHS
+  if(stockRecruitmentModelCode == 3 || stockRecruitmentModelCode == 4 || stockRecruitmentModelCode == 7){
     vector <Type> ssb_vector = ssb.rowwise().sum() ;
-    Type maxSSB = max(ssb_vector) ;
-    Type minSSB = min(ssb_vector) ;
+    Type maxSSB = max(ssb_vector)/scale ;
+    Type minSSB = min(ssb_vector)/scale ;
     Type pen = 0 ;
     pen += CppAD::CondExpLt(exp(rec_logb), maxSSB, Type(0.0), square(rec_logb-log(maxSSB))) ;
     pen += CppAD::CondExpLt(minSSB, exp(rec_logb), Type(0.0), square(log(minSSB)-rec_logb)) ;
@@ -589,16 +589,16 @@ Type objective_function<Type>::operator() ()
   }
 
   // Penalty for Mesnil
-  if(stockRecruitmentModelCode == 4){
-    vector <Type> ssb_vector = ssb.rowwise().sum() ;
-    Type maxSSB = max(ssb_vector) ;
-    Type minSSB = min(ssb_vector) ;
-    Type pen = 0 ;
-    pen += CppAD::CondExpLt(exp(rec_logb), maxSSB, Type(0.0), square(rec_logb-log(maxSSB))) ;
-    pen += CppAD::CondExpLt(minSSB, exp(rec_logb), Type(0.0), square(log(minSSB)-rec_logb)) ;
-    pen *= lambda_Mesnil ;
-    ans += pen ;
-  }
+  // if(stockRecruitmentModelCode == 4){
+  //   vector <Type> ssb_vector = ssb.rowwise().sum() ;
+  //   Type maxSSB = max(ssb_vector) ;
+  //   Type minSSB = min(ssb_vector) ;
+  //   Type pen = 0 ;
+  //   pen += CppAD::CondExpLt(exp(rec_logb), maxSSB, Type(0.0), square(rec_logb-log(maxSSB))) ;
+  //   pen += CppAD::CondExpLt(minSSB, exp(rec_logb), Type(0.0), square(log(minSSB)-rec_logb)) ;
+  //   pen *= lambda_Mesnil ;
+  //   ans += pen ;
+  // }
 
   // modeling somatic growth dynamics of weight
   vector<Type> sd_w=exp(omicron);
