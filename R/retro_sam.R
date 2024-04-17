@@ -38,9 +38,10 @@ retro_sam <- function(res, n=5, stat="mean", b.fix=TRUE,remove_short_index=-1, m
     res.c$input$dat$index <- res.c$input$dat$index[,-nc,drop=FALSE]
 
     res.c$input$dat$catch.prop <- res.c$input$dat$catch.prop[,-nc]
+    # res.c$input$catch_prop <- res.c$input$catch_prop[,-nc,]
 
     nc2 <- nc
-    if (res$input$last.catch.zero){
+    if (isTRUE(res$input$last.catch.zero)){
       res.c$input$dat$caa[,ncol(res.c$input$dat$caa)] <- 0
       nc2 <- nc2-1
     }
@@ -84,6 +85,7 @@ retro_sam <- function(res, n=5, stat="mean", b.fix=TRUE,remove_short_index=-1, m
     }
 
     # res1 <- do.call(sam,res.c$input)
+    # browser()
     if (is.null(p0_retro_list)) {
       res1 <- try(do.call(sam,res.c$input),silent=TRUE)
     } else {
