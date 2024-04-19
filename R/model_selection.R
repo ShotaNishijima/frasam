@@ -137,7 +137,7 @@ select_sigma_grid = function(
     tbl_sigma = bind_rows(tbl_sigma,tibble("stage" = i, "var" = as.character(grid2$var),"which" = as.numeric(grid2$X),"AIC" = sapply(stage_sigma,function(X) X$aic)))
     minAIC2 = min(sapply(stage_sigma,function(X) X$aic))
 
-    message(paste0("Stage ", i, ": The selected setting is 'var='",as.character(grid2$var[age_stage]), " and 'which'=",as.numeric(grid2$X[age_stage]), " AIC = ", round(samres2$aic,2)))
+    message(paste0("Stage ", i, ": The selected setting is 'var='",as.character(grid2$var[age_stage]), " and 'which'=",as.numeric(grid2$X[age_stage]), " AIC = ", round(min(sapply(stage_sigma,function(X) X$aic)),2)))
     grid2 <- grid2[-age_stage,]
     samres2 = stage_sigma[[age_stage]]
     if (minAIC2 < minAIC) {
@@ -156,7 +156,8 @@ select_sigma_grid = function(
   tbl_sigma = tbl_sigma %>% group_by(stage) %>%
     mutate(model = ifelse(AIC == min(AIC),"selected",NA)) %>%
     ungroup() %>%
-    mutate(model = ifelse(AIC == min(AIC),"best",model))
+    mutate(model = ifelse(AIC == min(AIC),"best",model)) %>%
+    dplyr::select(-Age,stage,var,which,AIC,model)
   # browser()
   message(paste0("In the best setting, AIC = ",round(min(tbl_sigma$AIC),2)))
 

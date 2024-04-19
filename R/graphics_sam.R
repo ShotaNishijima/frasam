@@ -213,8 +213,9 @@ plot_samvpa <- function(vpa_sam_list,CI=0.95,scenario_name=NULL,
 }
 
 #' レトロスペクティブ解析の結果をプロットする
-#' @param res フルデータを使った解析結果 (vpa or sam)
-#' @param retro_res
+#' @param res sam object
+#' @param retro_res \code{retro_sam}の結果
+#' @param start_year プロットを開始する年
 #' @import dplyr
 #' @export
 
@@ -229,6 +230,7 @@ retro_plot = function(res,retro_res,start_year=NULL,scale=1000, forecast=FALSE,
 
   res_tibble = convert_sam_tibble(res) %>% mutate(id = 0)
   maxyear = res_tibble$year %>% max
+  # if(isTRUE(forecast)) maxyear <- maxyear + 1
   if (isTRUE(res$input$last.catch.zero)) res_tibble = res_tibble %>% dplyr::filter(year<maxyear)
 
   for (i in 1:length(retro_res$Res)) {
@@ -248,7 +250,7 @@ retro_plot = function(res,retro_res,start_year=NULL,scale=1000, forecast=FALSE,
     summarise(value=mean(value)) %>%
     ungroup() %>%
     mutate(value = if_else(stat == "fishing_mortality",value,value/scale)) %>%
-    mutate(terminal_year = max(data$year)-id)
+    mutate(terminal_year = max(data$year)-id+as.numeric(forecast))
   # if (!(isTRUE(forecast) & class(res)[1]=="sam")) {
   #   data2 = data2 %>% mutate(terminal_year = terminal_year-1)  }
   data2 = data2 %>% dplyr::filter(year <= terminal_year) %>%
@@ -256,9 +258,17 @@ retro_plot = function(res,retro_res,start_year=NULL,scale=1000, forecast=FALSE,
     filter(year >= start_year) %>%
     filter(year <= as.numeric(terminal_year)) %>%
     mutate(terminal_year = factor(terminal_year, levels=unique(terminal_year)))
-  g1 = ggplot(data=data2,aes(x=year,y=value))+
-    geom_path(aes(colour=terminal_year,linetype=terminal_year),size=1)+
+  data_full = data2 %>% filter(id==0)
+  data_others = data2 %>% filter(id>0)
+  data_term = data2 %>%
+    mutate(term_year = as.numeric(as.character(terminal_year))) %>%
+    filter(year==term_year)
+  g1 = ggplot(data=data_others,aes(x=year,y=value))+
+    geom_path(data=data_full,colour="black",linewidth=1)+
+    geom_path(aes(colour=terminal_year),linewidth=1)+
     facet_wrap(vars(stat_f),scales="free_y",ncol=2)+
+    geom_point(data=filter(data_term,id==0),colour="black",size=2)+
+    geom_point(data=filter(data_term,id>0),aes(colour=terminal_year),size=2)+
     theme_SH()+theme_bw(base_size=base_size)+theme(legend.position="none")+
     xlab("Year") + ylab("")+
     ylim(0,NA)
