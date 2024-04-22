@@ -231,12 +231,15 @@ retro_plot = function(res,retro_res,start_year=NULL,scale=1000, forecast=FALSE,
   res_tibble = convert_sam_tibble(res) %>% mutate(id = 0)
   maxyear = res_tibble$year %>% max
   # if(isTRUE(forecast)) maxyear <- maxyear + 1
-  if (isTRUE(res$input$last.catch.zero)) res_tibble = res_tibble %>% dplyr::filter(year<maxyear)
+  # if (isTRUE(res$input$last.catch.zero)) {
+  #   res_tibble = res_tibble %>% dplyr::filter(year<maxyear)
+  #   maxyear <- maxyear - 1
+  # }
 
   for (i in 1:length(retro_res$Res)) {
     if (isTRUE(res$input$last.catch.zero)) {
       res_tibble <- full_join(res_tibble, convert_sam_tibble(retro_res$Res[[i]]) %>%
-                                mutate(id = i) %>% dplyr::filter(year<maxyear-i))
+                                mutate(id = i) %>% dplyr::filter(year<as.numeric(forecast)+maxyear-id))
     } else {
       res_tibble <- full_join(res_tibble, convert_sam_tibble(retro_res$Res[[i]]) %>% mutate(id = i))
     }
@@ -250,7 +253,7 @@ retro_plot = function(res,retro_res,start_year=NULL,scale=1000, forecast=FALSE,
     summarise(value=mean(value)) %>%
     ungroup() %>%
     mutate(value = if_else(stat == "fishing_mortality",value,value/scale)) %>%
-    mutate(terminal_year = max(data$year)-id+as.numeric(forecast))
+    mutate(terminal_year = max(data$year)-id+as.numeric(forecast)-as.numeric(res$input$last.catch.zero))
   # if (!(isTRUE(forecast) & class(res)[1]=="sam")) {
   #   data2 = data2 %>% mutate(terminal_year = terminal_year-1)  }
   data2 = data2 %>% dplyr::filter(year <= terminal_year) %>%
@@ -383,6 +386,90 @@ index_plot = function(samvpa_list,model_name=NULL, fleet_no = NULL,
 
   return( list(index=g_index,resid=g_resid,abund=g_abund) )
 }
+
+#' Indexの当てはまりについてプロットする関数
+#'
+#' @export
+
+index_plot2 = function(samres, index_name = NULL,
+                      scales=c("free","free_x","free"),base_size=14) {
+  # browser()
+  dat_index = samres$input$dat$index
+  index_obs = as_tibble(dat_index) %>%
+    mutate(id = 1:n()) %>%
+    pivot_longer(cols=-id,names_to="Year",values_to="obs")
+  res = samres
+  index_obs = index_obs %>% full_join(
+      as_tibble(res$pred.index) %>% mutate(id=1:n()) %>%
+        pivot_longer(cols=-id,names_to="Year",values_to="pred")
+    )
+
+  if (is.null(index_name)) index_name = as.character(1:nrow(dat_index))
+
+  index_pred = index_obs %>%
+    # pivot_longer(cols=all_of(model_name),names_to = "Model",values_to="pred") %>%
+    na.omit() %>%
+    mutate(resid = log(obs/pred)) %>%
+    mutate(Year = as.numeric(Year)) %>%
+    mutate(Fleet = index_name[id]) %>%
+    mutate(Fleet = factor(Fleet,levels=index_name))
+
+  index_obs = na.omit(index_obs) %>%
+    mutate(Year = as.numeric(Year)) %>%
+    mutate(Fleet = index_name[id]) %>%
+    mutate(Fleet = factor(Fleet,levels=index_name))
+
+  g_index = ggplot(data=NULL,aes(x=Year))+
+    geom_point(data=index_obs,aes(y=obs),colour="black",size=1.5)+
+    geom_path(data=index_pred,aes(y=pred),colour="blue",size=1)+
+    facet_wrap(vars(Fleet),nrow=2,scales=scales[1])+
+    scale_colour_brewer(palette="Set1",name="")+
+    theme_bw(base_size=base_size)+theme(legend.position="top")+
+    ylab("Index value")+ylim(0,NA)
+  # g_index
+
+  g_resid = ggplot(data=index_pred,aes(x=Year,y=resid)) +
+    # geom_point(data=index_obs,aes(y=obs),size=1.5) +
+    geom_point(size=1.5)+
+    facet_wrap(vars(Fleet),nrow=2,scales=scales[2])+
+    theme_bw(base_size=base_size)+theme(legend.position="top")+
+    scale_colour_brewer(palette="Set1",name="")+
+    scale_shape_discrete(name="")+
+    geom_hline(yintercept=0)+
+    stat_smooth(level=0.8,se=TRUE)+
+    ylab("Residual")
+
+  index_pred2 = index_pred
+  # %>% mutate(model_no = map_dbl(1:n(), function(i) which(model_name==Model[i])))
+  q_tmp = sapply(1:nrow(index_pred2), function(i) samres$q[index_pred2$id[i]])
+  b_tmp = sapply(1:nrow(index_pred2), function(i) samres$b[index_pred2$id[i]])
+  index_pred2 = index_pred2 %>% mutate(q=q_tmp,b=b_tmp) %>%
+    mutate(abund = (pred/q)^(1/b))
+
+  # colnames(index_pred2)
+
+  index_pred_tmp = index_pred2 %>% group_by(Fleet,id,q,b) %>%
+    summarise(max_abund = max(abund))
+
+  index_pred_curve = map_dfr(1:nrow(index_pred_tmp), function(i) {
+    data.frame(Fleet=index_pred_tmp$Fleet[i],id=index_pred_tmp$id[i],
+               q=index_pred_tmp$q[i],b=index_pred_tmp$b[i],abund=seq(0,index_pred_tmp$max_abund[i],length=201)) %>%
+      mutate(pred = q*abund^b)
+  })
+
+  g_abund = ggplot(data=NULL,aes(x=abund))+
+    geom_path(data=index_pred_curve,aes(y=pred),colour="blue",size=1)+
+    geom_point(data=index_pred2,aes(y=obs),size=1.5)+
+    facet_wrap(vars(Fleet),nrow=2,scales=scales[3])+
+    theme_bw(base_size=base_size)+theme(legend.position="top")+
+    scale_colour_brewer(palette="Set1",name="")+
+    ylab("Index")+xlab("Abundance")
+
+  # g_abund
+
+  return( list(index=g_index,resid=g_resid,abund=g_abund) )
+}
+
 
 #' Catch at ageの当てはまりについてプロットする関数
 #'
