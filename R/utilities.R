@@ -49,7 +49,7 @@ get_pm <- function(res_sam,
   ssb   <- colSums(res_sam$ssb)
 
   # calculate biological reference points
-  Fcurrent <- rowMeans(res_sam$faa[, as.character(year_Fcur)])
+  Fcurrent <- rowMeans(res_sam$faa[, as.character(year_Fcur), drop=F])
   refs <- frasyr::ref.F(res_sam, Fcurrent=Fcurrent, pSPR=perSPR,
                         M.year=year_biol, waa.year=year_biol, maa.year=year_biol,plot=FALSE)$summary
   refs <- refs[colnames(refs)%in%c("F0.1",str_c("FpSPR.",perSPR,".SPR"))][3,]
