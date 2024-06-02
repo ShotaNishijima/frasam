@@ -328,6 +328,9 @@ Calcu_Fmsy <- function(M, Sel, w, g, A = 6, method,
 #' @param alpha Estimated Parameter alpha in the Beverton-Holt stock recruitment relationship.
 #' @param beta Estimated Parameter beta in the Beverton-Holt stock recruitment relationship.
 #' @return A value of the stock biomass at the maximum sustainable yield (Bmsy).
+#' 
+#' @export
+#' 
 
 Calcu_Bmsy <- function(Fmsy, M, Sel, w, g, A = 6,
                        alpha, beta, method_SR){

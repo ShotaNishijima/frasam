@@ -56,9 +56,9 @@ get_pm <- function(res_sam,
 
   # calculate MSY reference points (use function copied from OMutility, OMutilityのときは6歳のF=1と定義していた。ここではどう定義する？)
   biopar <- derive_biopar(res_sam, year_biol)
-  RFmsy   <- Calcu_Fmsy(M=biopar$M, Sel=biopar$faa, w=biopar$waa, g=biopar$maa, method="Baranov", alpha=exp(res_sam$par_list$rec_loga), beta=exp(res_sam$par_list$rec_logb), method_SR=res_sam$SR)
-  Bmsy   <- Calcu_Bmsy(RFmsy, M=biopar$M, Sel=biopar$faa, w=biopar$waa, g=biopar$maa, alpha=exp(res_sam$par_list$rec_loga), beta=exp(res_sam$par_list$rec_logb), method_SR=res_sam$SR)
-  SBmsy   <- Calcu_SBmsy(RFmsy, M=biopar$M, Sel=biopar$faa, w=biopar$waa, g=biopar$maa, alpha=exp(res_sam$par_list$rec_loga), beta=exp(res_sam$par_list$rec_logb), method_SR=res_sam$SR)
+  RFmsy   <- Calcu_Fmsy(M=biopar$M, Sel=Fcurrent, w=biopar$waa, g=biopar$maa, method="Baranov", alpha=exp(res_sam$par_list$rec_loga), beta=exp(res_sam$par_list$rec_logb), method_SR=res_sam$SR)
+  Bmsy   <- Calcu_Bmsy(RFmsy, M=biopar$M, Sel=Fcurrent, w=biopar$waa, g=biopar$maa, alpha=exp(res_sam$par_list$rec_loga), beta=exp(res_sam$par_list$rec_logb), method_SR=res_sam$SR)
+  SBmsy   <- Calcu_SBmsy(RFmsy, M=biopar$M, Sel=Fcurrent, w=biopar$waa, g=biopar$maa, alpha=exp(res_sam$par_list$rec_loga), beta=exp(res_sam$par_list$rec_logb), method_SR=res_sam$SR)
   TBy <- res_sam$baa[,last_year] %>% sum()
   SBy <- res_sam$ssb[,last_year] %>% sum()
     
