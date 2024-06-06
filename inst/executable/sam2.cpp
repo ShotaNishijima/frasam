@@ -607,10 +607,10 @@ Type objective_function<Type>::operator() ()
       F_mean(i)+=exp(logF((keyLogFsta(0,j)),i));
       if (j<(stateDimN-1)) {
         zz=exp(logF((keyLogFsta(0,j)),i))+natMor(i,j);
-        Catch_biomass(i)+=exp(logN(j,i))*stockMeanWeight_true(i,j)*exp(logF((keyLogFsta(0,j)),i))/zz;
+        Catch_biomass(i)+=exp(logN(j,i))*stockMeanWeight_true(i,j)*exp(logF((keyLogFsta(0,j)),i))*(1-exp(-zz))/zz;
       } else {
         zz=alpha*exp(logF((keyLogFsta(0,j)),i))+natMor(i,j);
-        Catch_biomass(i)+=exp(logN(j,i))*stockMeanWeight_true(i,j)*alpha*exp(logF((keyLogFsta(0,j)),i))/zz;
+        Catch_biomass(i)+=exp(logN(j,i))*stockMeanWeight_true(i,j)*alpha*exp(logF((keyLogFsta(0,j)),i))*(1-exp(-zz))/zz;
       }
     }
     F_mean(i)/=stateDimN;
@@ -807,8 +807,8 @@ Type objective_function<Type>::operator() ()
     REPORT(logN);
     REPORT(obs);
   }
-  ADREPORT(logN);
-  ADREPORT(logF);
+  // ADREPORT(logN);
+  // ADREPORT(logF);
   ADREPORT(exp_logN);
   ADREPORT(exp_logF);
   ADREPORT(ssb);

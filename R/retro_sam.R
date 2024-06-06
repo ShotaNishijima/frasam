@@ -1,9 +1,7 @@
 
-####################################################
-### Retrospective Analysis including Forecasting ###
-####################################################
-
-#'レトロスペクティブ解析を実施する
+#' レトロスペクティブ解析を実施する
+#'
+#' retrospective forecasting is also possible
 #'
 #' @export
 

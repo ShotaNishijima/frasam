@@ -1,7 +1,3 @@
-#########################################################
-##### Core function of State-space Assessment model #####
-#########################################################
-
 #' SAMによる資源計算を実施する
 #'
 #' @param dat samに使用するdataでrvpaと同じフォーマットで利用可能
@@ -82,8 +78,9 @@ sam <- function(dat,
                 sep_omicron=TRUE,
                 growth_regime = NULL,
                 catch_prop = NULL,
-                no_est=FALSE
-                # retro.years = 0,
+                no_est=FALSE,
+                getJointPrecision = FALSE,
+                loopnum = 2
 ){
 
   argname <- ls()
@@ -124,7 +121,6 @@ sam <- function(dat,
       }
     }
 
-    # browser()
     obs <- suppressWarnings(
       cbind(expand.grid(as.numeric(rownames(caa)),as.numeric(colnames(caa))),1,unlist(caa))[,c(2,3,1,4)]
     )
@@ -416,7 +412,6 @@ sam <- function(dat,
   }
 
   if (isTRUE(model_wm[2]) && is.null(p0.list)) {
-    # browser()
     mod_mat0 = glmmTMB(y~factor(Age) + 0,data=maa_dat,family=ordbeta)
     alpha_g = mod_mat0$fit$par[names(mod_mat0$fit$par)=="beta"] %>% as.numeric()
     alpha_g = matrix(rep(alpha_g,nr),ncol=nr)
@@ -557,11 +552,10 @@ sam <- function(dat,
   if(!is.null(add_random)) {
     random = c(random,add_random)
   }
-  # browser()
 
     # obj <- TMB::MakeADFun(data, params, map = map, random=c("U"), DLL=cpp.file.name,silent=silent)
     obj <- TMB::MakeADFun(data, params, map = map, random=random, DLL=cpp.file.name,silent=silent)
-
+    obj$fn(obj$par)
 
   if(isTRUE(FreeADFun)) {
     TMB::FreeADFun(obj)
@@ -581,9 +575,33 @@ sam <- function(dat,
   }
 
   if(!isTRUE(no_est)) {
-    opt <- nlminb(obj$par, obj$fn, obj$gr, lower=lower, upper=upper)
+    nlminb.control = list(eval.max = 1e4,
+                          iter.max = 1e4,
+                          trace = 0)
+    # inital optimization
+    opt <- nlminb(obj$par, obj$fn, obj$gr, lower=lower, upper=upper,control=nlminb.control)
+
+    # pars = opt$par
+    # print(pars)
+    # set.seed(1)
+    # for(jj in 1:100) {
+    #   pars2 = pars + rnorm(length(pars),0,0.01)
+    #   if (as.numeric(obj$fn(x=pars)) > as.numeric(obj$fn(x=pars2))) {
+    #     print(pars2)
+    #     pars <- pars2
+    #   }
+    # }
+    # obj$par <- pars
+
+    # Re-run to further decrease final gradient (https://github.com/kaskr/TMB_contrib_R/blob/master/TMBhelper/R/fit_tmb.R)
+    for( i in seq(2,loopnum,length=max(0,loopnum-1)) ){
+      # Temp = parameter_estimates[c('iterations','evaluations')]
+      opt2 = nlminb( start=obj$par, objective=obj$fn, gradient=obj$gr, control=nlminb.control, lower=lower, upper=upper )
+      opt <- opt2
+    }
+
     if (opt$convergence!=0) warning("May not converge")
-    rep <- TMB::sdreport(obj,bias.correct = bias.correct,bias.correct.control = list(sd=bias.correct.sd), getReportCovariance=get.random.vcov)
+    rep <- TMB::sdreport(obj,bias.correct = bias.correct,bias.correct.control = list(sd=bias.correct.sd), getReportCovariance=get.random.vcov,getJointPrecision=getJointPrecision)
     if (max(rep$gradient.fixed)>1e-2) warning("Large maximum gradient component")
 
     # stop("Finish Optimization")
@@ -726,7 +744,6 @@ sam <- function(dat,
           }
         }
         if (abund[i]=="Bf") {
-          # browser()
           pred.index[i,] <- 0
           for (j in index.age[i]:max.age[i]) {
             pred.index[i,] <- pred.index[i,]+as.numeric(baa[j+1,]*obj$env$report()[["saa_f"]][j+1,,i+1])/scale

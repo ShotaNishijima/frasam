@@ -14,6 +14,7 @@ samprofile <- function(samres,param_name,which_param=1,param_range=NULL,length=5
 
   data = samres$data
   init = samres$par_list
+  # init = samres$opt$par
   map = samres$map
 
   if (is.null(param_range)) {
@@ -23,7 +24,9 @@ samprofile <- function(samres,param_name,which_param=1,param_range=NULL,length=5
 
   prof_param = seq(param_range[1],param_range[2],length=length)
 
-  map[[param_name]] <- 0:(length(init[[param_name]])-1)
+  if(is.null(map[[param_name]])) {
+    map[[param_name]] <- 0:(length(samres$par_list[[param_name]])-1)
+  }
   map[[param_name]][which_param] <- NA
   map[[param_name]] <- factor(map[[param_name]])
 
@@ -37,10 +40,21 @@ samprofile <- function(samres,param_name,which_param=1,param_range=NULL,length=5
   par_tbl = tibble(name = names(samres$opt$par),value = samres$opt$par,
                    likelihood="maximum")
 
+  # obj = samres$obj
+  # tmp <- try(obj$fn(opj$par))
+  # if(class(tmp)[1]=="try-error") {
+  # obj = TMB::MakeADFun(data,init,map=map,random=random,DLL=samres$input$cpp.file.name,silent=TRUE)
+  # }
+  # obj$fn(opj$par)
+  nlminb.control = list(eval.max = 1e4,
+                        iter.max = 1e4,
+                        trace = 0)
   for (i in 1:length) {
     init[[param_name]][which_param] <- prof_param[i]
     obj_tmp = TMB::MakeADFun(data,init,map=map,random=random,DLL=samres$input$cpp.file.name,silent=TRUE)
-    opt_tmp = nlminb(obj_tmp$par, obj_tmp$fn, obj_tmp$gr)
+    obj_tmp$fn(opt_tmp$par)
+    opt_tmp = nlminb(obj_tmp$par, obj_tmp$fn, obj_tmp$gr,control=nlminb.control)
+    # opt_tmp = nlminb(obj_tmp$par, obj_tmp$fn, obj_tmp$gr,control=nlminb.control)
     message(paste0("par: ",prof_param[i],"   objective: ", opt_tmp$objective))
     obj[[i]] <- obj_tmp
     opt[[i]] <- opt_tmp
@@ -73,11 +87,14 @@ samprofile <- function(samres,param_name,which_param=1,param_range=NULL,length=5
 #'
 #' @export
 
-est_fixed <- function(tmbdata,par_init,map,random="U",cpp.file.name="sam",silent=TRUE) {
+est_fixed <- function(tmbdata,par_init,map,random="U",cpp.file.name="sam2",silent=TRUE,...) {
 
-  obj_tmp = TMB::MakeADFun(tmbdata,par_init,map=map,random=random,DLL=cpp.file.name,silent=silent)
-  opt_tmp = nlminb(obj_tmp$par, obj_tmp$fn, obj_tmp$gr)
-
+  obj_tmp = TMB::MakeADFun(tmbdata,par_init,map=map,random=random,DLL=cpp.file.name,silent=silent,...)
+  obj_tmp$fn(opj_tmp$par)
+  nlminb.control = list(eval.max = 1e4,
+                        iter.max = 1e4,
+                        trace = 0)
+  opt_tmp = nlminb(obj_tmp$par, obj_tmp$fn, obj_tmp$gr,control=nlminb.control)
 
   return(list(obj=obj_tmp,opt=opt_tmp))
 }
@@ -91,10 +108,10 @@ est_fixed <- function(tmbdata,par_init,map,random="U",cpp.file.name="sam",silent
 #'
 #' @export
 
-est_mixed <- function(tmbdata,par_init,map,random="U",cpp.file.name="sam",silent=TRUE,bias_correct=TRUE) {
+est_mixed <- function(tmbdata,par_init,map,random="U",cpp.file.name="sam2",silent=TRUE,bias_correct=TRUE) {
 
   tmp = est_fixed(tmbdata,par_init,map=map,random=random,cpp.file.name=cpp.file.name,silent=silent)
-  rep = TMB::sdreport(tmp$obj)
+  rep = TMB::sdreport(tmp$obj,bias.correct=bias_correct)
 
   return(list(obj=tmp$obj,opt=tmp$opt,rep=rep))
 }

@@ -68,9 +68,10 @@ get_predSR <- function(samres,max.ssb.pred=1.3,length=100){
 #' @encoding UTF-8
 
 plot_samvpa <- function(vpa_sam_list,CI=0.95,scenario_name=NULL,
-                     alpha=0.4,size=1,base_size=16,log_scale=FALSE,
+                     alpha=0.4,size=1,base_size=14,log_scale=FALSE,
                      legend_name="Scenario",legend_nrow=1, legend_position="top",
-                     what.plot = c("biomass","SSB","Recruitment","U"),years = NULL
+                     what.plot = c("biomass","SSB","Recruitment","U"),years = NULL,
+                     ncol=3
 ){
 
   g0 = frasyr::plot_vpa(vpa_sam_list)
@@ -90,10 +91,12 @@ plot_samvpa <- function(vpa_sam_list,CI=0.95,scenario_name=NULL,
     mutate(stat2 = case_when(stat=="biomass" ~ "Biomass",
                              stat=="fishing_mortality"~"F",
                              stat=="U"~"Exploitation_rate",
+                             stat=="catch"~"Catch",
                              TRUE ~ stat))
   what.plot_f = case_when(what.plot=="biomass" ~ "Biomass",
                           what.plot=="fishing_mortality"~"F",
                           what.plot=="U"~"Exploitation_rate",
+                          what.plot=="catch"~"Catch",
                           TRUE ~ what.plot)
   # data2$stat2 %>% unique
   data2 = data2 %>%
@@ -113,6 +116,7 @@ plot_samvpa <- function(vpa_sam_list,CI=0.95,scenario_name=NULL,
   stat_order = case_when(what.plot=="biomass" ~ "Biomass",
                           what.plot=="fishing_mortality"~"F",
                           what.plot=="U"~"Exploitation_rate",
+                         what.plot=="catch"~"Catch",
                           TRUE ~ what.plot)
   for(i in 1:length(vpa_sam_list)) {
     res = vpa_sam_list[[i]]
@@ -129,13 +133,17 @@ plot_samvpa <- function(vpa_sam_list,CI=0.95,scenario_name=NULL,
       cvdata_R = cvdata %>% filter(stat0=="N") %>%
         arrange(Year) %>%
         mutate(Age = rep(as.numeric(rownames(res$naa)),ncol(res$naa))) %>%
-        filter(Age == 0) %>%
+        filter(Age == min(Age)) %>%
         select(-Age) %>%
         mutate(stat = "Recruitment")
 
       # cvdata$stat0 %>% unique()
-      cvdata = cvdata %>% filter(stat0 %in% c("SSB","B_total","F_mean","U")) %>%
-        mutate(stat = case_when(stat0=="SSB" ~ "SSB",stat0=="F_mean" ~ "F", stat0=="U" ~ "Exploitation_rate",TRUE ~ "Biomass")) %>%
+      cvdata = cvdata %>% filter(stat0 %in% c("SSB","B_total","F_mean","U","catch")) %>%
+        mutate(stat = case_when(stat0=="SSB" ~ "SSB",
+                                stat0=="F_mean" ~ "F",
+                                stat0=="U" ~ "Exploitation_rate",
+                                stat0 =="catch" ~ "Catch",
+                                TRUE ~ "Biomass")) %>%
         full_join(cvdata_R) %>%
         mutate(stat_f = factor(stat,levels=stat_order)) %>%
         select(-stat0,stat)
@@ -145,10 +153,10 @@ plot_samvpa <- function(vpa_sam_list,CI=0.95,scenario_name=NULL,
     if (class(res)=="sam") {
       if (is.null(res$rep$unbiased)){
         cvdata2 = tibble(stat0 = names(res$rep$value),CV=res$rep$sd/res$rep$value,model=scenario_name[i]) %>%
-          filter(stat0 %in% c("exp_logN","ssb","B_total","F_mean","Exploitation_rate"))
+          filter(stat0 %in% c("exp_logN","ssb","B_total","F_mean","Exploitation_rate","Catch_biomass"))
       }else{
         cvdata2 = tibble(stat0 = names(res$rep$value),CV=res$rep$sd/res$rep$unbiased$value,model=scenario_name[i]) %>%
-          filter(stat0 %in% c("exp_logN","ssb","B_total","F_mean","Exploitation_rate"))
+          filter(stat0 %in% c("exp_logN","ssb","B_total","F_mean","Exploitation_rate","Catch_biomass"))
       }
 
       cvdata2_R = cvdata2 %>% filter(stat0=="exp_logN") %>%
@@ -157,9 +165,13 @@ plot_samvpa <- function(vpa_sam_list,CI=0.95,scenario_name=NULL,
         mutate(Year = as.numeric(colnames(res$naa))) %>%
         select(-Age) %>% mutate(stat = "Recruitment")
 
-      cvdata2 = cvdata2 %>% filter(stat0 %in% c("ssb","B_total","F_mean","Exploitation_rate")) %>%
-        mutate(Year = rep(as.numeric(colnames(res$naa)),4)) %>%
-        mutate(stat = case_when(stat0=="ssb" ~ "SSB",stat0=="F_mean" ~ "F", stat0=="B_total" ~ "Biomass", TRUE~stat0)) %>%
+      cvdata2 = cvdata2 %>% filter(stat0 %in% c("ssb","B_total","F_mean","Exploitation_rate","Catch_biomass")) %>%
+        mutate(Year = rep(as.numeric(colnames(res$naa)),5)) %>%
+        mutate(stat = case_when(stat0=="ssb" ~ "SSB",
+                                stat0=="F_mean" ~ "F",
+                                stat0=="B_total" ~ "Biomass",
+                                stat0=="Catch_biomass" ~ "Catch",
+                                TRUE~stat0)) %>%
         full_join(cvdata2_R)
       cvdata2 = cvdata2 %>% filter(stat %in% stat_order) %>%
         mutate(stat_f = factor(stat,levels=stat_order)) %>%
@@ -194,7 +206,7 @@ plot_samvpa <- function(vpa_sam_list,CI=0.95,scenario_name=NULL,
 
   g1 = g1 +
     geom_path(aes(colour=Model,linetype=Model),size=size)+
-    facet_wrap(vars(stat_f),scales="free_y",ncol=2)+
+    facet_wrap(vars(stat_f),scales="free_y",ncol=ncol)+
     theme_SH()+theme_bw(base_size=base_size)+theme(legend.position=legend_position)+
     xlab("Year") + ylab("")+
     # ylim(0,NA)
@@ -202,7 +214,8 @@ plot_samvpa <- function(vpa_sam_list,CI=0.95,scenario_name=NULL,
     scale_linetype_discrete(name=legend_name)+
     guides(colour=guide_legend(nrow=legend_nrow),
            fill=guide_legend(nrow=legend_nrow),
-           linetype=guide_legend(nrow=legend_nrow))
+           linetype=guide_legend(nrow=legend_nrow))+
+    scale_x_continuous(breaks=scales::pretty_breaks())
   if (isTRUE(log_scale)) {
     g1 = g1 + scale_y_log10()
   } else {
@@ -274,7 +287,8 @@ retro_plot = function(res,retro_res,start_year=NULL,scale=1000, forecast=FALSE,
     geom_point(data=filter(data_term,id>0),aes(colour=terminal_year),size=2)+
     theme_SH()+theme_bw(base_size=base_size)+theme(legend.position="none")+
     xlab("Year") + ylab("")+
-    ylim(0,NA)
+    ylim(0,NA) +
+    scale_x_continuous(breaks=scales::breaks_pretty())
   if (isTRUE(plot_mohn)) {
     mohn = tibble(rho = mohn_res, stat = names(mohn_res)) %>%
       dplyr::filter(stat != "N") %>%
