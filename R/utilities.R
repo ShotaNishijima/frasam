@@ -41,7 +41,12 @@ get_pm <- function(res_sam,
   last_year <- last_year %>% as.character()
 
   # define waa catch
-  res_sam$input$dat$waa.catch <- waa_catch 
+  res_sam$input$dat$waa.catch <- waa_catch
+
+
+  if(res_sam$input$SR=="BHS"){
+    res_sam$input$SR <- res_sam$SR <- "HS"
+  }
 
   # define state variables
   aveF  <- colSums(res_sam$caa * res_sam$input$dat$waa.catch * res_sam$faa)/colSums(res_sam$caa * res_sam$input$dat$waa)
@@ -50,15 +55,23 @@ get_pm <- function(res_sam,
 
   # calculate biological reference points
   Fcurrent <- rowMeans(res_sam$faa[, as.character(year_Fcur)])
-  refs <- frasyr::ref.F(res_sam, Fcurrent=Fcurrent, pSPR=perSPR,
+  refs <- frasyr::ref.F(res_sam, Fcurrent=Fcurrent, pSPR=perSPR,rps.year=as.numeric(colnames(res_sam$naa)), 
                         M.year=year_biol, waa.year=year_biol, maa.year=year_biol,plot=FALSE)$summary
-  refs <- refs[colnames(refs)%in%c("F0.1",str_c("FpSPR.",perSPR,".SPR"))][3,]
+  refs <- refs[colnames(refs)%in%c("Fmed","F0.1",str_c("FpSPR.",perSPR,".SPR"))][3,]
+
 
   # calculate MSY reference points (use function copied from OMutility, OMutilityのときは6歳のF=1と定義していた。ここではどう定義する？)
   biopar <- derive_biopar(res_sam, year_biol)
-  RFmsy   <- Calcu_Fmsy(M=biopar$M, Sel=biopar$faa, w=biopar$waa, g=biopar$maa, method="Baranov", alpha=exp(res_sam$par_list$rec_loga), beta=exp(res_sam$par_list$rec_logb), method_SR=res_sam$SR)
-  Bmsy   <- Calcu_Bmsy(RFmsy, M=biopar$M, Sel=biopar$faa, w=biopar$waa, g=biopar$maa, alpha=exp(res_sam$par_list$rec_loga), beta=exp(res_sam$par_list$rec_logb), method_SR=res_sam$SR)
-  SBmsy   <- Calcu_SBmsy(RFmsy, M=biopar$M, Sel=biopar$faa, w=biopar$waa, g=biopar$maa, alpha=exp(res_sam$par_list$rec_loga), beta=exp(res_sam$par_list$rec_logb), method_SR=res_sam$SR)
+  if(res_sam$input$SR!="Prop"){
+    RFmsy   <- Calcu_Fmsy(M=biopar$M, Sel=biopar$faa, w=biopar$waa, g=biopar$maa, method="Baranov", alpha=exp(res_sam$par_list$rec_loga), beta=exp(res_sam$par_list$rec_logb), method_SR=res_sam$SR)
+    Bmsy   <- Calcu_Bmsy(RFmsy, M=biopar$M, Sel=biopar$faa, w=biopar$waa, g=biopar$maa, alpha=exp(res_sam$par_list$rec_loga), beta=exp(res_sam$par_list$rec_logb), method_SR=res_sam$SR)
+    SBmsy   <- Calcu_SBmsy(RFmsy, M=biopar$M, Sel=biopar$faa, w=biopar$waa, g=biopar$maa, alpha=exp(res_sam$par_list$rec_loga), beta=exp(res_sam$par_list$rec_logb), method_SR=res_sam$SR)
+  }
+  else{
+    RFmsy <- NA
+    Bmsy <- NA
+    SBmsy <- NA
+  }
   TBy <- res_sam$baa[,last_year] %>% sum()
   SBy <- res_sam$ssb[,last_year] %>% sum()
     
@@ -183,8 +196,8 @@ do_allboot <- function(res_sam_list, nsim=100, year_biol=2020:2022){
     res_pm_boot <- purrr::map_dfr(res_sam_boot[[i]], function(x) get_pm(x,year_biol=year_biol), .id="sim") %>%
         mutate(Model=i)
     res_pm <- bind_rows(res_pm,res_pm_boot)
-    res_SR_boot[[i]] <- purrr::map(res_rand, function(x) make_SRres(x, multi_ssb=1))
-    res_SR_fit[[i]] <- purrr::map(res_rand, function(x){
+    res_SR_boot[[i]] <- purrr::map(res_sam_boot[[i]], function(x) make_SRres(x, multi_ssb=1))
+    res_SR_fit[[i]] <- purrr::map(res_sam_boot[[i]], function(x){
         SRdata <- get.SRdata(x)
         fit.SR(SRdata, SR="BH")
     })
