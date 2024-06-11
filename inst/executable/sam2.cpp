@@ -273,22 +273,26 @@ Type objective_function<Type>::operator() ()
   using namespace density;  // 多変量正規分布を使う宣言
   MVNORM_t<Type> neg_log_densityF(fvar);  // var-cov matirx fvarを持つMVN
   Type ans=0;
-  array<Type> logF_resid(stateDimF,timeSteps); //
+  Type ans_f=0;
+  array<Type> logF_resid(stateDimF,timeSteps); // F process error residual
   if (F_RW_order==0) {
     for(int i=1;i<timeSteps;i++){
-      ans+=Fprocess_weight(i)*neg_log_densityF(logF.col(i)-logF.col(i-1)); // F-Process likelihood
+      ans_f+=Fprocess_weight(i)*neg_log_densityF(logF.col(i)-logF.col(i-1)); // F-Process likelihood
       SIMULATE {
         logF.col(i) = logF.col(i-1) + neg_log_densityF.simulate();
       }
+      logF_resid.col(i)=logF.col(i)-logF.col(i-1);
     }
   } else { // second order
     for(int i=2;i<timeSteps;i++){
-      ans+=Fprocess_weight(i)*neg_log_densityF(logF.col(i)-(Type(1.0)+F_RW_order)*logF.col(i-1)+F_RW_order*logF.col(i-2)); // F-Process likelihood
+      ans_f+=Fprocess_weight(i)*neg_log_densityF(logF.col(i)-(Type(1.0)+F_RW_order)*logF.col(i-1)+F_RW_order*logF.col(i-2)); // F-Process likelihood
       SIMULATE {
         logF.col(i) = (Type(1.0)+F_RW_order)*logF.col(i-1) - F_RW_order*logF.col(i-2) + neg_log_densityF.simulate();
       }
+      logF_resid.col(i)=logF.col(i)-(Type(1.0)+F_RW_order)*logF.col(i-1)+F_RW_order*logF.col(i-2);
     }
   }
+  ans+=ans_f;
 
   for(int i=0;i<timeSteps;i++){ // calc ssb
     ssb(i)=0.0;
@@ -358,6 +362,7 @@ Type objective_function<Type>::operator() ()
   vector<Type> predN0(stateDimN);  // logNの予測値
   vector<Type> predN(stateDimN);  // logNの予測値
   vector<Type> recResid(timeSteps); //再生産関係からの残差
+  array<Type> logN_resid(stateDimN,timeSteps); // N process error residual
 
   int start_timeStep=1+minAge;
   if(stockRecruitmentModelCode==0){ // if RW
@@ -383,6 +388,7 @@ Type objective_function<Type>::operator() ()
   // }
   // MVNORM_t<Type> neg_log_densityN0(nvar0);
   Type phi1 = (exp(trans_phi1)-Type(1.0))/(exp(trans_phi1)+Type(1.0));
+  Type ans_n=0.0;
 
   for(int i=start_timeStep;i<timeSteps;i++){
     if(stockRecruitmentModelCode==0){ // straight RW
@@ -446,11 +452,13 @@ Type objective_function<Type>::operator() ()
       predN(stateDimN-1)=log(exp(logN(stateDimN-2,i-1)-exp(logF((keyLogFsta(0,stateDimN-2)),i-1))-natMor(i-1,stateDimN-2))+
                              exp(logN(stateDimN-1,i-1)-alpha*exp(logF((keyLogFsta(0,stateDimN-1)),i-1))-natMor(i-1,stateDimN-1))); // plus group
     }
-    ans+=neg_log_densityN(logN.col(i)-predN); // N-Process likelihood
+    ans_n+=neg_log_densityN(logN.col(i)-predN); // N-Process likelihood
     SIMULATE {
       logN.col(i) = predN + neg_log_densityN.simulate();
     }
+    logN_resid.col(i)=logN.col(i)-predN;
   }
+  ans+=ans_n;
 
 
   // Now finally match to observations
@@ -458,6 +466,7 @@ Type objective_function<Type>::operator() ()
   int minYear=CppAD::Integer((obs(0,0)));
   Type predObs=0, zz, var;
   vector<Type> pred_log(nobs); //
+  vector<Type> ans_obs(nobs);
   for(int i=0;i<nobs;i++){
     y=CppAD::Integer(obs(i,0))-minYear;   // 年のラベル
     f=CppAD::Integer(obs(i,1));    //  fleetのラベル
@@ -584,12 +593,13 @@ Type objective_function<Type>::operator() ()
       }
     }
     var=varLogObs(CppAD::Integer(keyVarObs(f-1,a)));
-    ans+=-dnorm(log(obs(i,3)),predObs,sqrt(var),true);
+    ans_obs(i)=-dnorm(log(obs(i,3)),predObs,sqrt(var),true);
     pred_log(i) = predObs;
     SIMULATE {
       obs(i,3) = exp( rnorm(predObs, sqrt(var)) ) ;
     }
   }
+  ans+=sum(ans_obs);
 
   if(b_random==1){
     ans+=-sum(dnorm(logB,0,exp(logSD_b),true));
@@ -832,6 +842,12 @@ Type objective_function<Type>::operator() ()
   REPORT(ans_g);
   REPORT(N_mat);
   // REPORT(FY);
+  REPORT(logF_resid);
+  REPORT(logN_resid);
+  REPORT(ans_f);
+  REPORT(ans_n);
+  REPORT(ans_obs);
+  REPORT(ans);
 
   return ans;
 }
