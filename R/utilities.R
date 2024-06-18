@@ -32,7 +32,7 @@ get_pm <- function(res_sam,
                    waa_biom=res_sam$input$dat$waa,
                    year_biol=2020:2022,
                    year_Fcur=2020:2022,
-                   perSPR=c(30,40,50)
+                   perSPR=c(30,40,50, 60, 70)
                    ){
 
   # define year range
@@ -56,21 +56,34 @@ get_pm <- function(res_sam,
   # calculate biological reference points
   Fcurrent <- rowMeans(res_sam$faa[, as.character(year_Fcur)])
   refs <- frasyr::ref.F(res_sam, Fcurrent=Fcurrent, pSPR=perSPR,rps.year=as.numeric(colnames(res_sam$naa)), 
-                        M.year=year_biol, waa.year=year_biol, maa.year=year_biol,plot=FALSE)$summary
+                        M.year=year_biol, waa.year=year_biol, maa.year=year_biol,plot=FALSE)
+  currentSPR <- refs$currentSPR$perSPR
+  refs <- refs$summary
   refs <- refs[colnames(refs)%in%c("Fmed","F0.1",str_c("FpSPR.",perSPR,".SPR"))][3,]
-
+  colnames(refs) <- str_c(colnames(refs),"/Fcur")
+    
 
   # calculate MSY reference points (use function copied from OMutility, OMutilityのときは6歳のF=1と定義していた。ここではどう定義する？)
   biopar <- derive_biopar(res_sam, year_biol)
   if(res_sam$input$SR!="Prop"){
-    RFmsy   <- Calcu_Fmsy(M=biopar$M, Sel=biopar$faa, w=biopar$waa, g=biopar$maa, method="Baranov", alpha=exp(res_sam$par_list$rec_loga), beta=exp(res_sam$par_list$rec_logb), method_SR=res_sam$SR)
-    Bmsy   <- Calcu_Bmsy(RFmsy, M=biopar$M, Sel=biopar$faa, w=biopar$waa, g=biopar$maa, alpha=exp(res_sam$par_list$rec_loga), beta=exp(res_sam$par_list$rec_logb), method_SR=res_sam$SR)
-    SBmsy   <- Calcu_SBmsy(RFmsy, M=biopar$M, Sel=biopar$faa, w=biopar$waa, g=biopar$maa, alpha=exp(res_sam$par_list$rec_loga), beta=exp(res_sam$par_list$rec_logb), method_SR=res_sam$SR)
+    logb <- res_sam$par_list$rec_logb
+    if(is.null(logb)) logb <- res_sam$input$p0.list$rec_logb
+    RFmsy   <- Calcu_Fmsy(M=biopar$M, Sel=Fcurrent, w=biopar$waa, g=biopar$maa, method="Baranov", alpha=exp(res_sam$par_list$rec_loga), beta=exp(logb), method_SR=res_sam$SR)
+    Bmsy   <- Calcu_Bmsy(RFmsy, M=biopar$M, Sel=Fcurrent, w=biopar$waa, g=biopar$maa, alpha=exp(res_sam$par_list$rec_loga), beta=exp(logb), method_SR=res_sam$SR)
+    SBmsy   <- Calcu_SBmsy(RFmsy, M=biopar$M, Sel=Fcurrent, w=biopar$waa, g=biopar$maa, alpha=exp(res_sam$par_list$rec_loga), beta=exp(logb), method_SR=res_sam$SR)
+
+    # calculate additional reference values
+    refs_msy <- frasyr::ref.F(res_sam, Fcurrent=Fcurrent*RFmsy, pSPR=perSPR,rps.year=as.numeric(colnames(res_sam$naa)), 
+                              M.year=year_biol, waa.year=year_biol, maa.year=year_biol,plot=FALSE)
+    FmsySPR <- refs_msy$currentSPR$perSPR
+    aa <- calc_steepness(SR=res_sam$SR, rec_pars=make_SRres(res_sam)$pars, M=biopar$M, waa=biopar$waa, maa=biopar$maa,Pope=FALSE,faa=Fcurrent)
+    #  expect_equal(aa$Bmsy,Bmsy, tol=0.0001)
+    # expect_equal(aa$Fmsy2F, RFmsy, tol=1e-4)
+    h <- aa$h
+    SB0 <- aa$SB0
   }
   else{
-    RFmsy <- NA
-    Bmsy <- NA
-    SBmsy <- NA
+    RFmsy <- Bmsy <- SBmsy <- h <- SB0 <- FmsySPR <- NA
   }
   TBy <- res_sam$baa[,last_year] %>% sum()
   SBy <- res_sam$ssb[,last_year] %>% sum()
@@ -81,13 +94,19 @@ get_pm <- function(res_sam,
                  str_c("Ry", last5year), res_sam$naa[1,last5year],
                  str_c("AFy",last5year), aveF[last5year],
                  str_c("Ey", last5year), Erate[last5year],
+                 "currentSPR"  , currentSPR,                 
                  str_c("deple_median_last3"), mean(ssb[last3year])/median(ssb),
                  names(refs) , as.numeric(unlist(refs)),
                  "RFmsy"     , RFmsy,
                  "Bmsy"      , Bmsy,
                  "SBmsy"     , SBmsy,
-                 "RBmsy"     , TBy/Bmsy/1000,
-                 "RSBmsy"    , SBy/SBmsy/1000
+                 "h"         , h,
+                 "SB0"       , SB0,
+                 "SBmsy/SB0" , SBmsy/SB0,
+                 "FmsySPR"   , FmsySPR,
+                 "B/Bmsy"     , TBy/Bmsy/1000,
+                 "SB/SBmsy"    , SBy/SBmsy/1000,
+                 "SBmsy/SBmax"    , SBmsy*1000/max(ssb)
                  ) %>%
     unnest(cols=c(stat, value))
 
@@ -171,8 +190,8 @@ make_samrand <- function(res_sam, nsim=1000){
     res_rand[[i]] <- res_sam
     res_rand[[i]]$par_list$rec_loga <- rand_par$rec_loga[i]
     res_rand[[i]]$par_list$rec_logb <- rand_par$rec_logb[i]
-    res_rand[[i]]$rec.par["a"] <- rand_par$rec_loga[i] %>% exp()
-    res_rand[[i]]$rec.par["b"] <- rand_par$rec_logb[i] %>% exp()    
+    if(!is.null(rand_par$rec_loga)) res_rand[[i]]$rec.par["a"] <- rand_par$rec_loga[i] %>% exp()
+    if(!is.null(rand_par$rec_logb)) res_rand[[i]]$rec.par["b"] <- rand_par$rec_logb[i] %>% exp()    
     res_rand[[i]]$sigma.logN[1] <- rand_par$logSdLogN[i] %>% exp()
     res_rand[[i]]$naa[] <- naa_faa[i,1:7,] %>% exp()
     res_rand[[i]]$faa[] <- naa_faa[i,c(8:13,13),] %>% exp()
