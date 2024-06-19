@@ -7,7 +7,7 @@
 sam(
   dat,
   last.catch.zero = FALSE,
-  cpp.file.name = "growsam",
+  cpp.file.name = "sam2",
   tmb.run = FALSE,
   abund = c("B"),
   rec.age = 0,
@@ -69,7 +69,11 @@ sam(
   CV_w_fix = NULL,
   w_link = "log",
   sep_omicron = TRUE,
-  growth_regime = NULL
+  growth_regime = NULL,
+  catch_prop = NULL,
+  no_est = FALSE,
+  getJointPrecision = FALSE,
+  loopnum = 2
 )
 }
 \arguments{

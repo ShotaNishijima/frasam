@@ -11,13 +11,14 @@ plot_samvpa(
   scenario_name = NULL,
   alpha = 0.4,
   size = 1,
-  base_size = 16,
+  base_size = 14,
   log_scale = FALSE,
   legend_name = "Scenario",
   legend_nrow = 1,
   legend_position = "top",
   what.plot = c("biomass", "SSB", "Recruitment", "U"),
-  years = NULL
+  years = NULL,
+  ncol = 3
 )
 }
 \arguments{

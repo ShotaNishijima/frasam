@@ -6,7 +6,7 @@
 \title{SAMでTMBで実行するためにcppファイルのコンパイル等をする関数}
 \usage{
 use_sam_tmb(
-  TmbFile = "growsam",
+  TmbFile = "sam2",
   CppDir = system.file("executable", package = "frasam"),
   ...
 )

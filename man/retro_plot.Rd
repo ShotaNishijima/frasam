@@ -10,13 +10,17 @@ retro_plot(
   start_year = NULL,
   scale = 1000,
   forecast = FALSE,
-  base_size = 16,
+  base_size = 14,
   plot_mohn = TRUE,
   mohn_position = "upperleft"
 )
 }
 \arguments{
-\item{res}{フルデータを使った解析結果 (vpa or sam)}
+\item{res}{sam object}
+
+\item{retro_res}{\code{retro_sam}の結果}
+
+\item{start_year}{プロットを開始する年}
 }
 \description{
 レトロスペクティブ解析の結果をプロットする

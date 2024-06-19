@@ -10,8 +10,9 @@ est_fixed(
   par_init,
   map,
   random = "U",
-  cpp.file.name = "sam",
-  silent = TRUE
+  cpp.file.name = "sam2",
+  silent = TRUE,
+  ...
 )
 }
 \arguments{

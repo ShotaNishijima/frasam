@@ -15,5 +15,5 @@ retro_sam(
 )
 }
 \description{
-レトロスペクティブ解析を実施する
+retrospective forecasting is also possible
 }
