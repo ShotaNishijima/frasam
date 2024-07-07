@@ -57,6 +57,10 @@ get_pm <- function(res_sam,
   Fcurrent <- rowMeans(res_sam$faa[, as.character(year_Fcur)])
   refs <- frasyr::ref.F(res_sam, Fcurrent=Fcurrent, pSPR=perSPR,rps.year=as.numeric(colnames(res_sam$naa)), 
                         M.year=year_biol, waa.year=year_biol, maa.year=year_biol,plot=FALSE)
+  if(refs$Fmed[1]==0){
+    refs <- frasyr::ref.F(res_sam, Fcurrent=Fcurrent, pSPR=perSPR,rps.year=as.numeric(colnames(res_sam$naa)), 
+                          M.year=year_biol, waa.year=year_biol, maa.year=year_biol,plot=FALSE, Fem.init=-2) ## ad hoc fix  
+  }
   currentSPR <- refs$currentSPR$perSPR
   refs <- refs$summary
   refs <- refs[colnames(refs)%in%c("Fmed","F0.1",str_c("FpSPR.",perSPR,".SPR"))][3,]
