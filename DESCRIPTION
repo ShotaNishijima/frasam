@@ -11,7 +11,16 @@ Encoding: UTF-8
 LazyData: true
 Imports:
     frasyr,
-    TMB
-Suggests: 
+    TMB,
+    assertthat,
+    dplyr,
+    ggplot2,
+    glmmTMB,
+    magrittr,
+    purrr,
+    stringr,
+    tibble,
+    tidyr
+Suggests:
     testthat
-RoxygenNote: 7.1.0
+RoxygenNote: 7.2.3
