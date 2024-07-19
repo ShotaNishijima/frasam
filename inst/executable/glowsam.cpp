@@ -45,6 +45,86 @@ Type sqrt(Type x){
   return pow(x,Type(0.5));
 }
 
+// https://github.com/glmmTMB/glmmTMB/blob/a74c35fa443c9e86698676f3ffc31149ab1df849/glmmTMB/src/glmmTMB.cpp#L50C1-L58C3
+enum valid_link {
+  log_link                 = 0,
+  logit_link               = 1,
+  probit_link              = 2,
+  inverse_link             = 3,
+  cloglog_link             = 4,
+  identity_link            = 5,
+  sqrt_link                = 6
+};
+
+// https://github.com/glmmTMB/glmmTMB/blob/a74c35fa443c9e86698676f3ffc31149ab1df849/glmmTMB/src/glmmTMB.cpp#L81C1-L111C2
+template<class Type>
+Type inverse_linkfun(Type eta, int link) {
+  Type ans;
+  switch (link) {
+  case log_link:
+    ans = exp(eta);
+    break;
+  case identity_link:
+    ans = eta;
+    break;
+  case logit_link:
+    ans = invlogit(eta);
+    break;
+  case probit_link:
+    ans = pnorm(eta);
+    break;
+  case cloglog_link:
+    ans = Type(1) - exp(-exp(eta));
+    break;
+  case inverse_link:
+    ans = Type(1) / eta;
+    break;
+  case sqrt_link:
+    ans = eta*eta; // pow(eta, Type(2)) doesn't work ... ?
+    break;
+    // TODO: Implement remaining links
+  default:
+    error("Link not implemented!");
+  } // End switch
+  return ans;
+}
+
+// https://github.com/glmmTMB/glmmTMB/blob/a74c35fa443c9e86698676f3ffc31149ab1df849/glmmTMB/src/glmmTMB.cpp#L134C1-L149C2
+/* log transformed inverse_linkfun without losing too much accuracy */
+template<class Type>
+Type log_inverse_linkfun(Type eta, int link) {
+  Type ans;
+  switch (link) {
+  case log_link:
+    ans = eta;
+    break;
+  case logit_link:
+    ans = -logspace_add(Type(0), -eta); //log(1/(1+exp(-eta))) = -log(1+exp(-eta))
+    break;
+  default:
+    ans = log( inverse_linkfun(eta, link) );
+  } // End switch
+  return ans;
+}
+
+// https://github.com/glmmTMB/glmmTMB/blob/a74c35fa443c9e86698676f3ffc31149ab1df849/glmmTMB/src/glmmTMB.cpp#L151C1-L166C2
+/* log transformed inverse_linkfun without losing too much accuracy */
+template<class Type>
+Type log1m_inverse_linkfun(Type eta, int link) {
+  Type ans;
+  switch (link) {
+  case log_link:
+    ans = logspace_sub(Type(0), eta);
+    break;
+  case logit_link:
+    ans = -logspace_add(Type(0), eta);
+    break;
+  default:
+    ans = logspace_sub(Type(0), log( inverse_linkfun(eta, link) ));
+  } // End switch
+  return ans;
+}
+
 template<class Type>
 Type objective_function<Type>::operator() ()
 {
@@ -77,8 +157,8 @@ Type objective_function<Type>::operator() ()
   DATA_SCALAR(scale);
   DATA_SCALAR(gamma);
   // DATA_VECTOR(fbarRange);
-  DATA_INTEGER(sel_def); // selectivity defenition: devided by maxF(0), meanF(1), maxage(2)
-  DATA_INTEGER(b_random); // if 1, b estimated by random effects
+  DATA_INTEGER(sel_def); // selectivity difenition: devided by maxF(0), meanF(1), maxage(2)
+  DATA_INTEGER(b_random); // if 1, nonlinear coefficient b estimated by random effects
 
   PARAMETER_VECTOR(logQ);
   PARAMETER_VECTOR(logB);
@@ -92,6 +172,21 @@ Type objective_function<Type>::operator() ()
   PARAMETER(trans_phi1); //　#recruitment autocorrelation
   PARAMETER(logSD_b);
 
+  PARAMETER_ARRAY(logwaa); // row: age, column: year (行列がstockMeanWeightと逆であることに注意！)
+  PARAMETER_VECTOR(beta_w0);
+  PARAMETER_VECTOR(alpha_w);
+  PARAMETER_VECTOR(rho_w);
+  PARAMETER_VECTOR(omicron); // log(SD) for process error in weight growth
+  // PARAMETER(iota); // log(SD) for process error in maturity growth
+  PARAMETER_VECTOR(logCV_w); // CV for observation error in weight (for age0 and older)
+
+  PARAMETER_VECTOR(alpha_g); // intercept of maturity modeling
+  PARAMETER_VECTOR(psi);
+  PARAMETER(logdisp); // dispersion parameter (phi) in log space for beta distribution
+  PARAMETER_VECTOR(beta_g); // slope of maturity modeling for density dependence
+
+  PARAMETER(rec_logk); // additional parameter for HO (Hiroshi Okamura) model
+
   DATA_IVECTOR(iy);
   DATA_INTEGER(nlogF);
   DATA_INTEGER(nlogN);
@@ -101,11 +196,28 @@ Type objective_function<Type>::operator() ()
   DATA_SCALAR(F_RW_order); //0: first order, 1: second order
   DATA_SCALAR(lambda);
   DATA_SCALAR(lambda_Mesnil);
+  DATA_IVECTOR(model_weight_maturity); // whether modeling weight and maturity
+  DATA_SCALAR(scale_number);
+  DATA_INTEGER(dist_wobs); //distribution for weight: 0: lognormal, 1: gamma
+  DATA_ARRAY(weight_weight); // 体重データのモデリングの時に使用する重み（レトロの時に重みをゼロにするために使用）
+  DATA_ARRAY(maturity_weight);  // 体重データのモデリングの時に使用する重み（レトロの時に重みをゼロにするために使用）
+  DATA_VECTOR(g_fix); // its length is the number of age classes. Non-negative value (0-1) represents the fixed value of maturity at age while a negative value (e.g., -1)indicates estimating maturity.
+  DATA_INTEGER(alpha_w_link); //0: id link, 1: log link
 
   array<Type> logF(nlogF,U.cols()); // logF (6 x 50 matrix)
   array<Type> logN(nlogN,U.cols()); // logN (7 x 50 matrix)
   array<Type> exp_logF(nlogF,U.cols()); // F (6 x 50 matrix)
   array<Type> exp_logN(nlogN,U.cols()); // N (7 x 50 matrix)
+
+  array<Type> stockMeanWeight_true(stockMeanWeight.rows(),stockMeanWeight.cols()); // N (7 x 50 matrix)
+  // stockMeanWeight_true.fill(1.0);
+  // if(model_weight_maturity(0)<=0){
+    for(int i=0;i<stockMeanWeight_true.rows();i++){
+      for(int j=0;j<stockMeanWeight_true.cols();j++){
+        stockMeanWeight_true(i,j)=stockMeanWeight(i,j);
+      }
+    }
+  // }
 
   for(int i=0;i<nlogN;i++)
     for(int j=0;j<U.cols();j++){
@@ -126,6 +238,7 @@ Type objective_function<Type>::operator() ()
   vector<Type> varLogN=exp(logSdLogN*Type(2.0)); //  Nの???散
   vector<Type> varLogObs=exp(logSdLogObs*Type(2.0)); // Obsの???散
   vector<Type> ssb(timeSteps); // SSB (年数??????
+  vector<Type> ssn(timeSteps);
   vector<Type> logssb(timeSteps); //  logssb ???年数??????
   vector<Type> B_total(timeSteps);
   vector<Type> F_mean(timeSteps);
@@ -177,8 +290,10 @@ Type objective_function<Type>::operator() ()
 
   for(int i=0;i<timeSteps;i++){ // calc ssb
     ssb(i)=0.0;
+    ssn(i)=0.0;
     for(int j=0; j<stateDimN; ++j){
-      ssb(i)+=exp(logN(j,i))*exp(-exp(logF((keyLogFsta(0,j)),i))*propF(i,j)-natMor(i,j)*propM(i,j))*propMat(i,j)*stockMeanWeight(i,j);  // ssbを??????
+      ssb(i)+=exp(logN(j,i))*exp(-exp(logF((keyLogFsta(0,j)),i))*propF(i,j)-natMor(i,j)*propM(i,j))*propMat(i,j)*stockMeanWeight_true(i,j);  // ssbを
+      ssn(i)+=exp(logN(j,i))*exp(-exp(logF((keyLogFsta(0,j)),i))*propF(i,j)-natMor(i,j)*propM(i,j))*propMat(i,j);
       // ssb(i)+=exp(logN(j,i))*propMat(i,j)*stockMeanWeight(i,j);  // ssbを??????
     }
     logssb(i)=log(ssb(i));  // log(ssb)
@@ -269,7 +384,11 @@ Type objective_function<Type>::operator() ()
                 if(stockRecruitmentModelCode==6){ //Proportional to SSB (no density-dependence)
                   predN0(0)=rec_loga+log(ssb(i-minAge));
                 }else{
-                  error("SR model code not recognized");
+                  if(stockRecruitmentModelCode==7){ //HO model (HSの角が丸くなったモデル)
+                    predN0(0)=CppAD::CondExpLt(rec_logb,log(ssb(i-minAge)),rec_loga+rec_logb,rec_loga+rec_logb+(Type(1.0)-pow(ssb(i-minAge)/exp(rec_logb),exp(rec_logk)))*(log(ssb(i-minAge))-rec_logb));
+                  }else{
+                    error("SR model code not recognized");
+                  }
                 }
               }
               }
@@ -343,7 +462,7 @@ Type objective_function<Type>::operator() ()
           for(int j=a; j<amax+1; ++j){
           // for(int j=0; j<stateDimN; ++j){
             // predObs=+exp(logN(j,y))*stockMeanWeight(iy(i),j);
-            predObs+=exp(logN(j,y))*stockMeanWeight(iy(i),j); //
+            predObs+=exp(logN(j,y))*stockMeanWeight_true(iy(i),j); //
             }
           predObs=log(predObs)-log(scale);
           // predObs=logN(a,y)+log(stockMeanWeight(iy(i),a));
@@ -357,7 +476,7 @@ Type objective_function<Type>::operator() ()
           if(ft==3){// SSB survey
             predObs=0.0;
             for(int j=0; j<stateDimN; ++j){
-              predObs+=exp(logN(j,y))*propMat2(iy(i),j)*stockMeanWeight(iy(i),j); //
+              predObs+=exp(logN(j,y))*propMat2(iy(i),j)*stockMeanWeight_true(iy(i),j); //
             }
             predObs=log(predObs)-log(scale);
             if(CppAD::Integer(keyLogB(f-1,a))>(-1)){
@@ -383,7 +502,7 @@ Type objective_function<Type>::operator() ()
             }else{
               if (ft==5){ //Not used
                 for(int j=0; j<stateDimN; ++j){
-                  predObs+=exp(logN(a+j,y))*exp(-exp(logF((keyLogFsta(0,j)),iy(i)))-natMor(iy(i),j))*propMat2(iy(i),j)*stockMeanWeight(iy(i),j);
+                  predObs+=exp(logN(a+j,y))*exp(-exp(logF((keyLogFsta(0,j)),iy(i)))-natMor(iy(i),j))*propMat2(iy(i),j)*stockMeanWeight_true(iy(i),j);
                 }
                 predObs=log(predObs);
                 if(CppAD::Integer(keyLogB(f-1,a))>(-1)){
@@ -397,7 +516,7 @@ Type objective_function<Type>::operator() ()
                   predObs=0.0;
                   for(int j=a; j<amax+1; ++j){
                     // predObs=+exp(logN(j,y))*stockMeanWeight(iy(i),j)*saa(j,y);
-                    predObs+=exp(logN(j,y))*stockMeanWeight(iy(i),j)*saa(j,y); //
+                    predObs+=exp(logN(j,y))*stockMeanWeight_true(iy(i),j)*saa(j,y); //
                   }
                   predObs=log(predObs)-log(scale);
                   // predObs=logN(a,y)+log(stockMeanWeight(iy(i),a));
@@ -436,14 +555,14 @@ Type objective_function<Type>::operator() ()
     F_mean(i)=0.0;
     Catch_biomass(i)=0.0;
     for(int j=0; j<stateDimN; j++){
-      B_total(i)+=exp(logN(j,i))*stockMeanWeight(i,j);
+      B_total(i)+=exp(logN(j,i))*stockMeanWeight_true(i,j);
       F_mean(i)+=exp(logF((keyLogFsta(0,j)),i));
       if (j<(stateDimN-1)) {
         zz=exp(logF((keyLogFsta(0,j)),i))+natMor(i,j);
-        Catch_biomass(i)+=exp(logN(j,i))*stockMeanWeight(i,j)*exp(logF((keyLogFsta(0,j)),i))/zz;
+        Catch_biomass(i)+=exp(logN(j,i))*stockMeanWeight_true(i,j)*exp(logF((keyLogFsta(0,j)),i))/zz;
       } else {
         zz=alpha*exp(logF((keyLogFsta(0,j)),i))+natMor(i,j);
-        Catch_biomass(i)+=exp(logN(j,i))*stockMeanWeight(i,j)*alpha*exp(logF((keyLogFsta(0,j)),i))/zz;
+        Catch_biomass(i)+=exp(logN(j,i))*stockMeanWeight_true(i,j)*alpha*exp(logF((keyLogFsta(0,j)),i))/zz;
       }
     }
     F_mean(i)/=stateDimN;
@@ -479,6 +598,162 @@ Type objective_function<Type>::operator() ()
     ans += pen ;
   }
 
+  // modeling somatic growth dynamics of weight
+  vector<Type> sd_w=exp(omicron);
+  array<Type> logwaa_pred(logwaa.rows(),logwaa.cols());
+  array<Type> waa_true(logwaa.rows(),logwaa.cols());
+  logwaa_pred.fill(0.0);
+  waa_true.fill(-1);
+  Type ans_w=0;
+  vector<Type> wp(2);
+  Type alpha_w_total, rho_w_total,beta_w0_total;
+  vector<Type> N_sum(logwaa.cols());
+  Type scale_par=1;
+  Type shape=1;
+
+  if(model_weight_maturity(0)==1) {
+    for(int j=0;j<logwaa.cols();j++){
+      N_sum(j)=Type(0.0);
+      // ssb(j)=Type(0.0);
+      for(int i=0;i<logwaa.rows();i++){
+        waa_true(i,j)=exp(logwaa(i,j));
+        N_sum(j)+=exp_logN(i,j)/scale_number;
+        // ssb(j)+=exp_logN(i,j)*maa(i,j)*waa_true(i,j)/scale;
+        stockMeanWeight_true(j,i)=waa_true(i,j);
+        // observation likelihood
+        if(i==0) { // age 0
+          shape=pow(exp(logCV_w(0)),Type(-2.0));
+          if (dist_wobs==0) { //lognormal
+            shape=sqrt(log(Type(1.0)+pow(exp(logCV_w(0)),Type(2.0)))); //SD for lognormal distribution
+          }
+        } else {
+          shape=pow(exp(logCV_w(0)),Type(-2.0));
+          if (dist_wobs==0) { //lognormal
+            shape=sqrt(log(Type(1.0)+pow(exp(logCV_w(0)),Type(2.0)))); //SD for lognormal distribution
+          }
+        }
+        scale_par=waa_true(i,j)/shape;
+        if (dist_wobs==1){ //gamma
+          ans_w+=-weight_weight(i,j)*dgamma(stockMeanWeight(j,i),shape,scale_par,true); //using Gamma distribution
+        }else{ // lognormal
+          ans_w+= weight_weight(i,j)*(log(stockMeanWeight(j,i))-dnorm(log(stockMeanWeight(j,i)),logwaa(i,j)-Type(0.5)*shape*shape,shape,true)); //using lognormal distribution with bias correction
+        }
+      }
+    }
+
+    // process model for weight
+    for(int j=1;j<logwaa.cols();j++){ //最初の年は除く（2年目から）
+      for(int i=0;i<logwaa.rows();i++){
+        alpha_w_total=alpha_w(0);
+        if(alpha_w.size()>1){
+          alpha_w_total+=alpha_w(1)*N_sum(j);
+        }
+        if(alpha_w_link==1) alpha_w_total = exp(alpha_w_total);
+        rho_w_total=rho_w(0);
+        beta_w0_total=beta_w0(0);
+        if(beta_w0.size()>1){
+          beta_w0_total+=beta_w0(1)*ssb(j)/scale;
+          // beta_w0_total+=beta_w0(1)*exp_logN(0,j)/scale_number;
+          // beta_w0_total+=beta_w0(1)*ssn(j)/scale_number;
+        }
+        if(i==0){ // age 0
+          logwaa_pred(i,j)=beta_w0_total;
+          ans_w+=-dnorm(logwaa(i,j),logwaa_pred(i,j),sd_w(0),true);
+        }else{
+          if(i<logwaa.rows()-1){
+            // from Brody-growth coefficient and the von-Bertalanffy weight model
+            logwaa_pred(i,j)=alpha_w_total;
+            logwaa_pred(i,j)+=rho_w_total*waa_true(i-1,j-1);
+            logwaa_pred(i,j)=log(logwaa_pred(i,j));
+          }else{
+            if(maxAgePlusGroup==1) { //plus group
+              wp(0)=alpha_w_total;
+              wp(0)+=rho_w_total*waa_true(i-1,j-1);
+              wp(1)=alpha_w_total;
+              wp(1)+=rho_w_total*waa_true(i,j-1);
+              logwaa_pred(i,j)=exp_logN(i-1,j-1)*wp(0)+exp_logN(i,j-1)*wp(1);
+              logwaa_pred(i,j)=logwaa_pred(i,j)/(exp_logN(i-1,j-1)+exp_logN(i,j-1));
+              logwaa_pred(i,j)=log(logwaa_pred(i,j));
+            }else{
+              logwaa_pred(i,j)=alpha_w_total;
+              logwaa_pred(i,j)+=rho_w_total*waa_true(i-1,j-1);
+              logwaa_pred(i,j)=log(logwaa_pred(i,j));
+            }
+          }
+          if(sd_w.size()==1) {
+            ans_w+=-dnorm(logwaa(i,j),logwaa_pred(i,j),sd_w(0),true);
+          } else {
+            ans_w+=-dnorm(logwaa(i,j),logwaa_pred(i,j),sd_w(1),true);
+          }
+        }
+        // ans_w+=-dnorm(logwaa(i,j),logwaa_pred(i,j),sd_w,true);
+      }
+    }
+    ans += ans_w;
+  }
+
+  // process model for maturity (no observation error)
+  Type ans_g=0.0;
+  array<Type> maa(propMat.cols(),propMat.rows()); //行と列が逆！
+  array<Type> maa_pred(propMat.cols(),propMat.rows()); //行と列が逆！
+  array<Type> maa_diff(propMat.cols(),propMat.rows());
+  array<Type> diff_pred(propMat.cols(),propMat.rows());
+  maa_pred.fill(-1);
+  maa_diff.fill(-1);
+  Type multi_g;
+  array<Type> N_mat(alpha_g.size(),propMat.rows());
+  N_mat.fill(0.0);
+  Type disp=exp(logdisp);
+  Type s1, s2, s3;
+
+  if(model_weight_maturity(1)==1) {
+    for(int j=0;j<propMat.rows();j++){ //year
+      for(int i=0;i<propMat.cols();i++){ //age
+        maa(i,j)=propMat(j,i);
+        if(g_fix(i)<0.0){
+          a=CppAD::Integer(-g_fix(i))-1;
+          N_mat(a,j)+=exp_logN(i,j);
+          N_mat(a,j)+=exp_logN(i+1,j);
+          N_mat(a,j)/=scale_number;
+        }
+      }
+    }
+
+    for(int j=1;j<propMat.rows();j++){ //最初の年は除く（2年目から）
+      for(int i=1;i<propMat.cols();i++){
+        maa_diff(i,j)=(maa(i,j)-maa(i-1,j-1))/(Type(1.0)-maa(i-1,j-1));
+        if(g_fix(i)<0.0){
+          a=CppAD::Integer(-g_fix(i))-1;
+          multi_g=alpha_g(a);
+          multi_g+=beta_g(a)*N_mat(a,j-1);
+          maa_pred(i,j)=maa(i-1,j-1)+invlogit(multi_g)*(Type(1.0)-maa(i-1,j-1));
+          if (maa_diff(i,j) == 0.0) {
+            // ans_g += -log1m_inverse_linkfun(logit(maa_pred(i,j)) - psi(0), logit_link);
+            ans_g += -maturity_weight(i,j)*(log1m_inverse_linkfun(multi_g - psi(0), logit_link));
+            // std::cout << "zero " << asDouble(eta(i)) << " " << asDouble(psi(0)) << " " << asDouble(tmp_loglik) << std::endl;
+          } else if (maa_diff(i,j) == 1.0) {
+            // ans_g += -log_inverse_linkfun(logit(maa_pred(i,j)) - psi(1), logit_link);
+            ans_g += -maturity_weight(i,j)*(log_inverse_linkfun(multi_g - psi(1), logit_link));
+            // std::cout << "one " << asDouble(eta(i)) << " " << asDouble(psi(1)) << " " << asDouble(tmp_loglik) << std::endl;
+          } else {
+            // s1 = maa_pred(i,j)*disp;
+            // s2 = (Type(1)-maa_pred(i,j))*disp;
+            s1 = invlogit(multi_g)*disp;
+            s2 = (Type(1.0)-invlogit(multi_g))*disp;
+            // s3 = logspace_sub(log_inverse_linkfun(logit(maa_pred(i,j)) - psi(0), logit_link),
+            //                   log_inverse_linkfun(logit(maa_pred(i,j)) - psi(1), logit_link));
+            s3 = logspace_sub(log_inverse_linkfun(multi_g - psi(0), logit_link),
+                              log_inverse_linkfun(multi_g - psi(1), logit_link));
+            ans_g += maturity_weight(i,j)*(-s3 - dbeta(maa_diff(i,j), s1, s2, true));
+          }
+        } else {
+          maa_pred(i,j)=g_fix(i);
+        }
+      }
+    }
+  ans+=ans_g;
+  }
+
 
   SIMULATE {
     REPORT(logF);
@@ -495,12 +770,18 @@ Type objective_function<Type>::operator() ()
   ADREPORT(phi1);
   ADREPORT(Catch_biomass);
   ADREPORT(Exploitation_rate);
+  ADREPORT(stockMeanWeight_true);
 
   REPORT(logF);
   REPORT(logN);
   REPORT(pred_log);
   REPORT(saa); //selectivity at age
   REPORT(Sel1);
+  REPORT(stockMeanWeight_true);
+  REPORT(maa);
+  REPORT(maa_pred);
+  REPORT(ans_w);
+  REPORT(ans_g);
   // REPORT(FY);
 
   return ans;

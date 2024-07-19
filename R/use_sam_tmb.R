@@ -15,7 +15,7 @@
 #'
 #' @export
 
-use_sam_tmb <- function(TmbFile = "sam",
+use_sam_tmb <- function(TmbFile = "sam2",
                          CppDir = system.file("executable",package="frasam"),...) {
   test <- try(frasyr::use_rvpa_tmb(TmbFile=TmbFile,CppDir=CppDir,...))
   if (class(test) == "DLLInfo") {
