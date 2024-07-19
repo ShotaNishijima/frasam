@@ -206,6 +206,9 @@ Type objective_function<Type>::operator() ()
   DATA_IVECTOR(gr); // growth regime. Its length should be the number of years
   DATA_ARRAY(catch_prop4index); //  Catch proportion (multiplier) for index
 
+  DATA_VECTOR(logobs);
+  DATA_VECTOR_INDICATOR(keep, logobs);
+
   array<Type> logF(nlogF,U.cols()); // logF (6 x 50 matrix)
   array<Type> logN(nlogN,U.cols()); // logN (7 x 50 matrix)
   array<Type> exp_logF(nlogF,U.cols()); // F (6 x 50 matrix)
@@ -593,10 +596,14 @@ Type objective_function<Type>::operator() ()
       }
     }
     var=varLogObs(CppAD::Integer(keyVarObs(f-1,a)));
-    ans_obs(i)=-dnorm(log(obs(i,3)),predObs,sqrt(var),true);
+    // ans_obs(i)=-dnorm(log(obs(i,3)),predObs,sqrt(var),true);
+    ans_obs(i) -= keep(i)*dnorm(logobs(i),predObs,sqrt(var),true);
+    ans_obs(i) -= keep.cdf_lower(i)*log(pnorm(logobs(i), predObs,sqrt(var)) );
+    ans_obs(i) -= keep.cdf_upper(i)*log(1.0-pnorm(logobs(i), predObs,sqrt(var)) );
     pred_log(i) = predObs;
     SIMULATE {
-      obs(i,3) = exp( rnorm(predObs, sqrt(var)) ) ;
+      obs(i,3) = exp( rnorm(predObs, sqrt(var)) );
+      logobs(i) = rnorm(predObs, sqrt(var));
     }
   }
   ans+=sum(ans_obs);
@@ -816,6 +823,7 @@ Type objective_function<Type>::operator() ()
     REPORT(logF);
     REPORT(logN);
     REPORT(obs);
+    REPORT(logobs)
   }
   // ADREPORT(logN);
   // ADREPORT(logF);

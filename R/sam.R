@@ -329,6 +329,7 @@ sam <- function(dat,
       catch_prop <- array(1,dim=c(dim(dat$caa),max(data$obs[,2])))
       data$catch_prop4index <- catch_prop
     }
+    data$logobs = log(obs[,4])
   } else {
     message("'dat' and related arguments are ignored when using 'tmbdata'")
     data = tmbdata
