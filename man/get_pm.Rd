@@ -13,7 +13,7 @@ get_pm(
   waa_biom = res_sam$input$dat$waa,
   year_biol = 2020:2022,
   year_Fcur = 2020:2022,
-  perSPR = c(30, 40, 50)
+  perSPR = c(30, 40, 50, 60, 70)
 )
 }
 \arguments{
