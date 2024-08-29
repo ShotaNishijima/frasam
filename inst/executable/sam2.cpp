@@ -598,8 +598,8 @@ Type objective_function<Type>::operator() ()
     var=varLogObs(CppAD::Integer(keyVarObs(f-1,a)));
     // ans_obs(i)=-dnorm(log(obs(i,3)),predObs,sqrt(var),true);
     ans_obs(i) -= keep(i)*dnorm(logobs(i),predObs,sqrt(var),true);
-    ans_obs(i) -= keep.cdf_lower(i)*log(pnorm(logobs(i), predObs,sqrt(var)) );
-    ans_obs(i) -= keep.cdf_upper(i)*log(1.0-pnorm(logobs(i), predObs,sqrt(var)) );
+    // ans_obs(i) -= keep.cdf_lower(i)*log(pnorm(logobs(i), predObs,sqrt(var)) );
+    // ans_obs(i) -= keep.cdf_upper(i)*log(1.0-pnorm(logobs(i), predObs,sqrt(var)) );
     pred_log(i) = predObs;
     SIMULATE {
       obs(i,3) = exp( rnorm(predObs, sqrt(var)) );
