@@ -3,6 +3,9 @@
 #'
 #' retrospective forecasting is also possible
 #'
+#' @param res SAM object
+#' @param n the number of peels
+#'
 #' @export
 
 retro_sam <- function(res, n=5, stat="mean", b.fix=TRUE,remove_short_index=-1, map_add = NULL, p0_retro_list = NULL){
@@ -143,4 +146,3 @@ retro_sam <- function(res, n=5, stat="mean", b.fix=TRUE,remove_short_index=-1, m
   return(list(Res=Res,retro.n=obj.n, retro.b=obj.b, retro.s=obj.s, retro.r=obj.r, retro.f=obj.f, mohn=mohn,
               retro.n2=obj.n2, retro.b2=obj.b2, retro.s2=obj.s2, retro.r2=obj.r2, retro.f2=obj.f2, mohn_forecast=mohn2))
 }
-

@@ -51,7 +51,7 @@ sam <- function(dat,
                 scale=1000,
                 gamma=10,
                 sel.def="max",
-                # use.index = NULL,
+                use.index = NULL,
                 upper = NULL,
                 lower = NULL,
                 index.key = NULL,
@@ -106,13 +106,15 @@ sam <- function(dat,
     M <- dat$M
     index <- dat$index
 
-    # if (!is.null(use.index)) {
-    #   index <- index[use.index,]
-    #   abund <- abund[use.index]
-    #   if (isTRUE(b.est)) {
-    #     b.fix <- b.fix[use.index]
-    #   }
-    # }
+    if (!is.null(use.index)) {
+      index <- index[use.index,]
+      abund <- abund[use.index]
+      if (isTRUE(b.est)) {
+        b.fix <- b.fix[use.index]
+      }
+    } else {
+      use.index <- 1:nrow(index)
+    }
 
     for(i in 1:length(abund)) {
       if (abund[i]=="SSB") {

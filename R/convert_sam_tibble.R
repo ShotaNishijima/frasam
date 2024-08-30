@@ -1,8 +1,4 @@
 
-###################################################
-### Converrting a SAM result into a tibble form ###
-###################################################
-
 convert_vector <- function(vector,name){
   vector %>%
     as_tibble %>%
