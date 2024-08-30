@@ -85,8 +85,6 @@ retro_sam <- function(res, n=5, stat="mean", b.fix=TRUE,remove_short_index=-1, m
       res.c$input$maturity_weight[,nc2] <- 0
     }
 
-    # res1 <- do.call(sam,res.c$input)
-    # browser()
     if (is.null(p0_retro_list)) {
       res1 <- try(do.call(sam,res.c$input),silent=TRUE)
     } else {

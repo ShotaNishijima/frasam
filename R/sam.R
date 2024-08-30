@@ -143,9 +143,9 @@ sam <- function(dat,
     obs[,"maxage"] <- obs[,"maxage"]+rec.age
 
     if (tmb.run) {
-      library(TMB)
+      # library(TMB)
       compile(paste(cpp.file.name, ".cpp", sep = ""))
-      dyn.load(dynlib(cpp.file.name))
+      dyn.load(TMB::dynlib(cpp.file.name))
     }
 
     data <- list()
@@ -329,9 +329,10 @@ sam <- function(dat,
         data$catch_prop4index <- catch_prop
       }
     } else {
-      catch_prop <- array(1,dim=c(dim(dat$caa),max(data$obs[,2])))
+      catch_prop <- array(1,dim=c(dim(dat$waa),max(data$obs[,2])))
       data$catch_prop4index <- catch_prop
     }
+    assertthat::assert_that(all(dim(data$catch_prop4index) == c(dim(dat$waa),max(data$obs[,2]))))
     data$logobs = log(obs[,4])
   } else {
     message("'dat' and related arguments are ignored when using 'tmbdata'")

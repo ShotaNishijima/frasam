@@ -14,6 +14,11 @@ retro_sam(
   p0_retro_list = NULL
 )
 }
+\arguments{
+\item{res}{SAM object}
+
+\item{n}{the number of peels}
+}
 \description{
 retrospective forecasting is also possible
 }

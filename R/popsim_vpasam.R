@@ -5,7 +5,7 @@
 
 popsim_vpasam = function(Res,n=5,seed=1){
   if(is.numeric(set.seed)) set.seed(set.seed)
-  
+
   if (class(Res)=="sam"){
     Res$input$bias.correct.sd <- FALSE
     Res0 <- Res
@@ -13,7 +13,7 @@ popsim_vpasam = function(Res,n=5,seed=1){
     pred.index <- Res$pred.index
     pred.caa <- Res$caa
     sigma.index = Res$sigma
-    if (Res$input$est.method == "ls" && Res$input$index.key==NULL) sigma.index <- rep(Res$sigma,nrow(pred.index))
+    if (Res$input$est.method == "ls" && is.null(Res$input$index.key)) sigma.index <- rep(Res$sigma,nrow(pred.index))
     sigma.caa <- Res$sigma.logC
     resid.index <- log(as.matrix(Res$input$dat$index))-log(as.matrix(Res$pred.index))
     resid.caa <- log(Res$input$dat$caa)-log(Res$caa)
@@ -47,6 +47,6 @@ popsim_vpasam = function(Res,n=5,seed=1){
       dat.list[[j]] <- sim.dat
     }
   }
-  
+
   return(dat.list)
 }
