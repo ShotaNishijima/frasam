@@ -51,7 +51,7 @@ sam <- function(dat,
                 scale=1000,
                 gamma=10,
                 sel.def="max",
-                use.index = NULL,
+                # use.index = NULL,
                 upper = NULL,
                 lower = NULL,
                 index.key = NULL,
@@ -106,13 +106,13 @@ sam <- function(dat,
     M <- dat$M
     index <- dat$index
 
-    if (!is.null(use.index)) {
-      index <- index[use.index,]
-      abund <- abund[use.index]
-      if (isTRUE(b.est)) {
-        b.fix <- b.fix[use.index]
-      }
-    }
+    # if (!is.null(use.index)) {
+    #   index <- index[use.index,]
+    #   abund <- abund[use.index]
+    #   if (isTRUE(b.est)) {
+    #     b.fix <- b.fix[use.index]
+    #   }
+    # }
 
     for(i in 1:length(abund)) {
       if (abund[i]=="SSB") {
@@ -151,6 +151,7 @@ sam <- function(dat,
     data$obs <- obs
     data$noFleets <- max(obs[,2])
     data$fleetTypes <- data$sampleTimes <- numeric(nindex+1)
+    assertthat::assert_that(all(abund %in% c("B","SSB","N","Bs","Bf")))
     for (i in 1:nindex) {
       if (is.null(abund[i])) data$fleetTypes[i+1] <- data$freetTypes[i]
       if (abund[i] == "B") data$fleetTypes[i+1] <- 2
@@ -158,9 +159,9 @@ sam <- function(dat,
       if (abund[i] == "N") data$fleetTypes[i+1] <- 4
       if (abund[i] == "Bs") data$fleetTypes[i+1] <- 6
       if (abund[i] == "Bf") data$fleetTypes[i+1] <- 7
-      if (!(abund[i] %in% c("B","SSB","N","Bs","Bf"))) {
-        stop("abund code not recognized")
-      }
+      # if (!(abund[i] %in% c("B","SSB","N","Bs","Bf"))) {
+      #   stop("abund code not recognized")
+      # }
     }
 
     data$noYears <- ncol(waa)
