@@ -3,9 +3,9 @@ library(frasam)
 context("input check")
 test_that("test input",{
   # dat = get(load(system.file("data","dat_example.rda",package="frasam")))
-  data("dat_example")
+  data("dat_example",package="frasam")
   # samres = get(load(system.file("data","samres_example.rda",package="frasam")))
-  data("samres_example")
+  data("samres_example",package="frasam")
   input = samres$input
   tmbdata = samres$data
   use_sam_tmb(overwrite=FALSE)

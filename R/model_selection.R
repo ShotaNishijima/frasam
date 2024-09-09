@@ -114,6 +114,8 @@ select_sigma = function(
 #' @inheritParams select_sigma
 #' @param grid 'var'と'X'からなるdata.frame
 #'
+#' @export
+#'
 select_sigma_grid = function(
     samres,
     grid=expand.grid(var=c("varC","varF","varN","index.key")[1:2],X=1:2),

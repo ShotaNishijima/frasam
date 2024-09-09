@@ -3,7 +3,8 @@ library(frasam)
 
 context("retro check")
 test_that("test retrot",{
-  samres = get(load(system.file("data","samres_example.rda",package="frasam")))
+  # samres = get(load(system.file("data","samres_example.rda",package="frasam")))
+  data("samres_example",package="frasam")
   retrores = get(load(system.file("tests/testthat/testdata","retrores_example.rda",package="frasam")))
   input = samres$input
   input$p0.list <- NULL
