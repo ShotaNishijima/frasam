@@ -53,6 +53,8 @@ divide_sigma = function(
 #' @param X 境目を入れる場所の候補
 #' @param stopAIC AICが小さくならなかった時点で計算をやめるか（default: TRUE)
 #'
+#' @export
+#'
 select_sigma = function(
     samres,
     var=c("varC","varF","varN","index.key")[1],
@@ -113,6 +115,8 @@ select_sigma = function(
 #' @inheritParams divide_sigma
 #' @inheritParams select_sigma
 #' @param grid 'var'と'X'からなるdata.frame
+#'
+#' @export
 #'
 select_sigma_grid = function(
     samres,
