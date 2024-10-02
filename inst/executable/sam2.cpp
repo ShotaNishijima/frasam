@@ -249,6 +249,7 @@ Type objective_function<Type>::operator() ()
   vector<Type> F_mean(timeSteps);
   vector<Type> Catch_biomass(timeSteps);
   vector<Type> Exploitation_rate(timeSteps);
+  vector<Type> scale_U(timeSteps);
 
   //First take care of F
   matrix<Type> fvar(stateDimF,stateDimF);  // Fの???散??????
@@ -632,6 +633,7 @@ Type objective_function<Type>::operator() ()
     }
     F_mean(i)/=stateDimN;
     Exploitation_rate(i)=Catch_biomass(i)/B_total(i);
+    scale_U(i)=Exploitation_rate(i)/(1-Exploitation_rate(i));
   }
 
   ans = (Type(1.0)-lambda)*ans;
@@ -835,6 +837,7 @@ Type objective_function<Type>::operator() ()
   ADREPORT(phi1);
   ADREPORT(Catch_biomass);
   ADREPORT(Exploitation_rate);
+  ADREPORT(scale_U);
   ADREPORT(stockMeanWeight_true);
 
   REPORT(logF);

@@ -71,7 +71,7 @@ plot_samvpa <- function(vpa_sam_list,CI=0.95,scenario_name=NULL,
                      alpha=0.4,size=1,base_size=14,log_scale=FALSE,
                      legend_name="Scenario",legend_nrow=1, legend_position="top",
                      what.plot = c("biomass","SSB","Recruitment","U"),years = NULL,
-                     ncol=3
+                     ncol=2
 ){
 
   g0 = frasyr::plot_vpa(vpa_sam_list)
@@ -151,13 +151,15 @@ plot_samvpa <- function(vpa_sam_list,CI=0.95,scenario_name=NULL,
     }
 
     if (class(res)=="sam") {
+      # exploitation_rateのCVを(U*(1-U))に変更（2024/09/10）
       if (is.null(res$rep$unbiased)){
         cvdata2 = tibble(stat0 = names(res$rep$value),CV=res$rep$sd/res$rep$value,model=scenario_name[i]) %>%
-          filter(stat0 %in% c("exp_logN","ssb","B_total","F_mean","Exploitation_rate","Catch_biomass"))
+          filter(stat0 %in% c("exp_logN","ssb","B_total","F_mean","scale_U","Catch_biomass"))
       }else{
         cvdata2 = tibble(stat0 = names(res$rep$value),CV=res$rep$sd/res$rep$unbiased$value,model=scenario_name[i]) %>%
-          filter(stat0 %in% c("exp_logN","ssb","B_total","F_mean","Exploitation_rate","Catch_biomass"))
+          filter(stat0 %in% c("exp_logN","ssb","B_total","F_mean","scale_U","Catch_biomass"))
       }
+      cvdata2 = cvdata2 %>% mutate(stat0 = ifelse(stat0 == "scale_U","Exploitation_rate",stat0))
 
       cvdata2_R = cvdata2 %>% filter(stat0=="exp_logN") %>%
         mutate(Age = as.numeric(rep(rownames(res$naa),ncol(res$naa)))) %>%
@@ -187,10 +189,12 @@ plot_samvpa <- function(vpa_sam_list,CI=0.95,scenario_name=NULL,
   CVdata_all = CVdata_all %>% dplyr::select(-stat)
   # CVdata_all
 
+  # Exploitation rateについてはU/1-UのCVから計算に変更（2024/09/10）
   data3 = full_join(data2,CVdata_all) %>%
     mutate(stat_f = factor(stat_f,levels=stat_order)) %>%
-    mutate(Cz = exp(qnorm(CI+(1-CI)/2)*sqrt(log(1+CV^2)))) %>%
-    mutate(lower = value/Cz, upper = value*Cz) %>%
+    mutate(Cz = ifelse(stat_f != "Exploitation_rate",exp(qnorm(CI+(1-CI)/2)*sqrt(log(1+CV^2))),exp(qnorm(CI+(1-CI)/2)*CV))) %>%
+    mutate(lower = ifelse(stat_f != "Exploitation_rate", value/Cz, value/(1+(1-value)*Cz)),
+           upper = ifelse(stat_f != "Exploitation_rate", value*Cz, value/(value+(1-value)/Cz))) %>%
     arrange(model,stat_f,Year) %>%
     mutate(Model = factor(model,levels=scenario_name))
 
