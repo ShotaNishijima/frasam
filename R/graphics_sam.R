@@ -168,7 +168,8 @@ plot_samvpa <- function(vpa_sam_list,CI=0.95,scenario_name=NULL,
         select(-Age) %>% mutate(stat = "Recruitment")
 
       cvdata2 = cvdata2 %>% filter(stat0 %in% c("ssb","B_total","F_mean","Exploitation_rate","Catch_biomass")) %>%
-        mutate(Year = rep(as.numeric(colnames(res$naa)),5)) %>%
+        # mutate(Year = rep(as.numeric(colnames(res$naa)),length(unique(.$stat0)))) %>%
+        mutate(Year = rep(as.numeric(colnames(res$naa)),length(unique(.$stat0)))) %>%
         mutate(stat = case_when(stat0=="ssb" ~ "SSB",
                                 stat0=="F_mean" ~ "F",
                                 stat0=="B_total" ~ "Biomass",
@@ -499,6 +500,8 @@ caa_plot = function(samres,
   caa_obs = as_tibble(dat$caa) %>% mutate(Age=0:(n()-1)+samres$input$rec.age) %>%
     pivot_longer(cols=-Age,names_to="Year",values_to="obs") %>%
     mutate(Year = as.numeric(Year))
+
+  if(isTRUE(samres$input$last.catch.zero)) caa_obs = caa_obs %>% filter(Year < max(Year))
 
   caa_pred = as_tibble(samres$caa) %>% mutate(Age=0:(n()-1)+samres$input$rec.age) %>%
     pivot_longer(cols=-Age,names_to="Year",values_to="pred") %>%

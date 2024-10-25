@@ -229,6 +229,7 @@ sam <- function(dat,
     if (SR == "Const") SR.mode <- 5 # Constant R0(=a)
     if (SR == "Prop") SR.mode <- 6
     if (SR == "BHS") SR.mode <- 7
+    if (SR == "MR") SR.mode <- 8
     data$stockRecruitmentModelCode <- matrix(SR.mode)
 
     data$scale <- scale
@@ -465,7 +466,7 @@ sam <- function(dat,
         } else {
           log(a.init)
           },
-      rec_logb     = if (is.null(b.init)) {if (SR %in% c("HS","Mesnil","BHS")) 7 else -8} else {log(b.init)},
+      rec_logb     = if (is.null(b.init)) {if (SR %in% c("HS","Mesnil","BHS","MR")) 7 else -8} else {log(b.init)},
       logit_rho  = if (is.null(rho.init)) 0 else log(rho.init/(1-rho.init)),
       # logScale     = numeric(data$noScaledYears),
       # logScaleSSB  = if(any(data$fleetTypes %in% c(3,4))) {numeric(0)} else {numeric(0)},
@@ -535,7 +536,7 @@ sam <- function(dat,
         map$beta_g = rep(factor(NA),prod(dim(params$beta_g)))
       }
     }
-    if (SR != "BHS") map$rec_logk <- factor(NA)
+    if (!(SR %in% c("BHS","MR"))) map$rec_logk <- factor(NA)
 
     if(!is.null(CV_w_fix)) map$logCV_w = rep(factor(NA),length(logCV_w))
 
@@ -558,7 +559,8 @@ sam <- function(dat,
     random = c(random,add_random)
   }
 
-    # obj <- TMB::MakeADFun(data, params, map = map, random=c("U"), DLL=cpp.file.name,silent=silent)
+  # browser()
+  # obj <- TMB::MakeADFun(data, params, map = map, random=c("U"), DLL=cpp.file.name,silent=silent)
     obj <- TMB::MakeADFun(data, params, map = map, random=random, DLL=cpp.file.name,silent=silent)
     obj$fn(obj$par)
 
@@ -672,7 +674,8 @@ sam <- function(dat,
                              as.numeric(data$stockRecruitmentModelCode)==2 ~ "BH",
                              as.numeric(data$stockRecruitmentModelCode)==3 ~ "HS",
                              as.numeric(data$stockRecruitmentModelCode)==4 ~ "Mesnil",
-                             as.numeric(data$stockRecruitmentModelCode)==7 ~ "BHS")
+                             as.numeric(data$stockRecruitmentModelCode)==7 ~ "BHS",
+                             as.numeric(data$stockRecruitmentModelCode)==8 ~ "MR")
         #
         # a <- exp(rep$par.fixed[names(rep$par.fixed)=="rec_loga"])
         # b <- exp(rep$par.fixed[names(rep$par.fixed)=="rec_logb"])
@@ -680,8 +683,7 @@ sam <- function(dat,
         b <- exp(obj$env$parList()[["rec_logb"]])
         if (SR.mode==5) b <- NA
         if (SR.mode==6) b <- 0
-        if (SR.mode==7) k <- exp(obj$env$parList()[["rec_logk"]])
-
+        if (SR.mode %in% c(7,8)) k <- exp(obj$env$parList()[["rec_logk"]])
         #
         rec.par <- c(a,b)
         names(rec.par) <- c("a","b")
