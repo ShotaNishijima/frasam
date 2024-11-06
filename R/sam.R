@@ -80,7 +80,9 @@ sam <- function(dat,
                 catch_prop = NULL,
                 no_est=FALSE,
                 getJointPrecision = FALSE,
-                loopnum = 2
+                loopnum = 2,
+                obj_overwrite=NULL,
+                ignore.parm.uncertainty = FALSE
 ){
 
   argname <- ls()
@@ -564,6 +566,15 @@ sam <- function(dat,
     obj <- TMB::MakeADFun(data, params, map = map, random=random, DLL=cpp.file.name,silent=silent)
     obj$fn(obj$par)
 
+    if(!is.null(obj_overwrite)) {
+    #   check <- all.equal(obj,obj_overwrite)
+    #   if(isTRUE(check)) {
+        obj <- obj_overwrite
+    #   } else {
+    #     stop("'obj_overwrite' has a different structure from the original 'obj'")
+    #   }
+    }
+
   if(isTRUE(FreeADFun)) {
     TMB::FreeADFun(obj)
   }
@@ -585,30 +596,28 @@ sam <- function(dat,
     nlminb.control = list(eval.max = 1e4,
                           iter.max = 1e4,
                           trace = 0)
-    # inital optimization
-    opt <- nlminb(obj$par, obj$fn, obj$gr, lower=lower, upper=upper,control=nlminb.control)
 
-    # pars = opt$par
-    # print(pars)
-    # set.seed(1)
-    # for(jj in 1:100) {
-    #   pars2 = pars + rnorm(length(pars),0,0.01)
-    #   if (as.numeric(obj$fn(x=pars)) > as.numeric(obj$fn(x=pars2))) {
-    #     print(pars2)
-    #     pars <- pars2
-    #   }
-    # }
-    # obj$par <- pars
+    if(!is.null(obj_overwrite)) {
+      opt <- list()
+      opt$par <- obj$par
+      opt$convergence <- 0
+      opt$objective <- NA
+    } else {
+      # inital optimization
+      opt <- nlminb(obj$par, obj$fn, obj$gr, lower=lower, upper=upper,control=nlminb.control)
 
-    # Re-run to further decrease final gradient (https://github.com/kaskr/TMB_contrib_R/blob/master/TMBhelper/R/fit_tmb.R)
-    for( i in seq(2,loopnum,length=max(0,loopnum-1)) ){
-      # Temp = parameter_estimates[c('iterations','evaluations')]
-      opt2 = nlminb( start=obj$par, objective=obj$fn, gradient=obj$gr, control=nlminb.control, lower=lower, upper=upper )
-      opt <- opt2
+      # Re-run to further decrease final gradient (https://github.com/kaskr/TMB_contrib_R/blob/master/TMBhelper/R/fit_tmb.R)
+      for( i in seq(2,loopnum,length=max(0,loopnum-1)) ){
+        # Temp = parameter_estimates[c('iterations','evaluations')]
+        opt2 = nlminb( start=obj$par, objective=obj$fn, gradient=obj$gr, control=nlminb.control, lower=lower, upper=upper )
+        opt <- opt2
+      }
     }
 
     if (opt$convergence!=0) warning("May not converge")
-    rep <- TMB::sdreport(obj,bias.correct = bias.correct,bias.correct.control = list(sd=bias.correct.sd), getReportCovariance=get.random.vcov,getJointPrecision=getJointPrecision)
+    rep <- TMB::sdreport(obj,bias.correct = bias.correct,bias.correct.control = list(sd=bias.correct.sd), getReportCovariance=get.random.vcov,getJointPrecision=getJointPrecision
+                         ,ignore.parm.uncertainty=ignore.parm.uncertainty
+                         )
     if (max(rep$gradient.fixed)>1e-2) warning("Large maximum gradient component")
 
     # stop("Finish Optimization")
