@@ -122,7 +122,7 @@ get_pm <- function(res_sam,
 #' @encoding UTF-8
 #'
 
-make_SRres <- function(res_sam, multi_ssb=100, get_rand=FALSE, nsim=10000){
+make_SRres <- function(res_sam, multi_ssb=1.3, get_rand=FALSE, nsim=10000){
   res_sam2 <- res_sam
   res_sam2$input$Pope <- FALSE
   res_sam2$rec.par <- c(res_sam2$rec.par, sd=res_sam2$sigma.logN[1],rho=0,gamma=res_sam2$input$gamma)
@@ -132,12 +132,18 @@ make_SRres <- function(res_sam, multi_ssb=100, get_rand=FALSE, nsim=10000){
   res_SR$input$SRdata <- get.SRdata(res_sam)
   res_SR$input$SR <- res_sam$input$SR
   ssb <- seq(from=1,to=multi_ssb*max(colSums(res_sam2$ssb)),length=100)
+  scale_ssb <- res_sam$input$scale
+  scale_R <- res_sam$input$scale_number
+  # browser()
   if(res_SR$input$SR=="BHS"){
-    res_SR$pred <- tibble(SSB=ssb/1000,R=1000*frasyr::SRF_BHS(ssb/1000,res_SR$pars$a,res_SR$pars$b,1)) #最後1じゃない方が良い気がするがとりあえず放置
+    # res_SR$pred <- tibble(SSB=ssb/1000,R=1000*frasyr::SRF_BHS(ssb/1000,res_SR$pars$a,res_SR$pars$b,1)) #最後1じゃない方が良い気がするがとりあえず放置
+    res_SR$pred <- tibble(SSB=ssb,R=scale_R*frasyr::SRF_BHS(ssb/scale_ssb,res_SR$pars$a,res_SR$pars$b,exp(res_sam$par_list$rec_logk))) #最後1じゃない方が良い気がするがとりあえず放置
   }
   if(res_SR$input$SR=="BH"){
-    res_SR$pred <- tibble(SSB=ssb/1000,R=1000*frasyr::SRF_BH(ssb/1000,res_SR$pars$a,res_SR$pars$b,1))
+    res_SR$pred <- tibble(SSB=ssb/scale_ssb,R=scale_R*frasyr::SRF_BH(ssb/scale_ssb,res_SR$pars$a,res_SR$pars$b,1))
   }
+
+
   res_SR$AICc <- NA
 
   return(res_SR)
