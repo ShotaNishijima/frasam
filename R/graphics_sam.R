@@ -410,7 +410,7 @@ index_plot = function(samvpa_list,model_name=NULL, fleet_no = NULL,
 #'
 #' @export
 
-index_plot2 = function(samres, index_name = NULL,
+index_plot2 = function(samres, index_name = NULL,nrow=2,
                       scales=c("free","free_x","free"),base_size=14) {
   # browser()
   dat_index = samres$input$dat$index
@@ -441,7 +441,7 @@ index_plot2 = function(samres, index_name = NULL,
   g_index = ggplot(data=NULL,aes(x=Year))+
     geom_point(data=index_obs,aes(y=obs),colour="black",size=1.5)+
     geom_path(data=index_pred,aes(y=pred),colour="blue",size=1)+
-    facet_wrap(vars(Fleet),nrow=2,scales=scales[1])+
+    facet_wrap(vars(Fleet),nrow=nrow,scales=scales[1])+
     scale_colour_brewer(palette="Set1",name="")+
     theme_bw(base_size=base_size)+theme(legend.position="top")+
     ylab("Index value")+ylim(0,NA)
@@ -450,7 +450,7 @@ index_plot2 = function(samres, index_name = NULL,
   g_resid = ggplot(data=index_pred,aes(x=Year,y=resid)) +
     # geom_point(data=index_obs,aes(y=obs),size=1.5) +
     geom_point(size=1.5)+
-    facet_wrap(vars(Fleet),nrow=2,scales=scales[2])+
+    facet_wrap(vars(Fleet),nrow=nrow,scales=scales[2])+
     theme_bw(base_size=base_size)+theme(legend.position="top")+
     scale_colour_brewer(palette="Set1",name="")+
     scale_shape_discrete(name="")+
@@ -479,7 +479,7 @@ index_plot2 = function(samres, index_name = NULL,
   g_abund = ggplot(data=NULL,aes(x=abund))+
     geom_path(data=index_pred_curve,aes(y=pred),colour="blue",size=1)+
     geom_point(data=index_pred2,aes(y=obs),size=1.5)+
-    facet_wrap(vars(Fleet),nrow=2,scales=scales[3])+
+    facet_wrap(vars(Fleet),nrow=nrow,scales=scales[3])+
     theme_bw(base_size=base_size)+theme(legend.position="top")+
     scale_colour_brewer(palette="Set1",name="")+
     ylab("Index")+xlab("Abundance")
