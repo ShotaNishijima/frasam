@@ -121,11 +121,13 @@ plot_samvpa <- function(vpa_sam_list,CI=0.95,scenario_name=NULL,
   for(i in 1:length(vpa_sam_list)) {
     res = vpa_sam_list[[i]]
     if(class(res)=="vpa") {
+      # browser()
       if (is.null(res$rep)) {
         stop("Rerun vpa() with TMB=TRUE & sdreport=TRUE!")
       }
-      cvdata = tibble(stat0 = names(res$rep$value),CV=res$rep$sd/res$rep$value,model=scenario_name[i])
-      if (!("U" %in% what.plot)) cvdata = cvdata %>% filter(stat0 != "U")
+      cvdata = tibble(stat0 = names(res$rep$value),CV=res$rep$sd/res$rep$value,model=scenario_name[i]) %>%
+        filter(stat0 != "U")
+      if (!("U" %in% what.plot)) cvdata = cvdata %>% filter(stat0 != "scale_U")
       if (!("fishing_mortality" %in% what.plot)) cvdata = cvdata %>% filter(stat0 != "F_mean")
       cvdata = cvdata %>%
         mutate(Year = rep(as.numeric(colnames(res$naa)),nrow(cvdata)/ncol(res$naa)))
@@ -138,10 +140,10 @@ plot_samvpa <- function(vpa_sam_list,CI=0.95,scenario_name=NULL,
         mutate(stat = "Recruitment")
 
       # cvdata$stat0 %>% unique()
-      cvdata = cvdata %>% filter(stat0 %in% c("SSB","B_total","F_mean","U","catch")) %>%
+      cvdata = cvdata %>% filter(stat0 %in% c("SSB","B_total","F_mean","scale_U","catch")) %>%
         mutate(stat = case_when(stat0=="SSB" ~ "SSB",
                                 stat0=="F_mean" ~ "F",
-                                stat0=="U" ~ "Exploitation_rate",
+                                stat0=="scale_U" ~ "Exploitation_rate",
                                 stat0 =="catch" ~ "Catch",
                                 TRUE ~ "Biomass")) %>%
         full_join(cvdata_R) %>%
@@ -194,7 +196,7 @@ plot_samvpa <- function(vpa_sam_list,CI=0.95,scenario_name=NULL,
   data3 = full_join(data2,CVdata_all) %>%
     mutate(stat_f = factor(stat_f,levels=stat_order)) %>%
     mutate(Cz = ifelse(stat_f != "Exploitation_rate",exp(qnorm(CI+(1-CI)/2)*sqrt(log(1+CV^2))),exp(qnorm(CI+(1-CI)/2)*CV))) %>%
-    mutate(lower = ifelse(stat_f != "Exploitation_rate", value/Cz, value/(1+(1-value)*Cz)),
+    mutate(lower = ifelse(stat_f != "Exploitation_rate", value/Cz, value/(value+(1-value)*Cz)),
            upper = ifelse(stat_f != "Exploitation_rate", value*Cz, value/(value+(1-value)/Cz))) %>%
     arrange(model,stat_f,Year) %>%
     mutate(Model = factor(model,levels=scenario_name))
