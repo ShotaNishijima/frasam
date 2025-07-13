@@ -28,14 +28,16 @@
 get_pm <- function(res_sam,
                    res_future=NULL,
                    waa_catch=res_sam$input$dat$waa,
-                   last_year=2022,
+                   last_year=2023,
                    waa_biom=res_sam$input$dat$waa,
-                   year_biol=2020:2022,
-                   year_Fcur=2020:2022,
-                   perSPR=c(30,40,50, 60, 70)
+                   year_biol=2016:2023,
+                   year_Fcur=2021:2023,
+                   perSPR=c(30,40,50, 60, 70),
+                   start_year=1970
                    ){
 
   # define year range
+  last10year <- (last_year-(9:0)) %>% as.character()
   last5year <- (last_year-(4:0)) %>% as.character()
   last3year <- (last_year-(2:0)) %>% as.character()
   last_year <- last_year %>% as.character()
@@ -44,7 +46,7 @@ get_pm <- function(res_sam,
   res_sam$input$dat$waa.catch <- waa_catch
 
 
-  if(res_sam$input$SR=="BHS"){
+  if(res_sam$input$SR=="BHS" | res_sam$input$SR=="Mesnil"){
     res_sam$input$SR <- res_sam$SR <- "HS"
   }
 
@@ -52,6 +54,11 @@ get_pm <- function(res_sam,
   aveF  <- colSums(res_sam$caa * res_sam$input$dat$waa.catch * res_sam$faa)/colSums(res_sam$caa * res_sam$input$dat$waa)
   Erate <- colSums(res_sam$caa * res_sam$input$dat$waa.catch)/colSums(res_sam$baa)
   ssb   <- colSums(res_sam$ssb)
+
+  aveF <- aveF[as.character(start_year:last_year)]
+  Erate <- Erate[as.character(start_year:last_year)]
+  ssb <- ssb[as.character(start_year:last_year)]
+
 
   # calculate biological reference points
   Fcurrent <- rowMeans(res_sam$faa[, as.character(year_Fcur)])
@@ -92,25 +99,36 @@ get_pm <- function(res_sam,
   TBy <- res_sam$baa[,last_year] %>% sum()
   SBy <- res_sam$ssb[,last_year] %>% sum()
 
+  Scale <- res_sam$input$scale
+
   res <- tribble(~stat, ~value,
                  str_c("TBy",last_year), TBy,
-                 str_c("Sby",last_year), SBy,
+                 str_c("SBy",last_year), SBy,
                  str_c("Ry", last5year), res_sam$naa[1,last5year],
                  str_c("AFy",last5year), aveF[last5year],
                  str_c("Ey", last5year), Erate[last5year],
-                 "currentSPR"  , currentSPR,
+                 "currentSPR/SPR0"  , currentSPR,
+                 str_c("SSBmedian"), median(ssb),
                  str_c("deple_median_last3"), mean(ssb[last3year])/median(ssb),
+                 str_c("SSB_Q1"), quantile(ssb,probs=c(0.25))[1],
+                 str_c("deple_Q1_last3"), mean(ssb[last3year])/quantile(ssb,probs=c(0.25))[1],
+                 str_c("SSB_Q3"), quantile(ssb,probs=c(0.75))[1],
+                 str_c("deple_Q3_last3"), mean(ssb[last3year])/quantile(ssb,probs=c(0.75))[1],
+                 # str_c("SSBmean"), mean(ssb),
+                 # str_c("deple_mean_last3"), mean(ssb[last3year])/mean(ssb),
+                 # str_c("SSBmax_last10"),max(ssb[last10year]),
+                 # str_c("deple_max_last10_last3"), mean(ssb[last3year])/max(ssb[last10year]),
                  names(refs) , as.numeric(unlist(refs)),
                  "Fmsy/Fcur"     , RFmsy,
-                 "Bmsy"      , Bmsy,
-                 "SBmsy"     , SBmsy,
+                 "Bmsy"      , Bmsy*Scale,
+                 "SBmsy"     , SBmsy*Scale,
                  "h"         , h,
-                 "SB0"       , SB0,
+                 "SB0"       , SB0*Scale,
                  "SBmsy/SB0" , SBmsy/SB0,
                  "FmsySPR"   , FmsySPR,
-                 "B/Bmsy"     , TBy/Bmsy/1000,
-                 "SB/SBmsy"    , SBy/SBmsy/1000,
-                 "SBmsy/SBmax"    , SBmsy*1000/max(ssb)
+                 "B/Bmsy"     , TBy/Bmsy/Scale,
+                 "SB/SBmsy"    , SBy/SBmsy/Scale,
+                 "SBmsy/SBmax"    , Scale*SBmsy/max(ssb)
                  ) %>%
     unnest(cols=c(stat, value))
 

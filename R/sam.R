@@ -561,19 +561,10 @@ sam <- function(dat,
     random = c(random,add_random)
   }
 
-  # browser()
-  # obj <- TMB::MakeADFun(data, params, map = map, random=c("U"), DLL=cpp.file.name,silent=silent)
     obj <- TMB::MakeADFun(data, params, map = map, random=random, DLL=cpp.file.name,silent=silent)
     obj$fn(obj$par)
 
-    if(!is.null(obj_overwrite)) {
-    #   check <- all.equal(obj,obj_overwrite)
-    #   if(isTRUE(check)) {
-        obj <- obj_overwrite
-    #   } else {
-    #     stop("'obj_overwrite' has a different structure from the original 'obj'")
-    #   }
-    }
+    if(!is.null(obj_overwrite)) obj <- obj_overwrite
 
   if(isTRUE(FreeADFun)) {
     TMB::FreeADFun(obj)
@@ -582,8 +573,6 @@ sam <- function(dat,
   if (is.null(lower)) lower <- obj$par*0-Inf
   if (is.null(upper)) upper <- obj$par*0+Inf
 
-  # lower <- obj$par*0-Inf
-  # upper <- obj$par*0+Inf
   if (!is.null(b_range) & "rec_logb" %in% names(obj$par)) {
     lower["rec_logb"] <- log(b_range[1])
     upper["rec_logb"] <- log(b_range[2])
@@ -610,7 +599,11 @@ sam <- function(dat,
       for( i in seq(2,loopnum,length=max(0,loopnum-1)) ){
         # Temp = parameter_estimates[c('iterations','evaluations')]
         opt2 = nlminb( start=obj$par, objective=obj$fn, gradient=obj$gr, control=nlminb.control, lower=lower, upper=upper )
-        opt <- opt2
+        if(opt2$objective<=opt$objective) {
+          opt <- opt2
+        } else {
+          break
+        }
       }
     }
 
@@ -683,6 +676,7 @@ sam <- function(dat,
                              as.numeric(data$stockRecruitmentModelCode)==2 ~ "BH",
                              as.numeric(data$stockRecruitmentModelCode)==3 ~ "HS",
                              as.numeric(data$stockRecruitmentModelCode)==4 ~ "Mesnil",
+                             as.numeric(data$stockRecruitmentModelCode)==5 ~ "Const",
                              as.numeric(data$stockRecruitmentModelCode)==7 ~ "BHS",
                              as.numeric(data$stockRecruitmentModelCode)==8 ~ "MR")
         #

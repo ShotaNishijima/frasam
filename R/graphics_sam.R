@@ -64,6 +64,7 @@ get_predSR <- function(samres,max.ssb.pred=1.3,length=100){
 #' SAM or VPAの結果を描くグラフ
 #'
 #' @param samres samの結果オブジェクト
+#' @importFrom forcats fct_inorder
 #' @export
 #' @encoding UTF-8
 
@@ -76,7 +77,9 @@ plot_samvpa <- function(vpa_sam_list,CI=0.95,scenario_name=NULL,
 
   g0 = frasyr::plot_vpa(vpa_sam_list)
 
-  data = g0$data
+  data = g0$data %>%
+    mutate(id = forcats::fct_inorder(id))
+
   # data$stat %>% unique()
   # data$id %>% unique()
   data2 = data %>% dplyr::filter(stat %in% what.plot) %>%
@@ -98,17 +101,13 @@ plot_samvpa <- function(vpa_sam_list,CI=0.95,scenario_name=NULL,
                           what.plot=="U"~"Exploitation_rate",
                           what.plot=="catch"~"Catch",
                           TRUE ~ what.plot)
-  # data2$stat2 %>% unique
   data2 = data2 %>%
-    # mutate(model = if_else(id=="1","VPA","SAM")) %>%
     mutate(stat_f = factor(stat2,levels=what.plot_f,labels=what.plot_f))
-  # data2$stat_f %>% unique()
-  # nrow(data2)
+
   if (!is.null(scenario_name)) {
     data2 = data2 %>% mutate(model = scenario_name[sapply(1:nrow(data2), function(i) which(data2$id[i]==unique(data2$id)))])
   } else{
     scenario_name = unique(as.character(data2$id))
-    # data2 = data2 %>% mutate(model = id)
     data2 = data2 %>% mutate(model = scenario_name[sapply(1:nrow(data2), function(i) which(data2$id[i]==unique(data2$id)))])
   }
 
