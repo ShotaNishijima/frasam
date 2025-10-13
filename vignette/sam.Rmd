@@ -1,0 +1,247 @@
+---
+title: "SAMを使った資源量推定"
+author: "市野川桃子・西嶋翔太"
+date: "`r Sys.Date()`"
+output:
+  pdf_document:
+    latex_engine: xelatex
+    
+vignette: >
+  %\VignetteIndexEntry{1. Estimating abundances with SAM}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+# SAMのインストール
+- インストールに必要なパッケージ(devtools)はあらかじめインストールしておいてください
+
+```{r, fig.show='hold'}
+
+# インストール
+devtools::install_github("ShotaNishijima/frasam@cmsa11") # frasamのインストール
+devtools::install_github("ichimomo/frasyr@dev") # frasyrも使うのでfrasyrもインストールしてください
+
+# ライブラリの呼び出し
+library(frasyr)
+library(frasam)
+library(tidyverse)
+library(patchwork)
+
+```
+
+# SAMを適用するデータセットの作成
+
+VPAを適用するときのデータセットと同じ形式のデータセットが利用できます。
+ただし、VPAでは資源量指数が利用できなくても適用できますが、SAMでは資源量指数の利用が必須になります。
+
+## データの読み込み
+```{r, fig.show='hold'}
+
+caa   <- read.csv("https://raw.githubusercontent.com/ichimomo/frasyr/dev/data-raw/ex1_caa.csv",  row.names=1)
+waa   <- read.csv("https://raw.githubusercontent.com/ichimomo/frasyr/dev/data-raw/ex1_waa.csv",  row.names=1)
+maa   <- read.csv("https://raw.githubusercontent.com/ichimomo/frasyr/dev/data-raw/ex1_maa.csv",  row.names=1)
+index <- read.csv("https://raw.githubusercontent.com/ichimomo/frasyr/dev/data-raw/ex1_index.csv",  row.names=1)
+# create pseudo data for caa
+caa   <- caa * exp(rnorm(length(caa), mean=-0.5 * (0.1)^2, sd=0.1))
+dat <- data.handler(caa=caa, waa=waa, maa=maa, M=0.5, index=index)
+
+# まずはsamのhelpファイルを閲覧してどんなオプションがあるか把握しましょう
+help(sam)
+
+# これ必要？ tmb.run=TRUEだとsam2がないと言われた
+use_sam_tmb(TmbFile="sam2",overwrite=FALSE) #compile and activate
+
+# samの実施
+# (*)の部分が設定ポイント
+res_sam <- sam(dat,
+        last.catch.zero = FALSE,
+       	cpp.file.name = "sam2",
+    	tmb.run = FALSE, # TRUEにするとtmbをコンパイルしてロードする。最初の１回だけTRUEにするのが良い
+       	rec.age = 0,
+       	plus.group = TRUE,
+       	alpha = 1, # 最高年齢と最高年齢-1歳のFが同じと仮定
+        est.method = "ml",	
+	# 資源量指数に関わる設定。資源量指数の数だけベクトルで与える。
+	abund = c("SSB"), 
+       	min.age = c(0), 
+       	max.age = c(6), 
+       	b.est = FALSE, # b推定の有無(*)
+       	b.fix = NA,
+	# 分散に関わる設定。どの分散を同じとするか。年齢の数だけ与える (*)
+	varC =  c(0,0,0,0,0,0,0),
+        varN = c(0,1,1,1,1,1,1),
+        varF = c(0,0,0,0,0,0,0),
+        varN.fix = c(NA, 1e-4, 1e-4, 1e-4, 1e-4, 1e-4, 1e-4),
+	# 再生産関係推定に関わる設定 (*)
+	SR = "BH",
+    AR = 0,
+    # Fのrhoのタイプ。１なら選択率一定, 0なら完全にランダム, 2はrhoを推定 (*)
+    rho.mode = 0,
+	# 初期値の設定
+        q.init = NULL,
+	sdFsta.init = NULL,
+	sdLogN.init = c(0.2, 0.2),
+        sdLogObs.init = NULL,
+        rho.init = NULL,
+        a.init = NULL,
+        b.init = NULL,
+	# その他
+        ref.year = 1:5,
+        bias.correct = TRUE,
+        bias.correct.sd = FALSE,
+        get.random.vcov = FALSE,
+        silent = TRUE,
+       remove.Fprocess.year = NULL,
+       RW.Forder = 0,
+       map.add = NULL,
+       p0.list = NULL,
+       scale = 1000,
+       scale_number = 1000,       
+       gamma = 10,
+       sel.def = "max",
+       use.index = NULL,
+       upper = NULL,
+       lower = NULL,
+       index.key = NULL,
+       index.b.key = NULL,
+       lambda = 0,
+       add_random = NULL,
+       tmbdata = NULL,
+       map = NULL,
+       sep_omicron = TRUE,
+       catch_prop = NULL,
+       no_est = FALSE,
+       getJointPrecision = FALSE,
+       loopnum = 2
+    )
+
+# 推定結果の確認: opt=推定パラメータや目的関数、収束の有無 
+res_sam$opt
+# 推定結果の確認: rep=推定パラメータとSD
+res_sam$rep
+# 推定結果の確認: AIC
+res_sam$aic
+# 推定結果の確認: sigma
+res_sam[c("sigma","sigma.logC","sigma.logFsta","sigma.logN")]
+
+# 設定を変えてもう一度
+sam_input <- res_sam$input
+sam_input$rho.mode <- 1 # fix selectivity
+res_sam2 <- do.call(sam, sam_input)
+
+# AICの比較
+c(res_sam$aic, res_sam2$aic)
+
+# VPAもやってみる
+res_vpa <- vpa(dat,fc.year=1998:2000,tf.year = 1998:1999,
+               term.F="max",stat.tf="mean",Pope=TRUE,tune=TRUE,p.init=0.5, abund="SSB", min.age=0, max.age=6, sel.update=TRUE)
+
+# ３つのモデルの比較
+plot_vpa(list(VPA=res_vpa, SAM=res_sam, SAM2=res_sam2))
+
+# SAMだけの比較
+plot_samvpa(list(SAM=res_sam, SAM2=res_sam2))
+
+```
+
+# モデル選択
+
+```{r}
+# 動かない
+# select_sigma(res_sam, var="varF",X=NULL, stopAIC=TRUE)
+
+```
+
+# 再生産関係のプロット
+
+```{r}
+SR_sam0 <- res_sam %>% make_SRres
+plot_SR_simple(res_sam)
+biopar <- derive_biopar(res_sam, derive_year=1998:2000)
+steepness_sam <- calc_steepness(SR="BH", rec_pars=SR_sam0$pars,M=biopar$M, waa=biopar$waa, maa=biopar$maa)
+
+```
+
+
+# モデル診断
+
+## 残差プロット
+
+```{r}
+# 資源量指数
+resid_sam <- index_plot(res_sam); wrap_plots(resid_sam)
+
+# catch at age
+caa_resid <- caa_plot(res_sam); wrap_plots(caa_resid)
+
+```
+
+### レトロスペクティブ解析
+
+```{r}
+#retro_sam(res_sam) ## tmbがクラッシュする
+
+```
+
+```{r}
+res_profile <- samprofile(res_sam, "logQ", param_range=c(8, 11)) ## tmbがクラッシュする
+res_profile$obj_tbl %>% ggplot() + geom_line(aes(x=par, y=obj_value))
+
+```
+
+## ブートストラップ
+```{r}
+
+res_boot <- boo_sam(res_sam, n=100,method="p",seed=1)
+res_boot[[1]]$index <- res_sam$input$dat$index
+plot_boot(res_boot)
+
+
+## パラメトリックブートストラップ(method="p")
+set.seed(1)
+boot.sim2 <- boo.vpa(vout3,B_ite=10,method="p") # 実際には1000回以上(B=1000)やってください
+tf.dist2 <- sapply(boot.sim2,function(x) x$faa["2000"][6,])
+ci2 <- quantile(tf.dist2,probs=c(0.1,0.9))
+
+## 平滑化ブートストラップ(method="r")
+set.seed(1) 
+boot.sim3 <- boo.vpa(vout3,B_ite=10,method="r") # 実際には1000回以上(B=1000)やってください
+tf.dist3 <- sapply(boot.sim3,function(x) x$faa["2000"][6,])
+ci3 <- quantile(tf.dist3,probs=c(0.1,0.9))
+
+## 4つの信頼区間の比較
+rbind(ci0,ci1,ci2,ci3)
+
+## ノンパラメトリックブートストラップ for vout4
+set.seed(1)
+boot.sim4 <- boo.vpa(vout4,B_ite=10,method="n") # 実際には1000回以上(B=1000)やってください
+
+tf.dist4 <- sapply(boot.sim4[boot.sim4!="try-error"],function(x) x$faa["2000"][7,])
+ci4 <- quantile(tf.dist4,probs=c(0.1,0.9))
+
+## 親魚量の信頼区間のプロット
+Years <- colnames(dat$caa)
+ssb.boot <- sapply(boot.sim1,function(x) colSums(x$ssb))
+x <- t(apply(ssb.boot,1,quantile,probs=c(0.1,0.5,0.9)))
+matplot(Years,x,ylim=c(0,max(x)),col=1,type=c("l","b","l"),
+        pch=1,lty=c(2,1,2),ylab="Spawning biomass")
+```
+
+## 残差の自己相関のチェック
+```{r}
+resid <- as.numeric(log(vout3$pred.index) - log(dat$index))
+plot(resid,type="b")
+acf(resid) # 自己相関は特にない
+# 正規性の検定
+ks.test(resid,"pnorm",mean=mean(resid),sd=sd(resid))
+# 分布が有意に正規分布から外れているわけではない
+ks.test(c(resid,10),"pnorm",mean=mean(c(resid,10)),sd=sd(c(resid,10)))
+# 大きな外れ値があると、p値が小さくなって、正規分布でない、となる。
+```
+
