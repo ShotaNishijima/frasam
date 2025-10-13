@@ -2,7 +2,9 @@
 ##### Parametric bootstrap of SAM #####
 #######################################
 
-
+#'
+#' @export
+#' 
 
 boo_sam <- function(Res,n=100,seed=1,est=TRUE,method="p",use_p0=TRUE){
 

@@ -205,7 +205,7 @@ plot_samvpa <- function(vpa_sam_list,CI=0.95,scenario_name=NULL,
   }
 
   g1 = g1 +
-    geom_path(aes(colour=Model,linetype=Model),size=size)+
+    geom_path(aes(colour=Model,linetype=Model),linewidth=size)+
     facet_wrap(vars(stat_f),scales="free_y",ncol=ncol)+
     theme_SH()+theme_bw(base_size=base_size)+theme(legend.position=legend_position)+
     xlab("Year") + ylab("")+
@@ -351,7 +351,7 @@ index_plot = function(samvpa_list,model_name=NULL, fleet_no = NULL,
 
   g_index = ggplot(data=NULL,aes(x=Year))+
     geom_point(data=index_obs,aes(y=obs),colour="black",size=1.5)+
-    geom_path(data=index_pred,aes(y=pred,colour=Model),size=1)+
+    geom_path(data=index_pred,aes(y=pred,colour=Model),linewidth=1)+
     facet_wrap(vars(Fleet),nrow=2,scales=scales[1])+
     scale_colour_brewer(palette="Set1",name="")+
     theme_bw(base_size=base_size)+theme(legend.position="top")+
@@ -389,7 +389,7 @@ index_plot = function(samvpa_list,model_name=NULL, fleet_no = NULL,
   })
 
   g_abund = ggplot(data=NULL,aes(x=abund))+
-    geom_path(data=index_pred_curve,aes(y=pred,colour=Model),size=1)+
+    geom_path(data=index_pred_curve,aes(y=pred,colour=Model),linewidth=1)+
     geom_point(data=index_pred2,aes(y=obs,colour=Model),size=1.5)+
     facet_wrap(vars(Fleet),nrow=2,scales=scales[3])+
     theme_bw(base_size=base_size)+theme(legend.position="top")+
@@ -435,7 +435,7 @@ index_plot2 = function(samres, index_name = NULL,
 
   g_index = ggplot(data=NULL,aes(x=Year))+
     geom_point(data=index_obs,aes(y=obs),colour="black",size=1.5)+
-    geom_path(data=index_pred,aes(y=pred),colour="blue",size=1)+
+    geom_path(data=index_pred,aes(y=pred),colour="blue",linewidth=1)+
     facet_wrap(vars(Fleet),nrow=2,scales=scales[1])+
     scale_colour_brewer(palette="Set1",name="")+
     theme_bw(base_size=base_size)+theme(legend.position="top")+
@@ -472,7 +472,7 @@ index_plot2 = function(samres, index_name = NULL,
   })
 
   g_abund = ggplot(data=NULL,aes(x=abund))+
-    geom_path(data=index_pred_curve,aes(y=pred),colour="blue",size=1)+
+    geom_path(data=index_pred_curve,aes(y=pred),colour="blue",linewidth=1)+
     geom_point(data=index_pred2,aes(y=obs),size=1.5)+
     facet_wrap(vars(Fleet),nrow=2,scales=scales[3])+
     theme_bw(base_size=base_size)+theme(legend.position="top")+
@@ -508,7 +508,7 @@ caa_plot = function(samres,
 
   g_caa = ggplot(data=caa_dat,aes(x=Year))+
     geom_point(aes(y=obs),size=1.5) +
-    geom_path(aes(y=pred),size=0.8)+
+    geom_path(aes(y=pred),linewidth=0.8)+
     facet_wrap(vars(Age),nrow=2,scales=scales[1]) +
     theme_bw(base_size=base_size)+ylab("Catch at age")
 
