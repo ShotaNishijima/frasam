@@ -7,3 +7,6 @@
 *.dll
 
 R/for_developer.R
+
+/*.cpp
+tests/testthat/*.cpp
