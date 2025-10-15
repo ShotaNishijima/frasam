@@ -64,6 +64,7 @@ get_predSR <- function(samres,max.ssb.pred=1.3,length=100){
 #' SAM or VPAの結果を描くグラフ
 #'
 #' @param samres samの結果オブジェクト
+#' @importFrom forcats fct_inorder
 #' @export
 #' @encoding UTF-8
 
@@ -71,12 +72,14 @@ plot_samvpa <- function(vpa_sam_list,CI=0.95,scenario_name=NULL,
                      alpha=0.4,size=1,base_size=14,log_scale=FALSE,
                      legend_name="Scenario",legend_nrow=1, legend_position="top",
                      what.plot = c("biomass","SSB","Recruitment","U"),years = NULL,
-                     ncol=3
+                     ncol=2
 ){
 
   g0 = frasyr::plot_vpa(vpa_sam_list)
 
-  data = g0$data
+  data = g0$data %>%
+    mutate(id = forcats::fct_inorder(id))
+
   # data$stat %>% unique()
   # data$id %>% unique()
   data2 = data %>% dplyr::filter(stat %in% what.plot) %>%
@@ -98,17 +101,13 @@ plot_samvpa <- function(vpa_sam_list,CI=0.95,scenario_name=NULL,
                           what.plot=="U"~"Exploitation_rate",
                           what.plot=="catch"~"Catch",
                           TRUE ~ what.plot)
-  # data2$stat2 %>% unique
   data2 = data2 %>%
-    # mutate(model = if_else(id=="1","VPA","SAM")) %>%
     mutate(stat_f = factor(stat2,levels=what.plot_f,labels=what.plot_f))
-  # data2$stat_f %>% unique()
-  # nrow(data2)
+
   if (!is.null(scenario_name)) {
     data2 = data2 %>% mutate(model = scenario_name[sapply(1:nrow(data2), function(i) which(data2$id[i]==unique(data2$id)))])
   } else{
     scenario_name = unique(as.character(data2$id))
-    # data2 = data2 %>% mutate(model = id)
     data2 = data2 %>% mutate(model = scenario_name[sapply(1:nrow(data2), function(i) which(data2$id[i]==unique(data2$id)))])
   }
 
@@ -121,11 +120,13 @@ plot_samvpa <- function(vpa_sam_list,CI=0.95,scenario_name=NULL,
   for(i in 1:length(vpa_sam_list)) {
     res = vpa_sam_list[[i]]
     if(class(res)=="vpa") {
+      # browser()
       if (is.null(res$rep)) {
         stop("Rerun vpa() with TMB=TRUE & sdreport=TRUE!")
       }
-      cvdata = tibble(stat0 = names(res$rep$value),CV=res$rep$sd/res$rep$value,model=scenario_name[i])
-      if (!("U" %in% what.plot)) cvdata = cvdata %>% filter(stat0 != "U")
+      cvdata = tibble(stat0 = names(res$rep$value),CV=res$rep$sd/res$rep$value,model=scenario_name[i]) %>%
+        filter(stat0 != "U")
+      if (!("U" %in% what.plot)) cvdata = cvdata %>% filter(stat0 != "scale_U")
       if (!("fishing_mortality" %in% what.plot)) cvdata = cvdata %>% filter(stat0 != "F_mean")
       cvdata = cvdata %>%
         mutate(Year = rep(as.numeric(colnames(res$naa)),nrow(cvdata)/ncol(res$naa)))
@@ -138,10 +139,10 @@ plot_samvpa <- function(vpa_sam_list,CI=0.95,scenario_name=NULL,
         mutate(stat = "Recruitment")
 
       # cvdata$stat0 %>% unique()
-      cvdata = cvdata %>% filter(stat0 %in% c("SSB","B_total","F_mean","U","catch")) %>%
+      cvdata = cvdata %>% filter(stat0 %in% c("SSB","B_total","F_mean","scale_U","catch")) %>%
         mutate(stat = case_when(stat0=="SSB" ~ "SSB",
                                 stat0=="F_mean" ~ "F",
-                                stat0=="U" ~ "Exploitation_rate",
+                                stat0=="scale_U" ~ "Exploitation_rate",
                                 stat0 =="catch" ~ "Catch",
                                 TRUE ~ "Biomass")) %>%
         full_join(cvdata_R) %>%
@@ -151,13 +152,15 @@ plot_samvpa <- function(vpa_sam_list,CI=0.95,scenario_name=NULL,
     }
 
     if (class(res)=="sam") {
+      # exploitation_rateのCVを(U*(1-U))に変更（2024/09/10）
       if (is.null(res$rep$unbiased)){
         cvdata2 = tibble(stat0 = names(res$rep$value),CV=res$rep$sd/res$rep$value,model=scenario_name[i]) %>%
-          filter(stat0 %in% c("exp_logN","ssb","B_total","F_mean","Exploitation_rate","Catch_biomass"))
+          filter(stat0 %in% c("exp_logN","ssb","B_total","F_mean","scale_U","Catch_biomass"))
       }else{
         cvdata2 = tibble(stat0 = names(res$rep$value),CV=res$rep$sd/res$rep$unbiased$value,model=scenario_name[i]) %>%
-          filter(stat0 %in% c("exp_logN","ssb","B_total","F_mean","Exploitation_rate","Catch_biomass"))
+          filter(stat0 %in% c("exp_logN","ssb","B_total","F_mean","scale_U","Catch_biomass"))
       }
+      cvdata2 = cvdata2 %>% mutate(stat0 = ifelse(stat0 == "scale_U","Exploitation_rate",stat0))
 
       cvdata2_R = cvdata2 %>% filter(stat0=="exp_logN") %>%
         mutate(Age = as.numeric(rep(rownames(res$naa),ncol(res$naa)))) %>%
@@ -166,7 +169,8 @@ plot_samvpa <- function(vpa_sam_list,CI=0.95,scenario_name=NULL,
         select(-Age) %>% mutate(stat = "Recruitment")
 
       cvdata2 = cvdata2 %>% filter(stat0 %in% c("ssb","B_total","F_mean","Exploitation_rate","Catch_biomass")) %>%
-        mutate(Year = rep(as.numeric(colnames(res$naa)),5)) %>%
+        # mutate(Year = rep(as.numeric(colnames(res$naa)),length(unique(.$stat0)))) %>%
+        mutate(Year = rep(as.numeric(colnames(res$naa)),length(unique(.$stat0)))) %>%
         mutate(stat = case_when(stat0=="ssb" ~ "SSB",
                                 stat0=="F_mean" ~ "F",
                                 stat0=="B_total" ~ "Biomass",
@@ -187,10 +191,12 @@ plot_samvpa <- function(vpa_sam_list,CI=0.95,scenario_name=NULL,
   CVdata_all = CVdata_all %>% dplyr::select(-stat)
   # CVdata_all
 
+  # Exploitation rateについてはU/1-UのCVから計算に変更（2024/09/10）
   data3 = full_join(data2,CVdata_all) %>%
     mutate(stat_f = factor(stat_f,levels=stat_order)) %>%
-    mutate(Cz = exp(qnorm(CI+(1-CI)/2)*sqrt(log(1+CV^2)))) %>%
-    mutate(lower = value/Cz, upper = value*Cz) %>%
+    mutate(Cz = ifelse(stat_f != "Exploitation_rate",exp(qnorm(CI+(1-CI)/2)*sqrt(log(1+CV^2))),exp(qnorm(CI+(1-CI)/2)*CV))) %>%
+    mutate(lower = ifelse(stat_f != "Exploitation_rate", value/Cz, value/(value+(1-value)*Cz)),
+           upper = ifelse(stat_f != "Exploitation_rate", value*Cz, value/(value+(1-value)/Cz))) %>%
     arrange(model,stat_f,Year) %>%
     mutate(Model = factor(model,levels=scenario_name))
 
@@ -405,7 +411,7 @@ index_plot = function(samvpa_list,model_name=NULL, fleet_no = NULL,
 #'
 #' @export
 
-index_plot2 = function(samres, index_name = NULL,
+index_plot2 = function(samres, index_name = NULL,nrow=2,
                       scales=c("free","free_x","free"),base_size=14) {
   # browser()
   dat_index = samres$input$dat$index
@@ -436,7 +442,7 @@ index_plot2 = function(samres, index_name = NULL,
   g_index = ggplot(data=NULL,aes(x=Year))+
     geom_point(data=index_obs,aes(y=obs),colour="black",size=1.5)+
     geom_path(data=index_pred,aes(y=pred),colour="blue",linewidth=1)+
-    facet_wrap(vars(Fleet),nrow=2,scales=scales[1])+
+    facet_wrap(vars(Fleet),nrow=nrow,scales=scales[1])+
     scale_colour_brewer(palette="Set1",name="")+
     theme_bw(base_size=base_size)+theme(legend.position="top")+
     ylab("Index value")+ylim(0,NA)
@@ -445,7 +451,7 @@ index_plot2 = function(samres, index_name = NULL,
   g_resid = ggplot(data=index_pred,aes(x=Year,y=resid)) +
     # geom_point(data=index_obs,aes(y=obs),size=1.5) +
     geom_point(size=1.5)+
-    facet_wrap(vars(Fleet),nrow=2,scales=scales[2])+
+    facet_wrap(vars(Fleet),nrow=nrow,scales=scales[2])+
     theme_bw(base_size=base_size)+theme(legend.position="top")+
     scale_colour_brewer(palette="Set1",name="")+
     scale_shape_discrete(name="")+
@@ -474,7 +480,7 @@ index_plot2 = function(samres, index_name = NULL,
   g_abund = ggplot(data=NULL,aes(x=abund))+
     geom_path(data=index_pred_curve,aes(y=pred),colour="blue",linewidth=1)+
     geom_point(data=index_pred2,aes(y=obs),size=1.5)+
-    facet_wrap(vars(Fleet),nrow=2,scales=scales[3])+
+    facet_wrap(vars(Fleet),nrow=nrow,scales=scales[3])+
     theme_bw(base_size=base_size)+theme(legend.position="top")+
     scale_colour_brewer(palette="Set1",name="")+
     ylab("Index")+xlab("Abundance")
@@ -495,6 +501,8 @@ caa_plot = function(samres,
   caa_obs = as_tibble(dat$caa) %>% mutate(Age=0:(n()-1)+samres$input$rec.age) %>%
     pivot_longer(cols=-Age,names_to="Year",values_to="obs") %>%
     mutate(Year = as.numeric(Year))
+
+  if(isTRUE(samres$input$last.catch.zero)) caa_obs = caa_obs %>% filter(Year < max(Year))
 
   caa_pred = as_tibble(samres$caa) %>% mutate(Age=0:(n()-1)+samres$input$rec.age) %>%
     pivot_longer(cols=-Age,names_to="Year",values_to="pred") %>%
