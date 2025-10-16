@@ -81,7 +81,7 @@ res_sam <- sam(dat,
 	# 再生産関係推定に関わる設定 (*)
 	SR = "BH",
     AR = 0,
-    # Fのrhoのタイプ。１なら選択率一定, 0なら完全にランダム, 2はrhoを推定 (*)
+    # Fのrhoのタイプ。１なら選択率一定, 0なら完全にランダム, 2はrhoを推定 (*) 3もある？
     rho.mode = 0,
 	# 初期値の設定
         q.init = NULL,
@@ -145,8 +145,45 @@ res_vpa <- vpa(dat,fc.year=1998:2000,tf.year = 1998:1999,
 # ３つのモデルの比較
 plot_vpa(list(VPA=res_vpa, SAM=res_sam, SAM2=res_sam2))
 
-# SAMだけの比較
-plot_samvpa(list(SAM=res_sam, SAM2=res_sam2))
+# SAMだけの比較 (fishing_mortalityはFの平均？)
+plot_samvpa(list(SAM=res_sam, SAM2=res_sam2),what.plot = c("biomass","SSB","Recruitment","U","catch","fishing_mortality"))
+
+# 結果の出力
+res_samdata <- make_assess_result(res_sam)
+
+# F at age by year
+(gg <- res_samdata %>% dplyr::filter(stat=="faa") %>%
+  ggplot() +
+  geom_ribbon(aes(x=Age, ymax=upper, ymin=lower, group=Model, fill=Model), alpha=0.5) +
+  geom_line(aes(x=Age, y=Value, colour=Model, group=Model, size=Model), linetype=1) +
+  facet_wrap(.~Year, scales = "free_y", nrow=10, ncol=2, dir="v") +
+  scale_y_continuous(limits = c(0, NA)) +
+  scale_fill_manual("Model", values = c("#F8766D", "black")) +
+  scale_colour_manual("Model", values = c("#F8766D", "black")) +
+  scale_size_manual("Model", values = c(1, 0.5), guide = "none") +
+  theme_bw() + labs(title="FAA", x=xlab, y=ylab) +
+  theme(axis.text.x = element_text(size = 11, color = "black"), 
+        axis.text.y = element_text(size = 11, color = "black"), 
+        axis.line.x = element_line(linewidth = 0.3528), axis.line.y = element_line(linewidth = 0.3528), 
+        axis.minor.ticks.length = rel(0.5)))
+
+# F at age by year
+(gg <- res_samdata %>% dplyr::filter(stat=="faa") %>%
+   mutate(Age=factor(Age)) %>%
+  ggplot() +
+  geom_ribbon(aes(x=Year, ymax=upper, ymin=lower, group=Model, fill=Model), alpha=0.5) +
+  geom_line(aes(x=Year, y=Value, colour=Model, group=Model), linetype=1) +
+  facet_wrap(.~Age, scales = "free_y", nrow=10, ncol=2, dir="v") +
+  scale_y_continuous(limits = c(0, NA)) +
+#  scale_fill_manual("Model", values = c("#F8766D", "black")) +
+#  scale_colour_manual("Model", values = c("#F8766D", "black")) +
+#  scale_size_manual("Model", values = c(1, 0.5), guide = "none") +
+  theme_bw() + labs(title="FAA", x=xlab, y=ylab) +
+  theme(axis.text.x = element_text(size = 11, color = "black"), 
+        axis.text.y = element_text(size = 11, color = "black"), 
+        axis.line.x = element_line(linewidth = 0.3528), axis.line.y = element_line(linewidth = 0.3528), 
+        axis.minor.ticks.length = rel(0.5)))
+
 
 ```
 
@@ -174,11 +211,32 @@ steepness_sam <- calc_steepness(SR="BH", rec_pars=SR_sam0$pars,M=biopar$M, waa=b
 ## 残差プロット
 
 ```{r}
-# 資源量指数
+# 資源量指数 (frasyrのplot_residual_vpaと統合してもよい？）
 resid_sam <- index_plot(res_sam); wrap_plots(resid_sam)
 
 # catch at age
 caa_resid <- caa_plot(res_sam); wrap_plots(caa_resid)
+
+# catch at age (sakai ver.)
+
+caa_obs0 <- caa_obs %>% rownames_to_column(var="Age") %>% pivot_longer(cols=-Age, names_to="Year", values_to="Value") %>% mutate(Data="Observation")
+caa_est0 <- res_sam$caa %>% as.data.frame %>% rownames_to_column(var="Age") %>% pivot_longer(cols=-Age, names_to="Year", values_to="Value") %>% mutate(Data="Estimation")
+caa_obs_est <- bind_rows(caa_obs0, caa_est0)
+
+xlab <- "年齢"
+ylab <- "漁獲尾数（百万尾）"
+scale <- 1000
+g1 <- ggplot() +
+  geom_bar(data=caa_obs0, stat="identity", aes(x=Age, y=Value/scale), col="black", fill="#FFFFB3") +
+  geom_line(data=caa_est0, aes(x=Age, y=Value/scale, group=Data), col="#F8766D", linewidth=1.5) +
+  facet_wrap(~Year, scales = "free_y", nrow=10, dir="v") +
+  ylim(c(0, NA)) + scale_x_discrete(limit = c("0", "1", "2", "3", "4", "5", "6", "7", "8+")) +
+  theme_bw() + labs(title="CAAプロット(棒グラフ：観測値, 折れ線：推定値)", x=xlab, y=ylab) +
+  theme(axis.text.x = element_text(size = 11, color = "black"), 
+        axis.text.y = element_text(size = 11, color = "black"), 
+        axis.line.x = element_line(linewidth = 0.3528), axis.line.y = element_line(linewidth = 0.3528), 
+        axis.minor.ticks.length = rel(0.5), legend.position = "none")
+
 
 ```
 
@@ -189,9 +247,12 @@ caa_resid <- caa_plot(res_sam); wrap_plots(caa_resid)
 
 ```
 
+### プロファイル尤度
 ```{r}
-res_profile <- samprofile(res_sam, "logQ", param_range=c(8, 11)) ## tmbがクラッシュする
-res_profile$obj_tbl %>% ggplot() + geom_line(aes(x=par, y=obj_value))
+res_profile <- samprofile(res_sam, "logQ", param_range=c(8, 11)) 
+res_profile$obj_tbl %>% ggplot() + geom_line(aes(x=par, y=obj_value)) # 図示のための関数はある？
+
+# Mのプロファイル尤度もしたいけど、関数はあるか？
 
 ```
 
@@ -200,11 +261,30 @@ res_profile$obj_tbl %>% ggplot() + geom_line(aes(x=par, y=obj_value))
 
 res_boot <- boo_sam(res_sam, n=100,method="p",seed=1)
 
-## 親魚量の信頼区間のプロット
+## 親魚量のブートストラップ信頼区間のプロット
 years <- colnames(dat$caa)
 ssb_boot <- sapply(res_boot,function(x) colSums(x$ssb))
 x <- t(apply(ssb.boot,1,quantile,probs=c(0.1,0.5,0.9)))
 matplot(Years,x,ylim=c(0,max(x)),col=1,type=c("l","b","l"),
         pch=1,lty=c(2,1,2),ylab="Spawning biomass")
 ```
+
+## cross test
+
+```{r}
+pdata <- popsim_vpasam(res_sam, n=100)
+res_vpa_list <- list()
+for(i in 1:length(pdata)){
+  vpainput <- res_vpa$input
+  vpainput$dat <- pdata[[i]]
+  res_vpa_list[[i]] <- do.call(vpa, vpainput)
+}
+
+res_vpa_list[[1]] <- res_sam
+
+# 1番目がSAMの結果  (なんか関数ある？)
+plot_vpa(res_vpa_list, legend.position="none", what.plot=c("SSB", "biomass", "U", "Recruitment"))
+```
+
+## 将来予測
 
