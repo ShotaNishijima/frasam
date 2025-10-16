@@ -5,8 +5,8 @@
 #' @param alpha 最高年齢-1歳へのFに対する最高年齢のFの比
 #' @param upper 推定パラメータの上限値。固定効果の数のLengthを持つ必要あり。NULL（デフォルト）の場合Inf
 #' @param lower 推定パラメータの下限値。固定効果の数のLengthを持つ必要あり。NULL（デフォルト）の場合-Inf
-#' @param abund Indexの種類。用いるIndexの長さのベクトル。"B": 資源量、"SSB"：親魚資源量、"N"：尾数、"Bs"：資源量×fleetごとの選択率、"Bf"：資源量×選択率．合計する年齢の幅については\code{min.age
-#' @param catch_prop abund="Bs"のとき、対象とするfleetのcatch at ageの全体に対する比率？？
+#' @param abund Indexの種類。用いるIndexの長さのベクトル。"B": 資源量、"SSB"：親魚資源量、"N"：尾数、"Bs"：資源量×fleetごとの選択率、"Bf"：資源量×選択率．合計する年齢の幅については\code{min.age}と\code{max.age}
+#' @param catch_prop abund="Bs"のとき、対象とするfleetのcatch at ageの全体に対する比率.
 #' @param min.age Indexの最低年齢 (\code{frasyr::vpa()}と同じで最小の年齢を0とする) 用いるIndexの長さのベクトル
 #' @param max.age Indexの最高年齢 (\code{frasyr::vpa()}と同じで最小の年齢を0とする) 用いるIndexの長さのベクトル
 #' @param b.est Indexと資源量の間の非線形関係を考慮しない（FALSE, デフォルト）、考慮する(TRUE)
@@ -14,19 +14,19 @@
 #' @param index.key Indexのsigmaの制約 ??  どうやって使う？？
 #' @param index.b.key Indexのbの制約 ??  どうやって使う？？
 #' @param sel.def 選択率の定義。"max"（デフォルト）の場合、最大年齢を１とする。
-#' @param use.index NULLの場合、すべてのIndexを使う。フィットするときに除外したいIndexがある場合には、使用したいIndexの番号のベクトルを入れる。例えば１番目と３番目のIndexを使いたい場合c(1,3)とする。
-#' @param varC ??
+#' @param use.index この仕様は設定ミスを引き起こしやすいので廃止しました。使用するIndexのみデータに入れてください
+#' @param varC CAAの観測誤差
 #' @param varN ??
 #' @param varF ??
 #' @param varNfix ??
-#' @param rho.mode Fのランダムウォークのrhoの設定。0: rho=0, 1: rho=1, 2: rhoを推定する（デフォルト）
+#' @param rho.mode Fの多変量Random walkの非対角成分の相関係数のタイプ。１ならすべての年齢間で相関係数1, 0なら完全にランダム, 2は任意の年齢間で共通のrhoを推定、3は年齢i,jの相関を\eqn{rho^|i-j|}で推定
 #' @param no_est 推定しない(TRUE)、パラメータ推定する（FALSE, デフォルト）
 #' @param getJointPrecision JointPrecision matrixを計算しない（FALSE, デフォルト）、計算する（TRUE)
-#' @param loopnum デフォルトは2 何に使う??
-#' @param est.method パラメータ推定手法。"ml"(デフォルト)、"ls" (最小二乗法)  ?? 最小二乗法の場合、どんな仮定？（Index間のシグマが同じ？）
+#' @param loopnum 最適化を繰り返す回数．デフォルトは2
+#' @param est.method Index間の観測誤差sigmaをばらばらにするか（"ml"、デフォルト)、共通にするか（"ls")．\code{frasyr::vpa()}と同じ使い方．
 #' @param plus.group プラスグループを考慮する（TRUE, デフォルト）、考慮しない（FALSE）
-#' @param SR 再生産関係："RW", "BH", "RI", "HS", "Mesnil", or "Const"
-#' @param AR 再生産関係?の残差の自己相関パラメータを推定する（１）、推定しない（0, デフォルト） ?? これでいい？
+#' @param SR 再生産関係："RW"(Random walk), "BH", "RI", "HS", "Mesnil", or "Const"
+#' @param AR 再生産関係の残差の自己相関パラメータを推定する（１）、推定しない（0, デフォルト） ?? これでいい？
 #' @param b_random 再生産パラメータbをランダム効果として推定するかどうか??
 #' @param b_range 再生産パラメータbの値の範囲
 #' @param lambda ??
@@ -54,7 +54,7 @@
 #' @param map.add
 #' @param p0.list
 #' @param gamma
-#' @param FreeADFun
+#' @param FreeADFun \code{TMB::FreeADFun}を使う場合、TRUEにする。See \code{?TMB::FreeADFun}.
 #' @param add_random
 #' @param tmbdata
 #' @param map
