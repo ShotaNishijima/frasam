@@ -142,7 +142,9 @@ sam <- function(dat,
                 catch_prop = NULL,
                 no_est=FALSE,
                 getJointPrecision = FALSE,
-                loopnum = 2
+                loopnum = 2,
+                obj_overwrite=NULL,
+                ignore.parm.uncertainty = FALSE
 ){
 
   argname <- ls()
@@ -174,6 +176,8 @@ sam <- function(dat,
       if (isTRUE(b.est)) {
         b.fix <- b.fix[use.index]
       }
+    } else {
+      use.index <- 1:nrow(index)
     }
 
     for(i in 1:length(abund)) {
@@ -203,9 +207,9 @@ sam <- function(dat,
     obs[,"maxage"] <- obs[,"maxage"]+rec.age
 
     if (tmb.run) {
-      library(TMB)
+      # library(TMB)
       compile(paste(cpp.file.name, ".cpp", sep = ""))
-      dyn.load(dynlib(cpp.file.name))
+      dyn.load(TMB::dynlib(cpp.file.name))
     }
 
     data <- list()
@@ -213,6 +217,7 @@ sam <- function(dat,
     data$obs <- obs
     data$noFleets <- max(obs[,2])
     data$fleetTypes <- data$sampleTimes <- numeric(nindex+1)
+    assertthat::assert_that(all(abund %in% c("B","SSB","N","Bs","Bf")))
     for (i in 1:nindex) {
       if (is.null(abund[i])) data$fleetTypes[i+1] <- data$freetTypes[i]
       if (abund[i] == "B") data$fleetTypes[i+1] <- 2
@@ -220,9 +225,9 @@ sam <- function(dat,
       if (abund[i] == "N") data$fleetTypes[i+1] <- 4
       if (abund[i] == "Bs") data$fleetTypes[i+1] <- 6
       if (abund[i] == "Bf") data$fleetTypes[i+1] <- 7
-      if (!(abund[i] %in% c("B","SSB","N","Bs","Bf"))) {
-        stop("abund code not recognized")
-      }
+      # if (!(abund[i] %in% c("B","SSB","N","Bs","Bf"))) {
+      #   stop("abund code not recognized")
+      # }
     }
 
     data$noYears <- ncol(waa)
@@ -288,6 +293,7 @@ sam <- function(dat,
     if (SR == "Const") SR.mode <- 5 # Constant R0(=a)
     if (SR == "Prop") SR.mode <- 6
     if (SR == "BHS") SR.mode <- 7
+    if (SR == "MR") SR.mode <- 8
     data$stockRecruitmentModelCode <- matrix(SR.mode)
 
     data$scale <- scale
@@ -388,9 +394,10 @@ sam <- function(dat,
         data$catch_prop4index <- catch_prop
       }
     } else {
-      catch_prop <- array(1,dim=c(dim(dat$caa),max(data$obs[,2])))
+      catch_prop <- array(1,dim=c(dim(dat$waa),max(data$obs[,2])))
       data$catch_prop4index <- catch_prop
     }
+    assertthat::assert_that(all(dim(data$catch_prop4index) == c(dim(dat$waa),max(data$obs[,2]))))
     data$logobs = log(obs[,4])
   } else {
     message("'dat' and related arguments are ignored when using 'tmbdata'")
@@ -523,7 +530,7 @@ sam <- function(dat,
         } else {
           log(a.init)
           },
-      rec_logb     = if (is.null(b.init)) {if (SR %in% c("HS","Mesnil","BHS")) 7 else -8} else {log(b.init)},
+      rec_logb     = if (is.null(b.init)) {if (SR %in% c("HS","Mesnil","BHS","MR")) 7 else -8} else {log(b.init)},
       logit_rho  = if (is.null(rho.init)) 0 else log(rho.init/(1-rho.init)),
       # logScale     = numeric(data$noScaledYears),
       # logScaleSSB  = if(any(data$fleetTypes %in% c(3,4))) {numeric(0)} else {numeric(0)},
@@ -593,7 +600,7 @@ sam <- function(dat,
         map$beta_g = rep(factor(NA),prod(dim(params$beta_g)))
       }
     }
-    if (SR != "BHS") map$rec_logk <- factor(NA)
+    if (!(SR %in% c("BHS","MR"))) map$rec_logk <- factor(NA)
 
     if(!is.null(CV_w_fix)) map$logCV_w = rep(factor(NA),length(logCV_w))
 
@@ -616,9 +623,10 @@ sam <- function(dat,
     random = c(random,add_random)
   }
 
-    # obj <- TMB::MakeADFun(data, params, map = map, random=c("U"), DLL=cpp.file.name,silent=silent)
     obj <- TMB::MakeADFun(data, params, map = map, random=random, DLL=cpp.file.name,silent=silent)
     obj$fn(obj$par)
+
+    if(!is.null(obj_overwrite)) obj <- obj_overwrite
 
   if(isTRUE(FreeADFun)) {
     TMB::FreeADFun(obj)
@@ -627,8 +635,6 @@ sam <- function(dat,
   if (is.null(lower)) lower <- obj$par*0-Inf
   if (is.null(upper)) upper <- obj$par*0+Inf
 
-  # lower <- obj$par*0-Inf
-  # upper <- obj$par*0+Inf
   if (!is.null(b_range) & "rec_logb" %in% names(obj$par)) {
     lower["rec_logb"] <- log(b_range[1])
     upper["rec_logb"] <- log(b_range[2])
@@ -641,30 +647,32 @@ sam <- function(dat,
     nlminb.control = list(eval.max = 1e4,
                           iter.max = 1e4,
                           trace = 0)
-    # inital optimization
-    opt <- nlminb(obj$par, obj$fn, obj$gr, lower=lower, upper=upper,control=nlminb.control)
 
-    # pars = opt$par
-    # print(pars)
-    # set.seed(1)
-    # for(jj in 1:100) {
-    #   pars2 = pars + rnorm(length(pars),0,0.01)
-    #   if (as.numeric(obj$fn(x=pars)) > as.numeric(obj$fn(x=pars2))) {
-    #     print(pars2)
-    #     pars <- pars2
-    #   }
-    # }
-    # obj$par <- pars
+    if(!is.null(obj_overwrite)) {
+      opt <- list()
+      opt$par <- obj$par
+      opt$convergence <- 0
+      opt$objective <- NA
+    } else {
+      # inital optimization
+      opt <- nlminb(obj$par, obj$fn, obj$gr, lower=lower, upper=upper,control=nlminb.control)
 
-    # Re-run to further decrease final gradient (https://github.com/kaskr/TMB_contrib_R/blob/master/TMBhelper/R/fit_tmb.R)
-    for( i in seq(2,loopnum,length=max(0,loopnum-1)) ){
-      # Temp = parameter_estimates[c('iterations','evaluations')]
-      opt2 = nlminb( start=obj$par, objective=obj$fn, gradient=obj$gr, control=nlminb.control, lower=lower, upper=upper )
-      opt <- opt2
+      # Re-run to further decrease final gradient (https://github.com/kaskr/TMB_contrib_R/blob/master/TMBhelper/R/fit_tmb.R)
+      for( i in seq(2,loopnum,length=max(0,loopnum-1)) ){
+        # Temp = parameter_estimates[c('iterations','evaluations')]
+        opt2 = nlminb( start=obj$par, objective=obj$fn, gradient=obj$gr, control=nlminb.control, lower=lower, upper=upper )
+        if(opt2$objective<=opt$objective) {
+          opt <- opt2
+        } else {
+          break
+        }
+      }
     }
 
     if (opt$convergence!=0) warning("May not converge")
-    rep <- TMB::sdreport(obj,bias.correct = bias.correct,bias.correct.control = list(sd=bias.correct.sd), getReportCovariance=get.random.vcov,getJointPrecision=getJointPrecision)
+    rep <- TMB::sdreport(obj,bias.correct = bias.correct,bias.correct.control = list(sd=bias.correct.sd), getReportCovariance=get.random.vcov,getJointPrecision=getJointPrecision
+                         ,ignore.parm.uncertainty=ignore.parm.uncertainty
+                         )
     if (max(rep$gradient.fixed)>1e-2) warning("Large maximum gradient component")
 
     # stop("Finish Optimization")
@@ -730,7 +738,9 @@ sam <- function(dat,
                              as.numeric(data$stockRecruitmentModelCode)==2 ~ "BH",
                              as.numeric(data$stockRecruitmentModelCode)==3 ~ "HS",
                              as.numeric(data$stockRecruitmentModelCode)==4 ~ "Mesnil",
-                             as.numeric(data$stockRecruitmentModelCode)==7 ~ "BHS")
+                             as.numeric(data$stockRecruitmentModelCode)==5 ~ "Const",
+                             as.numeric(data$stockRecruitmentModelCode)==7 ~ "BHS",
+                             as.numeric(data$stockRecruitmentModelCode)==8 ~ "MR")
         #
         # a <- exp(rep$par.fixed[names(rep$par.fixed)=="rec_loga"])
         # b <- exp(rep$par.fixed[names(rep$par.fixed)=="rec_logb"])
@@ -738,8 +748,7 @@ sam <- function(dat,
         b <- exp(obj$env$parList()[["rec_logb"]])
         if (SR.mode==5) b <- NA
         if (SR.mode==6) b <- 0
-        if (SR.mode==7) k <- exp(obj$env$parList()[["rec_logk"]])
-
+        if (SR.mode %in% c(7,8)) k <- exp(obj$env$parList()[["rec_logk"]])
         #
         rec.par <- c(a,b)
         names(rec.par) <- c("a","b")

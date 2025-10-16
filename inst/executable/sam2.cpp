@@ -249,6 +249,7 @@ Type objective_function<Type>::operator() ()
   vector<Type> F_mean(timeSteps);
   vector<Type> Catch_biomass(timeSteps);
   vector<Type> Exploitation_rate(timeSteps);
+  vector<Type> scale_U(timeSteps);
 
   //First take care of F
   matrix<Type> fvar(stateDimF,stateDimF);  // Fの???散??????
@@ -424,10 +425,16 @@ Type objective_function<Type>::operator() ()
                 if(stockRecruitmentModelCode==6){ //Proportional to SSB (no density-dependence)
                   predN0(0)=rec_loga+log(ssb(i-minAge)/scale);
                 }else{
-                  if(stockRecruitmentModelCode==7){ //HO model (HSの角が丸くなったモデル)
+                  if(stockRecruitmentModelCode==7){ //BHS model (HSの角が丸くなったモデル)
                     predN0(0)=CppAD::CondExpLt(rec_logb,log(ssb(i-minAge)/scale),rec_loga+rec_logb,rec_loga+rec_logb+(Type(1.0)-pow((ssb(i-minAge)/scale)/exp(rec_logb),exp(rec_logk)))*(log(ssb(i-minAge)/scale)-rec_logb));
                   }else{
+                    if(stockRecruitmentModelCode==8){ //MR model (Mesnilでgammaを推定する場合)
+                      predN0(0)=ssb(i-minAge)/scale+sqrt(square(exp(rec_logb))+square(exp(rec_logk))/Type(4.0))-sqrt(square(ssb(i-minAge)/scale-exp(rec_logb))+square(exp(rec_logk))/Type(4.0));
+                      predN0(0)*=exp(rec_loga)/Type(2.0);
+                      predN0(0)=log(predN0(0));
+                    } else{
                     error("SR model code not recognized");
+                    }
                   }
                 }
               }
@@ -632,6 +639,7 @@ Type objective_function<Type>::operator() ()
     }
     F_mean(i)/=stateDimN;
     Exploitation_rate(i)=Catch_biomass(i)/B_total(i);
+    scale_U(i)=Exploitation_rate(i)/(1-Exploitation_rate(i));
   }
 
   ans = (Type(1.0)-lambda)*ans;
@@ -835,6 +843,7 @@ Type objective_function<Type>::operator() ()
   ADREPORT(phi1);
   ADREPORT(Catch_biomass);
   ADREPORT(Exploitation_rate);
+  ADREPORT(scale_U);
   ADREPORT(stockMeanWeight_true);
 
   REPORT(logF);

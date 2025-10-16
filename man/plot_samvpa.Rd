@@ -18,7 +18,7 @@ plot_samvpa(
   legend_position = "top",
   what.plot = c("biomass", "SSB", "Recruitment", "U"),
   years = NULL,
-  ncol = 3
+  ncol = 2
 )
 }
 \arguments{

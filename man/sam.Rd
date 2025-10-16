@@ -73,7 +73,9 @@ sam(
   catch_prop = NULL,
   no_est = FALSE,
   getJointPrecision = FALSE,
-  loopnum = 2
+  loopnum = 2,
+  obj_overwrite = NULL,
+  ignore.parm.uncertainty = FALSE
 )
 }
 \arguments{
