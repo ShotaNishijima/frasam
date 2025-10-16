@@ -3,9 +3,9 @@
 #' @param dat samに使用するdataでrvpaと同じフォーマットで利用可能
 #' @param rec.age 加入年齢 (default: 0)
 #' @param alpha 最高年齢-1歳へのFに対する最高年齢のFの比
-#' @param upper 推定パラメータの上限値。NULL（デフォルト）の場合Inf ?? 
-#' @param lower 推定パラメータの下限値。NULL（デフォルト）の場合-Inf ?? 
-#' @param abund Indexの種類。用いるIndexの長さのベクトル。"B": 総資源量、"SSB"：親魚資源量、"N"：尾数、"Bs"：総資源量×fleetごとの選択率、"Bf": ??
+#' @param upper 推定パラメータの上限値。固定効果の数のLengthを持つ必要あり。NULL（デフォルト）の場合Inf
+#' @param lower 推定パラメータの下限値。固定効果の数のLengthを持つ必要あり。NULL（デフォルト）の場合-Inf
+#' @param abund Indexの種類。用いるIndexの長さのベクトル。"B": 資源量、"SSB"：親魚資源量、"N"：尾数、"Bs"：資源量×fleetごとの選択率、"Bf"：資源量×選択率．合計する年齢の幅については\code{min.age
 #' @param catch_prop abund="Bs"のとき、対象とするfleetのcatch at ageの全体に対する比率？？
 #' @param min.age Indexの最低年齢 (\code{frasyr::vpa()}と同じで最小の年齢を0とする) 用いるIndexの長さのベクトル
 #' @param max.age Indexの最高年齢 (\code{frasyr::vpa()}と同じで最小の年齢を0とする) 用いるIndexの長さのベクトル
@@ -19,7 +19,7 @@
 #' @param varN ??
 #' @param varF ??
 #' @param varNfix ??
-#' @param rho.mode Fのランダムウォークのrhoの設定。0: rho=0, 1: rho=1, 2: rhoを推定する（デフォルト） 
+#' @param rho.mode Fのランダムウォークのrhoの設定。0: rho=0, 1: rho=1, 2: rhoを推定する（デフォルト）
 #' @param no_est 推定しない(TRUE)、パラメータ推定する（FALSE, デフォルト）
 #' @param getJointPrecision JointPrecision matrixを計算しない（FALSE, デフォルト）、計算する（TRUE)
 #' @param loopnum デフォルトは2 何に使う??
@@ -30,7 +30,7 @@
 #' @param b_random 再生産パラメータbをランダム効果として推定するかどうか??
 #' @param b_range 再生産パラメータbの値の範囲
 #' @param lambda ??
-#' @param lambda_Mesnil SRを"Mesnil"にした場合のラムダの値?? 
+#' @param lambda_Mesnil SRを"Mesnil"にした場合のラムダの値??
 #' @param q.init パラメータqの初期値。NULLの場合にはexp(-5)が用いられる。
 #' @param sdFsta.init Fのランダムウォークのσの初期値。NULLの場合（デフォルト）にはlog_sigma=-0.693147が用いられる。初期値を与える場合には、ノーマルスケールでの値を与える。
 #' @param sdLogN.init Nのプロセス誤差のσの初期値。NULLの場合（デフォルト）にはlog_sigma=0.35が用いられる（←コード上はこうなっているがこれで良い？）。初期値を与える場合には、ノーマルスケールでの値を与える。
@@ -69,7 +69,7 @@
 #' @param w_link
 #' @param sep_omicron
 #' @param growth_regime
-#' 
+#'
 #' @export
 #'
 
