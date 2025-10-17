@@ -1,6 +1,6 @@
 on:
   push:
-    branches: dev
+    branches: create_vignette
 
 name: pkgdown
 
