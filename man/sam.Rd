@@ -81,17 +81,101 @@ sam(
 \arguments{
 \item{dat}{samに使用するdataでrvpaと同じフォーマットで利用可能}
 
+\item{last.catch.zero}{最終年の漁獲量がない場合。デフォルトはFALSE（最終年の漁獲量が利用できて用いる）}
+
+\item{cpp.file.name}{推定に用いるcppファイル。デフォルトは最新版の"sam2"}
+
+\item{abund}{Indexの種類。用いるIndexの長さのベクトル。"B": 総資源量、"SSB"：親魚資源量、"N"：尾数、"Bs"：総資源量×fleetごとの選択率、"Bf": ??}
+
 \item{rec.age}{加入年齢 (default: 0)}
 
-\item{min.age}{Indexの最低年齢 (\code{frasyr::vpa()}と同じで最小の年齢を0とする)}
+\item{min.age}{Indexの最低年齢 (\code{frasyr::vpa()}と同じで最小の年齢を0とする) 用いるIndexの長さのベクトル}
 
-\item{max.age}{Indexの最高年齢 (\code{frasyr::vpa()}と同じで最小の年齢を0とする)}
+\item{max.age}{Indexの最高年齢 (\code{frasyr::vpa()}と同じで最小の年齢を0とする) 用いるIndexの長さのベクトル}
+
+\item{plus.group}{プラスグループを考慮する（TRUE, デフォルト）、考慮しない（FALSE）}
+
+\item{alpha}{最高年齢-1歳へのFに対する最高年齢のFの比}
+
+\item{b.est}{Indexと資源量の間の非線形関係を考慮しない（FALSE, デフォルト）、考慮する(TRUE)}
+
+\item{b.fix}{b.est=TRUEの場合、非線形パラメータbを推定するか（NA）、固定するか（固定する値） ??}
+
+\item{varC}{??}
+
+\item{varN}{??}
+
+\item{varF}{??}
+
+\item{est.method}{パラメータ推定手法。"ml"(デフォルト)、"ls" (最小二乗法)  ?? 最小二乗法の場合、どんな仮定？（Index間のシグマが同じ？）}
 
 \item{SR}{再生産関係："RW", "BH", "RI", "HS", "Mesnil", or "Const"}
 
-\item{index.key}{Indexのsigmaの制約}
+\item{AR}{再生産関係?の残差の自己相関パラメータを推定する（１）、推定しない（0, デフォルト） ?? これでいい？}
+
+\item{rho.mode}{Fのランダムウォークのrhoの設定。0: rho=0, 1: rho=1, 2: rhoを推定する（デフォルト）}
+
+\item{q.init}{パラメータqの初期値。NULLの場合にはexp(-5)が用いられる。}
+
+\item{sdFsta.init}{Fのランダムウォークのσの初期値。NULLの場合（デフォルト）にはlog_sigma=-0.693147が用いられる。初期値を与える場合には、ノーマルスケールでの値を与える。}
+
+\item{sdLogN.init}{Nのプロセス誤差のσの初期値。NULLの場合（デフォルト）にはlog_sigma=0.35が用いられる（←コード上はこうなっているがこれで良い？）。初期値を与える場合には、ノーマルスケールでの値を与える。}
+
+\item{sdLogObs.init}{Indexの観察誤差の初期値。NULLの場合（デフォルト）にはlog_sigma=-0.356675が用いられる。初期値を与える場合には、ノーマルスケールでの値を与える。}
+
+\item{rho.init}{rhoの初期値。NULLの場合（デフォルト）には0が用いられる。}
+
+\item{a.init}{再生産関係パラメータaの初期値。NULLの場合（デフォルト）、log_a=8 (SR="Const")またはlog_a=-4（SR="Const"以外）}
+
+\item{b.init}{再生産関係パラメータbの初期値。NULLの場合（デフォルト）、log_b=7 (SR="HS", "Mesnil", "BHS") またはlog_b=-8（それ以外）}
+
+\item{ref.year}{管理基準値を計算するときの参照年。最終年から何年分さかのぼるか。デフォルトは1:5（最新年からさかのぼって５年分）。}
+
+\item{bias.correct}{固定効果パラメータ？？のバイアスを補正する（TRUE：デフォルト）、補正しない（FALSE）}
+
+\item{bias.correct.sd}{ランダム効果のSDパラメータ？？のバイアスを補正する（TRUE）、補正しない（FALSE：デフォルト）}
+
+\item{get.random.vcov}{ランダム効果の分散共分散行列を推定する（TRUE、時間かかります）、推定しない（FALSE：デフォルト）}
+
+\item{silent}{MakeADfunのときの標準出力あり（TRUE: デフォルト）、なし（FALSE）}
+
+\item{scale}{資源量のスケーリングファクター。資源量はscaleで割った値となる}
+
+\item{sel.def}{選択率の定義。"max"（デフォルト）の場合、最大年齢を１とする。}
+
+\item{use.index}{NULLの場合、すべてのIndexを使う。フィットするときに除外したいIndexがある場合には、使用したいIndexの番号のベクトルを入れる。例えば１番目と３番目のIndexを使いたい場合c(1,3)とする。}
+
+\item{upper}{推定パラメータの上限値。NULL（デフォルト）の場合Inf ??}
+
+\item{lower}{推定パラメータの下限値。NULL（デフォルト）の場合-Inf ??}
+
+\item{index.key}{Indexのsigmaの制約 ??  どうやって使う？？}
+
+\item{index.b.key}{Indexのbの制約 ??  どうやって使う？？}
+
+\item{b_random}{再生産パラメータbをランダム効果として推定するかどうか??}
+
+\item{b_range}{再生産パラメータbの値の範囲}
+
+\item{lambda}{??}
+
+\item{lambda_Mesnil}{SRを"Mesnil"にした場合のラムダの値??}
 
 \item{model_wm}{weightとmaturityの成長をモデリングするかどうか}
+
+\item{scale_number}{尾数のスケーリングファクター。尾数はscaleで割った値となる}
+
+\item{growth_regime}{}
+
+\item{catch_prop}{abund="Bs"のとき、対象とするfleetのcatch at ageの全体に対する比率？？}
+
+\item{no_est}{推定しない(TRUE)、パラメータ推定する（FALSE, デフォルト）}
+
+\item{getJointPrecision}{JointPrecision matrixを計算しない（FALSE, デフォルト）、計算する（TRUE)}
+
+\item{loopnum}{デフォルトは2 何に使う??}
+
+\item{varNfix}{??}
 }
 \description{
 SAMによる資源計算を実施する
