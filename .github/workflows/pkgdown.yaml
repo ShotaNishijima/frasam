@@ -35,14 +35,9 @@ jobs:
           install.packages("remotes")
           remotes::install_deps(dependencies = TRUE)
           remotes::install_dev("pkgdown")
+          remotes::install_github("ichimomo/frasyr")	  
         shell: Rscript {0}
 
-      - name: Install frasyr dependency
-        run: |
-          Rscript -e "if (!requireNamespace('frasyr', quietly = TRUE)) {
-	            remotes::install_github('ichimomo/frasyr')
-	        }"
-    
       - name: Install package
         run: R CMD INSTALL .
 
