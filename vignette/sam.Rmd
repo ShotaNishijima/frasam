@@ -42,7 +42,7 @@ VPAを適用するときのデータセットと同じ形式のデータセッ�
 ただし、VPAでは資源量指数が利用できなくても適用できますが、SAMでは資源量指数の利用が必須になります。
 
 ## データの読み込み
-```{r, fig.show='hold'}
+```{r load_data, fig.show='hold'}
 
 caa   <- read.csv("https://raw.githubusercontent.com/ichimomo/frasyr/dev/data-raw/ex1_caa.csv",  row.names=1)
 waa   <- read.csv("https://raw.githubusercontent.com/ichimomo/frasyr/dev/data-raw/ex1_waa.csv",  row.names=1)
@@ -200,7 +200,7 @@ res_samdata <- make_assess_result(res_sam)
 - どの要素でsigmaを推定値し、どの年齢間でsigmaを共通にするか?
 - いろいろ試してAICの小さいものを選ぶ。（最新のCICというものもあるよう）
 
-```{r}
+```{r model_selection}
 
 # あまり動かず？
 #res_select <- select_sigma(res_sam, var="varF",X=1, stopAIC=TRUE)
@@ -219,7 +219,7 @@ c(res_sam$aic, res_sam2$aic)
 
 # 再生産関係のプロット
 
-```{r}
+```{r plot_SR_simple}
 
 ## 単純なプロット
 plot_SR_simple(res_sam)
@@ -238,7 +238,7 @@ steepness_sam <- calc_steepness(SR="BH", rec_pars=SR_sam0$pars,M=biopar$M, waa=b
 
 ## 残差プロット
 
-```{r}
+```{r plot_residual}
 
 ## 資源量指数 (frasyrのplot_residual_vpaと統合してもよい？）
 ## - これは通常のresidual 
@@ -278,13 +278,13 @@ g1 <- ggplot() +
 
 ### レトロスペクティブ解析
 
-```{r}
+```{r retro}
 #retro_sam(res_sam) ## tmbがクラッシュする
 
 ```
 
 ### プロファイル尤度
-```{r}
+```{r profile_likelihood}
 res_profile <- samprofile(res_sam, "logQ", param_range=c(8, 11)) 
 res_profile$obj_tbl %>% ggplot() + geom_line(aes(x=par, y=obj_value)) 
 
@@ -295,22 +295,22 @@ res_profile$obj_tbl %>% ggplot() + geom_line(aes(x=par, y=obj_value))
 ```
 
 ## ブートストラップ
-```{r}
+```{r bootstrap}
 
 res_boot <- boo_sam(res_sam, n=100,method="p",seed=1)
 
 ## 親魚量のブートストラップ信頼区間のプロット
 ## HessianからのSEと比較したりしたいかも
-years <- colnames(dat$caa)
+years <- colnames(dat$caa) %>% as.numeric()
 ssb_boot <- sapply(res_boot,function(x) colSums(x$ssb))
 x <- t(apply(ssb_boot,1,quantile,probs=c(0.1,0.5,0.9))) # プロットのための関数はなさそう
-matplot(Years,x,ylim=c(0,max(x)),col=1,type=c("l","b","l"),
+matplot(years,x,ylim=c(0,max(x)),col=1,type=c("l","b","l"),
         pch=1,lty=c(2,1,2),ylab="Spawning biomass")
 ```
 
 ## cross test
 
-```{r}
+```{r cross_test}
 pdata <- popsim_vpasam(res_sam, n=100)
 res_vpa_list <- list()
 for(i in 1:length(pdata)){
