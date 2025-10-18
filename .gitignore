@@ -10,3 +10,8 @@ R/for_developer.R
 
 /*.cpp
 tests/testthat/*.cpp
+
+vignette/*.cpp
+
+tools/data/*
+tools/Data/*

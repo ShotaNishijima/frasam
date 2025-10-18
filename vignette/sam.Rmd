@@ -81,7 +81,7 @@ res_sam <- sam(dat,
 	# 再生産関係推定に関わる設定 (*)
 	SR = "BH",
     AR = 0,
-    # Fの多変量Random walkの非対角成分の相関係数のタイプ。１ならすべての年齢間で相関係数1, 0なら完全にランダム, 2は任意の年齢間で共通のrhoを推定、3は年齢i,jの相関をrho^|i-j|で推定 (*)
+    # Fの多変量Random walkの非対角成分の相関係数のタイプ。１ならすべての年齢間で相関係数1, 0なら完全にランダム, 2は任意の年齢間で共通のrhoを推定、3は年齢i,jの相関を\eqn{\rho^|i-j|}で推定 (*)
     rho.mode = 0,
 	# 初期値の設定
         q.init = NULL,
@@ -191,8 +191,9 @@ res_samdata <- make_assess_result(res_sam)
 
 ```{r}
 # 動かない
-# select_sigma(res_sam, var="varF",X=NULL, stopAIC=TRUE)
-
+select_varN = select_sigma(res_sam, var="varN",X=2:6, stopAIC=TRUE)
+select_varN$tbl_sigma
+select_varN$reslist[[1]]$sigma
 ```
 
 # 再生産関係のプロット
@@ -243,8 +244,7 @@ g1 <- ggplot() +
 ### レトロスペクティブ解析
 
 ```{r}
-#retro_sam(res_sam) ## tmbがクラッシュする
-
+retro_sam(res_sam,n=1) ## tmbがクラッシュする
 ```
 
 ### プロファイル尤度
