@@ -1,0 +1,340 @@
+## ----setup, include = FALSE---------------------------------------------------
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 10,     # in (好みで調整)
+  fig.height = 6,
+  dpi = 150,
+  out.width = "100%", # コンテナ幅いっぱいに
+  fig.align = "center"
+)
+
+## ----fig.show='hold'----------------------------------------------------------
+
+## インストール (最新ブランチはcmsa11→vignetteとかが追加されたcreate_vignette)
+#devtools::install_github("ShotaNishijima/frasam@create_vignette") # frasam
+## frasyrも使うのでfrasyrもインストールしてください
+#devtools::install_github("ichimomo/frasyr@dev")
+
+# ライブラリの呼び出し
+library(frasyr)
+library(frasam)
+# devtools::load_all()
+library(tidyverse)
+library(patchwork)
+
+
+## ----load_data, fig.show='hold'-----------------------------------------------
+
+caa   <- read.csv("https://raw.githubusercontent.com/ichimomo/frasyr/dev/data-raw/ex1_caa.csv",  row.names=1)
+waa   <- read.csv("https://raw.githubusercontent.com/ichimomo/frasyr/dev/data-raw/ex1_waa.csv",  row.names=1)
+maa   <- read.csv("https://raw.githubusercontent.com/ichimomo/frasyr/dev/data-raw/ex1_maa.csv",  row.names=1)
+index <- read.csv("https://raw.githubusercontent.com/ichimomo/frasyr/dev/data-raw/ex1_index.csv",  row.names=1)
+# create pseudo data for caa
+caa   <- caa * exp(rnorm(length(caa), mean=-0.5 * (0.1)^2, sd=0.1))
+dat <- data.handler(caa=caa, waa=waa, maa=maa, M=0.5, index=index)
+
+# まずはsamのhelpファイルを閲覧してどんなオプションがあるか把握しましょう
+#help(sam)
+
+# SAMを使う準備 (samのオプションtmb.run=TRUEでも良いかもだけど、今はうまく動かないみたい？)
+use_sam_tmb(TmbFile="sam2",overwrite=FALSE) #compile and activate
+
+# samの実施
+# (*)の部分が設定ポイント
+res_sam <- sam(dat,
+               last.catch.zero = FALSE,
+               cpp.file.name = "sam2",
+               tmb.run = FALSE, # TRUEにするとtmbをコンパイルしてロードする。最初の１回だけTRUEにするのが良い？sam2だと動かない
+               rec.age = 0,
+               plus.group = TRUE,
+               alpha = 1, # 最高年齢と最高年齢-1歳のFが同じと仮定（VPAと同じ仮定)
+               est.method = "ml",
+               # 資源量指数に関わる設定。資源量指数の数だけベクトルで与える。
+               abund = c("SSB"),
+               min.age = c(0),
+               max.age = c(6),
+               b.est = FALSE, # b推定の有無(*)
+               b.fix = NA,
+               # 分散に関わる設定。どの分散を同じとするか。年齢の数だけ与える (*)
+               varC =  c(0,0,0,0,0,0,0),　#とりあえずすべての年齢で共通
+               varN = c(0,1,1,1,1,1,1),　#0歳と1歳魚以上で分ける
+               varF = c(0,0,0,0,0,0,0),   #とりあえずすべての年齢で共通
+               # 1歳魚以上のlog(N)のプロセス誤差を小さい値で固定(分散の値なので、この場合SD=0.01に相当)
+               varN.fix = c(NA, 1e-4),
+               # 再生産関係推定に関わる設定 (*)
+               SR = "BH",
+               AR = 0,
+               # Fの多変量Random walkの非対角成分の相関係数のタイプ。１ならすべての年齢間で相関係数1, 0なら完全にランダム, 2は任意の年齢間で共通のrhoを推定、3は年齢i,jの相関を\eqn{\rho^|i-j|}で推定 (*)
+               rho.mode = 0,
+               # 初期値の設定
+               q.init = NULL,
+               sdFsta.init = NULL,
+               sdLogN.init = c(0.2, 0.2),
+               sdLogObs.init = NULL,
+               rho.init = NULL,
+               a.init = NULL,
+               b.init = NULL,
+               # その他
+               # ref.year = 1:5, # 重要そうだけど使われていない
+               bias.correct = TRUE,
+               bias.correct.sd = FALSE,
+               get.random.vcov = FALSE,
+               silent = TRUE,
+               remove.Fprocess.year = NULL,
+               RW.Forder = 0,
+               map = NULL, # map (パラメータの推定の有無を個別に調整する) を入れる
+               map.add = NULL, # mapを追加する
+               p0.list = NULL,
+               scale = 1000,
+               scale_number = 1000,
+               gamma = 10,
+               sel.def = "max",
+               use.index = NULL,
+               upper = NULL,
+               lower = NULL,
+               index.key = NULL,
+               index.b.key = NULL,
+               lambda = 0,
+               add_random = NULL,
+               tmbdata = NULL,
+               sep_omicron = TRUE,
+               catch_prop = NULL,
+               no_est = FALSE,
+               getJointPrecision = FALSE,
+               loopnum = 2
+)
+
+## 推定結果の確認: opt=推定パラメータや目的関数、収束の有無
+## - $convergenceが0なら収束
+res_sam$opt
+
+## 推定結果の確認: rep=推定パラメータとSE
+## - 推定値(Estimate)に対してStd.Errorが異常に大きくないか
+## - Maximum gradient componentが十分小さい値か（1e-3以下なら十分OK、多数のパラメータを推定する難しいモデルなら上限0.1以下くらいでも？)
+res_sam$rep
+
+## 推定結果の確認: AIC（単独ではあまり意味がない。モデルを比較するときに）
+res_sam$aic
+
+## 推定結果の確認: 分散パラメータのsigma。ノーマルスケールで、大きさを確認。
+## - すごく小さい値で推定されている場合には推定の意味がないので推定しないなどする
+## - どのsigmaを共通にするか？を決める
+res_sam[c("sigma","sigma.logC","sigma.logFsta","sigma.logN")]
+
+## 固定効果の確認・出力
+fixef = out_par(res_sam,filename="FEpar")
+knitr::kable(fixef)
+
+## 結果の出力
+out_sam(res_sam, filename="sam")
+
+## VPAもやってみる
+res_vpa <- vpa(dat,fc.year=1998:2000,tf.year = 1998:1999,
+               term.F="max",stat.tf="mean",Pope=TRUE,tune=TRUE,p.init=0.5, abund="SSB", min.age=0, max.age=6, sel.update=TRUE)
+
+## VPAとSAMのモデルの比較
+plot_vpa(list(VPA=res_vpa, SAM=res_sam))
+plot_vpa(list(VPA=res_vpa, SAM=res_sam), what.plot=c("fishing_mortality"))
+
+
+## 設定を少し変えてもう一度実行する場合
+sam_input <- res_sam$input # samに渡した引数のリスト
+sam_input$rho.mode <- 2 # 引数の一部を変える（たとえば、Fの相関を推定する)
+res_sam2 <- do.call(sam, sam_input) # do.callで再度計算
+res_sam2$opt #収束している
+res_sam2$rep$pdHess #Hessianが正定値を持つかどうか（持たない場合SEが計算できない）
+
+## 2つのモデルのAICの比較
+## - 選択率一定モデルのほうがAICが小さい（＝より予測力が高い）
+c(res_sam$aic, res_sam2$aic)
+
+c(res_sam$rho, res_sam2$rho) #rho（F random walkの多変量正規分布の相関係数）が高いので推定した方がAIC低くなる
+
+sam_input$SR <- "RW" #加入をRWに変更
+sam_input$p0.list <- res_sam2$par_list #前の初期値を使用
+# sam_input$loopnum <- 3
+res_sam3 <- do.call(sam,sam_input)
+res_sam3$opt
+res_sam3$rep$pdHess
+
+c(res_sam$aic, res_sam2$aic, res_sam3$aic)
+
+
+## SAMだけの比較 (fishing_mortalityはFの平均？)
+## - 信頼区間付きバージョン
+## - VPAの結果も並列で示せるが、その場合vpa関数の実行にはTMB=TRUEオプションをつける必要あり
+plot_samvpa(list(SAM=res_sam, SAM2=res_sam2,SAM3=res_sam3),
+            what.plot = c("biomass","SSB","Recruitment","U","catch","fishing_mortality"))
+
+## 結果の出力
+## - 境さん関数(make_assess_result)
+## - out.vpa(out_samなら動く)、convert_vpa_tibbleも動くようにしたい
+res_samdata <- make_assess_result(res_sam)
+
+## F at age by year (境さんコード、関数化必要？時系列が長い場合への対応が必要)
+(gg <- res_samdata %>% dplyr::filter(stat=="faa") %>%
+    ggplot() +
+    geom_ribbon(aes(x=Age, ymax=upper, ymin=lower, group=Model, fill=Model), alpha=0.5) +
+    geom_line(aes(x=Age, y=Value, colour=Model, group=Model, size=Model), linetype=1) +
+    facet_wrap(.~Year, scales = "free_y", nrow=10, ncol=2, dir="v") +
+    scale_y_continuous(limits = c(0, NA)) +
+    scale_fill_manual("Model", values = c("#F8766D", "black")) +
+    scale_colour_manual("Model", values = c("#F8766D", "black")) +
+    scale_size_manual("Model", values = c(1, 0.5), guide = "none") +
+    theme_bw() + 
+    # labs(title="FAA", x=xlab, y=ylab) +
+    theme(axis.text.x = element_text(size = 11, color = "black"),
+          axis.text.y = element_text(size = 11, color = "black"),
+          axis.line.x = element_line(linewidth = 0.3528), axis.line.y = element_line(linewidth = 0.3528),
+          axis.minor.ticks.length = rel(0.5)))
+
+## F at age by year
+(gg <- res_samdata %>% dplyr::filter(stat=="faa") %>%
+    mutate(Age=factor(Age)) %>%
+    ggplot() +
+    geom_ribbon(aes(x=Year, ymax=upper, ymin=lower, group=Model, fill=Model), alpha=0.5) +
+    geom_line(aes(x=Year, y=Value, colour=Model, group=Model), linetype=1) +
+    facet_wrap(.~Age, scales = "free_y", nrow=10, ncol=2, dir="v") +
+    scale_y_continuous(limits = c(0, NA)) +
+    #  scale_fill_manual("Model", values = c("#F8766D", "black")) +
+    #  scale_colour_manual("Model", values = c("#F8766D", "black")) +
+    #  scale_size_manual("Model", values = c(1, 0.5), guide = "none") +
+    theme_bw() + 
+    # labs(title="FAA", x=xlab, y=ylab) +
+    theme(axis.text.x = element_text(size = 11, color = "black"),
+          axis.text.y = element_text(size = 11, color = "black"),
+          axis.line.x = element_line(linewidth = 0.3528), axis.line.y = element_line(linewidth = 0.3528),
+          axis.minor.ticks.length = rel(0.5)))
+
+
+
+## ----model_selection----------------------------------------------------------
+## varF(Fのプロセス誤差)とvarC（CAAの観測誤差）をどの年齢間で分けるかをstepAICで検討する
+
+# いまは1歳魚以上のvarNを固定しているが、それも検討することも可能
+# 検討する変数(VarF, VarC)を境界を入れる年齢Xについてのデータを生成(varとXを列名に使用)
+# ここでは収束しやすさからRWの場合を使用する（BHを使うとlog(b)->-InfになりSEが発散する
+grid = expand.grid(var=c("varF","varC"),X=1:6) %>%
+  filter(!(var == "varF" & X == 6)) #5-6歳のFは同じと仮定しているので6歳は不要なので除いておく
+
+res_select <- select_sigma_grid(
+  res_sam3, grid=grid, check_converge = TRUE, SEmax=10) # convergeしてるもののうちAIC最少を選ぶように変更
+## Best modelの結果チェック
+# FAAの誤差が0歳と1歳以上で分かれる
+cbind(
+  "Age" = 0:6,
+  "SD_caa" = res_select$bestres$sigma.logC,
+  "SD_faa" = res_select$bestres$sigma.logF,
+  "SD_naa" = res_select$bestres$sigma.logN
+) %>% knitr::kable()
+
+## ----plot_SR_simple-----------------------------------------------------------
+
+## 単純なプロット
+plot_SR_simple(res_sam)
+
+## SAMの結果からfraysrで使える再生産関係のオブジェクトを作成するとfrasyrの関数が使える
+SR_sam0 <- res_sam %>% make_SRres
+biopar <- derive_biopar(res_sam, derive_year=1998:2000)
+## steepness, R0, B0, 決定論的なMSY管理基準値の計算
+steepness_sam <- calc_steepness(SR="BH", rec_pars=SR_sam0$pars,M=biopar$M, waa=biopar$waa, maa=biopar$maa, faa=biopar$faa)
+## 再生産関係に依存しない管理基準値の計算(frasyr::ref.F)
+# FcurrentとPope=FALSEを明示的に引数に含める必要がある
+Fcurrent <- rowMeans(res_sam$faa[,as.character(1998:2000)])
+refF_res <- ref.F(res_sam,Fcurrent=Fcurrent,Pope=FALSE)
+refF_res$summary
+
+## ----plot_residual------------------------------------------------------------
+
+## 資源量指数 (frasyrのplot_residual_vpaと統合してもよい？）
+## - これは通常のresidual
+resid_sam <- index_plot(res_sam); wrap_plots(resid_sam)
+
+## - OSAは？ => 後で紹介する予定
+
+## catch at age
+## -
+caa_resid <- caa_plot(res_sam); wrap_plots(caa_resid)
+
+## total catch weight の比較も必要かも
+# 今関数はない
+
+# catch at age (sakai ver.)
+
+caa_obs0 <- dat$caa %>% rownames_to_column(var="Age") %>% pivot_longer(cols=-Age, names_to="Year", values_to="Value") %>% mutate(Data="Observation")
+caa_est0 <- res_sam$caa %>% as.data.frame %>% rownames_to_column(var="Age") %>% pivot_longer(cols=-Age, names_to="Year", values_to="Value") %>% mutate(Data="Estimation")
+caa_obs_est <- bind_rows(caa_obs0, caa_est0)
+
+xlab <- "年齢"
+ylab <- "漁獲尾数（百万尾）"
+scale <- 1000
+g1 <- ggplot() +
+  geom_bar(data=caa_obs0, stat="identity", aes(x=Age, y=Value/scale), col="black", fill="#FFFFB3") +
+  geom_line(data=caa_est0, aes(x=Age, y=Value/scale, group=Data), col="#F8766D", linewidth=1.5) +
+  facet_wrap(~Year, scales = "free_y", nrow=10, dir="v") +
+  ylim(c(0, NA)) + scale_x_discrete(limit = c("0", "1", "2", "3", "4", "5", "6", "7", "8+")) +
+  theme_bw() + labs(title="CAAプロット(棒グラフ：観測値, 折れ線：推定値)", x=xlab, y=ylab) +
+  theme(axis.text.x = element_text(size = 11, color = "black"),
+        axis.text.y = element_text(size = 11, color = "black"),
+        axis.line.x = element_line(linewidth = 0.3528), axis.line.y = element_line(linewidth = 0.3528),
+        axis.minor.ticks.length = rel(0.5), legend.position = "none")
+
+
+
+## ----retro--------------------------------------------------------------------
+retro_res = retro_sam(res_sam2,n=5) #nは年数
+
+(g_retro = retro_plot(res_sam2,retro_res,start_year=1991,mohn_position="bottomleft"))
+
+# retrospective forecastingもできる
+(g_retro2 = retro_plot(res_sam2,retro_res,start_year=1991,mohn_position="bottomleft", forecast=TRUE))
+
+## ----profile_likelihood-------------------------------------------------------
+# Catchabilityに対するプロファイル尤度
+# 同じ名前のパラメータが複数ある場合は引数\code{which_param}で位置を指定できる
+res_profile <- samprofile(res_sam, "logQ", which_param=1, param_range=c(8, 11))
+
+# 縦軸は負の対数尤度
+res_profile$obj_tbl[-1,] %>%
+  ggplot(aes(x=par, y=obj_value)) + geom_line(linewidth=0.5) +
+  geom_point(data=res_profile$obj_tbl[1,],colour="red")
+
+
+# Mのプロファイル尤度 => 関数がないからこんな感じで手動で
+Ms = c(0.1,0.3,0.5,0.7,0.9)
+scns = str_c("M:",Ms)
+samres_Mlist = map(Ms, function(i) {
+  res = res_sam2
+  p0_list = res$par_list
+  input = res$input
+  input$dat$M[] <- i
+  res.c = do.call(sam,input)
+  return( res.c )
+})
+
+data.frame(
+  M = Ms,
+  obj_value = sapply(samres_Mlist, function(x) x$opt$objective)
+) %>% ggplot(aes(x=M,y=obj_value)) + geom_line() + geom_point()
+
+
+## ----bootstrap----------------------------------------------------------------
+
+res_boot <- boo_sam(res_sam2, n=20,method="p",seed=1) #時間節約のため20回
+(g1 = plot_boosam(res_sam2,res_boot, CI=0.95, draw_deltaCI = TRUE))
+
+
+## ----cross_test---------------------------------------------------------------
+# pseudo dataを生成
+pdata <- popsim_vpasam(res_sam2, n=20)
+res_vpa_list <- list()
+for(i in 1:length(pdata)){
+  vpainput <- res_vpa$input
+  vpainput$dat <- pdata[[i]]
+  res_vpa_list[[i]] <- do.call(vpa, vpainput)
+}
+
+# 1番目がSAMの結果  (なんか関数ある？)
+plot_vpa(res_vpa_list, legend.position="none", what.plot=c("SSB", "biomass", "U", "Recruitment"))
+

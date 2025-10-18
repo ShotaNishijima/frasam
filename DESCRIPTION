@@ -27,5 +27,8 @@ Imports:
     scales,
     forcats
 Suggests:
-    testthat
-RoxygenNote: 7.3.2
+    testthat,
+    knitr,
+    rmarkdown
+RoxygenNote: 7.3.3
+VignetteBuilder: knitr

@@ -11,7 +11,10 @@ R/for_developer.R
 /*.cpp
 tests/testthat/*.cpp
 
-vignette/*.cpp
+vignettes/*.cpp
+vignettes/*.csv
 
 tools/data/*
 tools/Data/*
+/doc/
+/Meta/

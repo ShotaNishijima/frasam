@@ -10,4 +10,6 @@ out_par = function(res,filename=NULL) {
 
   if(is.null(filename)) filename <- "FE_parameter_table"
   write.csv(param_table,file=paste0(filename,".csv"),row.names = FALSE)
+
+  return(param_table)
 }
