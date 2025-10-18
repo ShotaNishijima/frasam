@@ -22,7 +22,9 @@ plot_samvpa(
 )
 }
 \arguments{
-\item{samres}{samの結果オブジェクト}
+\item{vpa_sam_list}{VPAまたはSAMの結果オブジェクトのリスト}
+
+\item{what_plot}{どの統計量をプロットするか}
 }
 \description{
 SAM or VPAの結果を描くグラフ

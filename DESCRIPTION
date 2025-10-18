@@ -24,7 +24,8 @@ Imports:
     tidyr,
     MASS,
     Matrix,
-    scales
+    scales,
+    forcats
 Suggests:
     testthat
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2

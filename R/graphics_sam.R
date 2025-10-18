@@ -63,7 +63,8 @@ get_predSR <- function(samres,max.ssb.pred=1.3,length=100){
 
 #' SAM or VPAの結果を描くグラフ
 #'
-#' @param samres samの結果オブジェクト
+#' @param vpa_sam_list VPAまたはSAMの結果オブジェクトのリスト
+#' @param what_plot どの統計量をプロットするか
 #' @importFrom forcats fct_inorder
 #' @export
 #' @encoding UTF-8
@@ -71,10 +72,14 @@ get_predSR <- function(samres,max.ssb.pred=1.3,length=100){
 plot_samvpa <- function(vpa_sam_list,CI=0.95,scenario_name=NULL,
                      alpha=0.4,size=1,base_size=14,log_scale=FALSE,
                      legend_name="Scenario",legend_nrow=1, legend_position="top",
-                     what.plot = c("biomass","SSB","Recruitment","U"),years = NULL,
+                     what.plot = c("biomass","SSB","Recruitment","U"),
+                     years = NULL,
                      ncol=2
 ){
 
+  if(class(vpa_sam_list)[1] %in% c("sam","vpa")) {
+    vpa_sam_list <- list(vpa_sam_list)
+  }
   g0 = frasyr::plot_vpa(vpa_sam_list)
 
   data = g0$data %>%
@@ -304,8 +309,21 @@ retro_plot = function(res,retro_res,start_year=NULL,scale=1000, forecast=FALSE,
     if (mohn_position=="upperleft") {
       g1 = g1 + geom_text(data=mohn,parse=TRUE,aes(x=start_year,y=ymax,label=label,hjust=0,vjust=1))
     } else {
-      end_year = data2$year %>% max
-      g1 = g1 + geom_text(data=mohn,parse=TRUE,aes(x=end_year,y=0,label=label,hjust=1,vjust=0))
+      if (mohn_position=="upperright") {
+        end_year = data2$year %>% max
+        g1 = g1 + geom_text(data=mohn,parse=TRUE,aes(x=end_year,y=ymax,label=label,hjust=1,vjust=1))
+      } else {
+        if (mohn_position=="bottomleft") {
+          g1 = g1 + geom_text(data=mohn,parse=TRUE,aes(x=start_year,y=0,label=label,hjust=0,vjust=0))
+        } else {
+          if (mohn_position=="bottomright") {
+            end_year = data2$year %>% max
+            g1 = g1 + geom_text(data=mohn,parse=TRUE,aes(x=end_year,y=0,label=label,hjust=1,vjust=0))
+          } else {
+            stop("Inappropriate 'mohn_position'!")
+          }
+        }
+      }
     }
   }
   g1
@@ -537,6 +555,7 @@ caa_plot = function(samres,
 
 #' 再生産関係についてプロットする関数
 #'
+#' @param samres SAMの結果オブジェクト
 #' @export
 
 plot_SR_simple = function(samres,length=1000,base_size=14,...) {
@@ -546,4 +565,92 @@ plot_SR_simple = function(samres,length=1000,base_size=14,...) {
     geom_path(data=get_SR$pred,linewidth=1)+
     theme_bw(base_size=base_size)
   return( g_SR )
+}
+
+
+#' ブートストラップについてプロットする関数
+
+#' @param samres \code{sam()}の結果オブジェクト
+#' @param boores \code{boo_sam}の結果オブジェクト
+#' @param draw_deltaCI デルタ法の信頼区間を描くか（デフォルト:FALSE）
+#' @param scenario_name 推定値の結果、ブートストラップの結果の凡例に使う名前
+#' @inheritParams plot_samvpa
+#' @export
+
+plot_boosam = function(samres,
+                       boores,
+                       CI = 0.95,
+                       what.plot = c("biomass", "SSB", "Recruitment", "U"),
+                       draw_deltaCI = FALSE,
+                       scenario_name = c("Estiamte", "Bootstrap"),
+                       alpha=0.4,
+                       size=1,
+                       base_size=14,
+                       log_scale=FALSE,
+                       legend_name="Scenario",
+                       legend_nrow=1,
+                       legend_position="top",
+                       years = NULL,
+                       ncol=2
+                       ) {
+
+  est_res = plot_samvpa(samres,CI=CI, what.plot = what.plot)
+
+  est_data = est_res$data %>%
+    mutate(scenario = scenario_name[1])
+
+  if(!isTRUE(draw_deltaCI)) {
+    est_data$lower <- est_data$upper <- NA
+  }
+
+
+  boo_res = plot_samvpa(boores, what.plot = what.plot, CI=0)
+  boo_data = boo_res$data
+
+  boo_data2 = boo_data %>% group_by(Year,stat2,stat_f) %>%
+    summarise(median = median(value),
+              mean = mean(value),
+              SD = sd(value),
+              CV = SD/mean) %>% suppressMessages() %>%
+    ungroup() %>%
+    rename(value = median)
+
+    # Exploitation rateについてはU/1-UのCVから計算に変更（2024/09/10）
+    boo_data3 = boo_data2 %>%
+      mutate(Cz = ifelse(stat_f != "Exploitation_rate",exp(qnorm(CI+(1-CI)/2)*sqrt(log(1+CV^2))),exp(qnorm(CI+(1-CI)/2)*CV))) %>%
+      mutate(lower = ifelse(stat_f != "Exploitation_rate", value/Cz, value/(value+(1-value)*Cz)),
+             upper = ifelse(stat_f != "Exploitation_rate", value*Cz, value/(value+(1-value)/Cz))) %>%
+      mutate(scenario = scenario_name[2])
+
+  data3 = bind_rows(boo_data3,est_data) %>%
+    mutate(Model = fct_inorder(scenario))
+
+  if (CI==0) {
+    g1 = ggplot(data=data3,aes(x=Year,y=value))
+  }else{
+    g1 = ggplot(data=data3,aes(x=Year,y=value))+
+      geom_ribbon(aes(ymax=upper,ymin=lower,fill=Model),alpha=alpha)+
+      scale_fill_brewer(palette="Set1",name=legend_name)
+  }
+
+  g1 = g1 +
+    geom_path(aes(colour=Model,linetype=Model),linewidth=size)+
+    facet_wrap(vars(stat_f),scales="free_y",ncol=ncol)+
+    frasyr::theme_SH()+theme_bw(base_size=base_size)+theme(legend.position=legend_position)+
+    xlab("Year") + ylab("")+
+    # ylim(0,NA)
+    scale_colour_brewer(palette="Set1",name=legend_name)+
+    scale_linetype_discrete(name=legend_name)+
+    guides(colour=guide_legend(title=NULL, nrow=legend_nrow),
+           fill=guide_legend(title=NULL, nrow=legend_nrow),
+           linetype=guide_legend(title=NULL, nrow=legend_nrow))+
+    scale_x_continuous(breaks=scales::pretty_breaks())
+  if (isTRUE(log_scale)) {
+    g1 = g1 + scale_y_log10()
+  } else {
+    g1 = g1 + ylim(0,NA)
+  }
+
+  g1
+
 }

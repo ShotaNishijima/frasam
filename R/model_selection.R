@@ -82,7 +82,7 @@ select_sigma = function(
     reslist[[i]] <- stage_sigma
     age_stage = which.min(sapply(stage_sigma,function(X) X$aic))
     tbl_sigma = bind_rows(tbl_sigma,tibble("stage" = i, "Age" = X2,"AIC" = sapply(stage_sigma,function(X) X$aic)))
-    minAIC2 = min(sapply(stage_sigma,function(X) X$aic))
+    minAIC2 = min(sapply(stage_sigma,function(X) X$aic),na.rm=T)
 
     X2 <- X2[-age_stage]
     samres2 = stage_sigma[[age_stage]]
@@ -143,7 +143,7 @@ select_sigma_grid = function(
     reslist[[i]] <- stage_sigma
 
     age_stage = which.min(sapply(stage_sigma,function(X) X$aic))
-    minAIC2 = min(sapply(stage_sigma,function(X) X$aic))
+    minAIC2 = min(sapply(stage_sigma,function(X) X$aic),na.rm=T)
 
     if( isTRUE(check_converge)) {
       # 収束していないもの、Hessianが求まっていないものを除くような仕様を追加(2025/05/14)
@@ -156,10 +156,15 @@ select_sigma_grid = function(
 
       tmp = convergence_aic %>%
         filter(convergence==0 & pdHess==TRUE & maxSE <= SEmax) %>%
-        filter(aic == min(aic))
+        filter(aic == min(aic,na.rm=T))
 
-      age_stage= tmp %>% pull(ID)
-      minAIC2 = tmp %>% pull(aic)
+      if (nrow(tmp)==0) {
+        warning("Any models fail to converge")
+        minAIC2 <- minAIC
+        age_stage= tmp %>% pull(ID)
+      } else {
+        minAIC2 = tmp %>% pull(aic)
+      }
         }
 
     tbl_sigma = bind_rows(tbl_sigma,
@@ -169,8 +174,10 @@ select_sigma_grid = function(
                                  "maxSE" = sapply(stage_sigma,function(X) max(sqrt(diag(X$rep$cov.fixed)),na.rm=TRUE))))
 
     message(paste0("Stage ", i, ": The selected setting is 'var='",as.character(grid2$var[age_stage]), " and 'which'=",as.numeric(grid2$X[age_stage]), " AIC = ", round(minAIC2,2)))
-    grid2 <- grid2[-age_stage,]
-    samres2 = stage_sigma[[age_stage]]
+    if (nrow(tmp)>0) {
+      grid2 <- grid2[-age_stage,]
+      samres2 = stage_sigma[[age_stage]]
+    }
     # samres2$rep
     if (minAIC2 < minAIC) {
       bestres <- samres2
