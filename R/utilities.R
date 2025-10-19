@@ -12,7 +12,7 @@
 #' @param perSPR percent SPR (\%) for calculating F\%SPR
 #'
 #' @examples
-#' \donotrun{
+#' \dontrun{
 #' res_pm_all <- purrr::map_dfr(basecase_list,
 #'                   function(x) get_pm(x, NULL, waa_catch=x$input$dat$waa), .id="id") %>%
 #'                   pivot_wider(values_from=value, names_from=stat)
