@@ -29,6 +29,7 @@ Imports:
 Suggests:
     testthat,
     knitr,
-    rmarkdown
+    rmarkdown,
+    lemon
 RoxygenNote: 7.3.3
 VignetteBuilder: knitr

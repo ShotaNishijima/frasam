@@ -22,7 +22,9 @@ knitr::opts_chunk$set(
   fig.height = 6,
   dpi = 150,
   out.width = "100%", # コンテナ幅いっぱいに
-  fig.align = "center"
+  fig.align = "center",
+  message = FALSE, 
+  warning = FALSE
 )
 ```
 # SAMのインストール
@@ -41,7 +43,8 @@ library(frasam)
 # devtools::load_all()
 library(tidyverse)
 library(patchwork)
-
+# install.packages("lemon")
+library(lemon)
 ```
 
 # SAMを適用するデータセットの作成
@@ -433,20 +436,33 @@ res_boot <- boo_sam(res_best, n=20,method="p",seed=1) #時間節約のため20�
 
 ```
 
-## cross test
+## Self-test / cross test
+
+- 真のモデルをVPA or SAMとして、疑似データを生成し、VPA or SAMのモデルを疑似データにフィットさせるというシミュレーションが可能
+- 真のモデル (operating model, OM) と推定モデルが同じモデルであればselt-test, 異なればcross-test
+- VPA or SAMのestimability (self-test), 異なる仮定に対する推定の頑健性 (cross test) を調べられる
 
 ```{r cross_test}
+## 真のモデルはSAM
 # pseudo dataを生成
-pdata <- popsim_vpasam(res_best, n=20)
-res_vpa_list <- list()
-for(i in 1:length(pdata)){
-  vpainput <- res_vpa$input
-  vpainput$dat <- pdata[[i]]
-  res_vpa_list[[i]] <- do.call(vpa, vpainput)
-}
+pdata_sam <- popsim_vpasam(res_best, n=20)
+# self-test (SAMで推定)
+# 前述のブートストラップと同じ（はず）
+fit_sam2sam <- fit2PSdata(res_best, PSdata=pdata_sam)
+metric_sam2sam = sumup_popsim(res_best,fit_sam2sam) #真のモデルの結果を使うこと
+# SSBの要約統計量を出力
+metric_sam2sam$summary %>% filter(stat=="SSB") %>% knitr::kable()
+(g_sam2sam <- plot_popsim(res_best,fit_sam2sam))
 
-# 1番目がSAMの結果  (なんか関数ある？)
-plot_vpa(res_vpa_list, legend.position="none", what.plot=c("SSB", "biomass", "U", "Recruitment"))
+# cross-test (VPAで推定)
+# 前述のブートストラップと同じ（はず）
+fit_vpa2sam <- fit2PSdata(res_vpa, PSdata=pdata_sam) #ここでは別のモデルを使う
+metric_vpa2sam = sumup_popsim(res_best,fit_vpa2sam) #こっちでは真のモデルの結果を使うこと!
+# SSBの要約統計量を出力
+metric_vpa2sam$summary %>% filter(stat=="SSB") %>% knitr::kable()
+(g_vpa2sam <- plot_popsim(res_best,fit_vpa2sam))
+
+# SAMの結果（res_best）の代わりに、VPAの結果をoperating model (真のモデル) として入れ替えて、VPAデータに対するself-test / cross-testもできます
 ```
 
 ## 将来予測

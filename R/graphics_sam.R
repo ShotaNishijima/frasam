@@ -698,4 +698,51 @@ plot_osa_resid <- function(osares) {
   return(list(caa = g_caa, index = g_index))
 }
 
+#' Popsimの結果ををプロットする関数
+#'
+#' @inheritParams sumup_popsim
+#'
+#' @encoding UTF-8
+#'
+#' @export
 
+plot_popsim = function(
+    res_true,
+    fit2PS,
+    CI = 0.95,
+    what.plot = c("biomass","SSB","Recruitment","U"),
+    Age =NULL,
+    scenario_name = c("True", "Simulation"),
+    alpha=0.4,
+    size=1,
+    base_size=14,
+    log_scale=FALSE,
+    legend_name="Scenario",
+    legend_nrow=1,
+    legend_position="top",
+    years = NULL,
+    ncol=2,
+    sim_colour = "blue") {
+
+  tmp = sumup_popsim(res_true,fit2PS,CI=CI)
+  tbl_wide = tmp$summary %>%
+    filter(stat %in% what.plot) %>%
+    filter(!is.null(age) | age %in% Age) %>%
+    mutate(stat_f = factor(stat,levels=what.plot)) %>%
+    arrange(stat_f) %>%
+    mutate(stat2 = ifelse(is.na(age), stat,
+                          mutate(str_c(stat,as.character(age))))) %>%
+    mutate(stat_f2 = fct_inorder(stat2)) %>%
+    arrange(stat_f2,year) %>%
+    mutate(year = as.integer(year))
+
+   ggplot(tbl_wide,aes(x=year,group=stat_f2)) +
+    geom_ribbon(aes(ymin=lower,ymax=upper),alpha=alpha,fill=sim_colour) +
+    facet_wrap(vars(stat_f2),scales="free_y",ncol=ncol) +
+    geom_path(aes(y=Median),colour=sim_colour,linewidth=0.7) +
+    lemon::geom_pointline(aes(y=value_true), distance = 0,
+                          linetype="dotted", linewidth=0.5)+
+    ylim(0,NA) + ylab("Value") + xlab("Year")+
+    frasyr::theme_SH()+
+    scale_x_continuous(breaks=scales::pretty_breaks())
+}

@@ -50,3 +50,79 @@ popsim_vpasam = function(Res,n=5,seed=1){
 
   return(dat.list)
 }
+
+
+#' 生成された疑似データにVPA/SAMを推定し、Self-test/Cross-testを実行
+#'
+#' @param res フィットさせるSAM/VPAのオブジェクト
+#' @param PSdata \code{popsim_vpa()}で生成された疑似データ
+#'
+#' @export
+fit2PSdata = function(res, PSdata) {
+  res_list <- lapply(1:length(PSdata), function(i){
+    input <- res$input
+    input$dat <- PSdata[[i]]
+    if(class(res)[1]=="vpa") {
+      res2 <- try(do.call(vpa, input))
+    } else {
+      if(class(res)[1]=="sam") {
+        res2 <- try(do.call(sam, input))
+      } else {
+        stop("'class(res)' should be either 'vpa' or 'sam'")
+      }
+    }
+    return( res2 )
+  })
+  return( res_list )
+}
+
+
+#' Self-test, Cross-testの結果をまとめるための関数
+#'
+#' @param res_true 真の推定値をもつSAMまたはVPAのオブジェクト
+#' @param fit2PS \code{fit2PSdata()} で得られる、疑似データにフィットさせた結果オブジェクト
+#'
+#' @inheritParams calc_metrics
+#'
+#' @return
+#' A list with the following components:
+#' \itemize{
+#'   \item \code{summary}: A data.frame containing performance metrics.
+#'     See [calc_metrics()] for details on the definitions of RMSE, MAE, R2_model, etc.
+#'   \item \code{all}: すべてのRunについての結果のデータフレーム
+#' }
+#'
+#' @encoding UTF-8
+#'
+#' @export
+#
+sumup_popsim <- function(
+    res_true,
+    fit2PS,
+    percent = FALSE,
+    CI = 0.95,
+    ...) {
+  tbl_true = convert_sam_tibble(res_true) %>%
+    dplyr::select(-sim) %>%
+    rename(value_true = value, type_true = type)
+  tbl_ps = map_dfr(1:length(fit2PS), function(i) {
+    convert_sam_tibble(fit2PS[[i]]) %>% mutate(simID = i)
+  }) %>% dplyr::select(-sim)
+
+  tbl_all = left_join(tbl_ps,tbl_true) %>% suppressMessages() %>%
+    dplyr::select(simID,stat,year,age,value,value_true,type,type_true,everything())
+
+  tbl_summary = tbl_all %>% group_by(stat,year,age) %>%
+    summarise(metrics = list(calc_metrics(value_true, value, percent = percent, ...)),
+              value_true = mean(value_true),
+              lower = quantile(value,probs=0.5*(1-CI))[1],
+              upper = quantile(value,probs=0.5*(1+CI))[1]
+              ) %>%
+    unnest_wider(metrics) %>%
+    ungroup() %>% suppressMessages()
+
+  return( list(all = tbl_all, summary = tbl_summary) )
+}
+
+
+
