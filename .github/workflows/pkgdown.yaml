@@ -31,12 +31,17 @@ jobs:
         with:
           use-public-rspm: true
 
+      # ---- insert as chatGPT suggests ----
+      - name: Install github dependencies
+        run: |
+	  install.packages("remotes")
+	  remotes::install_github("ichimomo/frasyr")
+	shell: Rscript {0}
+      # ----
+
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: |
-	     any::pkgdown
-	     local::.
-	     github::ichimomo/frasyr
+          extra-packages: any::pkgdown, local::. 
           needs: website
 
       - name: Build site
