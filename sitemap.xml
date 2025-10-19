@@ -20,6 +20,7 @@
 <url><loc>/reference/divide_sigma.html</loc></url>
 <url><loc>/reference/do_jitter.html</loc></url>
 <url><loc>/reference/do_loo_index.html</loc></url>
+<url><loc>/reference/do_osa_resid.html</loc></url>
 <url><loc>/reference/est_fixed.html</loc></url>
 <url><loc>/reference/est_mixed.html</loc></url>
 <url><loc>/reference/get_pm.html</loc></url>
@@ -33,6 +34,7 @@
 <url><loc>/reference/out_sam.html</loc></url>
 <url><loc>/reference/plot_SR_simple.html</loc></url>
 <url><loc>/reference/plot_boosam.html</loc></url>
+<url><loc>/reference/plot_osa_resid.html</loc></url>
 <url><loc>/reference/plot_samvpa.html</loc></url>
 <url><loc>/reference/popsim_vpasam.html</loc></url>
 <url><loc>/reference/retro_plot.html</loc></url>
