@@ -654,3 +654,48 @@ plot_boosam = function(samres,
   g1
 
 }
+
+
+
+#' OSA residualをプロットする関数
+#'
+#' @param osares \code{do_osa_resid}の結果オブジェクト
+#'
+#' @encoding UTF-8
+#'
+#' @export
+
+plot_osa_resid <- function(osares) {
+
+  ## caa
+  osa_resid_caa = osares %>%
+    filter(fleet==1) %>% #Fleet=1がCatch at age, それ以外がIndexを表す
+    filter(!is.nan(residual))
+
+  g_caa = osa_resid_caa %>%
+    ggplot(aes(x=year,y=age,colour=residual,size=abs(residual))) +
+    geom_point() +
+    scale_colour_gradient2(high="red",low="blue",mid="gray")+
+    xlab("Year")+
+    ylab("Age")+
+    scale_y_continuous(breaks=0:6)+
+    theme_SH()
+
+  ## index
+  osa_resid_index = osares %>%
+    filter(fleet>1) %>%
+    filter(!is.nan(residual))
+
+  g_index = osa_resid_index %>%
+    ggplot(aes(x=year,y=fleet-1,colour=residual,size=abs(residual))) +
+    geom_point() +
+    scale_colour_gradient2(high="red",low="blue",mid="gray")+
+    xlab("Fishing year")+
+    ylab("Index ID")+
+    scale_y_continuous(breaks=1:6)+
+    theme_bw()
+
+  return(list(caa = g_caa, index = g_index))
+}
+
+

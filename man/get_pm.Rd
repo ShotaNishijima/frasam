@@ -32,13 +32,13 @@ get_pm(
 
 \item{year_Fcur}{year range to derive F at age considred as F current. Fs at age are averaged by age during the given period}
 
-\item{perSPR}{percent SPR (%) for calculating F%SPR}
+\item{perSPR}{percent SPR (\%) for calculating F\%SPR}
 }
 \description{
 utilities for extracting statistics
 }
 \examples{
-\donotrun{
+\dontrun{
 res_pm_all <- purrr::map_dfr(basecase_list,
                   function(x) get_pm(x, NULL, waa_catch=x$input$dat$waa), .id="id") \%>\%
                   pivot_wider(values_from=value, names_from=stat)

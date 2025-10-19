@@ -8,12 +8,13 @@ output:
     fig_width: 10
     fig_height: 6
 vignette: >
-  %\VignetteIndexEntry{1. Estimating abundances with SAM}
+  %\VignetteIndexEntry{SAMを使った資源量推定}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
 ```{r setup, include = FALSE}
+options(rmarkdown.html_vignette.check_title = FALSE)
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
@@ -57,6 +58,12 @@ maa   <- read.csv("https://raw.githubusercontent.com/ichimomo/frasyr/dev/data-ra
 index <- read.csv("https://raw.githubusercontent.com/ichimomo/frasyr/dev/data-raw/ex1_index.csv",  row.names=1)
 # create pseudo data for caa
 caa   <- caa * exp(rnorm(length(caa), mean=-0.5 * (0.1)^2, sd=0.1))
+
+# Indexがひとつだと例としてあまり適切でないので、適当な加入Indexを作成する
+set.seed(2025)
+rec_idx <- seq(1,0.25,length=10)*exp(rnorm(10,0,0.2))
+index[2,] <- rec_idx
+
 dat <- data.handler(caa=caa, waa=waa, maa=maa, M=0.5, index=index)
 
 # まずはsamのhelpファイルを閲覧してどんなオプションがあるか把握しましょう
@@ -76,9 +83,9 @@ res_sam <- sam(dat,
                alpha = 1, # 最高年齢と最高年齢-1歳のFが同じと仮定（VPAと同じ仮定)
                est.method = "ml",
                # 資源量指数に関わる設定。資源量指数の数だけベクトルで与える。
-               abund = c("SSB"),
-               min.age = c(0),
-               max.age = c(6),
+               abund = c("SSB", "N"),
+               min.age = c(0, 0),
+               max.age = c(6, 0),
                b.est = FALSE, # b推定の有無(*)
                b.fix = NA,
                # 分散に関わる設定。どの分散を同じとするか。年齢の数だけ与える (*)
@@ -156,7 +163,7 @@ out_sam(res_sam, filename="sam")
 
 ## VPAもやってみる
 res_vpa <- vpa(dat,fc.year=1998:2000,tf.year = 1998:1999,
-               term.F="max",stat.tf="mean",Pope=TRUE,tune=TRUE,p.init=0.5, abund="SSB", min.age=0, max.age=6, sel.update=TRUE)
+               term.F="max",stat.tf="mean",Pope=TRUE,tune=TRUE,p.init=0.5, abund=c("SSB","N"), min.age=c(0,0), max.age=c(6,0), sel.update=TRUE)
 
 ## VPAとSAMのモデルの比較
 gg_graph1 <- plot_vpa(list(VPA=res_vpa, SAM=res_sam))
@@ -168,22 +175,22 @@ print(gg_graph2)
 
 ## 設定を少し変えてもう一度実行する場合
 sam_input <- res_sam$input # samに渡した引数のリスト
-sam_input$rho.mode <- 2 # 引数の一部を変える（たとえば、Fの相関を推定する)
+sam_input$rho.mode <- 1 # 引数の一部を変える（たとえば、Fの相関を1にする→今は選択率一定)
 res_sam2 <- do.call(sam, sam_input) # do.callで再度計算
 res_sam2$opt #収束している
+res_sam2$rep #sdreportの結果
 res_sam2$rep$pdHess #Hessianが正定値を持つかどうか（持たない場合SEが計算できない）
 
 ## 2つのモデルのAICの比較
 ## - 選択率一定モデルのほうがAICが小さい（＝より予測力が高い）
 c(res_sam$aic, res_sam2$aic)
 
-c(res_sam$rho, res_sam2$rho) #rho（F random walkの多変量正規分布の相関係数）が高いので推定した方がAIC低くなる
+c(res_sam$rho, res_sam2$rho) #Fの相関係数
 
 sam_input$SR <- "RW" #加入をRWに変更
-sam_input$p0.list <- res_sam2$par_list #前の初期値を使用
-# sam_input$loopnum <- 3
 res_sam3 <- do.call(sam,sam_input)
-res_sam3$opt
+res_sam3$opt　
+res_sam3$rep
 res_sam3$rep$pdHess
 
 c(res_sam$aic, res_sam2$aic, res_sam3$aic)
@@ -254,7 +261,7 @@ grid = expand.grid(var=c("varF","varC"),X=1:6) %>%
   filter(!(var == "varF" & X == 6)) #5-6歳のFは同じと仮定しているので6歳は不要なので除いておく
 
 res_select <- select_sigma_grid(
-  res_sam3, grid=grid, check_converge = TRUE, SEmax=10) # convergeしてるもののうちAIC最少を選ぶように変更
+  res_sam2, grid=grid, check_converge = TRUE, SEmax=Inf) # convergeしてるもののうちAIC最少を選ぶように変更
 ## Best modelの結果チェック
 # FAAの誤差が0歳と1歳以上で分かれる
 cbind(
@@ -263,6 +270,8 @@ cbind(
   "SD_faa" = res_select$bestres$sigma.logF,
   "SD_naa" = res_select$bestres$sigma.logN
 ) %>% knitr::kable()
+
+res_best <- res_select$bestres #AIC最少をベストモデルとする
 ```
 
 # 再生産関係のプロット
@@ -270,17 +279,17 @@ cbind(
 ```{r plot_SR_simple}
 
 ## 単純なプロット
-plot_SR_simple(res_sam)
+plot_SR_simple(res_best)
 
 ## SAMの結果からfraysrで使える再生産関係のオブジェクトを作成するとfrasyrの関数が使える
-SR_sam0 <- res_sam %>% make_SRres
-biopar <- derive_biopar(res_sam, derive_year=1998:2000)
+SR_sam0 <- res_best %>% make_SRres
+biopar <- derive_biopar(res_best, derive_year=1998:2000)
 ## steepness, R0, B0, 決定論的なMSY管理基準値の計算
 steepness_sam <- calc_steepness(SR="BH", rec_pars=SR_sam0$pars,M=biopar$M, waa=biopar$waa, maa=biopar$maa, faa=biopar$faa)
 ## 再生産関係に依存しない管理基準値の計算(frasyr::ref.F)
 # FcurrentとPope=FALSEを明示的に引数に含める必要がある
-Fcurrent <- rowMeans(res_sam$faa[,as.character(1998:2000)])
-refF_res <- ref.F(res_sam,Fcurrent=Fcurrent,Pope=FALSE)
+Fcurrent <- rowMeans(res_best$faa[,as.character(1998:2000)])
+refF_res <- ref.F(res_best,Fcurrent=Fcurrent,Pope=FALSE)
 refF_res$summary
 ```
 
@@ -292,13 +301,13 @@ refF_res$summary
 
 ## 資源量指数 (frasyrのplot_residual_vpaと統合してもよい？）
 ## - これは通常のresidual
-resid_sam <- index_plot(res_sam); wrap_plots(resid_sam)
+resid_sam <- index_plot(res_best); wrap_plots(resid_sam)
 
 ## - OSAは？ => 後で紹介する予定
 
 ## catch at age
 ## -
-caa_resid <- caa_plot(res_sam); wrap_plots(caa_resid)
+caa_resid <- caa_plot(res_best); wrap_plots(caa_resid)
 
 ## total catch weight の比較も必要かも
 # 今関数はない
@@ -306,7 +315,7 @@ caa_resid <- caa_plot(res_sam); wrap_plots(caa_resid)
 # catch at age (sakai ver.)
 
 caa_obs0 <- dat$caa %>% rownames_to_column(var="Age") %>% pivot_longer(cols=-Age, names_to="Year", values_to="Value") %>% mutate(Data="Observation")
-caa_est0 <- res_sam$caa %>% as.data.frame %>% rownames_to_column(var="Age") %>% pivot_longer(cols=-Age, names_to="Year", values_to="Value") %>% mutate(Data="Estimation")
+caa_est0 <- res_best$caa %>% as.data.frame %>% rownames_to_column(var="Age") %>% pivot_longer(cols=-Age, names_to="Year", values_to="Value") %>% mutate(Data="Estimation")
 caa_obs_est <- bind_rows(caa_obs0, caa_est0)
 
 xlab <- "年齢"
@@ -332,21 +341,48 @@ g1 <- ggplot() +
 - Retrospective forecastingも同時に実行可能でプロットもできる
 
 ```{r retro}
-retro_res = retro_sam(res_sam2,n=5) #nは年数
+retro_res = retro_sam(res_best,n=5) #nは年数
 
-(g_retro = retro_plot(res_sam2,retro_res,start_year=1991,mohn_position="bottomleft"))
+(g_retro = retro_plot(res_best,retro_res,start_year=1991,mohn_position="bottomleft"))
 
 # retrospective forecastingもできる
-(g_retro2 = retro_plot(res_sam2,retro_res,start_year=1991,mohn_position="bottomleft", forecast=TRUE))
+(g_retro2 = retro_plot(res_best,retro_res,start_year=1991,mohn_position="bottomleft", forecast=TRUE))
 ```
 
 
 ### Leave-one-out index analysis
-- 後で書く
+- Indexを一つずつの除いて、推定値の頑健性、影響力のあるIndexを明らかにする（ジャックナイフ解析？）
+- \code{do_loo_index()}という関数を使って実行する
+ 
+```{r loo-index}
+
+loo_res <- do_loo_index(res_best)
+reslist <- list()
+for ( j in 0:length(loo_res)) {
+    if(j==0) {
+      reslist[[j+1]] <- res_best
+    } else {
+      reslist[[j+1]] <- loo_res[[j]]
+    }
+}
+(g_loo <- plot_samvpa(reslist,CI=0,
+                    scenario_name = c("full",as.character(-1:-2))))
+
+```
 
 ### One-Step-Ahead (OSA) residuals
 
-- 後で書く
+- SAMはランダム効果モデルなので、ハイパーパラメータとランダム効果の推定でデータを二重に使っていることになる
+- ランダム効果でデータに対して過度に合わせることも可能であり（過剰適合）、通常の残差を診断に使うのは適切ではないと考えられている
+- また、時系列解析なので残差は独立ではないので、独立とみなした診断（QQ plotなど）は不適
+- あるサンプルを除いた時の予測値（One Step Ahead (OSA) prediction）とデータとの残差 (OSA residuals) を診断に使うのがより適切らしい
+- \code{TMB::oneStepPredict}を使って行うが、SAM用の関数\code{do_osa_resid()}を用意してある
+
+```{r OSA residual}
+osa.simple <- do_osa_resid(res_best)
+gg_osa = plot_osa_resid(osa.simple); wrap_plots(gg_osa)
+
+```
 
 
 ### プロファイル尤度
@@ -355,7 +391,7 @@ retro_res = retro_sam(res_sam2,n=5) #nは年数
 ```{r profile_likelihood}
 # Catchabilityに対するプロファイル尤度
 # 同じ名前のパラメータが複数ある場合は引数\code{which_param}で位置を指定できる
-res_profile <- samprofile(res_sam, "logQ", which_param=1, param_range=c(8, 11), length=25)
+res_profile <- samprofile(res_best, "logQ", which_param=1, param_range=c(8, 11), length=25)
 
 # 縦軸は負の対数尤度
 res_profile$obj_tbl[-1,] %>%
@@ -367,7 +403,7 @@ res_profile$obj_tbl[-1,] %>%
 Ms = c(0.1,0.3,0.5,0.7,0.9)
 scns = str_c("M:",Ms)
 samres_Mlist = map(Ms, function(i) {
-  res = res_sam2
+  res = res_best
   p0_list = res$par_list
   input = res$input
   input$dat$M[] <- i
@@ -380,6 +416,8 @@ data.frame(
   obj_value = sapply(samres_Mlist, function(x) x$opt$objective)
 ) %>% ggplot(aes(x=M,y=obj_value)) + geom_line() + geom_point()
 
+plot_samvpa(samres_Mlist,scenario_name=scns,CI=0.)
+
 ```
 
 ## ブートストラップ
@@ -390,7 +428,7 @@ data.frame(
 
 ```{r bootstrap}
 
-res_boot <- boo_sam(res_sam2, n=20,method="p",seed=1) #時間節約のため20回
+res_boot <- boo_sam(res_best, n=20,method="p",seed=1) #時間節約のため20回
 (g1 = plot_boosam(res_sam2,res_boot, CI=0.95, draw_deltaCI = TRUE))
 
 ```
@@ -399,7 +437,7 @@ res_boot <- boo_sam(res_sam2, n=20,method="p",seed=1) #時間節約のため20�
 
 ```{r cross_test}
 # pseudo dataを生成
-pdata <- popsim_vpasam(res_sam2, n=20)
+pdata <- popsim_vpasam(res_best, n=20)
 res_vpa_list <- list()
 for(i in 1:length(pdata)){
   vpainput <- res_vpa$input
