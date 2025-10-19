@@ -159,8 +159,11 @@ res_vpa <- vpa(dat,fc.year=1998:2000,tf.year = 1998:1999,
                term.F="max",stat.tf="mean",Pope=TRUE,tune=TRUE,p.init=0.5, abund="SSB", min.age=0, max.age=6, sel.update=TRUE)
 
 ## VPAとSAMのモデルの比較
-plot_vpa(list(VPA=res_vpa, SAM=res_sam))
-plot_vpa(list(VPA=res_vpa, SAM=res_sam), what.plot=c("fishing_mortality"))
+gg_graph1 <- plot_vpa(list(VPA=res_vpa, SAM=res_sam))
+gg_graph2 <- plot_vpa(list(VPA=res_vpa, SAM=res_sam), what.plot=c("fishing_mortality"))
+
+print(gg_graph1)
+print(gg_graph2)
 
 
 ## 設定を少し変えてもう一度実行する場合
