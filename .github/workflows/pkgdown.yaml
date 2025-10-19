@@ -36,7 +36,7 @@ jobs:
         run: |
           install.packages(c("remotes","pkgdown"))
           remotes::install_github("ichimomo/frasyr")
-	  remotes::install_local(".")
+          remotes::install_local(".")
         shell: Rscript {0}
       # ----
 
