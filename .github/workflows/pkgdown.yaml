@@ -38,7 +38,8 @@ jobs:
           remotes::install_github("ichimomo/frasyr")
         shell: Rscript {0}
       - name: Install frasam package
-        run Rscript -e "remotes::install_local(".")"
+        run: |
+	  Rscript -e 'remotes::install_local(".")'
       # ----
 
 #      - uses: r-lib/actions/setup-r-dependencies@v2
