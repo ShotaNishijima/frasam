@@ -9,7 +9,7 @@
 #' @param waa_biom weight at age for calculating biomass weight. If this is not given, sam_res$input$dat$waa is automatically used
 #' @param year_biol year range to derive biological parameters. Biological parameters are averaged by age during the given period
 #' @param year_Fcur year range to derive F at age considred as F current. Fs at age are averaged by age during the given period
-#' @param perSPR percent SPR (%) for calculating F%SPR
+#' @param perSPR percent SPR (\%) for calculating F\%SPR
 #'
 #' @examples
 #' \donotrun{

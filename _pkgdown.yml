@@ -12,10 +12,6 @@ navbar:
       icon: fa-github
       href: https://github.com/ichimomo/frasam
 
-reference:
-  - title: "Main functions"
-    contents:
-      - starts_with("your_main_function_prefix")
 
 articles:
   - title: "Vignettes"
