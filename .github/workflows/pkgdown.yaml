@@ -34,15 +34,15 @@ jobs:
       # ---- insert as chatGPT suggests ----
       - name: Install github dependencies
         run: |
-          install.packages("remotes")
+          install.packages("remotes","pkgdown")
           remotes::install_github("ichimomo/frasyr")
         shell: Rscript {0}
       # ----
 
-      - uses: r-lib/actions/setup-r-dependencies@v2
-        with:
-          extra-packages: any::pkgdown, local::. 
-          needs: website
+#      - uses: r-lib/actions/setup-r-dependencies@v2
+#        with:
+#          extra-packages: any::pkgdown, local::. 
+#          needs: website
 
       - name: Build site
         run: pkgdown::build_site_github_pages(new_process = FALSE, install = FALSE)
