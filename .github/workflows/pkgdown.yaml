@@ -34,7 +34,7 @@ jobs:
       # ---- insert as chatGPT suggests ----
       - name: Install github dependencies
         run: |
-          install.packages("remotes","pkgdown")
+          install.packages(c("remotes","pkgdown"))
           remotes::install_github("ichimomo/frasyr")
         shell: Rscript {0}
       # ----
