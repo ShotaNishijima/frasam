@@ -695,7 +695,16 @@ plot_osa_resid <- function(osares) {
     scale_y_continuous(breaks=1:6)+
     theme_bw()
 
-  return(list(caa = g_caa, index = g_index))
+  ## qq plot
+  p <- osares %>%
+    filter(!is.nan(residual)) %>%
+    stat_qq(distribution = qnorm) +  # 標準正規分布の分位数を使用
+    stat_qq_line(distribution = qnorm) +  # 標準正規分布に基づく直線
+    labs(x = "Theoretical Quantiles",
+         y = "Sample Quantiles") +
+    theme_SH()
+
+  return(list(caa = g_caa, index = g_index, qq = p))
 }
 
 #' Popsimの結果ををプロットする関数

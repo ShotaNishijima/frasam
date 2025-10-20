@@ -60,10 +60,10 @@ waa   <- read.csv("https://raw.githubusercontent.com/ichimomo/frasyr/dev/data-ra
 maa   <- read.csv("https://raw.githubusercontent.com/ichimomo/frasyr/dev/data-raw/ex1_maa.csv",  row.names=1)
 index <- read.csv("https://raw.githubusercontent.com/ichimomo/frasyr/dev/data-raw/ex1_index.csv",  row.names=1)
 # create pseudo data for caa
+set.seed(1)
 caa   <- caa * exp(rnorm(length(caa), mean=-0.5 * (0.1)^2, sd=0.1))
 
 # Indexがひとつだと例としてあまり適切でないので、適当な加入Indexを作成する
-set.seed(2025)
 rec_idx <- seq(1,0.25,length=10)*exp(rnorm(10,0,0.2))
 index[2,] <- rec_idx
 
@@ -161,9 +161,17 @@ res_sam[c("sigma","sigma.logC","sigma.logFsta","sigma.logN")]
 fixef = out_par(res_sam,filename="FEpar")
 knitr::kable(fixef)
 
+## 結果のプロット
+# デルタ法にかかる信頼区間が描かれる
+plot_samvpa(res_sam, CI=0.95)
+
 ## 結果の出力
 out_sam(res_sam, filename="sam")
+```
 
+### VPAや、異なる設定のSAMとの比較
+
+```{r comparison}
 ## VPAもやってみる
 res_vpa <- vpa(dat,fc.year=1998:2000,tf.year = 1998:1999,
                term.F="max",stat.tf="mean",Pope=TRUE,tune=TRUE,p.init=0.5, abund=c("SSB","N"), min.age=c(0,0), max.age=c(6,0), sel.update=TRUE)
@@ -205,12 +213,9 @@ c(res_sam$aic, res_sam2$aic, res_sam3$aic)
 plot_samvpa(list(SAM=res_sam, SAM2=res_sam2,SAM3=res_sam3),
             what.plot = c("biomass","SSB","Recruitment","U","catch","fishing_mortality"))
 
-## 結果の出力
-## - 境さん関数(make_assess_result)
-## - out.vpa(out_samなら動く)、convert_vpa_tibbleも動くようにしたい
-res_samdata <- make_assess_result(res_sam)
-
 ## F at age by year (境さんコード、関数化必要？時系列が長い場合への対応が必要)
+res_samdata <- make_assess_result(res_sam)　# 境さん関数(make_assess_result)
+
 (gg <- res_samdata %>% dplyr::filter(stat=="faa") %>%
     ggplot() +
     geom_ribbon(aes(x=Age, ymax=upper, ymin=lower, group=Model, fill=Model), alpha=0.5) +
@@ -244,8 +249,6 @@ res_samdata <- make_assess_result(res_sam)
           axis.text.y = element_text(size = 11, color = "black"),
           axis.line.x = element_line(linewidth = 0.3528), axis.line.y = element_line(linewidth = 0.3528),
           axis.minor.ticks.length = rel(0.5)))
-
-
 ```
 
 # モデル選択
@@ -261,20 +264,29 @@ res_samdata <- make_assess_result(res_sam)
 # 検討する変数(VarF, VarC)を境界を入れる年齢Xについてのデータを生成(varとXを列名に使用)
 # ここでは収束しやすさからRWの場合を使用する（BHを使うとlog(b)->-InfになりSEが発散する
 grid = expand.grid(var=c("varF","varC"),X=1:6) %>%
-  filter(!(var == "varF" & X == 6)) #5-6歳のFは同じと仮定しているので6歳は不要なので除いておく
+  filter(!(var == "varF" & X == 6)) #5-6歳のFは同じと仮定しており6歳は不要なので除いておく
 
 res_select <- select_sigma_grid(
-  res_sam2, grid=grid, check_converge = TRUE, SEmax=Inf) # convergeしてるもののうちAIC最少を選ぶように変更
+  res_sam3, grid=grid, check_converge = TRUE, SEmax=Inf) # 
+
+# stage 0 が元のモデル
+# varがどの分散を分けたか
+# whichはどの年齢で分けたか（1なら0歳と1歳魚以上で分ける）
+# AIC最少の分け方をして、AICが下がらなくなるまで実行
+# selectedはステージ内でAIC最少、bestは検討したすべてのモデルでAIC最少
+res_select$tbl_sigma %>% knitr::kable()
+
+
 ## Best modelの結果チェック
 # FAAの誤差が0歳と1歳以上で分かれる
+res_best <- res_select$bestres #AIC最少をベストモデルとする
 cbind(
   "Age" = 0:6,
-  "SD_caa" = res_select$bestres$sigma.logC,
-  "SD_faa" = res_select$bestres$sigma.logF,
-  "SD_naa" = res_select$bestres$sigma.logN
+  "SD_caa" = res_best$sigma.logC,
+  "SD_faa" = res_best$sigma.logF,
+  "SD_naa" = res_best$sigma.logN
 ) %>% knitr::kable()
 
-res_best <- res_select$bestres #AIC最少をベストモデルとする
 ```
 
 # 再生産関係のプロット
@@ -282,17 +294,17 @@ res_best <- res_select$bestres #AIC最少をベストモデルとする
 ```{r plot_SR_simple}
 
 ## 単純なプロット
-plot_SR_simple(res_best)
+plot_SR_simple(res_sam2) #BHモデルを例に
 
 ## SAMの結果からfraysrで使える再生産関係のオブジェクトを作成するとfrasyrの関数が使える
-SR_sam0 <- res_best %>% make_SRres
-biopar <- derive_biopar(res_best, derive_year=1998:2000)
+SR_sam0 <- res_sam2 %>% make_SRres
+biopar <- derive_biopar(res_sam2, derive_year=1998:2000)
 ## steepness, R0, B0, 決定論的なMSY管理基準値の計算
 steepness_sam <- calc_steepness(SR="BH", rec_pars=SR_sam0$pars,M=biopar$M, waa=biopar$waa, maa=biopar$maa, faa=biopar$faa)
 ## 再生産関係に依存しない管理基準値の計算(frasyr::ref.F)
 # FcurrentとPope=FALSEを明示的に引数に含める必要がある
-Fcurrent <- rowMeans(res_best$faa[,as.character(1998:2000)])
-refF_res <- ref.F(res_best,Fcurrent=Fcurrent,Pope=FALSE)
+Fcurrent <- rowMeans(res_sam2$faa[,as.character(1998:2000)])
+refF_res <- ref.F(res_sam2,Fcurrent=Fcurrent,Pope=FALSE)
 refF_res$summary
 ```
 
@@ -304,13 +316,11 @@ refF_res$summary
 
 ## 資源量指数 (frasyrのplot_residual_vpaと統合してもよい？）
 ## - これは通常のresidual
-resid_sam <- index_plot(res_best); wrap_plots(resid_sam)
-
-## - OSAは？ => 後で紹介する予定
+resid_sam <- index_plot(res_best); wrap_plots(resid_sam,ncol=1)
 
 ## catch at age
 ## -
-caa_resid <- caa_plot(res_best); wrap_plots(caa_resid)
+caa_resid <- caa_plot(res_best); wrap_plots(caa_resid,ncol=1)
 
 ## total catch weight の比較も必要かも
 # 今関数はない
@@ -338,9 +348,23 @@ g1 <- ggplot() +
 
 ```
 
+
+### One-Step-Ahead (OSA) residuals
+
+- SAMはランダム効果モデルなので、ハイパーパラメータとランダム効果の推定でデータを二重に使っていることになる
+- ランダム効果でデータに対して過度に合わせることも可能であり（過剰適合）、通常の残差を診断に使うのは適切ではないと考えられている
+- また、時系列解析なので残差は独立ではないので、独立とみなした診断（QQ plotなど）は不適
+- あるサンプルを除いた時の予測値（One Step Ahead (OSA) prediction）とデータとの残差 (OSA residuals) を診断に使うのがより適切らしい
+- 'TMB::oneStepPredict'を使って行うが、SAM用の関数'do_osa_resid()'を用意してある
+
+```{r OSA residual}
+osa.simple <- do_osa_resid(res_best)
+gg_osa = plot_osa_resid(osa.simple); wrap_plots(gg_osa,ncol=1)
+```
+
 ### レトロスペクティブ解析
 
-- \code{retro_sam()} という関数で実行可能
+- 'retro_sam()' という関数で実行可能
 - Retrospective forecastingも同時に実行可能でプロットもできる
 
 ```{r retro}
@@ -355,7 +379,7 @@ retro_res = retro_sam(res_best,n=5) #nは年数
 
 ### Leave-one-out index analysis
 - Indexを一つずつの除いて、推定値の頑健性、影響力のあるIndexを明らかにする（ジャックナイフ解析？）
-- \code{do_loo_index()}という関数を使って実行する
+- 'do_loo_index()'という関数を使って実行する
  
 ```{r loo-index}
 
@@ -373,19 +397,6 @@ for ( j in 0:length(loo_res)) {
 
 ```
 
-### One-Step-Ahead (OSA) residuals
-
-- SAMはランダム効果モデルなので、ハイパーパラメータとランダム効果の推定でデータを二重に使っていることになる
-- ランダム効果でデータに対して過度に合わせることも可能であり（過剰適合）、通常の残差を診断に使うのは適切ではないと考えられている
-- また、時系列解析なので残差は独立ではないので、独立とみなした診断（QQ plotなど）は不適
-- あるサンプルを除いた時の予測値（One Step Ahead (OSA) prediction）とデータとの残差 (OSA residuals) を診断に使うのがより適切らしい
-- \code{TMB::oneStepPredict}を使って行うが、SAM用の関数\code{do_osa_resid()}を用意してある
-
-```{r OSA residual}
-osa.simple <- do_osa_resid(res_best)
-gg_osa = plot_osa_resid(osa.simple); wrap_plots(gg_osa)
-
-```
 
 
 ### プロファイル尤度
@@ -393,7 +404,7 @@ gg_osa = plot_osa_resid(osa.simple); wrap_plots(gg_osa)
 - Cachability qなどを変化させたときの対数尤度を調べて、収束しているか、どの程度尤度が変わるか（不確実性の程度、信頼区間）を調べる
 ```{r profile_likelihood}
 # Catchabilityに対するプロファイル尤度
-# 同じ名前のパラメータが複数ある場合は引数\code{which_param}で位置を指定できる
+# 同じ名前のパラメータが複数ある場合は引数'which_param'で位置を指定できる
 res_profile <- samprofile(res_best, "logQ", which_param=1, param_range=c(8, 11), length=25)
 
 # 縦軸は負の対数尤度
@@ -407,9 +418,9 @@ Ms = c(0.1,0.3,0.5,0.7,0.9)
 scns = str_c("M:",Ms)
 samres_Mlist = map(Ms, function(i) {
   res = res_best
-  p0_list = res$par_list
   input = res$input
   input$dat$M[] <- i
+  # p0_list = res$par_list; input$p0.list <- p0_list #初期値を利用するとき
   res.c = do.call(sam,input)
   return( res.c )
 })
@@ -425,14 +436,14 @@ plot_samvpa(samres_Mlist,scenario_name=scns,CI=0.)
 
 ## ブートストラップ
 
-- \code{boo_sam()}で実行できる
-- ノンパラメトリックブートストラップ（\code{method="n"}）は厳密ではないので、パラメトリックブートストラップを推奨（\code{method="p"}）
-- delta法で求めたCIも図に加える場合は\code{draw_deltaCI=TRUE}
+- 'boo_sam()'で実行できる
+- ノンパラメトリックブートストラップ（'method="n"'）は厳密ではないので、パラメトリックブートストラップを推奨（'method="p"'）
+- delta法で求めたCIも図に加える場合は'draw_deltaCI=TRUE'
 
 ```{r bootstrap}
 
 res_boot <- boo_sam(res_best, n=20,method="p",seed=1) #時間節約のため20回
-(g1 = plot_boosam(res_sam2,res_boot, CI=0.95, draw_deltaCI = TRUE))
+(g1 = plot_boosam(res_best,res_boot, CI=0.95, draw_deltaCI = TRUE))
 
 ```
 
