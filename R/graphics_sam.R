@@ -740,7 +740,8 @@ plot_popsim = function(
     geom_ribbon(aes(ymin=lower,ymax=upper),alpha=alpha,fill=sim_colour) +
     facet_wrap(vars(stat_f2),scales="free_y",ncol=ncol) +
     geom_path(aes(y=Median),colour=sim_colour,linewidth=0.7) +
-    geom_point(aes(y=value_true),linetype="dotted", linewidth=0.5)+
+    lemon::geom_pointline(aes(y=value_true), distance = 0,
+                          linetype="dotted", linewidth=0.5)+
     ylim(0,NA) + ylab("Value") + xlab("Year")+
     frasyr::theme_SH()+
     scale_x_continuous(breaks=scales::pretty_breaks())
