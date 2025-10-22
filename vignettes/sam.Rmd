@@ -39,8 +39,8 @@ knitr::opts_chunk$set(
 
 # ライブラリの呼び出し
 library(frasyr)
-# library(frasam)
-devtools::load_all()
+library(frasam)
+# devtools::load_all()
 library(tidyverse)
 library(patchwork)
 # install.packages("lemon")
