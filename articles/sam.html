@@ -53,7 +53,7 @@
       <h1>SAMを使った資源量推定</h1>
                         <h4 data-toc-skip class="author">市野川桃子・西嶋翔太</h4>
             
-            <h4 data-toc-skip class="date">2025-10-20</h4>
+            <h4 data-toc-skip class="date">2025-10-22</h4>
       
 
       <div class="d-none name"><code>sam.Rmd</code></div>
@@ -98,10 +98,10 @@
 <span><span class="va">maa</span>   <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span><span class="st">"https://raw.githubusercontent.com/ichimomo/frasyr/dev/data-raw/ex1_maa.csv"</span>,  row.names<span class="op">=</span><span class="fl">1</span><span class="op">)</span></span>
 <span><span class="va">index</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span><span class="st">"https://raw.githubusercontent.com/ichimomo/frasyr/dev/data-raw/ex1_index.csv"</span>,  row.names<span class="op">=</span><span class="fl">1</span><span class="op">)</span></span>
 <span><span class="co"># create pseudo data for caa</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
 <span><span class="va">caa</span>   <span class="op">&lt;-</span> <span class="va">caa</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">caa</span><span class="op">)</span>, mean<span class="op">=</span><span class="op">-</span><span class="fl">0.5</span> <span class="op">*</span> <span class="op">(</span><span class="fl">0.1</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span>, sd<span class="op">=</span><span class="fl">0.1</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Indexがひとつだと例としてあまり適切でないので、適当な加入Indexを作成する</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">2025</span><span class="op">)</span></span>
 <span><span class="va">rec_idx</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">0.25</span>,length<span class="op">=</span><span class="fl">10</span><span class="op">)</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">10</span>,<span class="fl">0</span>,<span class="fl">0.2</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">index</span><span class="op">[</span><span class="fl">2</span>,<span class="op">]</span> <span class="op">&lt;-</span> <span class="va">rec_idx</span></span>
 <span></span>
@@ -184,22 +184,22 @@
 <span><span class="va">res_sam</span><span class="op">$</span><span class="va">opt</span></span>
 <span><span class="co">#&gt; $par</span></span>
 <span><span class="co">#&gt;         logQ         logQ logSdLogFsta    logSdLogN  logSdLogObs  logSdLogObs </span></span>
-<span><span class="co">#&gt;     9.589461    -7.157883    -1.872021    -1.633707    -2.754415    -1.360896 </span></span>
+<span><span class="co">#&gt;     9.560474    -7.232696    -1.877590    -1.761564    -3.101510    -1.367962 </span></span>
 <span><span class="co">#&gt;  logSdLogObs     rec_loga     rec_logb </span></span>
-<span><span class="co">#&gt;    -1.611545     2.346322   -18.267778 </span></span>
+<span><span class="co">#&gt;    -1.082575     2.365818   -20.967589 </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $objective</span></span>
-<span><span class="co">#&gt; [1] -5.25335</span></span>
+<span><span class="co">#&gt; [1] -4.304594</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $convergence</span></span>
 <span><span class="co">#&gt; [1] 0</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $iterations</span></span>
-<span><span class="co">#&gt; [1] 66</span></span>
+<span><span class="co">#&gt; [1] 87</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $evaluations</span></span>
 <span><span class="co">#&gt; function gradient </span></span>
-<span><span class="co">#&gt;       95       67 </span></span>
+<span><span class="co">#&gt;      116       88 </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $message</span></span>
 <span><span class="co">#&gt; [1] "relative convergence (4)"</span></span>
@@ -210,36 +210,36 @@
 <span><span class="va">res_sam</span><span class="op">$</span><span class="va">rep</span></span>
 <span><span class="co">#&gt; sdreport(.) result</span></span>
 <span><span class="co">#&gt;                Estimate   Std. Error</span></span>
-<span><span class="co">#&gt; logQ           9.589461 9.073807e-02</span></span>
-<span><span class="co">#&gt; logQ          -7.157883 7.018642e-02</span></span>
-<span><span class="co">#&gt; logSdLogFsta  -1.872021 1.589935e-01</span></span>
-<span><span class="co">#&gt; logSdLogN     -1.633707 2.634245e-01</span></span>
-<span><span class="co">#&gt; logSdLogObs   -2.754415 4.934159e-01</span></span>
-<span><span class="co">#&gt; logSdLogObs   -1.360896 2.360906e-01</span></span>
-<span><span class="co">#&gt; logSdLogObs   -1.611545 2.371708e-01</span></span>
-<span><span class="co">#&gt; rec_loga       2.346322 7.373170e-02</span></span>
-<span><span class="co">#&gt; rec_logb     -18.267778 1.389361e+04</span></span>
-<span><span class="co">#&gt; Maximum gradient component: 1.587814e-05</span></span>
+<span><span class="co">#&gt; logQ           9.560474 8.811785e-02</span></span>
+<span><span class="co">#&gt; logQ          -7.232696 1.118901e-01</span></span>
+<span><span class="co">#&gt; logSdLogFsta  -1.877590 1.476098e-01</span></span>
+<span><span class="co">#&gt; logSdLogN     -1.761564 2.699047e-01</span></span>
+<span><span class="co">#&gt; logSdLogObs   -3.101510 7.511999e-01</span></span>
+<span><span class="co">#&gt; logSdLogObs   -1.367962 2.342732e-01</span></span>
+<span><span class="co">#&gt; logSdLogObs   -1.082575 2.288350e-01</span></span>
+<span><span class="co">#&gt; rec_loga       2.365818 6.530281e-02</span></span>
+<span><span class="co">#&gt; rec_logb     -20.967589 4.742059e+04</span></span>
+<span><span class="co">#&gt; Maximum gradient component: 1.00355e-05</span></span>
 <span></span>
 <span><span class="co">## 推定結果の確認: AIC（単独ではあまり意味がない。モデルを比較するときに）</span></span>
 <span><span class="va">res_sam</span><span class="op">$</span><span class="va">aic</span></span>
-<span><span class="co">#&gt; [1] 7.493301</span></span>
+<span><span class="co">#&gt; [1] 9.390811</span></span>
 <span></span>
 <span><span class="co">## 推定結果の確認: 分散パラメータのsigma。ノーマルスケールで、大きさを確認。</span></span>
 <span><span class="co">## - すごく小さい値で推定されている場合には推定の意味がないので推定しないなどする</span></span>
 <span><span class="co">## - どのsigmaを共通にするか？を決める</span></span>
 <span><span class="va">res_sam</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sigma"</span>,<span class="st">"sigma.logC"</span>,<span class="st">"sigma.logFsta"</span>,<span class="st">"sigma.logN"</span><span class="op">)</span><span class="op">]</span></span>
 <span><span class="co">#&gt; $sigma</span></span>
-<span><span class="co">#&gt; [1] 0.2564308 0.1995790</span></span>
+<span><span class="co">#&gt; [1] 0.2546253 0.3387221</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $sigma.logC</span></span>
-<span><span class="co">#&gt; [1] 0.06364625 0.06364625 0.06364625 0.06364625 0.06364625 0.06364625 0.06364625</span></span>
+<span><span class="co">#&gt; [1] 0.04498123 0.04498123 0.04498123 0.04498123 0.04498123 0.04498123 0.04498123</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $sigma.logFsta</span></span>
-<span><span class="co">#&gt; [1] 0.1538125 0.1538125 0.1538125 0.1538125 0.1538125 0.1538125 0.1538125</span></span>
+<span><span class="co">#&gt; [1] 0.1529583 0.1529583 0.1529583 0.1529583 0.1529583 0.1529583 0.1529583</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $sigma.logN</span></span>
-<span><span class="co">#&gt; [1] 0.1952047 0.0100000 0.0100000 0.0100000 0.0100000 0.0100000 0.0100000</span></span>
+<span><span class="co">#&gt; [1] 0.171776 0.010000 0.010000 0.010000 0.010000 0.010000 0.010000</span></span>
 <span></span>
 <span><span class="co">## 固定効果の確認・出力</span></span>
 <span><span class="va">fixef</span> <span class="op">=</span> <span class="fu"><a href="../reference/out_par.html">out_par</a></span><span class="op">(</span><span class="va">res_sam</span>,filename<span class="op">=</span><span class="st">"FEpar"</span><span class="op">)</span></span>
@@ -255,75 +255,83 @@
 <tbody>
 <tr class="odd">
 <td align="left">logQ</td>
-<td align="right">9.589461</td>
-<td align="right">9.073810e-02</td>
-<td align="right">5.80e-06</td>
-<td align="right">1.460999e+04</td>
+<td align="right">9.560474</td>
+<td align="right">8.811780e-02</td>
+<td align="right">-5.4e-06</td>
+<td align="right">1.419257e+04</td>
 </tr>
 <tr class="even">
 <td align="left">logQ</td>
-<td align="right">-7.157883</td>
-<td align="right">7.018640e-02</td>
-<td align="right">1.59e-05</td>
-<td align="right">7.787000e-04</td>
+<td align="right">-7.232697</td>
+<td align="right">1.118901e-01</td>
+<td align="right">1.0e-05</td>
+<td align="right">7.226000e-04</td>
 </tr>
 <tr class="odd">
 <td align="left">logSdLogFsta</td>
-<td align="right">-1.872021</td>
-<td align="right">1.589935e-01</td>
-<td align="right">1.22e-05</td>
-<td align="right">1.538125e-01</td>
+<td align="right">-1.877590</td>
+<td align="right">1.476098e-01</td>
+<td align="right">1.8e-06</td>
+<td align="right">1.529583e-01</td>
 </tr>
 <tr class="even">
 <td align="left">logSdLogN</td>
-<td align="right">-1.633707</td>
-<td align="right">2.634245e-01</td>
-<td align="right">4.20e-06</td>
-<td align="right">1.952047e-01</td>
+<td align="right">-1.761564</td>
+<td align="right">2.699047e-01</td>
+<td align="right">2.3e-06</td>
+<td align="right">1.717760e-01</td>
 </tr>
 <tr class="odd">
 <td align="left">logSdLogObs</td>
-<td align="right">-2.754415</td>
-<td align="right">4.934159e-01</td>
-<td align="right">2.80e-06</td>
-<td align="right">6.364630e-02</td>
+<td align="right">-3.101510</td>
+<td align="right">7.511999e-01</td>
+<td align="right">-4.0e-07</td>
+<td align="right">4.498120e-02</td>
 </tr>
 <tr class="even">
 <td align="left">logSdLogObs</td>
-<td align="right">-1.360896</td>
-<td align="right">2.360906e-01</td>
-<td align="right">-5.00e-06</td>
-<td align="right">2.564308e-01</td>
+<td align="right">-1.367962</td>
+<td align="right">2.342732e-01</td>
+<td align="right">-7.0e-07</td>
+<td align="right">2.546253e-01</td>
 </tr>
 <tr class="odd">
 <td align="left">logSdLogObs</td>
-<td align="right">-1.611545</td>
-<td align="right">2.371708e-01</td>
-<td align="right">2.60e-06</td>
-<td align="right">1.995790e-01</td>
+<td align="right">-1.082575</td>
+<td align="right">2.288350e-01</td>
+<td align="right">-4.5e-06</td>
+<td align="right">3.387221e-01</td>
 </tr>
 <tr class="even">
 <td align="left">rec_loga</td>
-<td align="right">2.346322</td>
-<td align="right">7.373170e-02</td>
-<td align="right">1.03e-05</td>
-<td align="right">1.044708e+01</td>
+<td align="right">2.365818</td>
+<td align="right">6.530280e-02</td>
+<td align="right">1.3e-06</td>
+<td align="right">1.065275e+01</td>
 </tr>
 <tr class="odd">
 <td align="left">rec_logb</td>
-<td align="right">-18.267778</td>
-<td align="right">1.389361e+04</td>
-<td align="right">0.00e+00</td>
+<td align="right">-20.967589</td>
+<td align="right">4.742059e+04</td>
+<td align="right">0.0e+00</td>
 <td align="right">0.000000e+00</td>
 </tr>
 </tbody>
 </table>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
-<span><span class="co">## 結果の出力</span></span>
-<span><span class="fu"><a href="../reference/out_sam.html">out_sam</a></span><span class="op">(</span><span class="va">res_sam</span>, filename<span class="op">=</span><span class="st">"sam"</span><span class="op">)</span></span>
+<span><span class="co">## 結果のプロット</span></span>
+<span><span class="co"># デルタ法にかかる信頼区間が描かれる</span></span>
+<span><span class="fu"><a href="../reference/plot_samvpa.html">plot_samvpa</a></span><span class="op">(</span><span class="va">res_sam</span>, CI<span class="op">=</span><span class="fl">0.95</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co">## VPAもやってみる</span></span>
+<span><span class="co">## 結果の出力</span></span>
+<span><span class="fu"><a href="../reference/out_sam.html">out_sam</a></span><span class="op">(</span><span class="va">res_sam</span>, filename<span class="op">=</span><span class="st">"sam"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="sam_files/figure-html/load_data-1.png" width="100%" style="display: block; margin: auto;"></p>
+<div class="section level4">
+<h4 id="vpaや異なる設定のsamとの比較">VPAや、異なる設定のSAMとの比較<a class="anchor" aria-label="anchor" href="#vpa%E3%82%84%E7%95%B0%E3%81%AA%E3%82%8B%E8%A8%AD%E5%AE%9A%E3%81%AEsam%E3%81%A8%E3%81%AE%E6%AF%94%E8%BC%83"></a>
+</h4>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">## VPAもやってみる</span></span>
 <span><span class="va">res_vpa</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/frasyr/man/vpa.html" class="external-link">vpa</a></span><span class="op">(</span><span class="va">dat</span>,fc.year<span class="op">=</span><span class="fl">1998</span><span class="op">:</span><span class="fl">2000</span>,tf.year <span class="op">=</span> <span class="fl">1998</span><span class="op">:</span><span class="fl">1999</span>,</span>
 <span>               term.F<span class="op">=</span><span class="st">"max"</span>,stat.tf<span class="op">=</span><span class="st">"mean"</span>,Pope<span class="op">=</span><span class="cn">TRUE</span>,tune<span class="op">=</span><span class="cn">TRUE</span>,p.init<span class="op">=</span><span class="fl">0.5</span>, abund<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"SSB"</span>,<span class="st">"N"</span><span class="op">)</span>, min.age<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">0</span><span class="op">)</span>, max.age<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">6</span>,<span class="fl">0</span><span class="op">)</span>, sel.update<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
@@ -331,9 +339,13 @@
 <span><span class="va">gg_graph1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/frasyr/man/plot_vpa.html" class="external-link">plot_vpa</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>VPA<span class="op">=</span><span class="va">res_vpa</span>, SAM<span class="op">=</span><span class="va">res_sam</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">gg_graph2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/frasyr/man/plot_vpa.html" class="external-link">plot_vpa</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>VPA<span class="op">=</span><span class="va">res_vpa</span>, SAM<span class="op">=</span><span class="va">res_sam</span><span class="op">)</span>, what.plot<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"fishing_mortality"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">gg_graph1</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">gg_graph2</span><span class="op">)</span></span>
-<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">gg_graph1</span><span class="op">)</span></span></code></pre></div>
+<p><img src="sam_files/figure-html/comparison-1.png" width="100%" style="display: block; margin: auto;"></p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">gg_graph2</span><span class="op">)</span></span></code></pre></div>
+<p><img src="sam_files/figure-html/comparison-2.png" width="100%" style="display: block; margin: auto;"></p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
 <span></span>
 <span><span class="co">## 設定を少し変えてもう一度実行する場合</span></span>
 <span><span class="va">sam_input</span> <span class="op">&lt;-</span> <span class="va">res_sam</span><span class="op">$</span><span class="va">input</span> <span class="co"># samに渡した引数のリスト</span></span>
@@ -342,45 +354,45 @@
 <span><span class="va">res_sam2</span><span class="op">$</span><span class="va">opt</span> <span class="co">#収束している</span></span>
 <span><span class="co">#&gt; $par</span></span>
 <span><span class="co">#&gt;         logQ         logQ logSdLogFsta    logSdLogN  logSdLogObs  logSdLogObs </span></span>
-<span><span class="co">#&gt;     9.567369    -7.182519    -2.088952    -1.693182    -2.254609    -1.415567 </span></span>
+<span><span class="co">#&gt;     9.512568    -7.296031    -2.061695    -1.834227    -2.377935    -1.437568 </span></span>
 <span><span class="co">#&gt;  logSdLogObs     rec_loga     rec_logb </span></span>
-<span><span class="co">#&gt;    -1.671908     2.347437   -20.512563 </span></span>
+<span><span class="co">#&gt;    -1.110561     2.382367   -19.094873 </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $objective</span></span>
-<span><span class="co">#&gt; [1] -18.62319</span></span>
+<span><span class="co">#&gt; [1] -19.7347</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $convergence</span></span>
 <span><span class="co">#&gt; [1] 0</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $iterations</span></span>
-<span><span class="co">#&gt; [1] 85</span></span>
+<span><span class="co">#&gt; [1] 78</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $evaluations</span></span>
 <span><span class="co">#&gt; function gradient </span></span>
-<span><span class="co">#&gt;      112       86 </span></span>
+<span><span class="co">#&gt;      105       79 </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $message</span></span>
 <span><span class="co">#&gt; [1] "relative convergence (4)"</span></span>
 <span><span class="va">res_sam2</span><span class="op">$</span><span class="va">rep</span> <span class="co">#sdreportの結果</span></span>
 <span><span class="co">#&gt; sdreport(.) result</span></span>
 <span><span class="co">#&gt;                Estimate   Std. Error</span></span>
-<span><span class="co">#&gt; logQ           9.567369 9.020410e-02</span></span>
-<span><span class="co">#&gt; logQ          -7.182519 7.350979e-02</span></span>
-<span><span class="co">#&gt; logSdLogFsta  -2.088952 2.715267e-01</span></span>
-<span><span class="co">#&gt; logSdLogN     -1.693182 2.618395e-01</span></span>
-<span><span class="co">#&gt; logSdLogObs   -2.254609 1.126745e-01</span></span>
-<span><span class="co">#&gt; logSdLogObs   -1.415567 2.355007e-01</span></span>
-<span><span class="co">#&gt; logSdLogObs   -1.671908 2.441719e-01</span></span>
-<span><span class="co">#&gt; rec_loga       2.347437 6.843250e-02</span></span>
-<span><span class="co">#&gt; rec_logb     -20.512563 4.122388e+04</span></span>
-<span><span class="co">#&gt; Maximum gradient component: 5.003338e-05</span></span>
+<span><span class="co">#&gt; logQ           9.512568 9.125255e-02</span></span>
+<span><span class="co">#&gt; logQ          -7.296031 1.177387e-01</span></span>
+<span><span class="co">#&gt; logSdLogFsta  -2.061695 2.787371e-01</span></span>
+<span><span class="co">#&gt; logSdLogN     -1.834227 2.616238e-01</span></span>
+<span><span class="co">#&gt; logSdLogObs   -2.377935 1.120733e-01</span></span>
+<span><span class="co">#&gt; logSdLogObs   -1.437568 2.347150e-01</span></span>
+<span><span class="co">#&gt; logSdLogObs   -1.110561 2.293440e-01</span></span>
+<span><span class="co">#&gt; rec_loga       2.382367 5.989813e-02</span></span>
+<span><span class="co">#&gt; rec_logb     -19.094873 2.338457e+04</span></span>
+<span><span class="co">#&gt; Maximum gradient component: 4.651708e-06</span></span>
 <span><span class="va">res_sam2</span><span class="op">$</span><span class="va">rep</span><span class="op">$</span><span class="va">pdHess</span> <span class="co">#Hessianが正定値を持つかどうか（持たない場合SEが計算できない）</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span>
 <span></span>
 <span><span class="co">## 2つのモデルのAICの比較</span></span>
 <span><span class="co">## - 選択率一定モデルのほうがAICが小さい（＝より予測力が高い）</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">res_sam</span><span class="op">$</span><span class="va">aic</span>, <span class="va">res_sam2</span><span class="op">$</span><span class="va">aic</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1]   7.493301 -19.246374</span></span>
+<span><span class="co">#&gt; [1]   9.390811 -21.469394</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">res_sam</span><span class="op">$</span><span class="va">rho</span>, <span class="va">res_sam2</span><span class="op">$</span><span class="va">rho</span><span class="op">)</span> <span class="co">#Fの相関係数</span></span>
 <span><span class="co">#&gt; [1] 0 1</span></span>
@@ -390,55 +402,54 @@
 <span><span class="va">res_sam3</span><span class="op">$</span><span class="va">opt</span>　</span>
 <span><span class="co">#&gt; $par</span></span>
 <span><span class="co">#&gt;         logQ         logQ logSdLogFsta    logSdLogN  logSdLogObs  logSdLogObs </span></span>
-<span><span class="co">#&gt;     9.557986    -7.189545    -2.080289    -1.113911    -2.250367    -1.430761 </span></span>
+<span><span class="co">#&gt;     9.505219    -7.303391    -2.047747    -1.254582    -2.374554    -1.444442 </span></span>
 <span><span class="co">#&gt;  logSdLogObs </span></span>
-<span><span class="co">#&gt;    -1.665477 </span></span>
+<span><span class="co">#&gt;    -1.108991 </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $objective</span></span>
-<span><span class="co">#&gt; [1] -13.58094</span></span>
+<span><span class="co">#&gt; [1] -14.68522</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $convergence</span></span>
 <span><span class="co">#&gt; [1] 0</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $iterations</span></span>
-<span><span class="co">#&gt; [1] 48</span></span>
+<span><span class="co">#&gt; [1] 53</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $evaluations</span></span>
 <span><span class="co">#&gt; function gradient </span></span>
-<span><span class="co">#&gt;       66       48 </span></span>
+<span><span class="co">#&gt;       84       53 </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $message</span></span>
-<span><span class="co">#&gt; [1] "both X-convergence and relative convergence (5)"</span></span>
+<span><span class="co">#&gt; [1] "relative convergence (4)"</span></span>
 <span><span class="va">res_sam3</span><span class="op">$</span><span class="va">rep</span></span>
 <span><span class="co">#&gt; sdreport(.) result</span></span>
 <span><span class="co">#&gt;               Estimate Std. Error</span></span>
-<span><span class="co">#&gt; logQ          9.557986 0.09000536</span></span>
-<span><span class="co">#&gt; logQ         -7.189545 0.07421993</span></span>
-<span><span class="co">#&gt; logSdLogFsta -2.080289 0.27342451</span></span>
-<span><span class="co">#&gt; logSdLogN    -1.113911 0.25226177</span></span>
-<span><span class="co">#&gt; logSdLogObs  -2.250367 0.11344229</span></span>
-<span><span class="co">#&gt; logSdLogObs  -1.430761 0.23392965</span></span>
-<span><span class="co">#&gt; logSdLogObs  -1.665477 0.24375664</span></span>
-<span><span class="co">#&gt; Maximum gradient component: 2.588278e-06</span></span>
+<span><span class="co">#&gt; logQ          9.505219 0.09135781</span></span>
+<span><span class="co">#&gt; logQ         -7.303391 0.11811402</span></span>
+<span><span class="co">#&gt; logSdLogFsta -2.047747 0.28031293</span></span>
+<span><span class="co">#&gt; logSdLogN    -1.254582 0.25257649</span></span>
+<span><span class="co">#&gt; logSdLogObs  -2.374554 0.11286891</span></span>
+<span><span class="co">#&gt; logSdLogObs  -1.444442 0.23289432</span></span>
+<span><span class="co">#&gt; logSdLogObs  -1.108991 0.22963190</span></span>
+<span><span class="co">#&gt; Maximum gradient component: 0.0001249072</span></span>
 <span><span class="va">res_sam3</span><span class="op">$</span><span class="va">rep</span><span class="op">$</span><span class="va">pdHess</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">res_sam</span><span class="op">$</span><span class="va">aic</span>, <span class="va">res_sam2</span><span class="op">$</span><span class="va">aic</span>, <span class="va">res_sam3</span><span class="op">$</span><span class="va">aic</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1]   7.493301 -19.246374 -13.161880</span></span>
+<span><span class="co">#&gt; [1]   9.390811 -21.469394 -15.370439</span></span>
 <span></span>
 <span></span>
 <span><span class="co">## SAMだけの比較 (fishing_mortalityはFの平均？)</span></span>
 <span><span class="co">## - 信頼区間付きバージョン</span></span>
 <span><span class="co">## - VPAの結果も並列で示せるが、その場合vpa関数の実行にはTMB=TRUEオプションをつける必要あり</span></span>
 <span><span class="fu"><a href="../reference/plot_samvpa.html">plot_samvpa</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>SAM<span class="op">=</span><span class="va">res_sam</span>, SAM2<span class="op">=</span><span class="va">res_sam2</span>,SAM3<span class="op">=</span><span class="va">res_sam3</span><span class="op">)</span>,</span>
-<span>            what.plot <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"biomass"</span>,<span class="st">"SSB"</span>,<span class="st">"Recruitment"</span>,<span class="st">"U"</span>,<span class="st">"catch"</span>,<span class="st">"fishing_mortality"</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co">## 結果の出力</span></span>
-<span><span class="co">## - 境さん関数(make_assess_result)</span></span>
-<span><span class="co">## - out.vpa(out_samなら動く)、convert_vpa_tibbleも動くようにしたい</span></span>
-<span><span class="va">res_samdata</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/make_assess_result.html">make_assess_result</a></span><span class="op">(</span><span class="va">res_sam</span><span class="op">)</span></span>
-<span></span>
+<span>            what.plot <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"biomass"</span>,<span class="st">"SSB"</span>,<span class="st">"Recruitment"</span>,<span class="st">"U"</span>,<span class="st">"catch"</span>,<span class="st">"fishing_mortality"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p><img src="sam_files/figure-html/comparison-3.png" width="100%" style="display: block; margin: auto;"></p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
 <span><span class="co">## F at age by year (境さんコード、関数化必要？時系列が長い場合への対応が必要)</span></span>
+<span><span class="va">res_samdata</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/make_assess_result.html">make_assess_result</a></span><span class="op">(</span><span class="va">res_sam</span><span class="op">)</span>　<span class="co"># 境さん関数(make_assess_result)</span></span>
+<span></span>
 <span><span class="op">(</span><span class="va">gg</span> <span class="op">&lt;-</span> <span class="va">res_samdata</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">stat</span><span class="op">==</span><span class="st">"faa"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_ribbon.html" class="external-link">geom_ribbon</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">Age</span>, ymax<span class="op">=</span><span class="va">upper</span>, ymin<span class="op">=</span><span class="va">lower</span>, group<span class="op">=</span><span class="va">Model</span>, fill<span class="op">=</span><span class="va">Model</span><span class="op">)</span>, alpha<span class="op">=</span><span class="fl">0.5</span><span class="op">)</span> <span class="op">+</span></span>
@@ -453,8 +464,10 @@
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>axis.text.x <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">11</span>, color <span class="op">=</span> <span class="st">"black"</span><span class="op">)</span>,</span>
 <span>          axis.text.y <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">11</span>, color <span class="op">=</span> <span class="st">"black"</span><span class="op">)</span>,</span>
 <span>          axis.line.x <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_line</a></span><span class="op">(</span>linewidth <span class="op">=</span> <span class="fl">0.3528</span><span class="op">)</span>, axis.line.y <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_line</a></span><span class="op">(</span>linewidth <span class="op">=</span> <span class="fl">0.3528</span><span class="op">)</span>,</span>
-<span>          axis.minor.ticks.length <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">rel</a></span><span class="op">(</span><span class="fl">0.5</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
+<span>          axis.minor.ticks.length <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">rel</a></span><span class="op">(</span><span class="fl">0.5</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p><img src="sam_files/figure-html/comparison-4.png" width="100%" style="display: block; margin: auto;"></p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
 <span><span class="co">## F at age by year</span></span>
 <span><span class="op">(</span><span class="va">gg</span> <span class="op">&lt;-</span> <span class="va">res_samdata</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">stat</span><span class="op">==</span><span class="st">"faa"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>Age<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">Age</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
@@ -472,7 +485,8 @@
 <span>          axis.text.y <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">11</span>, color <span class="op">=</span> <span class="st">"black"</span><span class="op">)</span>,</span>
 <span>          axis.line.x <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_line</a></span><span class="op">(</span>linewidth <span class="op">=</span> <span class="fl">0.3528</span><span class="op">)</span>, axis.line.y <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_line</a></span><span class="op">(</span>linewidth <span class="op">=</span> <span class="fl">0.3528</span><span class="op">)</span>,</span>
 <span>          axis.minor.ticks.length <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">rel</a></span><span class="op">(</span><span class="fl">0.5</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="sam_files/figure-html/load_data-1.png" width="100%" style="display: block; margin: auto;"><img src="sam_files/figure-html/load_data-2.png" width="100%" style="display: block; margin: auto;"><img src="sam_files/figure-html/load_data-3.png" width="100%" style="display: block; margin: auto;"><img src="sam_files/figure-html/load_data-4.png" width="100%" style="display: block; margin: auto;"><img src="sam_files/figure-html/load_data-5.png" width="100%" style="display: block; margin: auto;"></p>
+<p><img src="sam_files/figure-html/comparison-5.png" width="100%" style="display: block; margin: auto;"></p>
+</div>
 </div>
 </div>
 <div class="section level2">
@@ -487,24 +501,279 @@
 </ul>
 </li>
 </ul>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## varF(Fのプロセス誤差)とvarC（CAAの観測誤差）をどの年齢間で分けるかをstepAICで検討する</span></span>
 <span></span>
 <span><span class="co"># いまは1歳魚以上のvarNを固定しているが、それも検討することも可能</span></span>
 <span><span class="co"># 検討する変数(VarF, VarC)を境界を入れる年齢Xについてのデータを生成(varとXを列名に使用)</span></span>
 <span><span class="co"># ここでは収束しやすさからRWの場合を使用する（BHを使うとlog(b)-&gt;-InfになりSEが発散する</span></span>
 <span><span class="va">grid</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/expand.grid.html" class="external-link">expand.grid</a></span><span class="op">(</span>var<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"varF"</span>,<span class="st">"varC"</span><span class="op">)</span>,X<span class="op">=</span><span class="fl">1</span><span class="op">:</span><span class="fl">6</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="op">(</span><span class="va">var</span> <span class="op">==</span> <span class="st">"varF"</span> <span class="op">&amp;</span> <span class="va">X</span> <span class="op">==</span> <span class="fl">6</span><span class="op">)</span><span class="op">)</span> <span class="co">#5-6歳のFは同じと仮定しているので6歳は不要なので除いておく</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="op">(</span><span class="va">var</span> <span class="op">==</span> <span class="st">"varF"</span> <span class="op">&amp;</span> <span class="va">X</span> <span class="op">==</span> <span class="fl">6</span><span class="op">)</span><span class="op">)</span> <span class="co">#5-6歳のFは同じと仮定しており6歳は不要なので除いておく</span></span>
 <span></span>
 <span><span class="va">res_select</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/select_sigma_grid.html">select_sigma_grid</a></span><span class="op">(</span></span>
-<span>  <span class="va">res_sam2</span>, grid<span class="op">=</span><span class="va">grid</span>, check_converge <span class="op">=</span> <span class="cn">TRUE</span>, SEmax<span class="op">=</span><span class="cn">Inf</span><span class="op">)</span> <span class="co"># convergeしてるもののうちAIC最少を選ぶように変更</span></span>
+<span>  <span class="va">res_sam3</span>, grid<span class="op">=</span><span class="va">grid</span>, check_converge <span class="op">=</span> <span class="cn">TRUE</span>, SEmax<span class="op">=</span><span class="cn">Inf</span><span class="op">)</span> <span class="co"># </span></span>
+<span></span>
+<span><span class="co"># stage 0 が元のモデル</span></span>
+<span><span class="co"># varがどの分散を分けたか</span></span>
+<span><span class="co"># whichはどの年齢で分けたか（1なら0歳と1歳魚以上で分ける）</span></span>
+<span><span class="co"># AIC最少の分け方をして、AICが下がらなくなるまで実行</span></span>
+<span><span class="co"># selectedはステージ内でAIC最少、bestは検討したすべてのモデルでAIC最少</span></span>
+<span><span class="va">res_select</span><span class="op">$</span><span class="va">tbl_sigma</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<table style="width:100%;" class="table">
+<colgroup>
+<col width="9%">
+<col width="15%">
+<col width="18%">
+<col width="10%">
+<col width="15%">
+<col width="7%">
+<col width="9%">
+<col width="13%">
+</colgroup>
+<thead><tr class="header">
+<th align="right">stage</th>
+<th align="right">AIC</th>
+<th align="right">convergence</th>
+<th align="left">pdHess</th>
+<th align="right">maxSE</th>
+<th align="left">var</th>
+<th align="right">which</th>
+<th align="left">model</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="right">0</td>
+<td align="right">-15.37044</td>
+<td align="right">0</td>
+<td align="left">TRUE</td>
+<td align="right">0.2803129</td>
+<td align="left">NA</td>
+<td align="right">NA</td>
+<td align="left">selected</td>
+</tr>
+<tr class="even">
+<td align="right">1</td>
+<td align="right">-16.17782</td>
+<td align="right">0</td>
+<td align="left">TRUE</td>
+<td align="right">0.3434833</td>
+<td align="left">varF</td>
+<td align="right">1</td>
+<td align="left">best</td>
+</tr>
+<tr class="odd">
+<td align="right">1</td>
+<td align="right">70.30363</td>
+<td align="right">1</td>
+<td align="left">FALSE</td>
+<td align="right">0.3066315</td>
+<td align="left">varC</td>
+<td align="right">1</td>
+<td align="left">NA</td>
+</tr>
+<tr class="even">
+<td align="right">1</td>
+<td align="right">-15.20191</td>
+<td align="right">1</td>
+<td align="left">TRUE</td>
+<td align="right">0.2926398</td>
+<td align="left">varF</td>
+<td align="right">2</td>
+<td align="left">NA</td>
+</tr>
+<tr class="odd">
+<td align="right">1</td>
+<td align="right">-13.64304</td>
+<td align="right">1</td>
+<td align="left">TRUE</td>
+<td align="right">0.2808002</td>
+<td align="left">varC</td>
+<td align="right">2</td>
+<td align="left">NA</td>
+</tr>
+<tr class="even">
+<td align="right">1</td>
+<td align="right">-13.38721</td>
+<td align="right">0</td>
+<td align="left">TRUE</td>
+<td align="right">0.2896330</td>
+<td align="left">varF</td>
+<td align="right">3</td>
+<td align="left">NA</td>
+</tr>
+<tr class="odd">
+<td align="right">1</td>
+<td align="right">-13.37596</td>
+<td align="right">1</td>
+<td align="left">TRUE</td>
+<td align="right">0.2804344</td>
+<td align="left">varC</td>
+<td align="right">3</td>
+<td align="left">NA</td>
+</tr>
+<tr class="even">
+<td align="right">1</td>
+<td align="right">-14.33871</td>
+<td align="right">1</td>
+<td align="left">TRUE</td>
+<td align="right">0.2845544</td>
+<td align="left">varF</td>
+<td align="right">4</td>
+<td align="left">NA</td>
+</tr>
+<tr class="odd">
+<td align="right">1</td>
+<td align="right">-13.40533</td>
+<td align="right">0</td>
+<td align="left">TRUE</td>
+<td align="right">0.2806029</td>
+<td align="left">varC</td>
+<td align="right">4</td>
+<td align="left">NA</td>
+</tr>
+<tr class="even">
+<td align="right">1</td>
+<td align="right">-15.81438</td>
+<td align="right">1</td>
+<td align="left">TRUE</td>
+<td align="right">0.2892509</td>
+<td align="left">varF</td>
+<td align="right">5</td>
+<td align="left">NA</td>
+</tr>
+<tr class="odd">
+<td align="right">1</td>
+<td align="right">-13.66380</td>
+<td align="right">1</td>
+<td align="left">TRUE</td>
+<td align="right">0.2789667</td>
+<td align="left">varC</td>
+<td align="right">5</td>
+<td align="left">NA</td>
+</tr>
+<tr class="even">
+<td align="right">1</td>
+<td align="right">-13.78186</td>
+<td align="right">0</td>
+<td align="left">TRUE</td>
+<td align="right">0.4950590</td>
+<td align="left">varC</td>
+<td align="right">6</td>
+<td align="left">NA</td>
+</tr>
+<tr class="odd">
+<td align="right">2</td>
+<td align="right">68.47550</td>
+<td align="right">1</td>
+<td align="left">FALSE</td>
+<td align="right">3.5031052</td>
+<td align="left">varC</td>
+<td align="right">1</td>
+<td align="left">NA</td>
+</tr>
+<tr class="even">
+<td align="right">2</td>
+<td align="right">-14.57080</td>
+<td align="right">1</td>
+<td align="left">TRUE</td>
+<td align="right">0.3559270</td>
+<td align="left">varF</td>
+<td align="right">2</td>
+<td align="left">NA</td>
+</tr>
+<tr class="odd">
+<td align="right">2</td>
+<td align="right">-15.13593</td>
+<td align="right">0</td>
+<td align="left">TRUE</td>
+<td align="right">0.3199824</td>
+<td align="left">varC</td>
+<td align="right">2</td>
+<td align="left">NA</td>
+</tr>
+<tr class="even">
+<td align="right">2</td>
+<td align="right">-14.64335</td>
+<td align="right">0</td>
+<td align="left">TRUE</td>
+<td align="right">0.3457028</td>
+<td align="left">varF</td>
+<td align="right">3</td>
+<td align="left">NA</td>
+</tr>
+<tr class="odd">
+<td align="right">2</td>
+<td align="right">-14.25631</td>
+<td align="right">0</td>
+<td align="left">TRUE</td>
+<td align="right">0.3436794</td>
+<td align="left">varC</td>
+<td align="right">3</td>
+<td align="left">NA</td>
+</tr>
+<tr class="even">
+<td align="right">2</td>
+<td align="right">-14.26322</td>
+<td align="right">1</td>
+<td align="left">TRUE</td>
+<td align="right">0.3400563</td>
+<td align="left">varF</td>
+<td align="right">4</td>
+<td align="left">NA</td>
+</tr>
+<tr class="odd">
+<td align="right">2</td>
+<td align="right">-14.25064</td>
+<td align="right">1</td>
+<td align="left">TRUE</td>
+<td align="right">0.3432627</td>
+<td align="left">varC</td>
+<td align="right">4</td>
+<td align="left">NA</td>
+</tr>
+<tr class="even">
+<td align="right">2</td>
+<td align="right">-15.45370</td>
+<td align="right">1</td>
+<td align="left">TRUE</td>
+<td align="right">0.3382439</td>
+<td align="left">varF</td>
+<td align="right">5</td>
+<td align="left">NA</td>
+</tr>
+<tr class="odd">
+<td align="right">2</td>
+<td align="right">-14.71694</td>
+<td align="right">0</td>
+<td align="left">TRUE</td>
+<td align="right">0.3587414</td>
+<td align="left">varC</td>
+<td align="right">5</td>
+<td align="left">NA</td>
+</tr>
+<tr class="even">
+<td align="right">2</td>
+<td align="right">-15.15816</td>
+<td align="right">0</td>
+<td align="left">TRUE</td>
+<td align="right">0.5952348</td>
+<td align="left">varC</td>
+<td align="right">6</td>
+<td align="left">selected</td>
+</tr>
+</tbody>
+</table>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span></span>
 <span><span class="co">## Best modelの結果チェック</span></span>
 <span><span class="co"># FAAの誤差が0歳と1歳以上で分かれる</span></span>
+<span><span class="va">res_best</span> <span class="op">&lt;-</span> <span class="va">res_select</span><span class="op">$</span><span class="va">bestres</span> <span class="co">#AIC最少をベストモデルとする</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span></span>
 <span>  <span class="st">"Age"</span> <span class="op">=</span> <span class="fl">0</span><span class="op">:</span><span class="fl">6</span>,</span>
-<span>  <span class="st">"SD_caa"</span> <span class="op">=</span> <span class="va">res_select</span><span class="op">$</span><span class="va">bestres</span><span class="op">$</span><span class="va">sigma.logC</span>,</span>
-<span>  <span class="st">"SD_faa"</span> <span class="op">=</span> <span class="va">res_select</span><span class="op">$</span><span class="va">bestres</span><span class="op">$</span><span class="va">sigma.logF</span>,</span>
-<span>  <span class="st">"SD_naa"</span> <span class="op">=</span> <span class="va">res_select</span><span class="op">$</span><span class="va">bestres</span><span class="op">$</span><span class="va">sigma.logN</span></span>
+<span>  <span class="st">"SD_caa"</span> <span class="op">=</span> <span class="va">res_best</span><span class="op">$</span><span class="va">sigma.logC</span>,</span>
+<span>  <span class="st">"SD_faa"</span> <span class="op">=</span> <span class="va">res_best</span><span class="op">$</span><span class="va">sigma.logF</span>,</span>
+<span>  <span class="st">"SD_naa"</span> <span class="op">=</span> <span class="va">res_best</span><span class="op">$</span><span class="va">sigma.logN</span></span>
 <span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <table class="table">
 <thead><tr class="header">
@@ -516,108 +785,625 @@
 <tbody>
 <tr class="odd">
 <td align="right">0</td>
-<td align="right">0.1049146</td>
-<td align="right">0.1238168</td>
-<td align="right">0.1839333</td>
+<td align="right">0.0898453</td>
+<td align="right">0.0988359</td>
+<td align="right">0.2748462</td>
 </tr>
 <tr class="even">
 <td align="right">1</td>
-<td align="right">0.1049146</td>
-<td align="right">0.1238168</td>
+<td align="right">0.0898453</td>
+<td align="right">0.1475825</td>
 <td align="right">0.0100000</td>
 </tr>
 <tr class="odd">
 <td align="right">2</td>
-<td align="right">0.1049146</td>
-<td align="right">0.1238168</td>
+<td align="right">0.0898453</td>
+<td align="right">0.1475825</td>
 <td align="right">0.0100000</td>
 </tr>
 <tr class="even">
 <td align="right">3</td>
-<td align="right">0.1049146</td>
-<td align="right">0.1238168</td>
+<td align="right">0.0898453</td>
+<td align="right">0.1475825</td>
 <td align="right">0.0100000</td>
 </tr>
 <tr class="odd">
 <td align="right">4</td>
-<td align="right">0.1049146</td>
-<td align="right">0.1238168</td>
+<td align="right">0.0898453</td>
+<td align="right">0.1475825</td>
 <td align="right">0.0100000</td>
 </tr>
 <tr class="even">
 <td align="right">5</td>
-<td align="right">0.1049146</td>
-<td align="right">0.1238168</td>
+<td align="right">0.0898453</td>
+<td align="right">0.1475825</td>
 <td align="right">0.0100000</td>
 </tr>
 <tr class="odd">
 <td align="right">6</td>
-<td align="right">0.1049146</td>
-<td align="right">0.1238168</td>
+<td align="right">0.0898453</td>
+<td align="right">0.1475825</td>
 <td align="right">0.0100000</td>
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
-<span><span class="va">res_best</span> <span class="op">&lt;-</span> <span class="va">res_select</span><span class="op">$</span><span class="va">bestres</span> <span class="co">#AIC最少をベストモデルとする</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="再生産関係のプロット">再生産関係のプロット<a class="anchor" aria-label="anchor" href="#%E5%86%8D%E7%94%9F%E7%94%A3%E9%96%A2%E4%BF%82%E3%81%AE%E3%83%97%E3%83%AD%E3%83%83%E3%83%88"></a>
 </h2>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co">## 単純なプロット</span></span>
-<span><span class="fu"><a href="../reference/plot_SR_simple.html">plot_SR_simple</a></span><span class="op">(</span><span class="va">res_best</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="../reference/plot_SR_simple.html">plot_SR_simple</a></span><span class="op">(</span><span class="va">res_sam2</span><span class="op">)</span> <span class="co">#BHモデルを例に</span></span></code></pre></div>
 <p><img src="sam_files/figure-html/plot_SR_simple-1.png" width="100%" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co">## SAMの結果からfraysrで使える再生産関係のオブジェクトを作成するとfrasyrの関数が使える</span></span>
-<span><span class="va">SR_sam0</span> <span class="op">&lt;-</span> <span class="va">res_best</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="va">make_SRres</span></span>
-<span><span class="va">biopar</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/frasyr/man/derive_biopar.html" class="external-link">derive_biopar</a></span><span class="op">(</span><span class="va">res_best</span>, derive_year<span class="op">=</span><span class="fl">1998</span><span class="op">:</span><span class="fl">2000</span><span class="op">)</span></span>
+<span><span class="va">SR_sam0</span> <span class="op">&lt;-</span> <span class="va">res_sam2</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="va">make_SRres</span></span>
+<span><span class="va">biopar</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/frasyr/man/derive_biopar.html" class="external-link">derive_biopar</a></span><span class="op">(</span><span class="va">res_sam2</span>, derive_year<span class="op">=</span><span class="fl">1998</span><span class="op">:</span><span class="fl">2000</span><span class="op">)</span></span>
 <span><span class="co">## steepness, R0, B0, 決定論的なMSY管理基準値の計算</span></span>
 <span><span class="va">steepness_sam</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/frasyr/man/calc_steepness.html" class="external-link">calc_steepness</a></span><span class="op">(</span>SR<span class="op">=</span><span class="st">"BH"</span>, rec_pars<span class="op">=</span><span class="va">SR_sam0</span><span class="op">$</span><span class="va">pars</span>,M<span class="op">=</span><span class="va">biopar</span><span class="op">$</span><span class="va">M</span>, waa<span class="op">=</span><span class="va">biopar</span><span class="op">$</span><span class="va">waa</span>, maa<span class="op">=</span><span class="va">biopar</span><span class="op">$</span><span class="va">maa</span>, faa<span class="op">=</span><span class="va">biopar</span><span class="op">$</span><span class="va">faa</span><span class="op">)</span></span>
 <span><span class="co">## 再生産関係に依存しない管理基準値の計算(frasyr::ref.F)</span></span>
 <span><span class="co"># FcurrentとPope=FALSEを明示的に引数に含める必要がある</span></span>
-<span><span class="va">Fcurrent</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">rowMeans</a></span><span class="op">(</span><span class="va">res_best</span><span class="op">$</span><span class="va">faa</span><span class="op">[</span>,<span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="fl">1998</span><span class="op">:</span><span class="fl">2000</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="va">refF_res</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/frasyr/man/ref.F.html" class="external-link">ref.F</a></span><span class="op">(</span><span class="va">res_best</span>,Fcurrent<span class="op">=</span><span class="va">Fcurrent</span>,Pope<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">Fcurrent</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">rowMeans</a></span><span class="op">(</span><span class="va">res_sam2</span><span class="op">$</span><span class="va">faa</span><span class="op">[</span>,<span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="fl">1998</span><span class="op">:</span><span class="fl">2000</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="va">refF_res</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/frasyr/man/ref.F.html" class="external-link">ref.F</a></span><span class="op">(</span><span class="va">res_sam2</span>,Fcurrent<span class="op">=</span><span class="va">Fcurrent</span>,Pope<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="sam_files/figure-html/plot_SR_simple-2.png" width="100%" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">refF_res</span><span class="op">$</span><span class="va">summary</span></span>
 <span><span class="co">#&gt;            Fcurrent Fmed Flow Fhigh      Fmax      F0.1 Fmean FpSPR.10.SPR</span></span>
-<span><span class="co">#&gt; max       0.4871229   NA   NA    NA 0.5623093 0.3412731    NA    0.6748425</span></span>
-<span><span class="co">#&gt; mean      0.4322984  NaN  NaN   NaN 0.4990227 0.3028636   NaN    0.5988906</span></span>
-<span><span class="co">#&gt; Fref/Fcur 1.0000000   NA   NA    NA 1.1543478 0.7005893    NA    1.3853640</span></span>
+<span><span class="co">#&gt; max       0.4565963   NA   NA    NA 0.5620096 0.3383543    NA    0.6752882</span></span>
+<span><span class="co">#&gt; mean      0.4121442  NaN  NaN   NaN 0.5072950 0.3054137   NaN    0.6095454</span></span>
+<span><span class="co">#&gt; Fref/Fcur 1.0000000   NA   NA    NA 1.2308677 0.7410360    NA    1.4789612</span></span>
 <span><span class="co">#&gt;           FpSPR.20.SPR FpSPR.30.SPR FpSPR.40.SPR FpSPR.50.SPR FpSPR.60.SPR</span></span>
-<span><span class="co">#&gt; max          0.4387275    0.3144842    0.2320948    0.1713765    0.1237870</span></span>
-<span><span class="co">#&gt; mean         0.3893498    0.2790898    0.2059731    0.1520884    0.1098550</span></span>
-<span><span class="co">#&gt; Fref/Fcur    0.9006505    0.6455952    0.4764605    0.3518136    0.2541186</span></span>
+<span><span class="co">#&gt; max          0.4380875    0.3135295    0.2310909    0.1704472    0.1229955</span></span>
+<span><span class="co">#&gt; mean         0.3954374    0.2830058    0.2085930    0.1538533    0.1110212</span></span>
+<span><span class="co">#&gt; Fref/Fcur    0.9594637    0.6866668    0.5061164    0.3732996    0.2693746</span></span>
 <span><span class="co">#&gt;           FpSPR.70.SPR FpSPR.80.SPR FpSPR.90.SPR</span></span>
-<span><span class="co">#&gt; max         0.08495827   0.05235453   0.02438887</span></span>
-<span><span class="co">#&gt; mean        0.07539642   0.04646215   0.02164396</span></span>
-<span><span class="co">#&gt; Fref/Fcur   0.17440828   0.10747704   0.05006718</span></span></code></pre></div>
+<span><span class="co">#&gt; max         0.08434062   0.05193112   0.02417321</span></span>
+<span><span class="co">#&gt; mean        0.07612962   0.04687535   0.02181983</span></span>
+<span><span class="co">#&gt; Fref/Fcur   0.18471597   0.11373531   0.05294221</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="モデル診断">モデル診断<a class="anchor" aria-label="anchor" href="#%E3%83%A2%E3%83%87%E3%83%AB%E8%A8%BA%E6%96%AD"></a>
 </h2>
 <div class="section level3">
+<h3 id="jitter-analysis">jitter analysis<a class="anchor" aria-label="anchor" href="#jitter-analysis"></a>
+</h3>
+<ul>
+<li>初期値を変えて再推定し、目的関数（負の対数尤度）の値が変わらないかをチェックする</li>
+</ul>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">jitterres</span> <span class="op">=</span> <span class="fu"><a href="../reference/do_jitter.html">do_jitter</a></span><span class="op">(</span><span class="va">res_best</span>,SD<span class="op">=</span><span class="fl">0.1</span>,nsim<span class="op">=</span><span class="fl">100</span><span class="op">)</span> <span class="co">#SDは初期値を乱数発生させる際のSD</span></span>
+<span><span class="co">#&gt; 0: -16.089</span></span>
+<span><span class="co">#&gt; 1: -16.089</span></span>
+<span><span class="co">#&gt; 2: -16.089</span></span>
+<span><span class="co">#&gt; 3: -16.089</span></span>
+<span><span class="co">#&gt; 4: -16.089</span></span>
+<span><span class="co">#&gt; 5: -16.089</span></span>
+<span><span class="co">#&gt; 6: -16.089</span></span>
+<span><span class="co">#&gt; 7: -16.089</span></span>
+<span><span class="co">#&gt; 8: -16.089</span></span>
+<span><span class="co">#&gt; 9: -16.089</span></span>
+<span><span class="co">#&gt; 10: -16.089</span></span>
+<span><span class="co">#&gt; 11: -16.089</span></span>
+<span><span class="co">#&gt; 12: -16.089</span></span>
+<span><span class="co">#&gt; 13: -16.089</span></span>
+<span><span class="co">#&gt; 14: -16.089</span></span>
+<span><span class="co">#&gt; 15: -16.089</span></span>
+<span><span class="co">#&gt; 16: -16.089</span></span>
+<span><span class="co">#&gt; 17: -16.089</span></span>
+<span><span class="co">#&gt; 18: -16.089</span></span>
+<span><span class="co">#&gt; 19: -16.089</span></span>
+<span><span class="co">#&gt; 20: -16.089</span></span>
+<span><span class="co">#&gt; 21: -16.089</span></span>
+<span><span class="co">#&gt; 22: -16.089</span></span>
+<span><span class="co">#&gt; 23: -16.089</span></span>
+<span><span class="co">#&gt; 24: -16.089</span></span>
+<span><span class="co">#&gt; 25: -16.089</span></span>
+<span><span class="co">#&gt; 26: -16.089</span></span>
+<span><span class="co">#&gt; 27: -16.089</span></span>
+<span><span class="co">#&gt; 28: -16.089</span></span>
+<span><span class="co">#&gt; 29: -16.089</span></span>
+<span><span class="co">#&gt; 30: -16.089</span></span>
+<span><span class="co">#&gt; 31: -16.089</span></span>
+<span><span class="co">#&gt; 32: -16.089</span></span>
+<span><span class="co">#&gt; 33: -16.089</span></span>
+<span><span class="co">#&gt; 34: -16.089</span></span>
+<span><span class="co">#&gt; 35: -16.089</span></span>
+<span><span class="co">#&gt; 36: -16.089</span></span>
+<span><span class="co">#&gt; 37: -16.089</span></span>
+<span><span class="co">#&gt; 38: -16.089</span></span>
+<span><span class="co">#&gt; 39: -16.089</span></span>
+<span><span class="co">#&gt; 40: -16.089</span></span>
+<span><span class="co">#&gt; 41: -16.089</span></span>
+<span><span class="co">#&gt; 42: -16.089</span></span>
+<span><span class="co">#&gt; 43: -16.089</span></span>
+<span><span class="co">#&gt; 44: -16.089</span></span>
+<span><span class="co">#&gt; 45: -16.089</span></span>
+<span><span class="co">#&gt; 46: -16.089</span></span>
+<span><span class="co">#&gt; 47: -16.089</span></span>
+<span><span class="co">#&gt; 48: -16.089</span></span>
+<span><span class="co">#&gt; 49: -16.089</span></span>
+<span><span class="co">#&gt; 50: -16.089</span></span>
+<span><span class="co">#&gt; 51: -16.089</span></span>
+<span><span class="co">#&gt; 52: -16.089</span></span>
+<span><span class="co">#&gt; 53: -16.089</span></span>
+<span><span class="co">#&gt; 54: -16.089</span></span>
+<span><span class="co">#&gt; 55: -16.089</span></span>
+<span><span class="co">#&gt; 56: -16.089</span></span>
+<span><span class="co">#&gt; 57: -16.089</span></span>
+<span><span class="co">#&gt; 58: -16.089</span></span>
+<span><span class="co">#&gt; 59: -16.089</span></span>
+<span><span class="co">#&gt; 60: -16.089</span></span>
+<span><span class="co">#&gt; 61: -16.089</span></span>
+<span><span class="co">#&gt; 62: -16.089</span></span>
+<span><span class="co">#&gt; 63: -16.089</span></span>
+<span><span class="co">#&gt; 64: -16.089</span></span>
+<span><span class="co">#&gt; 65: -16.089</span></span>
+<span><span class="co">#&gt; 66: -16.089</span></span>
+<span><span class="co">#&gt; 67: -16.089</span></span>
+<span><span class="co">#&gt; 68: -16.089</span></span>
+<span><span class="co">#&gt; 69: -16.089</span></span>
+<span><span class="co">#&gt; 70: -16.089</span></span>
+<span><span class="co">#&gt; 71: -16.089</span></span>
+<span><span class="co">#&gt; 72: -16.089</span></span>
+<span><span class="co">#&gt; 73: -16.089</span></span>
+<span><span class="co">#&gt; 74: -16.089</span></span>
+<span><span class="co">#&gt; 75: -16.089</span></span>
+<span><span class="co">#&gt; 76: -16.089</span></span>
+<span><span class="co">#&gt; 77: -16.089</span></span>
+<span><span class="co">#&gt; 78: -16.089</span></span>
+<span><span class="co">#&gt; 79: -16.089</span></span>
+<span><span class="co">#&gt; 80: -16.089</span></span>
+<span><span class="co">#&gt; 81: -16.089</span></span>
+<span><span class="co">#&gt; 82: -16.089</span></span>
+<span><span class="co">#&gt; 83: -16.089</span></span>
+<span><span class="co">#&gt; 84: -16.089</span></span>
+<span><span class="co">#&gt; 85: -16.089</span></span>
+<span><span class="co">#&gt; 86: -16.089</span></span>
+<span><span class="co">#&gt; 87: 31.624</span></span>
+<span><span class="co">#&gt; 88: -16.089</span></span>
+<span><span class="co">#&gt; 89: -16.089</span></span>
+<span><span class="co">#&gt; 90: -16.089</span></span>
+<span><span class="co">#&gt; 91: -16.089</span></span>
+<span><span class="co">#&gt; 92: -16.089</span></span>
+<span><span class="co">#&gt; 93: -16.089</span></span>
+<span><span class="co">#&gt; 94: -16.089</span></span>
+<span><span class="co">#&gt; 95: -16.089</span></span>
+<span><span class="co">#&gt; 96: -16.089</span></span>
+<span><span class="co">#&gt; 97: -16.089</span></span>
+<span><span class="co">#&gt; 98: -16.089</span></span>
+<span><span class="co">#&gt; 99: -16.089</span></span>
+<span><span class="co">#&gt; 100: -16.089</span></span>
+<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">jitterres</span><span class="op">$</span><span class="va">resdat</span><span class="op">)</span> <span class="co">#変わらない</span></span></code></pre></div>
+<table class="table">
+<thead><tr class="header">
+<th align="right">ID</th>
+<th align="right">obj_value</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="right">0</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="even">
+<td align="right">1</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="odd">
+<td align="right">2</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="even">
+<td align="right">3</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="odd">
+<td align="right">4</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="even">
+<td align="right">5</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="odd">
+<td align="right">6</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="even">
+<td align="right">7</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="odd">
+<td align="right">8</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="even">
+<td align="right">9</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="odd">
+<td align="right">10</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="even">
+<td align="right">11</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="odd">
+<td align="right">12</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="even">
+<td align="right">13</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="odd">
+<td align="right">14</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="even">
+<td align="right">15</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="odd">
+<td align="right">16</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="even">
+<td align="right">17</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="odd">
+<td align="right">18</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="even">
+<td align="right">19</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="odd">
+<td align="right">20</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="even">
+<td align="right">21</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="odd">
+<td align="right">22</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="even">
+<td align="right">23</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="odd">
+<td align="right">24</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="even">
+<td align="right">25</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="odd">
+<td align="right">26</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="even">
+<td align="right">27</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="odd">
+<td align="right">28</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="even">
+<td align="right">29</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="odd">
+<td align="right">30</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="even">
+<td align="right">31</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="odd">
+<td align="right">32</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="even">
+<td align="right">33</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="odd">
+<td align="right">34</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="even">
+<td align="right">35</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="odd">
+<td align="right">36</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="even">
+<td align="right">37</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="odd">
+<td align="right">38</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="even">
+<td align="right">39</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="odd">
+<td align="right">40</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="even">
+<td align="right">41</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="odd">
+<td align="right">42</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="even">
+<td align="right">43</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="odd">
+<td align="right">44</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="even">
+<td align="right">45</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="odd">
+<td align="right">46</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="even">
+<td align="right">47</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="odd">
+<td align="right">48</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="even">
+<td align="right">49</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="odd">
+<td align="right">50</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="even">
+<td align="right">51</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="odd">
+<td align="right">52</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="even">
+<td align="right">53</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="odd">
+<td align="right">54</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="even">
+<td align="right">55</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="odd">
+<td align="right">56</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="even">
+<td align="right">57</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="odd">
+<td align="right">58</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="even">
+<td align="right">59</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="odd">
+<td align="right">60</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="even">
+<td align="right">61</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="odd">
+<td align="right">62</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="even">
+<td align="right">63</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="odd">
+<td align="right">64</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="even">
+<td align="right">65</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="odd">
+<td align="right">66</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="even">
+<td align="right">67</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="odd">
+<td align="right">68</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="even">
+<td align="right">69</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="odd">
+<td align="right">70</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="even">
+<td align="right">71</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="odd">
+<td align="right">72</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="even">
+<td align="right">73</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="odd">
+<td align="right">74</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="even">
+<td align="right">75</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="odd">
+<td align="right">76</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="even">
+<td align="right">77</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="odd">
+<td align="right">78</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="even">
+<td align="right">79</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="odd">
+<td align="right">80</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="even">
+<td align="right">81</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="odd">
+<td align="right">82</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="even">
+<td align="right">83</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="odd">
+<td align="right">84</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="even">
+<td align="right">85</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="odd">
+<td align="right">86</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="even">
+<td align="right">87</td>
+<td align="right">31.62361</td>
+</tr>
+<tr class="odd">
+<td align="right">88</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="even">
+<td align="right">89</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="odd">
+<td align="right">90</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="even">
+<td align="right">91</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="odd">
+<td align="right">92</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="even">
+<td align="right">93</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="odd">
+<td align="right">94</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="even">
+<td align="right">95</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="odd">
+<td align="right">96</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="even">
+<td align="right">97</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="odd">
+<td align="right">98</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="even">
+<td align="right">99</td>
+<td align="right">-16.08891</td>
+</tr>
+<tr class="odd">
+<td align="right">100</td>
+<td align="right">-16.08891</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section level3">
 <h3 id="残差プロット">残差プロット<a class="anchor" aria-label="anchor" href="#%E6%AE%8B%E5%B7%AE%E3%83%97%E3%83%AD%E3%83%83%E3%83%88"></a>
 </h3>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co">## 資源量指数 (frasyrのplot_residual_vpaと統合してもよい？）</span></span>
 <span><span class="co">## - これは通常のresidual</span></span>
-<span><span class="va">resid_sam</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/index_plot.html">index_plot</a></span><span class="op">(</span><span class="va">res_best</span><span class="op">)</span>; <span class="fu"><a href="https://patchwork.data-imaginist.com/reference/wrap_plots.html" class="external-link">wrap_plots</a></span><span class="op">(</span><span class="va">resid_sam</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">resid_sam</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/index_plot.html">index_plot</a></span><span class="op">(</span><span class="va">res_best</span><span class="op">)</span>; <span class="fu"><a href="https://patchwork.data-imaginist.com/reference/wrap_plots.html" class="external-link">wrap_plots</a></span><span class="op">(</span><span class="va">resid_sam</span>,ncol<span class="op">=</span><span class="fl">1</span><span class="op">)</span></span></code></pre></div>
 <p><img src="sam_files/figure-html/plot_residual-1.png" width="100%" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
-<span><span class="co">## - OSAは？ =&gt; 後で紹介する予定</span></span>
-<span></span>
 <span><span class="co">## catch at age</span></span>
-<span><span class="co">## -</span></span>
-<span><span class="va">caa_resid</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/caa_plot.html">caa_plot</a></span><span class="op">(</span><span class="va">res_best</span><span class="op">)</span>; <span class="fu"><a href="https://patchwork.data-imaginist.com/reference/wrap_plots.html" class="external-link">wrap_plots</a></span><span class="op">(</span><span class="va">caa_resid</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">caa_resid</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/caa_plot.html">caa_plot</a></span><span class="op">(</span><span class="va">res_best</span><span class="op">)</span>; <span class="fu"><a href="https://patchwork.data-imaginist.com/reference/wrap_plots.html" class="external-link">wrap_plots</a></span><span class="op">(</span><span class="va">caa_resid</span>,ncol<span class="op">=</span><span class="fl">2</span><span class="op">)</span></span></code></pre></div>
 <p><img src="sam_files/figure-html/plot_residual-2.png" width="100%" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co">## total catch weight の比較も必要かも</span></span>
 <span><span class="co"># 今関数はない</span></span>
@@ -642,46 +1428,6 @@
 <span>        axis.line.x <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_line</a></span><span class="op">(</span>linewidth <span class="op">=</span> <span class="fl">0.3528</span><span class="op">)</span>, axis.line.y <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_line</a></span><span class="op">(</span>linewidth <span class="op">=</span> <span class="fl">0.3528</span><span class="op">)</span>,</span>
 <span>        axis.minor.ticks.length <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">rel</a></span><span class="op">(</span><span class="fl">0.5</span><span class="op">)</span>, legend.position <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span></span></code></pre></div>
 <div class="section level4">
-<h4 id="レトロスペクティブ解析">レトロスペクティブ解析<a class="anchor" aria-label="anchor" href="#%E3%83%AC%E3%83%88%E3%83%AD%E3%82%B9%E3%83%9A%E3%82%AF%E3%83%86%E3%82%A3%E3%83%96%E8%A7%A3%E6%9E%90"></a>
-</h4>
-<ul>
-<li> という関数で実行可能</li>
-<li>Retrospective forecastingも同時に実行可能でプロットもできる</li>
-</ul>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">retro_res</span> <span class="op">=</span> <span class="fu"><a href="../reference/retro_sam.html">retro_sam</a></span><span class="op">(</span><span class="va">res_best</span>,n<span class="op">=</span><span class="fl">5</span><span class="op">)</span> <span class="co">#nは年数</span></span>
-<span></span>
-<span><span class="op">(</span><span class="va">g_retro</span> <span class="op">=</span> <span class="fu"><a href="../reference/retro_plot.html">retro_plot</a></span><span class="op">(</span><span class="va">res_best</span>,<span class="va">retro_res</span>,start_year<span class="op">=</span><span class="fl">1991</span>,mohn_position<span class="op">=</span><span class="st">"bottomleft"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="sam_files/figure-html/retro-1.png" width="100%" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
-<span><span class="co"># retrospective forecastingもできる</span></span>
-<span><span class="op">(</span><span class="va">g_retro2</span> <span class="op">=</span> <span class="fu"><a href="../reference/retro_plot.html">retro_plot</a></span><span class="op">(</span><span class="va">res_best</span>,<span class="va">retro_res</span>,start_year<span class="op">=</span><span class="fl">1991</span>,mohn_position<span class="op">=</span><span class="st">"bottomleft"</span>, forecast<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="sam_files/figure-html/retro-2.png" width="100%" style="display: block; margin: auto;"></p>
-</div>
-<div class="section level4">
-<h4 id="leave-one-out-index-analysis">Leave-one-out index analysis<a class="anchor" aria-label="anchor" href="#leave-one-out-index-analysis"></a>
-</h4>
-<ul>
-<li>Indexを一つずつの除いて、推定値の頑健性、影響力のあるIndexを明らかにする（ジャックナイフ解析？）</li>
-<li>という関数を使って実行する</li>
-</ul>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
-<span><span class="va">loo_res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/do_loo_index.html">do_loo_index</a></span><span class="op">(</span><span class="va">res_best</span><span class="op">)</span></span>
-<span><span class="va">reslist</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="kw">for</span> <span class="op">(</span> <span class="va">j</span> <span class="kw">in</span> <span class="fl">0</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">loo_res</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="kw">if</span><span class="op">(</span><span class="va">j</span><span class="op">==</span><span class="fl">0</span><span class="op">)</span> <span class="op">{</span></span>
-<span>      <span class="va">reslist</span><span class="op">[[</span><span class="va">j</span><span class="op">+</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">res_best</span></span>
-<span>    <span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
-<span>      <span class="va">reslist</span><span class="op">[[</span><span class="va">j</span><span class="op">+</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">loo_res</span><span class="op">[[</span><span class="va">j</span><span class="op">]</span><span class="op">]</span></span>
-<span>    <span class="op">}</span></span>
-<span><span class="op">}</span></span>
-<span><span class="op">(</span><span class="va">g_loo</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_samvpa.html">plot_samvpa</a></span><span class="op">(</span><span class="va">reslist</span>,CI<span class="op">=</span><span class="fl">0</span>,</span>
-<span>                    scenario_name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"full"</span>,<span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span><span class="op">:</span><span class="op">-</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="sam_files/figure-html/loo-index-1.png" width="100%" style="display: block; margin: auto;"></p>
-</div>
-<div class="section level4">
 <h4 id="one-step-ahead-osa-residuals">One-Step-Ahead (OSA) residuals<a class="anchor" aria-label="anchor" href="#one-step-ahead-osa-residuals"></a>
 </h4>
 <ul>
@@ -692,9 +1438,9 @@ plotなど）は不適</li>
 <li>あるサンプルを除いた時の予測値（One Step Ahead (OSA)
 prediction）とデータとの残差 (OSA residuals)
 を診断に使うのがより適切らしい</li>
-<li>を使って行うが、SAM用の関数を用意してある</li>
+<li>’TMB::oneStepPredict’を使って行うが、SAM用の関数’do_osa_resid()’を用意してある</li>
 </ul>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">osa.simple</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/do_osa_resid.html">do_osa_resid</a></span><span class="op">(</span><span class="va">res_best</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 90</span></span>
 <span><span class="co">#&gt; [1] 89</span></span>
@@ -786,8 +1532,89 @@ prediction）とデータとの残差 (OSA residuals)
 <span><span class="co">#&gt; [1] 3</span></span>
 <span><span class="co">#&gt; [1] 2</span></span>
 <span><span class="co">#&gt; [1] 1</span></span>
-<span><span class="va">gg_osa</span> <span class="op">=</span> <span class="fu"><a href="../reference/plot_osa_resid.html">plot_osa_resid</a></span><span class="op">(</span><span class="va">osa.simple</span><span class="op">)</span>; <span class="fu"><a href="https://patchwork.data-imaginist.com/reference/wrap_plots.html" class="external-link">wrap_plots</a></span><span class="op">(</span><span class="va">gg_osa</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">gg_osa</span> <span class="op">=</span> <span class="fu"><a href="../reference/plot_osa_resid.html">plot_osa_resid</a></span><span class="op">(</span><span class="va">osa.simple</span><span class="op">)</span>; <span class="fu"><a href="https://patchwork.data-imaginist.com/reference/wrap_plots.html" class="external-link">wrap_plots</a></span><span class="op">(</span><span class="va">gg_osa</span>,ncol<span class="op">=</span><span class="fl">2</span><span class="op">)</span></span></code></pre></div>
 <p><img src="sam_files/figure-html/OSA%20residual-1.png" width="100%" style="display: block; margin: auto;"></p>
+</div>
+<div class="section level4">
+<h4 id="レトロスペクティブ解析">レトロスペクティブ解析<a class="anchor" aria-label="anchor" href="#%E3%83%AC%E3%83%88%E3%83%AD%E3%82%B9%E3%83%9A%E3%82%AF%E3%83%86%E3%82%A3%E3%83%96%E8%A7%A3%E6%9E%90"></a>
+</h4>
+<ul>
+<li>‘retro_sam()’ という関数で実行可能</li>
+<li>Retrospective forecastingも同時に実行可能でプロットもできる</li>
+</ul>
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">retro_res</span> <span class="op">=</span> <span class="fu"><a href="../reference/retro_sam.html">retro_sam</a></span><span class="op">(</span><span class="va">res_best</span>,n<span class="op">=</span><span class="fl">5</span><span class="op">)</span> <span class="co">#nは年数</span></span>
+<span></span>
+<span><span class="op">(</span><span class="va">g_retro</span> <span class="op">=</span> <span class="fu"><a href="../reference/retro_plot.html">retro_plot</a></span><span class="op">(</span><span class="va">res_best</span>,<span class="va">retro_res</span>,start_year<span class="op">=</span><span class="fl">1991</span>,mohn_position<span class="op">=</span><span class="st">"bottomleft"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p><img src="sam_files/figure-html/retro-1.png" width="100%" style="display: block; margin: auto;"></p>
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span><span class="co"># retrospective forecastingもできる</span></span>
+<span><span class="op">(</span><span class="va">g_retro2</span> <span class="op">=</span> <span class="fu"><a href="../reference/retro_plot.html">retro_plot</a></span><span class="op">(</span><span class="va">res_best</span>,<span class="va">retro_res</span>,start_year<span class="op">=</span><span class="fl">1991</span>,mohn_position<span class="op">=</span><span class="st">"bottomleft"</span>, forecast<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p><img src="sam_files/figure-html/retro-2.png" width="100%" style="display: block; margin: auto;"></p>
+</div>
+<div class="section level4">
+<h4 id="hindcast-cross-validation">Hindcast cross validation<a class="anchor" aria-label="anchor" href="#hindcast-cross-validation"></a>
+</h4>
+<ul>
+<li>レトロスペクティブ解析で最新のデータを順番に除いていき、除いたIndexを予測するHindcast
+cross validationを実行する</li>
+<li>Mean absolute scaled error (MASE) で予測精度を評価する</li>
+</ul>
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="op">(</span><span class="va">g_hindcast</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_hindcastCV.html">plot_hindcastCV</a></span><span class="op">(</span><span class="va">res_best</span>, <span class="va">retro_res</span>, show_mase <span class="op">=</span> <span class="cn">TRUE</span>, mase_position <span class="op">=</span> <span class="st">"bottomleft"</span>, use_index <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">2</span>, log <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p><img src="sam_files/figure-html/hindcasting-1.png" width="100%" style="display: block; margin: auto;"></p>
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span><span class="co"># MASEの結果を取り出す場合</span></span>
+<span><span class="va">res_mase</span> <span class="op">=</span> <span class="fu"><a href="../reference/calc_mase.html">calc_mase</a></span><span class="op">(</span><span class="va">res_best</span>, <span class="va">retro_res</span>, log <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="va">res_mase</span><span class="op">$</span><span class="va">mase</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<table class="table">
+<thead><tr class="header">
+<th align="right">idx</th>
+<th align="left">index</th>
+<th align="right">denominator</th>
+<th align="right">numerator</th>
+<th align="right">MASE</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="right">1</td>
+<td align="left">Index 1</td>
+<td align="right">324.3231275</td>
+<td align="right">212.4539428</td>
+<td align="right">0.6550687</td>
+</tr>
+<tr class="even">
+<td align="right">2</td>
+<td align="left">Index 2</td>
+<td align="right">0.1126078</td>
+<td align="right">0.1329193</td>
+<td align="right">1.1803741</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section level4">
+<h4 id="leave-one-out-index-analysis">Leave-one-out index analysis<a class="anchor" aria-label="anchor" href="#leave-one-out-index-analysis"></a>
+</h4>
+<ul>
+<li>Indexを一つずつの除いて、推定値の頑健性、影響力のあるIndexを明らかにする（ジャックナイフ解析？）</li>
+<li>’do_loo_index()’という関数を使って実行する</li>
+</ul>
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">loo_res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/do_loo_index.html">do_loo_index</a></span><span class="op">(</span><span class="va">res_best</span><span class="op">)</span></span>
+<span><span class="va">reslist</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="kw">for</span> <span class="op">(</span> <span class="va">j</span> <span class="kw">in</span> <span class="fl">0</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">loo_res</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="kw">if</span><span class="op">(</span><span class="va">j</span><span class="op">==</span><span class="fl">0</span><span class="op">)</span> <span class="op">{</span></span>
+<span>      <span class="va">reslist</span><span class="op">[[</span><span class="va">j</span><span class="op">+</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">res_best</span></span>
+<span>    <span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
+<span>      <span class="va">reslist</span><span class="op">[[</span><span class="va">j</span><span class="op">+</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">loo_res</span><span class="op">[[</span><span class="va">j</span><span class="op">]</span><span class="op">]</span></span>
+<span>    <span class="op">}</span></span>
+<span><span class="op">}</span></span>
+<span><span class="op">(</span><span class="va">g_loo</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_samvpa.html">plot_samvpa</a></span><span class="op">(</span><span class="va">reslist</span>,CI<span class="op">=</span><span class="fl">0</span>,</span>
+<span>                    scenario_name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"full"</span>,<span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span><span class="op">:</span><span class="op">-</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p><img src="sam_files/figure-html/loo-index-1.png" width="100%" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level4">
 <h4 id="プロファイル尤度">プロファイル尤度<a class="anchor" aria-label="anchor" href="#%E3%83%97%E3%83%AD%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB%E5%B0%A4%E5%BA%A6"></a>
@@ -796,9 +1623,9 @@ prediction）とデータとの残差 (OSA residuals)
 <li>Cachability
 qなどを変化させたときの対数尤度を調べて、収束しているか、どの程度尤度が変わるか（不確実性の程度、信頼区間）を調べる</li>
 </ul>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Catchabilityに対するプロファイル尤度</span></span>
-<span><span class="co"># 同じ名前のパラメータが複数ある場合は引数\code{which_param}で位置を指定できる</span></span>
+<span><span class="co"># 同じ名前のパラメータが複数ある場合は引数'which_param'で位置を指定できる</span></span>
 <span><span class="va">res_profile</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/samprofile.html">samprofile</a></span><span class="op">(</span><span class="va">res_best</span>, <span class="st">"logQ"</span>, which_param<span class="op">=</span><span class="fl">1</span>, param_range<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">8</span>, <span class="fl">11</span><span class="op">)</span>, length<span class="op">=</span><span class="fl">25</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># 縦軸は負の対数尤度</span></span>
@@ -806,7 +1633,7 @@ qなどを変化させたときの対数尤度を調べて、収束している�
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">par</span>, y<span class="op">=</span><span class="va">obj_value</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span>linewidth<span class="op">=</span><span class="fl">0.5</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">res_profile</span><span class="op">$</span><span class="va">obj_tbl</span><span class="op">[</span><span class="fl">1</span>,<span class="op">]</span>,colour<span class="op">=</span><span class="st">"red"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="sam_files/figure-html/profile_likelihood-1.png" width="100%" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span></span>
 <span><span class="co"># Mのプロファイル尤度 =&gt; 関数がないからこんな感じで手動で</span></span>
@@ -814,9 +1641,9 @@ qなどを変化させたときの対数尤度を調べて、収束している�
 <span><span class="va">scns</span> <span class="op">=</span> <span class="fu"><a href="https://stringr.tidyverse.org/reference/str_c.html" class="external-link">str_c</a></span><span class="op">(</span><span class="st">"M:"</span>,<span class="va">Ms</span><span class="op">)</span></span>
 <span><span class="va">samres_Mlist</span> <span class="op">=</span> <span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map</a></span><span class="op">(</span><span class="va">Ms</span>, <span class="kw">function</span><span class="op">(</span><span class="va">i</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">res</span> <span class="op">=</span> <span class="va">res_best</span></span>
-<span>  <span class="va">p0_list</span> <span class="op">=</span> <span class="va">res</span><span class="op">$</span><span class="va">par_list</span></span>
 <span>  <span class="va">input</span> <span class="op">=</span> <span class="va">res</span><span class="op">$</span><span class="va">input</span></span>
 <span>  <span class="va">input</span><span class="op">$</span><span class="va">dat</span><span class="op">$</span><span class="va">M</span><span class="op">[</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">i</span></span>
+<span>  <span class="co"># p0_list = res$par_list; input$p0.list &lt;- p0_list #初期値を利用するとき</span></span>
 <span>  <span class="va">res.c</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">sam</span>,<span class="va">input</span><span class="op">)</span></span>
 <span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span> <span class="va">res.c</span> <span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span>
@@ -826,7 +1653,7 @@ qなどを変化させたときの対数尤度を調べて、収束している�
 <span>  obj_value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">samres_Mlist</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="va">x</span><span class="op">$</span><span class="va">opt</span><span class="op">$</span><span class="va">objective</span><span class="op">)</span></span>
 <span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">M</span>,y<span class="op">=</span><span class="va">obj_value</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="sam_files/figure-html/profile_likelihood-2.png" width="100%" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="fu"><a href="../reference/plot_samvpa.html">plot_samvpa</a></span><span class="op">(</span><span class="va">samres_Mlist</span>,scenario_name<span class="op">=</span><span class="va">scns</span>,CI<span class="op">=</span><span class="fl">0.</span><span class="op">)</span></span></code></pre></div>
 <p><img src="sam_files/figure-html/profile_likelihood-3.png" width="100%" style="display: block; margin: auto;"></p>
@@ -836,11 +1663,11 @@ qなどを変化させたときの対数尤度を調べて、収束している�
 <h3 id="ブートストラップ">ブートストラップ<a class="anchor" aria-label="anchor" href="#%E3%83%96%E3%83%BC%E3%83%88%E3%82%B9%E3%83%88%E3%83%A9%E3%83%83%E3%83%97"></a>
 </h3>
 <ul>
-<li>で実行できる</li>
-<li>ノンパラメトリックブートストラップ（）は厳密ではないので、パラメトリックブートストラップを推奨（）</li>
-<li>delta法で求めたCIも図に加える場合は</li>
+<li>’boo_sam()’で実行できる</li>
+<li>ノンパラメトリックブートストラップ（‘method=“n”’）は厳密ではないので、パラメトリックブートストラップを推奨（‘method=“p”’）</li>
+<li>delta法で求めたCIも図に加える場合は’draw_deltaCI=TRUE’</li>
 </ul>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">res_boot</span> <span class="op">&lt;-</span> <span class="fu">boo_sam</span><span class="op">(</span><span class="va">res_best</span>, n<span class="op">=</span><span class="fl">20</span>,method<span class="op">=</span><span class="st">"p"</span>,seed<span class="op">=</span><span class="fl">1</span><span class="op">)</span> <span class="co">#時間節約のため20回</span></span>
 <span><span class="co">#&gt; -----1-----</span></span>
@@ -863,7 +1690,7 @@ qなどを変化させたときの対数尤度を調べて、収束している�
 <span><span class="co">#&gt; -----18-----</span></span>
 <span><span class="co">#&gt; -----19-----</span></span>
 <span><span class="co">#&gt; -----20-----</span></span>
-<span><span class="op">(</span><span class="va">g1</span> <span class="op">=</span> <span class="fu"><a href="../reference/plot_boosam.html">plot_boosam</a></span><span class="op">(</span><span class="va">res_sam2</span>,<span class="va">res_boot</span>, CI<span class="op">=</span><span class="fl">0.95</span>, draw_deltaCI <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span><span class="op">(</span><span class="va">g1</span> <span class="op">=</span> <span class="fu"><a href="../reference/plot_boosam.html">plot_boosam</a></span><span class="op">(</span><span class="va">res_best</span>,<span class="va">res_boot</span>, CI<span class="op">=</span><span class="fl">0.95</span>, draw_deltaCI <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="sam_files/figure-html/bootstrap-1.png" width="100%" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level3">
@@ -877,7 +1704,7 @@ SAMのモデルを疑似データにフィットさせるというシミュレ�
 <li>VPA or SAMのestimability (self-test), 異なる仮定に対する推定の頑健性
 (cross test) を調べられる</li>
 </ul>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## 真のモデルはSAM</span></span>
 <span><span class="co"># pseudo dataを生成</span></span>
 <span><span class="va">pdata_sam</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/popsim_vpasam.html">popsim_vpasam</a></span><span class="op">(</span><span class="va">res_best</span>, n<span class="op">=</span><span class="fl">20</span><span class="op">)</span></span>
@@ -889,20 +1716,20 @@ SAMのモデルを疑似データにフィットさせるというシミュレ�
 <span><span class="va">metric_sam2sam</span><span class="op">$</span><span class="va">summary</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">stat</span><span class="op">==</span><span class="st">"SSB"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <table style="width:100%;" class="table">
 <colgroup>
-<col width="4%">
-<col width="4%">
+<col width="3%">
+<col width="3%">
 <col width="3%">
 <col width="7%">
 <col width="7%">
+<col width="7%">
+<col width="7%">
 <col width="8%">
 <col width="8%">
+<col width="7%">
+<col width="7%">
 <col width="8%">
-<col width="8%">
-<col width="8%">
-<col width="8%">
-<col width="8%">
-<col width="8%">
-<col width="8%">
+<col width="7%">
+<col width="7%">
 </colgroup>
 <thead><tr class="header">
 <th align="left">stat</th>
@@ -925,168 +1752,168 @@ SAMのモデルを疑似データにフィットさせるというシミュレ�
 <td align="left">SSB</td>
 <td align="right">1991</td>
 <td align="right">NA</td>
-<td align="right">4.714890</td>
-<td align="right">3.739724</td>
-<td align="right">0.0407805</td>
-<td align="right">0.0323460</td>
-<td align="right">0.6798051</td>
-<td align="right">0.0058798</td>
-<td align="right">116.29599</td>
-<td align="right">0.0402735</td>
-<td align="right">115.61619</td>
-<td align="right">108.23633</td>
-<td align="right">124.31695</td>
+<td align="right">4.661949</td>
+<td align="right">3.867840</td>
+<td align="right">0.0388047</td>
+<td align="right">0.0321947</td>
+<td align="right">2.7251465</td>
+<td align="right">0.0226833</td>
+<td align="right">122.86402</td>
+<td align="right">0.0339602</td>
+<td align="right">120.13887</td>
+<td align="right">113.87872</td>
+<td align="right">128.58634</td>
 </tr>
 <tr class="even">
 <td align="left">SSB</td>
 <td align="right">1992</td>
 <td align="right">NA</td>
-<td align="right">4.470541</td>
-<td align="right">3.417776</td>
-<td align="right">0.0391776</td>
-<td align="right">0.0299517</td>
-<td align="right">0.6635134</td>
-<td align="right">0.0058147</td>
-<td align="right">114.77299</td>
-<td align="right">0.0384901</td>
-<td align="right">114.10948</td>
-<td align="right">108.00884</td>
-<td align="right">124.11675</td>
+<td align="right">4.502387</td>
+<td align="right">3.895362</td>
+<td align="right">0.0373392</td>
+<td align="right">0.0323050</td>
+<td align="right">2.7449952</td>
+<td align="right">0.0227648</td>
+<td align="right">123.32574</td>
+<td align="right">0.0329973</td>
+<td align="right">120.58075</td>
+<td align="right">116.30587</td>
+<td align="right">129.39099</td>
 </tr>
 <tr class="odd">
 <td align="left">SSB</td>
 <td align="right">1993</td>
 <td align="right">NA</td>
-<td align="right">3.981475</td>
-<td align="right">2.961603</td>
-<td align="right">0.0345664</td>
-<td align="right">0.0257121</td>
-<td align="right">-0.7306428</td>
-<td align="right">-0.0063433</td>
-<td align="right">114.45279</td>
-<td align="right">0.0354558</td>
-<td align="right">115.18344</td>
-<td align="right">108.50679</td>
-<td align="right">123.23835</td>
+<td align="right">4.370651</td>
+<td align="right">3.598317</td>
+<td align="right">0.0360806</td>
+<td align="right">0.0297048</td>
+<td align="right">0.6667532</td>
+<td align="right">0.0055042</td>
+<td align="right">121.80254</td>
+<td align="right">0.0343674</td>
+<td align="right">121.13579</td>
+<td align="right">116.11164</td>
+<td align="right">129.52494</td>
 </tr>
 <tr class="even">
 <td align="left">SSB</td>
 <td align="right">1994</td>
 <td align="right">NA</td>
-<td align="right">3.916236</td>
-<td align="right">3.049157</td>
-<td align="right">0.0371171</td>
-<td align="right">0.0288992</td>
-<td align="right">-0.5248452</td>
-<td align="right">-0.0049744</td>
-<td align="right">104.98534</td>
-<td align="right">0.0374849</td>
-<td align="right">105.51019</td>
-<td align="right">99.88823</td>
-<td align="right">113.44926</td>
+<td align="right">3.971060</td>
+<td align="right">3.027791</td>
+<td align="right">0.0356222</td>
+<td align="right">0.0271606</td>
+<td align="right">0.0470865</td>
+<td align="right">0.0004224</td>
+<td align="right">111.52420</td>
+<td align="right">0.0353486</td>
+<td align="right">111.47711</td>
+<td align="right">106.57860</td>
+<td align="right">120.11133</td>
 </tr>
 <tr class="odd">
 <td align="left">SSB</td>
 <td align="right">1995</td>
 <td align="right">NA</td>
-<td align="right">3.353828</td>
-<td align="right">2.650598</td>
-<td align="right">0.0345464</td>
-<td align="right">0.0273027</td>
-<td align="right">-0.7773941</td>
-<td align="right">-0.0080076</td>
-<td align="right">96.30453</td>
-<td align="right">0.0354207</td>
-<td align="right">97.08192</td>
-<td align="right">91.91651</td>
-<td align="right">104.10862</td>
+<td align="right">4.676986</td>
+<td align="right">3.355768</td>
+<td align="right">0.0454239</td>
+<td align="right">0.0325920</td>
+<td align="right">-0.9082279</td>
+<td align="right">-0.0088209</td>
+<td align="right">102.05483</td>
+<td align="right">0.0466055</td>
+<td align="right">102.96306</td>
+<td align="right">98.10030</td>
+<td align="right">113.13606</td>
 </tr>
 <tr class="even">
 <td align="left">SSB</td>
 <td align="right">1996</td>
 <td align="right">NA</td>
-<td align="right">3.156222</td>
-<td align="right">2.498548</td>
-<td align="right">0.0379865</td>
-<td align="right">0.0300711</td>
-<td align="right">0.2791449</td>
-<td align="right">0.0033596</td>
-<td align="right">83.36722</td>
-<td align="right">0.0387767</td>
-<td align="right">83.08808</td>
-<td align="right">77.38519</td>
-<td align="right">88.79782</td>
+<td align="right">5.831915</td>
+<td align="right">4.125065</td>
+<td align="right">0.0657630</td>
+<td align="right">0.0465159</td>
+<td align="right">-2.0151428</td>
+<td align="right">-0.0227236</td>
+<td align="right">86.66558</td>
+<td align="right">0.0676102</td>
+<td align="right">88.68073</td>
+<td align="right">82.41079</td>
+<td align="right">102.17911</td>
 </tr>
 <tr class="odd">
 <td align="left">SSB</td>
 <td align="right">1997</td>
 <td align="right">NA</td>
-<td align="right">3.152909</td>
-<td align="right">2.535913</td>
-<td align="right">0.0467273</td>
-<td align="right">0.0375832</td>
-<td align="right">-0.0284438</td>
-<td align="right">-0.0004215</td>
-<td align="right">67.44623</td>
-<td align="right">0.0479250</td>
-<td align="right">67.47468</td>
-<td align="right">62.47695</td>
-<td align="right">73.73288</td>
+<td align="right">6.628819</td>
+<td align="right">4.541080</td>
+<td align="right">0.0904462</td>
+<td align="right">0.0619602</td>
+<td align="right">-2.9363136</td>
+<td align="right">-0.0400642</td>
+<td align="right">70.35391</td>
+<td align="right">0.0931512</td>
+<td align="right">73.29023</td>
+<td align="right">65.95244</td>
+<td align="right">88.56592</td>
 </tr>
 <tr class="even">
 <td align="left">SSB</td>
 <td align="right">1998</td>
 <td align="right">NA</td>
-<td align="right">3.542636</td>
-<td align="right">3.009047</td>
-<td align="right">0.0682894</td>
-<td align="right">0.0580037</td>
-<td align="right">0.2051571</td>
-<td align="right">0.0039547</td>
-<td align="right">52.08197</td>
-<td align="right">0.0683529</td>
-<td align="right">51.87681</td>
-<td align="right">46.55599</td>
-<td align="right">58.09936</td>
+<td align="right">7.732189</td>
+<td align="right">5.338087</td>
+<td align="right">0.1324338</td>
+<td align="right">0.0914286</td>
+<td align="right">-3.2239057</td>
+<td align="right">-0.0552178</td>
+<td align="right">55.16140</td>
+<td align="right">0.1370546</td>
+<td align="right">58.38530</td>
+<td align="right">51.06447</td>
+<td align="right">76.39438</td>
 </tr>
 <tr class="odd">
 <td align="left">SSB</td>
 <td align="right">1999</td>
 <td align="right">NA</td>
-<td align="right">4.224429</td>
-<td align="right">3.418742</td>
-<td align="right">0.0944754</td>
-<td align="right">0.0764570</td>
-<td align="right">0.1067732</td>
-<td align="right">0.0023879</td>
-<td align="right">44.82137</td>
-<td align="right">0.0973533</td>
-<td align="right">44.71460</td>
-<td align="right">38.61181</td>
-<td align="right">52.98685</td>
+<td align="right">11.394980</td>
+<td align="right">8.412452</td>
+<td align="right">0.2068685</td>
+<td align="right">0.1527226</td>
+<td align="right">-5.2363220</td>
+<td align="right">-0.0950620</td>
+<td align="right">49.84688</td>
+<td align="right">0.2169300</td>
+<td align="right">55.08320</td>
+<td align="right">44.06765</td>
+<td align="right">79.80608</td>
 </tr>
 <tr class="even">
 <td align="left">SSB</td>
 <td align="right">2000</td>
 <td align="right">NA</td>
-<td align="right">5.503604</td>
-<td align="right">4.265156</td>
-<td align="right">0.1368733</td>
-<td align="right">0.1060734</td>
-<td align="right">-0.5414189</td>
-<td align="right">-0.0134650</td>
-<td align="right">39.66807</td>
-<td align="right">0.1416574</td>
-<td align="right">40.20949</td>
-<td align="right">32.56410</td>
-<td align="right">51.16901</td>
+<td align="right">15.861250</td>
+<td align="right">12.134483</td>
+<td align="right">0.2916285</td>
+<td align="right">0.2231073</td>
+<td align="right">-7.4120169</td>
+<td align="right">-0.1362790</td>
+<td align="right">46.97654</td>
+<td align="right">0.3125197</td>
+<td align="right">54.38855</td>
+<td align="right">37.48188</td>
+<td align="right">88.31504</td>
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">g_sam2sam</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_popsim.html">plot_popsim</a></span><span class="op">(</span><span class="va">res_best</span>,<span class="va">fit_sam2sam</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="sam_files/figure-html/cross_test-1.png" width="100%" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co"># cross-test (VPAで推定)</span></span>
 <span><span class="co"># 前述のブートストラップと同じ（はず）</span></span>
@@ -1094,22 +1921,22 @@ SAMのモデルを疑似データにフィットさせるというシミュレ�
 <span><span class="va">metric_vpa2sam</span> <span class="op">=</span> <span class="fu"><a href="../reference/sumup_popsim.html">sumup_popsim</a></span><span class="op">(</span><span class="va">res_best</span>,<span class="va">fit_vpa2sam</span><span class="op">)</span> <span class="co">#こっちでは真のモデルの結果を使うこと!</span></span>
 <span><span class="co"># SSBの要約統計量を出力</span></span>
 <span><span class="va">metric_vpa2sam</span><span class="op">$</span><span class="va">summary</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">stat</span><span class="op">==</span><span class="st">"SSB"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
+<table style="width:100%;" class="table">
 <colgroup>
-<col width="4%">
-<col width="4%">
+<col width="3%">
+<col width="3%">
 <col width="3%">
 <col width="7%">
 <col width="7%">
-<col width="8%">
-<col width="8%">
+<col width="7%">
 <col width="7%">
 <col width="8%">
 <col width="8%">
+<col width="7%">
+<col width="7%">
 <col width="8%">
-<col width="8%">
-<col width="8%">
-<col width="8%">
+<col width="7%">
+<col width="7%">
 </colgroup>
 <thead><tr class="header">
 <th align="left">stat</th>
@@ -1132,168 +1959,168 @@ SAMのモデルを疑似データにフィットさせるというシミュレ�
 <td align="left">SSB</td>
 <td align="right">1991</td>
 <td align="right">NA</td>
-<td align="right">6.471087</td>
-<td align="right">5.529497</td>
-<td align="right">0.0559704</td>
-<td align="right">0.0478263</td>
-<td align="right">5.340624</td>
-<td align="right">0.0461927</td>
-<td align="right">120.95681</td>
-<td align="right">0.0408417</td>
-<td align="right">115.61619</td>
-<td align="right">110.48940</td>
-<td align="right">127.03547</td>
+<td align="right">8.142650</td>
+<td align="right">7.039151</td>
+<td align="right">0.0677770</td>
+<td align="right">0.0585918</td>
+<td align="right">6.6211994</td>
+<td align="right">0.0551129</td>
+<td align="right">126.76007</td>
+<td align="right">0.0441018</td>
+<td align="right">120.13887</td>
+<td align="right">115.43221</td>
+<td align="right">134.35362</td>
 </tr>
 <tr class="even">
 <td align="left">SSB</td>
 <td align="right">1992</td>
 <td align="right">NA</td>
-<td align="right">6.344622</td>
-<td align="right">5.089540</td>
-<td align="right">0.0556012</td>
-<td align="right">0.0446023</td>
-<td align="right">3.590157</td>
-<td align="right">0.0314624</td>
-<td align="right">117.69963</td>
-<td align="right">0.0395019</td>
-<td align="right">114.10948</td>
-<td align="right">110.64467</td>
-<td align="right">127.82181</td>
+<td align="right">7.701260</td>
+<td align="right">6.527281</td>
+<td align="right">0.0638681</td>
+<td align="right">0.0541320</td>
+<td align="right">6.6056733</td>
+<td align="right">0.0547822</td>
+<td align="right">127.18642</td>
+<td align="right">0.0352559</td>
+<td align="right">120.58075</td>
+<td align="right">119.66000</td>
+<td align="right">133.99567</td>
 </tr>
 <tr class="odd">
 <td align="left">SSB</td>
 <td align="right">1993</td>
 <td align="right">NA</td>
-<td align="right">5.992787</td>
-<td align="right">4.777344</td>
-<td align="right">0.0520282</td>
-<td align="right">0.0414760</td>
-<td align="right">3.365942</td>
-<td align="right">0.0292224</td>
-<td align="right">118.54938</td>
-<td align="right">0.0371021</td>
-<td align="right">115.18344</td>
-<td align="right">111.95927</td>
-<td align="right">127.80785</td>
+<td align="right">6.965555</td>
+<td align="right">5.840357</td>
+<td align="right">0.0575020</td>
+<td align="right">0.0482133</td>
+<td align="right">5.9827678</td>
+<td align="right">0.0493889</td>
+<td align="right">127.11856</td>
+<td align="right">0.0306716</td>
+<td align="right">121.13579</td>
+<td align="right">121.55460</td>
+<td align="right">133.14608</td>
 </tr>
 <tr class="even">
 <td align="left">SSB</td>
 <td align="right">1994</td>
 <td align="right">NA</td>
-<td align="right">6.375684</td>
-<td align="right">4.992017</td>
-<td align="right">0.0604272</td>
-<td align="right">0.0473131</td>
-<td align="right">4.063816</td>
-<td align="right">0.0385159</td>
-<td align="right">109.57400</td>
-<td align="right">0.0443690</td>
-<td align="right">105.51019</td>
-<td align="right">101.73084</td>
-<td align="right">119.76746</td>
+<td align="right">5.439429</td>
+<td align="right">4.569630</td>
+<td align="right">0.0487941</td>
+<td align="right">0.0409916</td>
+<td align="right">4.4127897</td>
+<td align="right">0.0395847</td>
+<td align="right">115.88990</td>
+<td align="right">0.0287363</td>
+<td align="right">111.47711</td>
+<td align="right">110.42625</td>
+<td align="right">121.62645</td>
 </tr>
 <tr class="odd">
 <td align="left">SSB</td>
 <td align="right">1995</td>
 <td align="right">NA</td>
-<td align="right">6.128014</td>
-<td align="right">4.745004</td>
-<td align="right">0.0631221</td>
-<td align="right">0.0488763</td>
-<td align="right">4.133170</td>
-<td align="right">0.0425740</td>
-<td align="right">101.21509</td>
-<td align="right">0.0426599</td>
-<td align="right">97.08192</td>
-<td align="right">95.57532</td>
-<td align="right">110.62512</td>
+<td align="right">4.648353</td>
+<td align="right">3.575130</td>
+<td align="right">0.0451458</td>
+<td align="right">0.0347225</td>
+<td align="right">2.4923298</td>
+<td align="right">0.0242061</td>
+<td align="right">105.45539</td>
+<td align="right">0.0331378</td>
+<td align="right">102.96306</td>
+<td align="right">101.37631</td>
+<td align="right">112.50731</td>
 </tr>
 <tr class="even">
 <td align="left">SSB</td>
 <td align="right">1996</td>
 <td align="right">NA</td>
-<td align="right">6.237325</td>
-<td align="right">4.913610</td>
-<td align="right">0.0750688</td>
-<td align="right">0.0591374</td>
-<td align="right">4.487785</td>
-<td align="right">0.0540124</td>
-<td align="right">87.57586</td>
-<td align="right">0.0562459</td>
-<td align="right">83.08808</td>
-<td align="right">79.45123</td>
-<td align="right">96.92702</td>
+<td align="right">4.432428</td>
+<td align="right">3.663845</td>
+<td align="right">0.0499819</td>
+<td align="right">0.0413150</td>
+<td align="right">0.4764826</td>
+<td align="right">0.0053730</td>
+<td align="right">89.15721</td>
+<td align="right">0.0486326</td>
+<td align="right">88.68073</td>
+<td align="right">83.87463</td>
+<td align="right">97.32415</td>
 </tr>
 <tr class="odd">
 <td align="left">SSB</td>
 <td align="right">1997</td>
 <td align="right">NA</td>
-<td align="right">6.307079</td>
-<td align="right">4.863802</td>
-<td align="right">0.0934733</td>
-<td align="right">0.0720834</td>
-<td align="right">3.450676</td>
-<td align="right">0.0511403</td>
-<td align="right">70.92535</td>
-<td align="right">0.0742778</td>
-<td align="right">67.47468</td>
-<td align="right">63.85060</td>
-<td align="right">82.26122</td>
+<td align="right">4.750496</td>
+<td align="right">4.094026</td>
+<td align="right">0.0648176</td>
+<td align="right">0.0558605</td>
+<td align="right">-0.6798861</td>
+<td align="right">-0.0092766</td>
+<td align="right">72.61034</td>
+<td align="right">0.0659631</td>
+<td align="right">73.29023</td>
+<td align="right">67.34023</td>
+<td align="right">82.75405</td>
 </tr>
 <tr class="even">
 <td align="left">SSB</td>
 <td align="right">1998</td>
 <td align="right">NA</td>
-<td align="right">6.901705</td>
-<td align="right">5.284913</td>
-<td align="right">0.1330403</td>
-<td align="right">0.1018743</td>
-<td align="right">4.289524</td>
-<td align="right">0.0826867</td>
-<td align="right">56.16634</td>
-<td align="right">0.0997085</td>
-<td align="right">51.87681</td>
-<td align="right">48.74747</td>
-<td align="right">67.64629</td>
+<td align="right">5.801118</td>
+<td align="right">5.067535</td>
+<td align="right">0.0993592</td>
+<td align="right">0.0867947</td>
+<td align="right">-1.3493640</td>
+<td align="right">-0.0231114</td>
+<td align="right">57.03594</td>
+<td align="right">0.1024471</td>
+<td align="right">58.38530</td>
+<td align="right">50.91000</td>
+<td align="right">67.40871</td>
 </tr>
 <tr class="odd">
 <td align="left">SSB</td>
 <td align="right">1999</td>
 <td align="right">NA</td>
-<td align="right">7.090084</td>
-<td align="right">4.946232</td>
-<td align="right">0.1585631</td>
-<td align="right">0.1106178</td>
-<td align="right">3.154422</td>
-<td align="right">0.0705457</td>
-<td align="right">47.86902</td>
-<td align="right">0.1342297</td>
-<td align="right">44.71460</td>
-<td align="right">40.62752</td>
-<td align="right">61.98933</td>
+<td align="right">8.812162</td>
+<td align="right">7.773706</td>
+<td align="right">0.1599791</td>
+<td align="right">0.1411266</td>
+<td align="right">-4.7892080</td>
+<td align="right">-0.0869450</td>
+<td align="right">50.29400</td>
+<td align="right">0.1659331</td>
+<td align="right">55.08320</td>
+<td align="right">44.83848</td>
+<td align="right">70.62665</td>
 </tr>
 <tr class="even">
 <td align="left">SSB</td>
 <td align="right">2000</td>
 <td align="right">NA</td>
-<td align="right">8.516743</td>
-<td align="right">6.248140</td>
-<td align="right">0.2118093</td>
-<td align="right">0.1553897</td>
-<td align="right">1.960584</td>
-<td align="right">0.0487592</td>
-<td align="right">42.17008</td>
-<td align="right">0.1892163</td>
-<td align="right">40.20949</td>
-<td align="right">33.98896</td>
-<td align="right">60.50028</td>
+<td align="right">13.166226</td>
+<td align="right">11.142891</td>
+<td align="right">0.2420772</td>
+<td align="right">0.2048757</td>
+<td align="right">-9.0355522</td>
+<td align="right">-0.1661297</td>
+<td align="right">45.35300</td>
+<td align="right">0.2557327</td>
+<td align="right">54.38855</td>
+<td align="right">38.74190</td>
+<td align="right">79.70781</td>
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">g_vpa2sam</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_popsim.html">plot_popsim</a></span><span class="op">(</span><span class="va">res_best</span>,<span class="va">fit_vpa2sam</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="sam_files/figure-html/cross_test-2.png" width="100%" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co"># SAMの結果（res_best）の代わりに、VPAの結果をoperating model (真のモデル) として入れ替えて、VPAデータに対するself-test / cross-testもできます</span></span></code></pre></div>
 </div>

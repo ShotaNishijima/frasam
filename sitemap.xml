@@ -16,6 +16,7 @@
 <url><loc>/reference/Calcu_YPR.html</loc></url>
 <url><loc>/reference/Est_SR.html</loc></url>
 <url><loc>/reference/caa_plot.html</loc></url>
+<url><loc>/reference/calc_mase.html</loc></url>
 <url><loc>/reference/calc_metrics.html</loc></url>
 <url><loc>/reference/convert_sam_tibble.html</loc></url>
 <url><loc>/reference/divide_sigma.html</loc></url>
@@ -36,6 +37,7 @@
 <url><loc>/reference/out_sam.html</loc></url>
 <url><loc>/reference/plot_SR_simple.html</loc></url>
 <url><loc>/reference/plot_boosam.html</loc></url>
+<url><loc>/reference/plot_hindcastCV.html</loc></url>
 <url><loc>/reference/plot_osa_resid.html</loc></url>
 <url><loc>/reference/plot_popsim.html</loc></url>
 <url><loc>/reference/plot_samvpa.html</loc></url>
