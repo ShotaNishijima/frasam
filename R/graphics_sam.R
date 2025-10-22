@@ -698,6 +698,7 @@ plot_osa_resid <- function(osares) {
   ## qq plot
   p <- osares %>%
     filter(!is.nan(residual)) %>%
+    ggplot(aes(sample = residual)) +
     stat_qq(distribution = qnorm) +  # 標準正規分布の分位数を使用
     stat_qq_line(distribution = qnorm) +  # 標準正規分布に基づく直線
     labs(x = "Theoretical Quantiles",
@@ -754,4 +755,96 @@ plot_popsim = function(
     ylim(0,NA) + ylab("Value") + xlab("Year")+
     frasyr::theme_SH()+
     scale_x_continuous(breaks=scales::pretty_breaks())
+}
+
+
+#' レトロの結果を使って資源量指標値に対するhindcast cross validationをプロットする関数
+#'
+#' @param show_mase MASEの結果を載せるかどうか
+#' @param use_index 特定のIndexを使う場合、\code{use_index = c(1,3)}のように指定する
+#' @param years プロットする期間を指定する場合、\code{years = 2015:2024}のように指定する
+#' @inheritParams calc_mase
+#'
+#'
+#' @encoding UTF-8
+#'
+#' @export
+
+plot_hindcastCV = function(samres,
+                           retrores,
+                           h=1,
+                           log = FALSE,
+                           index_name = NULL,
+                           show_mase = TRUE,
+                           mase_position = "upperright",
+                           use_index = NULL,
+                           years = NULL
+) {
+  res_mase = calc_mase(samres = samres,
+                       retrores = retrores,
+                       h = h,
+                       log = log,
+                       index_name = index_name)
+
+  if(is.null(use_index)) {
+    use_index = 1:nrow(samres$input$dat$index)
+  }
+
+  dat_removed = res_mase$removed %>% filter(idx %in% use_index)
+  dat_full = res_mase$full %>% filter(idx %in% use_index)
+  dat_mase = res_mase$mase %>% filter(idx %in% use_index)
+  dat_cv = res_mase$cv %>% filter(idx %in% use_index)
+
+  dat_both = bind_rows(dat_full,dat_removed) %>%
+    group_by(idx, index) %>%
+    summarise(ymax = max(obs, pred_full, pred_cond, na.rm=T)) %>%
+    ungroup()
+
+  if (!mase_position %in% c("upperright", "upperleft", "bottomright", "bottomleft")) {
+    stop("Invalid value for 'mase_position'. Must be one of 'upperright', 'upperleft', 'bottomright', or 'bottomleft'.")
+  }
+
+  dat_mase2 = left_join(dat_mase,dat_both) %>%
+    mutate(year = max(dat_full$year), #upperright
+           y = ymax,
+           label = sprintf("MASE == %.2f",MASE)) %>%
+    mutate(hjust=1,vjust=1)
+
+  if(mase_position == "upperleft") {
+    dat_mase2 = dat_mase2 %>%
+      mutate(year = min(dat_full$year),
+             hjust = 0)
+  }
+  if(str_detect(mase_position,"bottom")) {
+    dat_mase2 = dat_mase2 %>%
+      mutate(y = 0, vjust = 0)
+    if(str_detect(mase_position,"left")) {
+      dat_mase2 = dat_mase2 %>%
+        mutate(vjust = 0, hjust = 0,
+               year = min(dat_full$year))
+    }
+  }
+
+  gg <- ggplot(data = dat_removed, aes(x=year)) +
+    geom_path(linewidth=0.8,aes(y=pred_cond,colour=as.factor(retro_id)))+
+    geom_point(data = dat_cv, size=2,
+               aes(x = year_target, y=pred_cond,colour=as.factor(retro_id)))+
+    geom_path(data=dat_full,aes(y=pred_full),colour="black",linewidth=0.8)+
+    geom_point(data=dat_full,aes(y=obs),colour="black",size=2)+
+    frasyr::theme_SH()+
+    scale_x_continuous(breaks=scales::pretty_breaks()) +
+    ylab("Value") + xlab("Year") +
+    ylim(0,NA)
+
+  if (length(use_index) > 1) {
+    gg <- gg + facet_wrap(vars(index), scales="free_y")
+  }
+
+  if (isTRUE(show_mase)) {
+    gg <- gg +
+      geom_text(data=dat_mase2,parse=TRUE,size=4,
+                aes(y=y,label=label,hjust=hjust,vjust=vjust))
+
+  }
+  gg
 }

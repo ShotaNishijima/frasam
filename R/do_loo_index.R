@@ -13,8 +13,12 @@ do_loo_index = function(samres) {
 
   RES = lapply(1:nindex,function(j) {
     input$dat$index <- res$input$dat$index[-j,]
-    input$a.init <- as.numeric(res$rec.par["a"])
+    if(!is.null(res$rec.par["a"])) {
+      input$a.init <- as.numeric(res$rec.par["a"])
+    }
+    if(!is.null(res$rec.par["b"])) {
     input$b.init <- as.numeric(res$rec.par["b"])
+    }
     input$q.init <- res$q[-j]
     input$abund <- res$input$abund[-j]
     input$min.age <- res$input$min.age[-j]

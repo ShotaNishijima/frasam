@@ -2,6 +2,10 @@
 #' output sam object results
 #' @param res sam object
 #'
+#' @importFrom readr write_csv
+#' @importFrom tibble rownames_to_column as_tibble
+#' @importFrom dplyr select
+#'
 #' @export
 
 out_sam <- function(res,

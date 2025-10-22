@@ -25,7 +25,8 @@ Imports:
     MASS,
     Matrix,
     scales,
-    forcats
+    forcats,
+    readr
 Suggests:
     testthat,
     knitr,

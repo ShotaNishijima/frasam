@@ -1,19 +1,4 @@
----
-title: "SAMを使った資源量推定"
-author: "市野川桃子・西嶋翔太"
-date: "`r format(Sys.Date())`"
-output:
-  rmarkdown::html_vignette:
-    css: style.css
-    fig_width: 10
-    fig_height: 6
-vignette: >
-  %\VignetteIndexEntry{SAMを使った資源量推定}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
----
-
-```{r setup, include = FALSE}
+## ----setup, include = FALSE---------------------------------------------------
 options(rmarkdown.html_vignette.check_title = FALSE)
 knitr::opts_chunk$set(
   collapse = TRUE,
@@ -26,11 +11,8 @@ knitr::opts_chunk$set(
   message = FALSE, 
   warning = FALSE
 )
-```
-# SAMのインストール
-- インストールに必要なパッケージ(devtools)はあらかじめインストールしておいてください
 
-```{r, fig.show='hold'}
+## ----fig.show='hold'----------------------------------------------------------
 
 ## インストール (最新ブランチはcmsa11→vignetteとかが追加されたcreate_vignette)
 #devtools::install_github("ShotaNishijima/frasam@create_vignette") # frasam
@@ -39,21 +21,14 @@ knitr::opts_chunk$set(
 
 # ライブラリの呼び出し
 library(frasyr)
-# library(frasam)
-devtools::load_all()
+library(frasam)
+# devtools::load_all()
 library(tidyverse)
 library(patchwork)
 # install.packages("lemon")
 library(lemon)
-```
 
-# SAMを適用するデータセットの作成
-
-VPAを適用するときのデータセットと同じ形式のデータセットが利用できます。
-ただし、VPAでは資源量指数が利用できなくても適用できますが、SAMでは資源量指数の利用が必須になります。
-
-## データの読み込み
-```{r load_data, fig.show='hold'}
+## ----load_data, fig.show='hold'-----------------------------------------------
 
 caa   <- read.csv("https://raw.githubusercontent.com/ichimomo/frasyr/dev/data-raw/ex1_caa.csv",  row.names=1)
 waa   <- read.csv("https://raw.githubusercontent.com/ichimomo/frasyr/dev/data-raw/ex1_waa.csv",  row.names=1)
@@ -167,11 +142,8 @@ plot_samvpa(res_sam, CI=0.95)
 
 ## 結果の出力
 out_sam(res_sam, filename="sam")
-```
 
-### VPAや、異なる設定のSAMとの比較
-
-```{r comparison}
+## ----comparison---------------------------------------------------------------
 ## VPAもやってみる
 res_vpa <- vpa(dat,fc.year=1998:2000,tf.year = 1998:1999,
                term.F="max",stat.tf="mean",Pope=TRUE,tune=TRUE,p.init=0.5, abund=c("SSB","N"), min.age=c(0,0), max.age=c(6,0), sel.update=TRUE)
@@ -249,15 +221,8 @@ res_samdata <- make_assess_result(res_sam)　# 境さん関数(make_assess_resul
           axis.text.y = element_text(size = 11, color = "black"),
           axis.line.x = element_line(linewidth = 0.3528), axis.line.y = element_line(linewidth = 0.3528),
           axis.minor.ticks.length = rel(0.5)))
-```
 
-# モデル選択
-- rho.mode 0, 1, 2, 3のどれか？
-- 再生産関係の関数と自己相関
-- どの要素でsigmaを推定値し、どの年齢間でsigmaを共通にするか?
-  - いろいろ試してAICの小さいものを選ぶ。（最新のcAICというものもあるようだが、未実装）
-
-```{r model_selection}
+## ----model_selection----------------------------------------------------------
 ## varF(Fのプロセス誤差)とvarC（CAAの観測誤差）をどの年齢間で分けるかをstepAICで検討する
 
 # いまは1歳魚以上のvarNを固定しているが、それも検討することも可能
@@ -287,11 +252,8 @@ cbind(
   "SD_naa" = res_best$sigma.logN
 ) %>% knitr::kable()
 
-```
 
-# 再生産関係のプロット
-
-```{r plot_SR_simple}
+## ----plot_SR_simple-----------------------------------------------------------
 
 ## 単純なプロット
 plot_SR_simple(res_sam2) #BHモデルを例に
@@ -306,30 +268,20 @@ steepness_sam <- calc_steepness(SR="BH", rec_pars=SR_sam0$pars,M=biopar$M, waa=b
 Fcurrent <- rowMeans(res_sam2$faa[,as.character(1998:2000)])
 refF_res <- ref.F(res_sam2,Fcurrent=Fcurrent,Pope=FALSE)
 refF_res$summary
-```
 
-# モデル診断
-
-## jitter analysis
-
-- 初期値を変えて再推定し、目的関数（負の対数尤度）の値が変わらないかをチェックする
-
-```{r jitter}
+## ----jitter-------------------------------------------------------------------
 jitterres = do_jitter(res_best,SD=0.1,nsim=100) #SDは初期値を乱数発生させる際のSD
 knitr::kable(jitterres$resdat) #変わらない
-```
 
-
-## 残差プロット
-
-```{r plot_residual}
+## ----plot_residual------------------------------------------------------------
 
 ## 資源量指数 (frasyrのplot_residual_vpaと統合してもよい？）
 ## - これは通常のresidual
 resid_sam <- index_plot(res_best); wrap_plots(resid_sam,ncol=1)
 
 ## catch at age
-caa_resid <- caa_plot(res_best); wrap_plots(caa_resid,ncol=2)
+## -
+caa_resid <- caa_plot(res_best); wrap_plots(caa_resid,ncol=1)
 
 ## total catch weight の比較も必要かも
 # 今関数はない
@@ -355,149 +307,4 @@ g1 <- ggplot() +
         axis.minor.ticks.length = rel(0.5), legend.position = "none")
 
 
-```
 
-
-### One-Step-Ahead (OSA) residuals
-
-- SAMはランダム効果モデルなので、ハイパーパラメータとランダム効果の推定でデータを二重に使っていることになる
-- ランダム効果でデータに対して過度に合わせることも可能であり（過剰適合）、通常の残差を診断に使うのは適切ではないと考えられている
-- また、時系列解析なので残差は独立ではないので、独立とみなした診断（QQ plotなど）は不適
-- あるサンプルを除いた時の予測値（One Step Ahead (OSA) prediction）とデータとの残差 (OSA residuals) を診断に使うのがより適切らしい
-- 'TMB::oneStepPredict'を使って行うが、SAM用の関数'do_osa_resid()'を用意してある
-
-```{r OSA residual}
-osa.simple <- do_osa_resid(res_best)
-gg_osa = plot_osa_resid(osa.simple); wrap_plots(gg_osa,ncol=2)
-```
-
-### レトロスペクティブ解析
-
-- 'retro_sam()' という関数で実行可能
-- Retrospective forecastingも同時に実行可能でプロットもできる
-
-```{r retro}
-retro_res = retro_sam(res_best,n=5) #nは年数
-
-(g_retro = retro_plot(res_best,retro_res,start_year=1991,mohn_position="bottomleft"))
-
-# retrospective forecastingもできる
-(g_retro2 = retro_plot(res_best,retro_res,start_year=1991,mohn_position="bottomleft", forecast=TRUE))
-```
-
-
-### Hindcast cross validation
-
-- レトロスペクティブ解析で最新のデータを順番に除いていき、除いたIndexを予測するHindcast cross validationを実行する
-- Mean absolute scaled error (MASE) で予測精度を評価する
-
-```{r hindcasting}
-(g_hindcast <- plot_hindcastCV(res_best, retro_res, show_mase = TRUE, mase_position = "bottomleft", use_index = 1:2, log = FALSE))
-
-# MASEの結果を取り出す場合
-res_mase = calc_mase(res_best, retro_res, log = FALSE)
-res_mase$mase %>% knitr::kable()
-```
-
-### Leave-one-out index analysis
-- Indexを一つずつの除いて、推定値の頑健性、影響力のあるIndexを明らかにする（ジャックナイフ解析？）
-- 'do_loo_index()'という関数を使って実行する
- 
-```{r loo-index}
-loo_res <- do_loo_index(res_best)
-reslist <- list()
-for ( j in 0:length(loo_res)) {
-    if(j==0) {
-      reslist[[j+1]] <- res_best
-    } else {
-      reslist[[j+1]] <- loo_res[[j]]
-    }
-}
-(g_loo <- plot_samvpa(reslist,CI=0,
-                    scenario_name = c("full",as.character(-1:-2))))
-
-```
-
-
-
-### プロファイル尤度
-
-- Cachability qなどを変化させたときの対数尤度を調べて、収束しているか、どの程度尤度が変わるか（不確実性の程度、信頼区間）を調べる
-```{r profile_likelihood}
-# Catchabilityに対するプロファイル尤度
-# 同じ名前のパラメータが複数ある場合は引数'which_param'で位置を指定できる
-res_profile <- samprofile(res_best, "logQ", which_param=1, param_range=c(8, 11), length=25)
-
-# 縦軸は負の対数尤度
-res_profile$obj_tbl[-1,] %>%
-  ggplot(aes(x=par, y=obj_value)) + geom_line(linewidth=0.5) +
-  geom_point(data=res_profile$obj_tbl[1,],colour="red")
-
-
-# Mのプロファイル尤度 => 関数がないからこんな感じで手動で
-Ms = c(0.1,0.3,0.5,0.7,0.9)
-scns = str_c("M:",Ms)
-samres_Mlist = map(Ms, function(i) {
-  res = res_best
-  input = res$input
-  input$dat$M[] <- i
-  # p0_list = res$par_list; input$p0.list <- p0_list #初期値を利用するとき
-  res.c = do.call(sam,input)
-  return( res.c )
-})
-
-data.frame(
-  M = Ms,
-  obj_value = sapply(samres_Mlist, function(x) x$opt$objective)
-) %>% ggplot(aes(x=M,y=obj_value)) + geom_line() + geom_point()
-
-plot_samvpa(samres_Mlist,scenario_name=scns,CI=0.)
-
-```
-
-## ブートストラップ
-
-- 'boo_sam()'で実行できる
-- ノンパラメトリックブートストラップ（'method="n"'）は厳密ではないので、パラメトリックブートストラップを推奨（'method="p"'）
-- delta法で求めたCIも図に加える場合は'draw_deltaCI=TRUE'
-
-```{r bootstrap}
-
-res_boot <- boo_sam(res_best, n=20,method="p",seed=1) #時間節約のため20回
-(g1 = plot_boosam(res_best,res_boot, CI=0.95, draw_deltaCI = TRUE))
-
-```
-
-## Self-test / cross test
-
-- 真のモデルをVPA or SAMとして、疑似データを生成し、VPA or SAMのモデルを疑似データにフィットさせるというシミュレーションが可能
-- 真のモデル (operating model, OM) と推定モデルが同じモデルであればselt-test, 異なればcross-test
-- VPA or SAMのestimability (self-test), 異なる仮定に対する推定の頑健性 (cross test) を調べられる
-
-```{r cross_test}
-## 真のモデルはSAM
-# pseudo dataを生成
-pdata_sam <- popsim_vpasam(res_best, n=20)
-# self-test (SAMで推定)
-# 前述のブートストラップと同じ（はず）
-fit_sam2sam <- fit2PSdata(res_best, PSdata=pdata_sam)
-metric_sam2sam = sumup_popsim(res_best,fit_sam2sam) #真のモデルの結果を使うこと
-# SSBの要約統計量を出力
-metric_sam2sam$summary %>% filter(stat=="SSB") %>% knitr::kable()
-(g_sam2sam <- plot_popsim(res_best,fit_sam2sam))
-
-# cross-test (VPAで推定)
-# 前述のブートストラップと同じ（はず）
-fit_vpa2sam <- fit2PSdata(res_vpa, PSdata=pdata_sam) #ここでは別のモデルを使う
-metric_vpa2sam = sumup_popsim(res_best,fit_vpa2sam) #こっちでは真のモデルの結果を使うこと!
-# SSBの要約統計量を出力
-metric_vpa2sam$summary %>% filter(stat=="SSB") %>% knitr::kable()
-(g_vpa2sam <- plot_popsim(res_best,fit_vpa2sam))
-
-# SAMの結果（res_best）の代わりに、VPAの結果をoperating model (真のモデル) として入れ替えて、VPAデータに対するself-test / cross-testもできます
-```
-
-## 将来予測
-
-- 資源量推定の不確実性をどこまで考慮するか？
-- 再生産関係は外部で推定しても良いのかも（難しいことはしなくてもよいようにもしておく）
