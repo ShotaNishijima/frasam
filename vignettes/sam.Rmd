@@ -315,7 +315,8 @@ refF_res$summary
 - 初期値を変えて再推定し、目的関数（負の対数尤度）の値が変わらないかをチェックする
 
 ```{r jitter}
-jitterres = do_jitter(res_best,SD=0.1,nsim=100) #SDは初期値を乱数発生させる際のSD
+# ここでは10回だけ
+jitterres = do_jitter(res_best,SD=0.1,nsim=10) #SDは初期値を乱数発生させる際のSD
 knitr::kable(jitterres$resdat) #変わらない
 ```
 
@@ -326,7 +327,7 @@ knitr::kable(jitterres$resdat) #変わらない
 
 ## 資源量指数 (frasyrのplot_residual_vpaと統合してもよい？）
 ## - これは通常のresidual
-resid_sam <- index_plot(res_best); wrap_plots(resid_sam,ncol=1)
+resid_sam <- index_plot(res_best); wrap_plots(resid_sam,nrow=1)
 
 ## catch at age
 caa_resid <- caa_plot(res_best); wrap_plots(caa_resid,ncol=2)
@@ -435,7 +436,7 @@ res_profile$obj_tbl[-1,] %>%
 
 
 # Mのプロファイル尤度 => 関数がないからこんな感じで手動で
-Ms = c(0.1,0.3,0.5,0.7,0.9)
+Ms = seq(0.3,0.7,by=0.1)
 scns = str_c("M:",Ms)
 samres_Mlist = map(Ms, function(i) {
   res = res_best
