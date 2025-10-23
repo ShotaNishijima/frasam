@@ -69,6 +69,12 @@ index[2,] <- rec_idx
 
 dat <- data.handler(caa=caa, waa=waa, maa=maa, M=0.5, index=index)
 
+```
+
+# SAMの解析
+## 基本的な設定で解析と結果の出力
+
+```{r initial analysis}
 # まずはsamのhelpファイルを閲覧してどんなオプションがあるか把握しましょう
 #help(sam)
 
@@ -169,7 +175,7 @@ plot_samvpa(res_sam, CI=0.95)
 out_sam(res_sam, filename="sam")
 ```
 
-### VPAや、異なる設定のSAMとの比較
+## VPAや、異なる設定のSAMとの比較
 
 ```{r comparison}
 ## VPAもやってみる
@@ -359,7 +365,7 @@ g1 <- ggplot() +
 ```
 
 
-### One-Step-Ahead (OSA) residuals
+## One-Step-Ahead (OSA) residuals
 
 - SAMはランダム効果モデルなので、ハイパーパラメータとランダム効果の推定でデータを二重に使っていることになる
 - ランダム効果でデータに対して過度に合わせることも可能であり（過剰適合）、通常の残差を診断に使うのは適切ではないと考えられている
@@ -372,7 +378,7 @@ osa.simple <- do_osa_resid(res_best)
 gg_osa = plot_osa_resid(osa.simple); wrap_plots(gg_osa,ncol=2)
 ```
 
-### レトロスペクティブ解析
+## レトロスペクティブ解析
 
 - 'retro_sam()' という関数で実行可能
 - Retrospective forecastingも同時に実行可能でプロットもできる
@@ -387,7 +393,7 @@ retro_res = retro_sam(res_best,n=5) #nは年数
 ```
 
 
-### Hindcast cross validation
+## Hindcast cross validation
 
 - レトロスペクティブ解析で最新のデータを順番に除いていき、除いたIndexを予測するHindcast cross validationを実行する
 - Mean absolute scaled error (MASE) で予測精度を評価する
@@ -400,7 +406,7 @@ res_mase = calc_mase(res_best, retro_res, log = FALSE)
 res_mase$mase %>% knitr::kable()
 ```
 
-### Leave-one-out index analysis
+## Leave-one-out index analysis
 - Indexを一つずつの除いて、推定値の頑健性、影響力のあるIndexを明らかにする（ジャックナイフ解析？）
 - 'do_loo_index()'という関数を使って実行する
  
@@ -420,8 +426,7 @@ for ( j in 0:length(loo_res)) {
 ```
 
 
-
-### プロファイル尤度
+## プロファイル尤度
 
 - Cachability qなどを変化させたときの対数尤度を調べて、収束しているか、どの程度尤度が変わるか（不確実性の程度、信頼区間）を調べる
 ```{r profile_likelihood}
@@ -498,7 +503,7 @@ metric_vpa2sam$summary %>% filter(stat=="SSB") %>% knitr::kable()
 # SAMの結果（res_best）の代わりに、VPAの結果をoperating model (真のモデル) として入れ替えて、VPAデータに対するself-test / cross-testもできます
 ```
 
-## 将来予測
+# 将来予測
 
 - 資源量推定の不確実性をどこまで考慮するか？
 - 再生産関係は外部で推定しても良いのかも（難しいことはしなくてもよいようにもしておく）
