@@ -53,7 +53,7 @@
       <h1>SAMを使った資源量推定</h1>
                         <h4 data-toc-skip class="author">市野川桃子・西嶋翔太</h4>
             
-            <h4 data-toc-skip class="date">2025-10-22</h4>
+            <h4 data-toc-skip class="date">2025-10-23</h4>
       
 
       <div class="d-none name"><code>sam.Rmd</code></div>
@@ -105,9 +105,17 @@
 <span><span class="va">rec_idx</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">0.25</span>,length<span class="op">=</span><span class="fl">10</span><span class="op">)</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">10</span>,<span class="fl">0</span>,<span class="fl">0.2</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">index</span><span class="op">[</span><span class="fl">2</span>,<span class="op">]</span> <span class="op">&lt;-</span> <span class="va">rec_idx</span></span>
 <span></span>
-<span><span class="va">dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/frasyr/man/data.handler.html" class="external-link">data.handler</a></span><span class="op">(</span>caa<span class="op">=</span><span class="va">caa</span>, waa<span class="op">=</span><span class="va">waa</span>, maa<span class="op">=</span><span class="va">maa</span>, M<span class="op">=</span><span class="fl">0.5</span>, index<span class="op">=</span><span class="va">index</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># まずはsamのhelpファイルを閲覧してどんなオプションがあるか把握しましょう</span></span>
+<span><span class="va">dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/frasyr/man/data.handler.html" class="external-link">data.handler</a></span><span class="op">(</span>caa<span class="op">=</span><span class="va">caa</span>, waa<span class="op">=</span><span class="va">waa</span>, maa<span class="op">=</span><span class="va">maa</span>, M<span class="op">=</span><span class="fl">0.5</span>, index<span class="op">=</span><span class="va">index</span><span class="op">)</span></span></code></pre></div>
+</div>
+</div>
+<div class="section level2">
+<h2 id="samの解析">SAMの解析<a class="anchor" aria-label="anchor" href="#sam%E3%81%AE%E8%A7%A3%E6%9E%90"></a>
+</h2>
+<div class="section level3">
+<h3 id="基本的な設定で解析と結果の出力">基本的な設定で解析と結果の出力<a class="anchor" aria-label="anchor" href="#%E5%9F%BA%E6%9C%AC%E7%9A%84%E3%81%AA%E8%A8%AD%E5%AE%9A%E3%81%A7%E8%A7%A3%E6%9E%90%E3%81%A8%E7%B5%90%E6%9E%9C%E3%81%AE%E5%87%BA%E5%8A%9B"></a>
+</h3>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># まずはsamのhelpファイルを閲覧してどんなオプションがあるか把握しましょう</span></span>
 <span><span class="co">#help(sam)</span></span>
 <span></span>
 <span><span class="co"># SAMを使う準備 (samのオプションtmb.run=TRUEでも良いかもだけど、今はうまく動かないみたい？)</span></span>
@@ -318,19 +326,21 @@
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co">## 結果のプロット</span></span>
 <span><span class="co"># デルタ法にかかる信頼区間が描かれる</span></span>
-<span><span class="fu"><a href="../reference/plot_samvpa.html">plot_samvpa</a></span><span class="op">(</span><span class="va">res_sam</span>, CI<span class="op">=</span><span class="fl">0.95</span><span class="op">)</span></span>
-<span></span>
+<span><span class="fu"><a href="../reference/plot_samvpa.html">plot_samvpa</a></span><span class="op">(</span><span class="va">res_sam</span>, CI<span class="op">=</span><span class="fl">0.95</span><span class="op">)</span></span></code></pre></div>
+<p><img src="sam_files/figure-html/initial%20analysis-1.png" width="100%" style="display: block; margin: auto;"></p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
 <span><span class="co">## 結果の出力</span></span>
 <span><span class="fu"><a href="../reference/out_sam.html">out_sam</a></span><span class="op">(</span><span class="va">res_sam</span>, filename<span class="op">=</span><span class="st">"sam"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="sam_files/figure-html/load_data-1.png" width="100%" style="display: block; margin: auto;"></p>
-<div class="section level4">
-<h4 id="vpaや異なる設定のsamとの比較">VPAや、異なる設定のSAMとの比較<a class="anchor" aria-label="anchor" href="#vpa%E3%82%84%E7%95%B0%E3%81%AA%E3%82%8B%E8%A8%AD%E5%AE%9A%E3%81%AEsam%E3%81%A8%E3%81%AE%E6%AF%94%E8%BC%83"></a>
-</h4>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+</div>
+<div class="section level3">
+<h3 id="vpaや異なる設定のsamとの比較">VPAや、異なる設定のSAMとの比較<a class="anchor" aria-label="anchor" href="#vpa%E3%82%84%E7%95%B0%E3%81%AA%E3%82%8B%E8%A8%AD%E5%AE%9A%E3%81%AEsam%E3%81%A8%E3%81%AE%E6%AF%94%E8%BC%83"></a>
+</h3>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## VPAもやってみる</span></span>
 <span><span class="va">res_vpa</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/frasyr/man/vpa.html" class="external-link">vpa</a></span><span class="op">(</span><span class="va">dat</span>,fc.year<span class="op">=</span><span class="fl">1998</span><span class="op">:</span><span class="fl">2000</span>,tf.year <span class="op">=</span> <span class="fl">1998</span><span class="op">:</span><span class="fl">1999</span>,</span>
 <span>               term.F<span class="op">=</span><span class="st">"max"</span>,stat.tf<span class="op">=</span><span class="st">"mean"</span>,Pope<span class="op">=</span><span class="cn">TRUE</span>,tune<span class="op">=</span><span class="cn">TRUE</span>,p.init<span class="op">=</span><span class="fl">0.5</span>, abund<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"SSB"</span>,<span class="st">"N"</span><span class="op">)</span>, min.age<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">0</span><span class="op">)</span>, max.age<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">6</span>,<span class="fl">0</span><span class="op">)</span>, sel.update<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span>
@@ -341,10 +351,10 @@
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">gg_graph1</span><span class="op">)</span></span></code></pre></div>
 <p><img src="sam_files/figure-html/comparison-1.png" width="100%" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">gg_graph2</span><span class="op">)</span></span></code></pre></div>
 <p><img src="sam_files/figure-html/comparison-2.png" width="100%" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span></span>
 <span><span class="co">## 設定を少し変えてもう一度実行する場合</span></span>
@@ -445,7 +455,7 @@
 <span><span class="fu"><a href="../reference/plot_samvpa.html">plot_samvpa</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>SAM<span class="op">=</span><span class="va">res_sam</span>, SAM2<span class="op">=</span><span class="va">res_sam2</span>,SAM3<span class="op">=</span><span class="va">res_sam3</span><span class="op">)</span>,</span>
 <span>            what.plot <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"biomass"</span>,<span class="st">"SSB"</span>,<span class="st">"Recruitment"</span>,<span class="st">"U"</span>,<span class="st">"catch"</span>,<span class="st">"fishing_mortality"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="sam_files/figure-html/comparison-3.png" width="100%" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co">## F at age by year (境さんコード、関数化必要？時系列が長い場合への対応が必要)</span></span>
 <span><span class="va">res_samdata</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/make_assess_result.html">make_assess_result</a></span><span class="op">(</span><span class="va">res_sam</span><span class="op">)</span>　<span class="co"># 境さん関数(make_assess_result)</span></span>
@@ -466,7 +476,7 @@
 <span>          axis.line.x <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_line</a></span><span class="op">(</span>linewidth <span class="op">=</span> <span class="fl">0.3528</span><span class="op">)</span>, axis.line.y <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_line</a></span><span class="op">(</span>linewidth <span class="op">=</span> <span class="fl">0.3528</span><span class="op">)</span>,</span>
 <span>          axis.minor.ticks.length <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">rel</a></span><span class="op">(</span><span class="fl">0.5</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="sam_files/figure-html/comparison-4.png" width="100%" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co">## F at age by year</span></span>
 <span><span class="op">(</span><span class="va">gg</span> <span class="op">&lt;-</span> <span class="va">res_samdata</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">stat</span><span class="op">==</span><span class="st">"faa"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
@@ -488,7 +498,6 @@
 <p><img src="sam_files/figure-html/comparison-5.png" width="100%" style="display: block; margin: auto;"></p>
 </div>
 </div>
-</div>
 <div class="section level2">
 <h2 id="モデル選択">モデル選択<a class="anchor" aria-label="anchor" href="#%E3%83%A2%E3%83%87%E3%83%AB%E9%81%B8%E6%8A%9E"></a>
 </h2>
@@ -501,7 +510,7 @@
 </ul>
 </li>
 </ul>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## varF(Fのプロセス誤差)とvarC（CAAの観測誤差）をどの年齢間で分けるかをstepAICで検討する</span></span>
 <span></span>
 <span><span class="co"># いまは1歳魚以上のvarNを固定しているが、それも検討することも可能</span></span>
@@ -763,7 +772,7 @@
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span></span>
 <span><span class="co">## Best modelの結果チェック</span></span>
@@ -831,12 +840,12 @@
 <div class="section level2">
 <h2 id="再生産関係のプロット">再生産関係のプロット<a class="anchor" aria-label="anchor" href="#%E5%86%8D%E7%94%9F%E7%94%A3%E9%96%A2%E4%BF%82%E3%81%AE%E3%83%97%E3%83%AD%E3%83%83%E3%83%88"></a>
 </h2>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co">## 単純なプロット</span></span>
 <span><span class="fu"><a href="../reference/plot_SR_simple.html">plot_SR_simple</a></span><span class="op">(</span><span class="va">res_sam2</span><span class="op">)</span> <span class="co">#BHモデルを例に</span></span></code></pre></div>
 <p><img src="sam_files/figure-html/plot_SR_simple-1.png" width="100%" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co">## SAMの結果からfraysrで使える再生産関係のオブジェクトを作成するとfrasyrの関数が使える</span></span>
 <span><span class="va">SR_sam0</span> <span class="op">&lt;-</span> <span class="va">res_sam2</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="va">make_SRres</span></span>
@@ -848,7 +857,7 @@
 <span><span class="va">Fcurrent</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">rowMeans</a></span><span class="op">(</span><span class="va">res_sam2</span><span class="op">$</span><span class="va">faa</span><span class="op">[</span>,<span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="fl">1998</span><span class="op">:</span><span class="fl">2000</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="va">refF_res</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/frasyr/man/ref.F.html" class="external-link">ref.F</a></span><span class="op">(</span><span class="va">res_sam2</span>,Fcurrent<span class="op">=</span><span class="va">Fcurrent</span>,Pope<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="sam_files/figure-html/plot_SR_simple-2.png" width="100%" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">refF_res</span><span class="op">$</span><span class="va">summary</span></span>
 <span><span class="co">#&gt;            Fcurrent Fmed Flow Fhigh      Fmax      F0.1 Fmean FpSPR.10.SPR</span></span>
 <span><span class="co">#&gt; max       0.4565963   NA   NA    NA 0.5620096 0.3383543    NA    0.6752882</span></span>
@@ -872,7 +881,7 @@
 <ul>
 <li>初期値を変えて再推定し、目的関数（負の対数尤度）の値が変わらないかをチェックする</li>
 </ul>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># ここでは10回だけ</span></span>
 <span><span class="va">jitterres</span> <span class="op">=</span> <span class="fu"><a href="../reference/do_jitter.html">do_jitter</a></span><span class="op">(</span><span class="va">res_best</span>,SD<span class="op">=</span><span class="fl">0.1</span>,nsim<span class="op">=</span><span class="fl">10</span><span class="op">)</span> <span class="co">#SDは初期値を乱数発生させる際のSD</span></span>
 <span><span class="co">#&gt; 0: -16.089</span></span>
@@ -943,18 +952,18 @@
 <div class="section level3">
 <h3 id="残差プロット">残差プロット<a class="anchor" aria-label="anchor" href="#%E6%AE%8B%E5%B7%AE%E3%83%97%E3%83%AD%E3%83%83%E3%83%88"></a>
 </h3>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co">## 資源量指数 (frasyrのplot_residual_vpaと統合してもよい？）</span></span>
 <span><span class="co">## - これは通常のresidual</span></span>
 <span><span class="va">resid_sam</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/index_plot.html">index_plot</a></span><span class="op">(</span><span class="va">res_best</span><span class="op">)</span>; <span class="fu"><a href="https://patchwork.data-imaginist.com/reference/wrap_plots.html" class="external-link">wrap_plots</a></span><span class="op">(</span><span class="va">resid_sam</span>,nrow<span class="op">=</span><span class="fl">1</span><span class="op">)</span></span></code></pre></div>
 <p><img src="sam_files/figure-html/plot_residual-1.png" width="100%" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co">## catch at age</span></span>
 <span><span class="va">caa_resid</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/caa_plot.html">caa_plot</a></span><span class="op">(</span><span class="va">res_best</span><span class="op">)</span>; <span class="fu"><a href="https://patchwork.data-imaginist.com/reference/wrap_plots.html" class="external-link">wrap_plots</a></span><span class="op">(</span><span class="va">caa_resid</span>,ncol<span class="op">=</span><span class="fl">2</span><span class="op">)</span></span></code></pre></div>
 <p><img src="sam_files/figure-html/plot_residual-2.png" width="100%" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co">## total catch weight の比較も必要かも</span></span>
 <span><span class="co"># 今関数はない</span></span>
@@ -978,9 +987,10 @@
 <span>        axis.text.y <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">11</span>, color <span class="op">=</span> <span class="st">"black"</span><span class="op">)</span>,</span>
 <span>        axis.line.x <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_line</a></span><span class="op">(</span>linewidth <span class="op">=</span> <span class="fl">0.3528</span><span class="op">)</span>, axis.line.y <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_line</a></span><span class="op">(</span>linewidth <span class="op">=</span> <span class="fl">0.3528</span><span class="op">)</span>,</span>
 <span>        axis.minor.ticks.length <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">rel</a></span><span class="op">(</span><span class="fl">0.5</span><span class="op">)</span>, legend.position <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span></span></code></pre></div>
-<div class="section level4">
-<h4 id="one-step-ahead-osa-residuals">One-Step-Ahead (OSA) residuals<a class="anchor" aria-label="anchor" href="#one-step-ahead-osa-residuals"></a>
-</h4>
+</div>
+<div class="section level3">
+<h3 id="one-step-ahead-osa-residuals">One-Step-Ahead (OSA) residuals<a class="anchor" aria-label="anchor" href="#one-step-ahead-osa-residuals"></a>
+</h3>
 <ul>
 <li>SAMはランダム効果モデルなので、ハイパーパラメータとランダム効果の推定でデータを二重に使っていることになる</li>
 <li>ランダム効果でデータに対して過度に合わせることも可能であり（過剰適合）、通常の残差を診断に使うのは適切ではないと考えられている</li>
@@ -991,7 +1001,7 @@ prediction）とデータとの残差 (OSA residuals)
 を診断に使うのがより適切らしい</li>
 <li>’TMB::oneStepPredict’を使って行うが、SAM用の関数’do_osa_resid()’を用意してある</li>
 </ul>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">osa.simple</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/do_osa_resid.html">do_osa_resid</a></span><span class="op">(</span><span class="va">res_best</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 90</span></span>
 <span><span class="co">#&gt; [1] 89</span></span>
@@ -1086,36 +1096,36 @@ prediction）とデータとの残差 (OSA residuals)
 <span><span class="va">gg_osa</span> <span class="op">=</span> <span class="fu"><a href="../reference/plot_osa_resid.html">plot_osa_resid</a></span><span class="op">(</span><span class="va">osa.simple</span><span class="op">)</span>; <span class="fu"><a href="https://patchwork.data-imaginist.com/reference/wrap_plots.html" class="external-link">wrap_plots</a></span><span class="op">(</span><span class="va">gg_osa</span>,ncol<span class="op">=</span><span class="fl">2</span><span class="op">)</span></span></code></pre></div>
 <p><img src="sam_files/figure-html/OSA%20residual-1.png" width="100%" style="display: block; margin: auto;"></p>
 </div>
-<div class="section level4">
-<h4 id="レトロスペクティブ解析">レトロスペクティブ解析<a class="anchor" aria-label="anchor" href="#%E3%83%AC%E3%83%88%E3%83%AD%E3%82%B9%E3%83%9A%E3%82%AF%E3%83%86%E3%82%A3%E3%83%96%E8%A7%A3%E6%9E%90"></a>
-</h4>
+<div class="section level3">
+<h3 id="レトロスペクティブ解析">レトロスペクティブ解析<a class="anchor" aria-label="anchor" href="#%E3%83%AC%E3%83%88%E3%83%AD%E3%82%B9%E3%83%9A%E3%82%AF%E3%83%86%E3%82%A3%E3%83%96%E8%A7%A3%E6%9E%90"></a>
+</h3>
 <ul>
 <li>‘retro_sam()’ という関数で実行可能</li>
 <li>Retrospective forecastingも同時に実行可能でプロットもできる</li>
 </ul>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">retro_res</span> <span class="op">=</span> <span class="fu"><a href="../reference/retro_sam.html">retro_sam</a></span><span class="op">(</span><span class="va">res_best</span>,n<span class="op">=</span><span class="fl">5</span><span class="op">)</span> <span class="co">#nは年数</span></span>
 <span></span>
 <span><span class="op">(</span><span class="va">g_retro</span> <span class="op">=</span> <span class="fu"><a href="../reference/retro_plot.html">retro_plot</a></span><span class="op">(</span><span class="va">res_best</span>,<span class="va">retro_res</span>,start_year<span class="op">=</span><span class="fl">1991</span>,mohn_position<span class="op">=</span><span class="st">"bottomleft"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="sam_files/figure-html/retro-1.png" width="100%" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co"># retrospective forecastingもできる</span></span>
 <span><span class="op">(</span><span class="va">g_retro2</span> <span class="op">=</span> <span class="fu"><a href="../reference/retro_plot.html">retro_plot</a></span><span class="op">(</span><span class="va">res_best</span>,<span class="va">retro_res</span>,start_year<span class="op">=</span><span class="fl">1991</span>,mohn_position<span class="op">=</span><span class="st">"bottomleft"</span>, forecast<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="sam_files/figure-html/retro-2.png" width="100%" style="display: block; margin: auto;"></p>
 </div>
-<div class="section level4">
-<h4 id="hindcast-cross-validation">Hindcast cross validation<a class="anchor" aria-label="anchor" href="#hindcast-cross-validation"></a>
-</h4>
+<div class="section level3">
+<h3 id="hindcast-cross-validation">Hindcast cross validation<a class="anchor" aria-label="anchor" href="#hindcast-cross-validation"></a>
+</h3>
 <ul>
 <li>レトロスペクティブ解析で最新のデータを順番に除いていき、除いたIndexを予測するHindcast
 cross validationを実行する</li>
 <li>Mean absolute scaled error (MASE) で予測精度を評価する</li>
 </ul>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">g_hindcast</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_hindcastCV.html">plot_hindcastCV</a></span><span class="op">(</span><span class="va">res_best</span>, <span class="va">retro_res</span>, show_mase <span class="op">=</span> <span class="cn">TRUE</span>, mase_position <span class="op">=</span> <span class="st">"bottomleft"</span>, use_index <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">2</span>, log <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="sam_files/figure-html/hindcasting-1.png" width="100%" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co"># MASEの結果を取り出す場合</span></span>
 <span><span class="va">res_mase</span> <span class="op">=</span> <span class="fu"><a href="../reference/calc_mase.html">calc_mase</a></span><span class="op">(</span><span class="va">res_best</span>, <span class="va">retro_res</span>, log <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
@@ -1146,14 +1156,14 @@ cross validationを実行する</li>
 </tbody>
 </table>
 </div>
-<div class="section level4">
-<h4 id="leave-one-out-index-analysis">Leave-one-out index analysis<a class="anchor" aria-label="anchor" href="#leave-one-out-index-analysis"></a>
-</h4>
+<div class="section level3">
+<h3 id="leave-one-out-index-analysis">Leave-one-out index analysis<a class="anchor" aria-label="anchor" href="#leave-one-out-index-analysis"></a>
+</h3>
 <ul>
 <li>Indexを一つずつの除いて、推定値の頑健性、影響力のあるIndexを明らかにする（ジャックナイフ解析？）</li>
 <li>’do_loo_index()’という関数を使って実行する</li>
 </ul>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">loo_res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/do_loo_index.html">do_loo_index</a></span><span class="op">(</span><span class="va">res_best</span><span class="op">)</span></span>
 <span><span class="va">reslist</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="kw">for</span> <span class="op">(</span> <span class="va">j</span> <span class="kw">in</span> <span class="fl">0</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">loo_res</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
@@ -1167,14 +1177,14 @@ cross validationを実行する</li>
 <span>                    scenario_name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"full"</span>,<span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span><span class="op">:</span><span class="op">-</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="sam_files/figure-html/loo-index-1.png" width="100%" style="display: block; margin: auto;"></p>
 </div>
-<div class="section level4">
-<h4 id="プロファイル尤度">プロファイル尤度<a class="anchor" aria-label="anchor" href="#%E3%83%97%E3%83%AD%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB%E5%B0%A4%E5%BA%A6"></a>
-</h4>
+<div class="section level3">
+<h3 id="プロファイル尤度">プロファイル尤度<a class="anchor" aria-label="anchor" href="#%E3%83%97%E3%83%AD%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB%E5%B0%A4%E5%BA%A6"></a>
+</h3>
 <ul>
 <li>Cachability
 qなどを変化させたときの対数尤度を調べて、収束しているか、どの程度尤度が変わるか（不確実性の程度、信頼区間）を調べる</li>
 </ul>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Catchabilityに対するプロファイル尤度</span></span>
 <span><span class="co"># 同じ名前のパラメータが複数ある場合は引数'which_param'で位置を指定できる</span></span>
 <span><span class="va">res_profile</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/samprofile.html">samprofile</a></span><span class="op">(</span><span class="va">res_best</span>, <span class="st">"logQ"</span>, which_param<span class="op">=</span><span class="fl">1</span>, param_range<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">8</span>, <span class="fl">11</span><span class="op">)</span>, length<span class="op">=</span><span class="fl">25</span><span class="op">)</span></span>
@@ -1184,7 +1194,7 @@ qなどを変化させたときの対数尤度を調べて、収束している�
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">par</span>, y<span class="op">=</span><span class="va">obj_value</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span>linewidth<span class="op">=</span><span class="fl">0.5</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">res_profile</span><span class="op">$</span><span class="va">obj_tbl</span><span class="op">[</span><span class="fl">1</span>,<span class="op">]</span>,colour<span class="op">=</span><span class="st">"red"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="sam_files/figure-html/profile_likelihood-1.png" width="100%" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span></span>
 <span><span class="co"># Mのプロファイル尤度 =&gt; 関数がないからこんな感じで手動で</span></span>
@@ -1204,11 +1214,10 @@ qなどを変化させたときの対数尤度を調べて、収束している�
 <span>  obj_value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">samres_Mlist</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="va">x</span><span class="op">$</span><span class="va">opt</span><span class="op">$</span><span class="va">objective</span><span class="op">)</span></span>
 <span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">M</span>,y<span class="op">=</span><span class="va">obj_value</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="sam_files/figure-html/profile_likelihood-2.png" width="100%" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="fu"><a href="../reference/plot_samvpa.html">plot_samvpa</a></span><span class="op">(</span><span class="va">samres_Mlist</span>,scenario_name<span class="op">=</span><span class="va">scns</span>,CI<span class="op">=</span><span class="fl">0.</span><span class="op">)</span></span></code></pre></div>
 <p><img src="sam_files/figure-html/profile_likelihood-3.png" width="100%" style="display: block; margin: auto;"></p>
-</div>
 </div>
 <div class="section level3">
 <h3 id="ブートストラップ">ブートストラップ<a class="anchor" aria-label="anchor" href="#%E3%83%96%E3%83%BC%E3%83%88%E3%82%B9%E3%83%88%E3%83%A9%E3%83%83%E3%83%97"></a>
@@ -1218,7 +1227,7 @@ qなどを変化させたときの対数尤度を調べて、収束している�
 <li>ノンパラメトリックブートストラップ（‘method=“n”’）は厳密ではないので、パラメトリックブートストラップを推奨（‘method=“p”’）</li>
 <li>delta法で求めたCIも図に加える場合は’draw_deltaCI=TRUE’</li>
 </ul>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">res_boot</span> <span class="op">&lt;-</span> <span class="fu">boo_sam</span><span class="op">(</span><span class="va">res_best</span>, n<span class="op">=</span><span class="fl">20</span>,method<span class="op">=</span><span class="st">"p"</span>,seed<span class="op">=</span><span class="fl">1</span><span class="op">)</span> <span class="co">#時間節約のため20回</span></span>
 <span><span class="co">#&gt; -----1-----</span></span>
@@ -1255,7 +1264,7 @@ SAMのモデルを疑似データにフィットさせるというシミュレ�
 <li>VPA or SAMのestimability (self-test), 異なる仮定に対する推定の頑健性
 (cross test) を調べられる</li>
 </ul>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## 真のモデルはSAM</span></span>
 <span><span class="co"># pseudo dataを生成</span></span>
 <span><span class="va">pdata_sam</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/popsim_vpasam.html">popsim_vpasam</a></span><span class="op">(</span><span class="va">res_best</span>, n<span class="op">=</span><span class="fl">20</span><span class="op">)</span></span>
@@ -1461,10 +1470,10 @@ SAMのモデルを疑似データにフィットさせるというシミュレ�
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">g_sam2sam</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_popsim.html">plot_popsim</a></span><span class="op">(</span><span class="va">res_best</span>,<span class="va">fit_sam2sam</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="sam_files/figure-html/cross_test-1.png" width="100%" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co"># cross-test (VPAで推定)</span></span>
 <span><span class="co"># 前述のブートストラップと同じ（はず）</span></span>
@@ -1668,21 +1677,21 @@ SAMのモデルを疑似データにフィットさせるというシミュレ�
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">g_vpa2sam</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_popsim.html">plot_popsim</a></span><span class="op">(</span><span class="va">res_best</span>,<span class="va">fit_vpa2sam</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="sam_files/figure-html/cross_test-2.png" width="100%" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co"># SAMの結果（res_best）の代わりに、VPAの結果をoperating model (真のモデル) として入れ替えて、VPAデータに対するself-test / cross-testもできます</span></span></code></pre></div>
 </div>
-<div class="section level3">
-<h3 id="将来予測">将来予測<a class="anchor" aria-label="anchor" href="#%E5%B0%86%E6%9D%A5%E4%BA%88%E6%B8%AC"></a>
-</h3>
+</div>
+<div class="section level2">
+<h2 id="将来予測">将来予測<a class="anchor" aria-label="anchor" href="#%E5%B0%86%E6%9D%A5%E4%BA%88%E6%B8%AC"></a>
+</h2>
 <ul>
 <li>資源量推定の不確実性をどこまで考慮するか？</li>
 <li>再生産関係は外部で推定しても良いのかも（難しいことはしなくてもよいようにもしておく）</li>
 </ul>
-</div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
