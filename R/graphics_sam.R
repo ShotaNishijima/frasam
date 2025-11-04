@@ -790,8 +790,14 @@ plot_hindcastCV = function(samres,
     use_index = 1:nrow(samres$input$dat$index)
   }
 
-  dat_removed = res_mase$removed %>% filter(idx %in% use_index)
+  dat_removed = res_mase$removed %>%
+    filter(idx %in% use_index)
   dat_full = res_mase$full %>% filter(idx %in% use_index)
+
+  if(!is.null(years)) {
+    dat_removed = filter(dat_removed, year %in% years)
+    dat_full = filter(dat_full, year %in% years)
+  }
   dat_mase = res_mase$mase %>% filter(idx %in% use_index)
   dat_cv = res_mase$cv %>% filter(idx %in% use_index)
 
