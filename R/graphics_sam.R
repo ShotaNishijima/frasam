@@ -678,7 +678,7 @@ plot_osa_resid <- function(osares) {
     scale_colour_gradient2(high="red",low="blue",mid="gray")+
     xlab("Year")+
     ylab("Age")+
-    scale_y_continuous(breaks=0:6)+
+    scale_y_continuous(breaks=0:100)+
     theme_SH()
 
   ## index
@@ -692,7 +692,7 @@ plot_osa_resid <- function(osares) {
     scale_colour_gradient2(high="red",low="blue",mid="gray")+
     xlab("Fishing year")+
     ylab("Index ID")+
-    scale_y_continuous(breaks=1:6)+
+    scale_y_continuous(breaks=1:100)+
     theme_bw()
 
   ## qq plot
