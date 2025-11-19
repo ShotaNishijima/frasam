@@ -679,7 +679,8 @@ sam <- function(dat,
 
     SR.name <- "RW"
     is.SR <- ifelse(SR.mode==0, FALSE, TRUE)
-    par_list = obj$env$parList(opt$par)
+    # par_list = obj$env$parList(opt$par)
+    par_list = obj$env$parList() #最適化しないように修正
 
     BioRefPt <- function(data, rep, opt, ref.year, is.SR, obj){
       if (is.null(rep$unbiased)) {
@@ -762,7 +763,8 @@ sam <- function(dat,
       loglik <- -opt$objective
       aic <- 2*opt$objective+2*length(opt$par)
 
-      q1 <- exp(as.numeric(rep$par.fixed[names(rep$par.fixed) == "logQ"]))
+      # q1 <- exp(as.numeric(rep$par.fixed[names(rep$par.fixed) == "logQ"]))
+      q1 <- exp(as.numeric(obj$env$parList()[["logQ"]]))
       if (isTRUE(b_random)){
         b1 <- exp(as.numeric(rep$par.random[names(rep$par.random) == "logB"]))
       }else{
@@ -787,7 +789,8 @@ sam <- function(dat,
       if(!is.null(index.key)) sigma2 <- sigma2[index.key-min(index.key)+1]
       sigma3 <- exp(as.numeric(par_list[["logSdLogFsta"]]))
       sigma3 <- sapply(1:ncol1, function(i) sigma3[data$keyVarF[1,i]+1])
-      sigma4 <- exp(obj$env$parList(opt$par)$logSdLogN)
+      # sigma4 <- exp(obj$env$parList(opt$par)$logSdLogN)
+      sigma4 <- exp(obj$env$parList()[["logSdLogN"]]) #修正2025/11/12
       # sigma4 <- exp(as.numeric(rep$par.fixed[names(rep$par.fixed) == "logSdLogN"]))
       sigma4 <- sapply(1:ncol1, function(i) sigma4[data$keyVarLogN[1,i]+1])
       rho1 <- ifelse(as.numeric(data$rhoMode) > 1, 1/(1+exp(-as.numeric(rep$par.fixed[names(rep$par.fixed) == "logit_rho"]))),as.numeric(data$rhoMode))
