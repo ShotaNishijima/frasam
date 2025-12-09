@@ -679,7 +679,7 @@ plot_osa_resid <- function(osares) {
     xlab("Year")+
     ylab("Age")+
     scale_y_continuous(breaks=0:100)+
-    theme_SH()
+    theme_bw()
 
   ## index
   osa_resid_index = osares %>%
