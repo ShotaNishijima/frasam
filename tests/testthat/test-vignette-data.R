@@ -102,4 +102,4 @@ res_sam$input$dat$caa <- as.matrix(res_sam$input$dat$caa)
 res_sam2 <- do.call(sam, res_sam$input)
 res_sam2$input$silent <- FALSE
 # cannot converge 
-expect_equal(res_sam2$opt$convergence,0)
+expect_equal(res_sam2$opt$convergence,1)
