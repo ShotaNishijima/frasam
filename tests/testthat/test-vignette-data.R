@@ -101,5 +101,5 @@ expect_equal(res_sam$opt$convergence,0)
 res_sam$input$dat$caa <- as.matrix(res_sam$input$dat$caa)
 res_sam2 <- do.call(sam, res_sam$input)
 res_sam2$input$silent <- FALSE
-# cannot converge 
-expect_equal(res_sam2$opt$convergence,1)
+# 修正前は収束しなかったが、修正すると（データがdata.frameに内部で変換されるので）ふつうに収束するようになる
+expect_equal(res_sam2$opt$convergence,0)
