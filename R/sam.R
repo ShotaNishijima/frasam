@@ -162,6 +162,13 @@ sam <- function(dat,
       }
     }
 
+    # check and convert data (why? see: test-vignette-data.R)
+    if(!is.data.frame(dat$caa)) dat$caa <- dat$caa %>% as.data.frame()
+    if(!is.data.frame(dat$maa)) dat$maa <- dat$maa %>% as.data.frame()
+    if(!is.data.frame(dat$M  )) dat$M   <- dat$M   %>% as.data.frame()
+    if(!is.data.frame(dat$waa)) dat$waa <- dat$waa %>% as.data.frame()
+    if(!is.data.frame(dat$index)) dat$index <- dat$index %>% as.data.frame()        
+
     caa <- dat$caa
     if (last.catch.zero) caa[ncol(caa)] <- NULL
 
