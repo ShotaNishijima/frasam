@@ -20,3 +20,12 @@ tools/Data/*
 /Meta/
 docs
 .positai
+
+FEpar.csv
+
+tools/**.RDS
+tools/**.csv
+tools/**.rds
+tools/**.rds
+tools/**.RData
+
