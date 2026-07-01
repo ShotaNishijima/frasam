@@ -1,0 +1,159 @@
+---
+title: "FAQ on how to use 'frasam'"
+author: "Shota Nishijima (FRA)"
+date: "`r format(Sys.Date())`"
+output:
+  rmarkdown::html_vignette:
+    css: style.css
+vignette: >
+  %\VignetteIndexEntry{FAQ on how to use 'frasam'}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+options(rmarkdown.html_vignette.check_title = FALSE)
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  message = FALSE,
+  warning = FALSE
+)
+```
+
+# FAQ
+
+この文書は、`frasam` を使うときによくある質問と対応方針をまとめるためのものです。
+解析の詳細な手順は通常のvignetteに残し、ここではエラー対応、確認方法、開発時の注意点を短く整理します。
+ここに載せてほしい項目は、[Issues](https://github.com/ShotaNishijima/frasam/issues)に書き込んでください。あるいは、ニシジマまで連絡してください。
+
+```{r setup, include = FALSE}
+  options(rmarkdown.html_vignette.check_title = FALSE)
+  knitr::opts_chunk$set(
+    collapse = TRUE,
+    comment = "#>",
+    message = FALSE,
+    warning = FALSE
+  )
+
+  library(frasam)
+```
+## インストールと依存パッケージ
+
+### `frasyr` がないと言われます
+
+`frasam` は `frasyr` に依存しています。未インストールの場合は、開発版の `frasyr` を入れてから再実行してください。
+
+```{r install-frasyr, eval = FALSE}
+install.packages("remotes")
+remotes::install_github("ichimomo/frasyr@dev")
+```
+
+## SAMの実行
+
+### `use_sam_tmb()` はいつ実行しますか？
+
+- `sam()` を実行する前に、TMBで使う実行ファイルを準備するために実行します。
+- 通常のテストや例では、上書きしない設定にします。
+
+```{r use-sam-tmb, eval = TRUE}
+use_sam_tmb(overwrite = FALSE)
+```
+
+
+### 一部の引数のみを変更して解析したい
+
+- SAMの結果オブジェクトに格納されている`input`を使って、前までの設定を引き継いだ解析ができます
+- ここでは再生産関係を変更した場合を例に説明します。
+
+```{r use-do.call, eval = TRUE}
+data("dat_ex") #example data
+
+#Random walk (RW)
+res_rw  <- sam(
+  dat_ex,
+  last.catch.zero = TRUE,
+  abund = c("N","N","N","SSB","B"),
+  min.age=c(0,0,1,0,0),
+  max.age = c(0,0,1,6,6),
+  rec.age = 0,
+  index.key=0:4,
+  b.est=FALSE,
+  SR = "RW",
+  varC = c(0,0,1,1,1,2,2),
+  varF = c(0,0,1,1,1,1,1),
+  varN = c(0,1,1,1,1,1,1),
+  rho.mode=3,
+  bias.correct = FALSE,
+  silent = TRUE
+)
+
+# RW -> BH
+input <- res_rw$input
+input$SR <- "BH"
+res_bh <- do.call(sam, input)
+
+# RW -> RI
+input$SR <- "RI"
+res_ri <- do.call(sam, input)
+
+plot_samvpa(list(res_rw,res_bh,res_ri), CI=0.8,
+            scenario_name=rev(c("RW","BH","RI")))
+```
+
+### 以前の解析結果の初期値を利用したい
+
+-`par_list`に固定効果とランダム効果のパラメータ推定値がリスト形式で与えられている
+- これを次の解析の初期値として使うことで、推定を安定化させることができる
+- ただし、固定効果とランダム効果の数や構造が変わるとうまく行かないので、注意すること
+- ここでは`rho.mode`を変更したときを例に説明する
+
+```{r use-p0, eval = TRUE}
+
+input$p0.list <- res_ri$par_list
+input$rho.mode <- 2
+res_rho2 <- do.call(sam, input)
+
+plot_samvpa(list(res_ri, res_rho2), CI=0.8,
+            scenario_name=rev(c("Rho3","Rho2")))
+
+```
+
+## SAMの結果の出力
+
+### `plot_samvpa()`の縦軸のスケールを換えたい
+
+- `plot_samvpa()` では、加入量、資源量、親魚量、漁獲量の表示スケールを個別に変更できます。
+デフォルトはいずれも `1000` なので、引数を指定しない場合はこれまでと同じ図になります。
+
+- 下の例では、加入量は元のスケールで表示し、資源量と親魚量は `10000` で割って表示しています。
+
+
+```{r plot-samvpa-scale-example, eval = TRUE}
+gg1 <- plot_samvpa(
+  list(res_rw, res_bh, res_ri),
+  CI = 0.8,
+  scenario_name = rev(c("RW", "BH", "RI")),
+  scale_recruitment = 1,
+  scale_biomass = 10000,
+  scale_ssb = 10000
+)
+print(gg1)
+```
+
+- 以下のやり方で、表示名を事後的に変えて、日本語表記や単位を含めることができます
+
+```{r plot-samvpa-facet-label, eval = TRUE}
+gg1 +
+    ggplot2::facet_wrap(
+      ggplot2::vars(stat_f),
+      scales = "free_y",
+      ncol = 2,
+      labeller = ggplot2::as_labeller(c(
+        "Recruitment" = "加入量（尾）",
+        "Biomass" = "資源量（万トン）",
+        "SSB" = "親魚量（万トン）",
+        "Exploitation_rate" = "漁獲割合"
+      ))
+    )
+```
