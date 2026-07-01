@@ -115,8 +115,10 @@ out_sam <- function(res,
     write_csv(path=csvname,append=T, col_names=TRUE)
 
   write("\n# stock-recruitment relationship",file=csvname,append=T)
-  write.table2(cbind("type"=res$input$SR,data.frame(t(res$rec.par)),"sigmaR"=res$sigma.logN[1]),
-               title.tmp="Stock-recuitment relationship",is.plot=FALSE)
+  if (!is.null(res$rec.par)) {
+    write.table2(cbind("type"=res$input$SR,data.frame(t(res$rec.par)),"sigmaR"=res$sigma.logN[1]),
+                 title.tmp="Stock-recuitment relationship",is.plot=FALSE)
+  }
 
   tmp <- sumrep[rownames(sumrep)=="exp_logN",]
   tmp <- cbind(expand.grid(age=rownames(res$naa),year=colnames(res$naa)),tmp) %>%
