@@ -139,7 +139,17 @@ sam(
 
 \item{silent}{MakeADfunのときの標準出力あり（TRUE: デフォルト）、なし（FALSE）}
 
+\item{remove.Fprocess.year}{Years to remove from the F process model.}
+
+\item{RW.Forder}{Order of the random-walk process for fishing mortality.}
+
+\item{map.add}{Additional TMB map settings.}
+
+\item{p0.list}{Initial parameter list.}
+
 \item{scale}{資源量のスケーリングファクター。資源量はscaleで割った値となる}
+
+\item{gamma}{Gamma parameter setting.}
 
 \item{sel.def}{選択率の定義。"max"（デフォルト）の場合、最大年齢を１とする。}
 
@@ -161,13 +171,39 @@ sam(
 
 \item{FreeADFun}{\code{TMB::FreeADFun}を使う場合、TRUEにする。See \code{?TMB::FreeADFun}.}
 
+\item{add_random}{Additional random effects.}
+
 \item{lambda_Mesnil}{SRを"Mesnil"にした場合のラムダの値??}
+
+\item{tmbdata}{TMB data list.}
+
+\item{map}{TMB parameter map.}
 
 \item{model_wm}{weightとmaturityの成長をモデリングするかどうか}
 
+\item{w0_factor}{Factor setting for initial weight.}
+
+\item{weight_factor}{Factor setting for weight-at-age.}
+
+\item{family_w}{Error distribution for weight observations.}
+
+\item{maturity_factor}{Factor setting for maturity-at-age.}
+
 \item{scale_number}{尾数のスケーリングファクター。尾数はscaleで割った値となる}
 
-\item{growth_regime}{}
+\item{weight_weight}{Weight assigned to weight-at-age likelihood components.}
+
+\item{maturity_weight}{Weight assigned to maturity-at-age likelihood components.}
+
+\item{g_fix}{Fixed value setting for growth parameter g.}
+
+\item{CV_w_fix}{Fixed value setting for weight coefficient of variation.}
+
+\item{w_link}{Link function for weight model.}
+
+\item{sep_omicron}{Whether to separate omicron parameters.}
+
+\item{growth_regime}{Growth regime setting.}
 
 \item{catch_prop}{abund="Bs"のとき、対象とするfleetのcatch at ageの全体に対する比率.}
 

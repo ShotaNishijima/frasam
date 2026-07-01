@@ -49,26 +49,26 @@
 #' @param cpp.file.name 推定に用いるcppファイル。デフォルトは最新版の"sam2"
 #' @param scale 資源量のスケーリングファクター。資源量はscaleで割った値となる
 #' @param scale_number 尾数のスケーリングファクター。尾数はscaleで割った値となる
-#' @param remove.Fprocess.year
-#' @param RW.Forder
-#' @param map.add
-#' @param p0.list
-#' @param gamma
+#' @param remove.Fprocess.year Years to remove from the F process model.
+#' @param RW.Forder Order of the random-walk process for fishing mortality.
+#' @param map.add Additional TMB map settings.
+#' @param p0.list Initial parameter list.
+#' @param gamma Gamma parameter setting.
 #' @param FreeADFun \code{TMB::FreeADFun}を使う場合、TRUEにする。See \code{?TMB::FreeADFun}.
-#' @param add_random
-#' @param tmbdata
-#' @param map
-#' @param w0_factor
-#' @param weight_factor
-#' @param family_w
-#' @param maturity_factor
-#' @param weight_weight
-#' @param maturity_weight
-#' @param g_fix
-#' @param CV_w_fix
-#' @param w_link
-#' @param sep_omicron
-#' @param growth_regime
+#' @param add_random Additional random effects.
+#' @param tmbdata TMB data list.
+#' @param map TMB parameter map.
+#' @param w0_factor Factor setting for initial weight.
+#' @param weight_factor Factor setting for weight-at-age.
+#' @param family_w Error distribution for weight observations.
+#' @param maturity_factor Factor setting for maturity-at-age.
+#' @param weight_weight Weight assigned to weight-at-age likelihood components.
+#' @param maturity_weight Weight assigned to maturity-at-age likelihood components.
+#' @param g_fix Fixed value setting for growth parameter g.
+#' @param CV_w_fix Fixed value setting for weight coefficient of variation.
+#' @param w_link Link function for weight model.
+#' @param sep_omicron Whether to separate omicron parameters.
+#' @param growth_regime Growth regime setting.
 #'
 #' @export
 #'

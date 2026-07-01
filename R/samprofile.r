@@ -52,7 +52,7 @@ samprofile <- function(samres,param_name,which_param=1,param_range=NULL,length=5
   for (i in 1:length) {
     init[[param_name]][which_param] <- prof_param[i]
     obj_tmp = TMB::MakeADFun(data,init,map=map,random=random,DLL=samres$input$cpp.file.name,silent=TRUE)
-    obj_tmp$fn(opt_tmp$par)
+    obj_tmp$fn(obj_tmp$par)
     opt_tmp = nlminb(obj_tmp$par, obj_tmp$fn, obj_tmp$gr,control=nlminb.control)
     # opt_tmp = nlminb(obj_tmp$par, obj_tmp$fn, obj_tmp$gr,control=nlminb.control)
     message(paste0("par: ",prof_param[i],"   objective: ", opt_tmp$objective))
@@ -90,7 +90,7 @@ samprofile <- function(samres,param_name,which_param=1,param_range=NULL,length=5
 est_fixed <- function(tmbdata,par_init,map,random="U",cpp.file.name="sam2",silent=TRUE,...) {
 
   obj_tmp = TMB::MakeADFun(tmbdata,par_init,map=map,random=random,DLL=cpp.file.name,silent=silent,...)
-  obj_tmp$fn(opj_tmp$par)
+  obj_tmp$fn(obj_tmp$par)
   nlminb.control = list(eval.max = 1e4,
                         iter.max = 1e4,
                         trace = 0)

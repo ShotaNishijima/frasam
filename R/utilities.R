@@ -205,9 +205,6 @@ get_randpar <- function(res_sam, nsim=10000, only_fix=TRUE){
 #'
 #' @encoding UTF-8
 #'
-#' @examples
-#'
-
 make_samrand <- function(res_sam, nsim=1000){
 
   rand_par <- get_randpar(res_sam, nsim=nsim, only_fix=FALSE)

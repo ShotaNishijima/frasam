@@ -193,8 +193,10 @@ calc_mase = function(samres,
 
   cv_grid = expand.grid(idx = info$idx, retro_id = 1:nretro) %>%
     left_join(info) %>%
-    mutate(year_target = T_i - retro_id + h, #予測する年
-           year_cond = T_i - retro_id)　#予測に使うレトロのterminal year
+    mutate(
+      year_target = T_i - retro_id + h,
+      year_cond = T_i - retro_id
+    )
 
   cv_grid = left_join(
     cv_grid,

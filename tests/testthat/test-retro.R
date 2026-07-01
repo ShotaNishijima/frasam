@@ -5,7 +5,8 @@ context("retro check")
 test_that("test retrot",{
   # samres = get(load(system.file("data","samres_example.rda",package="frasam")))
   data("samres_example",package="frasam")
-  retrores = get(load(system.file("tests/testthat/testdata","retrores_example.rda",package="frasam")))
+  # retrores = get(load(system.file("tests/testthat/testdata","retrores_example.rda",package="frasam")))
+  retrores <- get(load(testthat::test_path("testdata", "retrores_example.rda")))
   input = samres$input
   input$p0.list <- NULL
   use_sam_tmb(overwrite=FALSE)
