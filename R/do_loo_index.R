@@ -29,7 +29,8 @@ do_loo_index = function(samres) {
     if(!is.null(res$input$catch_prop)) input$catch_prop <- res$input$catch_prop[,,-j]
 
     input$no_est <- TRUE
-    tmp = do.call(sam,input)
+    tmp = try(do.call(sam,input), silent = TRUE)
+    if (inherits(tmp, "try-error")) return(tmp)
 
     p0_list <- tmp$obj$env$parList()
     p0_list$U <- res$obj$env$parList()[["U"]]
@@ -39,7 +40,7 @@ do_loo_index = function(samres) {
     input$no_est <- FALSE
     input$p0.list <- p0_list
 
-    res.c = do.call(sam,input)
+    res.c = try(do.call(sam,input), silent = TRUE)
     return( res.c )
   })
   return( RES )
