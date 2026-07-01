@@ -1,8 +1,9 @@
 library(frasam)
-# load_all()
+# devtools::load_all()
 context("data check")
 test_that("test data",{
   data("dat_example",package="frasam")
+  dat_example_loaded <- dat_example
   # dat = get(load(system.file("data","dat_example.rda",package="frasam")))
   caa <- read.csv(system.file("extdata","caa1_2023.csv",package="frasam"),row.names=1)
   waa <- read.csv(system.file("extdata","waa1_2023.csv",package="frasam"),row.names=1)
@@ -10,7 +11,7 @@ test_that("test data",{
   cpue <- read.csv(system.file("extdata","cpue1_2023.csv",package="frasam"),row.names=1)
   dat_orig <- frasyr::data.handler(caa=caa, waa=waa, maa=maa, M=0.4,index=cpue)
 
-  expect_equal(dim(dat$caa),dim(dat_orig$caa))
+  expect_equal(dim(dat_example_loaded$caa),dim(dat_orig$caa))
 
   # expect_equal(round(sum(abs(dat$caa-dat_orig$caa)),2),0)
   # expect_equal(round(sum(abs(dat$waa-dat_orig$waa)),2),0)
