@@ -13,17 +13,22 @@ do_osa_resid <- function(samres,
                       method="oneStepGaussianOffMode", #
                       subset=NULL,
                       trace=2) {
-  obj = samres$obj
-  obs = samres$data$obs #fitするデータ (catch at age + index)
-  if(is.null(subset)) subset <- 1:nrow(obs)
-  osa.simple <- TMB::oneStepPredict(obj,
-                                    observation.name = "logobs",
-                                    method=method, #
-                                    data.term.indicator = "keep",
-                                    subset=1:nrow(obs),
-                                    trace=trace)
 
-  osa_resid = obs %>% as.data.frame() %>%
+  obj <- samres$obj
+  obs_all <- samres$data$obs
+  if (is.null(subset)) subset <- seq_len(nrow(obs_all))
+
+  osa.simple <- TMB::oneStepPredict(
+    obj,
+    observation.name = "logobs",
+    method = method,
+    data.term.indicator = "keep",
+    subset = subset,
+    trace = trace
+  )
+
+  osa_resid <- obs_all[subset, , drop = FALSE] %>%
+    as.data.frame() %>%
     mutate(logobs = log(obs)) %>%
     bind_cols(as.data.frame(osa.simple))
 
