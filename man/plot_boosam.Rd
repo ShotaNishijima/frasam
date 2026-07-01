@@ -27,9 +27,31 @@ plot_boosam(
 
 \item{boores}{\code{boo_sam}の結果オブジェクト}
 
+\item{CI}{Confidence interval width. Set 0 to omit confidence intervals.}
+
+\item{what.plot}{Statistics to plot.}
+
 \item{draw_deltaCI}{デルタ法の信頼区間を描くか（デフォルト:FALSE）}
 
 \item{scenario_name}{推定値の結果、ブートストラップの結果の凡例に使う名前}
+
+\item{alpha}{Alpha value for confidence interval ribbons.}
+
+\item{size}{Line width.}
+
+\item{base_size}{Base font size.}
+
+\item{log_scale}{If \code{TRUE}, use a log scale on the y-axis.}
+
+\item{legend_name}{Legend title.}
+
+\item{legend_nrow}{Number of rows in the legend.}
+
+\item{legend_position}{Legend position.}
+
+\item{years}{Years to include in the plot.}
+
+\item{ncol}{Number of columns in the facet plot.}
 }
 \description{
 ブートストラップについてプロットする関数

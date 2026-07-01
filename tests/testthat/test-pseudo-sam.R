@@ -36,6 +36,31 @@ test_that("pseudo SAM example runs and matches saved result", {
   )
   expect_false(is.null(plot_res))
 
+  expect_error(
+    plot_res_scaled <- plot_samvpa(
+      res_test,
+      CI = 0,
+      scenario_name = "pseudo",
+      what.plot = c("biomass", "SSB", "Recruitment"),
+      scale_biomass = 1,
+      scale_ssb = 1,
+      scale_recruitment = 1
+    ),
+    NA
+  )
+  expect_equal(
+    plot_res_scaled$data$value[plot_res_scaled$data$stat_f == "Biomass"],
+    plot_res$data$value[plot_res$data$stat_f == "Biomass"] * 1000
+  )
+  expect_equal(
+    plot_res_scaled$data$value[plot_res_scaled$data$stat_f == "SSB"],
+    plot_res$data$value[plot_res$data$stat_f == "SSB"] * 1000
+  )
+  expect_equal(
+    plot_res_scaled$data$value[plot_res_scaled$data$stat_f == "Recruitment"],
+    plot_res$data$value[plot_res$data$stat_f == "Recruitment"] * 1000
+  )
+
   out_file <- tempfile("sam_ex_out_")
   expect_error(out_sam(res_test, filename = out_file), NA)
   expect_true(file.exists(paste0(out_file, ".csv")))

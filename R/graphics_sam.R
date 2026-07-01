@@ -61,10 +61,25 @@ get_predSR <- function(samres,max.ssb.pred=1.3,length=100){
 
 }
 
-#' SAM or VPAの結果を描くグラフ
+#' Plot SAM or VPA results
 #'
-#' @param vpa_sam_list VPAまたはSAMの結果オブジェクトのリスト
-#' @param what_plot どの統計量をプロットするか
+#' @param vpa_sam_list A SAM or VPA result object, or a list of result objects.
+#' @param CI Confidence interval width. Set 0 to omit confidence intervals.
+#' @param scenario_name Scenario names used in the legend.
+#' @param alpha Alpha value for confidence interval ribbons.
+#' @param size Line width.
+#' @param base_size Base font size.
+#' @param log_scale If \code{TRUE}, use a log scale on the y-axis.
+#' @param legend_name Legend title.
+#' @param legend_nrow Number of rows in the legend.
+#' @param legend_position Legend position.
+#' @param what.plot Statistics to plot.
+#' @param years Years to include in the plot.
+#' @param ncol Number of columns in the facet plot.
+#' @param scale_recruitment Divisor for recruitment values in the plot.
+#' @param scale_biomass Divisor for biomass values in the plot.
+#' @param scale_ssb Divisor for spawning stock biomass values in the plot.
+#' @param scale_catch Divisor for catch values in the plot.
 #' @importFrom forcats fct_inorder
 #' @export
 #' @encoding UTF-8
@@ -74,12 +89,26 @@ plot_samvpa <- function(vpa_sam_list,CI=0.95,scenario_name=NULL,
                      legend_name="Scenario",legend_nrow=1, legend_position="top",
                      what.plot = c("biomass","SSB","Recruitment","U"),
                      years = NULL,
-                     ncol=2
+                     ncol=2,
+                     scale_recruitment = 1000,
+                     scale_biomass = 1000,
+                     scale_ssb = 1000,
+                     scale_catch = 1000
 ){
 
   if(class(vpa_sam_list)[1] %in% c("sam","vpa")) {
     vpa_sam_list <- list(vpa_sam_list)
   }
+  plot_scales <- c(
+    scale_recruitment = scale_recruitment,
+    scale_biomass = scale_biomass,
+    scale_ssb = scale_ssb,
+    scale_catch = scale_catch
+  )
+  if (any(!is.finite(plot_scales) | plot_scales <= 0)) {
+    stop("All scale arguments must be positive finite values.")
+  }
+
   g0 = frasyr::plot_vpa(vpa_sam_list)
 
   data = g0$data %>%
@@ -91,7 +120,13 @@ plot_samvpa <- function(vpa_sam_list,CI=0.95,scenario_name=NULL,
     group_by(id,year,stat) %>%
     summarise(value=mean(value)) %>%
     ungroup() %>%
-    mutate(value = if_else(stat == "fishing_mortality"|stat == "U",value,value/1000))
+    mutate(value = case_when(
+      stat == "Recruitment" ~ value / scale_recruitment,
+      stat == "biomass" ~ value / scale_biomass,
+      stat == "SSB" ~ value / scale_ssb,
+      stat == "catch" ~ value / scale_catch,
+      TRUE ~ value
+    ))
   # data2 %>% filter(stat == "U")
   # class(data2$stat)
   data2 = data2 %>%
