@@ -4,7 +4,7 @@
 
 
 popsim_vpasam = function(Res,n=5,seed=1){
-  if(is.numeric(set.seed)) set.seed(set.seed)
+  if (!is.null(seed)) set.seed(seed)
 
   if (class(Res)=="sam"){
     Res$input$bias.correct.sd <- FALSE
