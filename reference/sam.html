@@ -57,6 +57,7 @@
 <span>  varN <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  varF <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  varN.fix <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  est.method <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  SR <span class="op">=</span> <span class="st">"BH"</span>,</span>
 <span>  AR <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  rho.mode <span class="op">=</span> <span class="fl">2</span>,</span>
@@ -174,6 +175,10 @@
 <dd><p>??</p></dd>
 
 
+<dt id="arg-est-method">est.method<a class="anchor" aria-label="anchor" href="#arg-est-method"></a></dt>
+<dd><p>Deprecated. Use <code>index.key</code> instead. If <code>"ls"</code> is supplied and <code>index.key = NULL</code>, all index observation-error sigmas are shared.</p></dd>
+
+
 <dt id="arg-sr">SR<a class="anchor" aria-label="anchor" href="#arg-sr"></a></dt>
 <dd><p>再生産関係："RW"(Random walk), "BH", "RI", "HS", "Mesnil", or "Const"</p></dd>
 
@@ -263,7 +268,7 @@
 
 
 <dt id="arg-use-index">use.index<a class="anchor" aria-label="anchor" href="#arg-use-index"></a></dt>
-<dd><p>この仕様は設定ミスを引き起こしやすいので廃止しました。使用するIndexのみデータに入れてください</p></dd>
+<dd><p>この仕様は設定ミスを引き起こしやすいので廃止しました。<code>sam()</code>を使用するまえに、Indexのデータを使用するもののみにsubsetするようにしてください</p></dd>
 
 
 <dt id="arg-upper">upper<a class="anchor" aria-label="anchor" href="#arg-upper"></a></dt>

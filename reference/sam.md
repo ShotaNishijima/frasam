@@ -22,6 +22,7 @@ sam(
   varN = 0,
   varF = 0,
   varN.fix = NULL,
+  est.method = NULL,
   SR = "BH",
   AR = 0,
   rho.mode = 2,
@@ -144,6 +145,11 @@ sam(
 
   ??
 
+- est.method:
+
+  Deprecated. Use `index.key` instead. If `"ls"` is supplied and
+  `index.key = NULL`, all index observation-error sigmas are shared.
+
 - SR:
 
   再生産関係："RW"(Random walk), "BH", "RI", "HS", "Mesnil", or "Const"
@@ -240,7 +246,7 @@ sam(
 
 - use.index:
 
-  この仕様は設定ミスを引き起こしやすいので廃止しました。使用するIndexのみデータに入れてください
+  この仕様は設定ミスを引き起こしやすいので廃止しました。`sam()`を使用するまえに、Indexのデータを使用するもののみにsubsetするようにしてください
 
 - upper:
 
