@@ -3,12 +3,12 @@ title: "FAQ on how to use 'frasam'"
 author: "Shota Nishijima (FRA)"
 date: "`r format(Sys.Date())`"
 output:
-  rmarkdown::md_document:
-    variant: markdown_github
-    toc: true
-    toc_depth: 3
   rmarkdown::html_vignette:
     css: style.css
+    toc: true
+    toc_depth: 3
+  rmarkdown::md_document:
+    variant: markdown_github
     toc: true
     toc_depth: 3
 vignette: >
@@ -19,7 +19,7 @@ vignette: >
 
 # Frequently Asked Questions
 
-この文書は、`frasam` を使うときによくある質問と対応方針をまとめるためのものです。
+この文書は、`frasam` を使うときによくある質問・要望と対応方針をまとめるためのものです。
 解析の詳細な手順は通常のvignetteに残し、ここではエラー対応、確認方法、開発時の注意点を短く整理します。
 ここに載せてほしい項目は、[Issues](https://github.com/ShotaNishijima/frasam/issues)に書き込んでください。あるいは、ニシジマまで連絡してください。
 
@@ -43,13 +43,12 @@ vignette: >
 
 ### どのブランチを`frasam` を使えばよい？
 
-- このvignetteにある仕様を使う場合は`frasam` は `faq`をインストールしてください
-- いずれ、開発版は`dev`に置く予定です
+- このvignetteにある仕様を使う場合は`frasam` は `create_vignette`のブランチをインストールしてください
 
 ```{r install-frasam, eval = FALSE}
 install.packages("remotes")
-remotes::install_github("ShotaNishijima/frasyr@dev")
-# remotes::install_github("ShotaNishijima/frasyr@faq")
+remotes::install_github("ShotaNishijima/frasyr@create_vignette")
+# remotes::install_github("ShotaNishijima/frasyr@dev")
 
 library(frasam)
 ```
@@ -86,7 +85,7 @@ data("dat_ex") #example data
 #Random walk (RW)
 res_rw  <- sam(
   dat_ex,
-  last.catch.zero = TRUE,
+  last.catch.zero = TRUE, #最終年のcatchがzeroかどうか
   abund = c("N","N","N","SSB","B"),
   min.age=c(0,0,1,0,0),
   max.age = c(0,0,1,6,6),
@@ -267,7 +266,7 @@ fit_check_strict_sigma$checks[
 fit_check_strict_sigma$sigma[!fit_check_strict_sigma$sigma$ok, ]
 ```
 
-### 資源尾数Nのプロセス誤差を小さい値に固定したい
+### 資源尾数Nのプロセス誤差を小さい値に固定したい {#fix-SDlogN}
 
 - SAMではVPAと異なり、加入以降の個体数が、漁獲死亡(F)と自然死亡係数(M)以外の要因（プロセス誤差）によっても変化することを仮定します
 - その値を小さくすることで、VPAと同じ個体群動態になります
@@ -288,10 +287,213 @@ res_varNfix$sigma.logN #1歳魚以上はSD=0.01に固定
 check_fit_sam(res_varNfix, verbose = TRUE) #すべてOKになる
 ```
 
-### 
+### ある固定効果パラメータをある値に固定して使いたい {#fix-SDlogC}
+
+- 上記で説明したNの過程誤差以外にも、他のパラメータを固定したい場合があるかもしれない
+- 例えば、catch at ageの観測誤差の分散が事前に分かっている場合はその値を固定することは妥当だと思われる
+- TMBでは`map`という機能を使って、固定効果パラメータを初期値に固定できる機能がある
+- `sam`では`map.add`という引数を利用することで、特定のパラメータを固定できる
+- SAMではcatch at ageの観測誤差とIndexの観測誤差（のSDのlog）が共にlogSdLogObsというパラメータで推定されているので、その場所を見つける必要がある
+
+```{r fix-logsdlogobs, echo = TRUE}
+input <- res_varNfix$input
+
+# 現在の推定値を次の初期値に使う
+input$p0.list <- res_varNfix$par_list
+
+# 有効桁数の違いで match() が NA になることがあるので、
+# 許容誤差つきで一番近い位置を探す関数を用意する
+find_pos <- function(x, target, tol = 1e-6) {
+  pos <- which(abs(x - target) < tol)
+  if (length(pos) == 0) {
+    pos <- which.min(abs(x - target))
+  }
+  pos[1]
+}
+
+# logSdLogObs は log スケールだが、確認しやすいように SD スケールで比較する
+sigma_hat <- exp(input$p0.list$logSdLogObs)
+
+# sigma.logC に対応する logSdLogObs の位置を探す
+idx_logC <- sapply(unique(res_varNfix$sigma.logC), function(z) {
+  find_pos(sigma_hat, z, tol = 1e-6)
+})
+
+idx_logC
+sigma_hat[idx_logC]
+exp(input$p0.list$logSdLogObs[idx_logC])
+
+# 例: すべてのsigma.logCを 0.2 に固定する
+fix_pos <- idx_logC[]
+
+# map は、推定するパラメータには番号、固定するパラメータには NA を入れる
+map_logSdLogObs <- seq_along(input$p0.list$logSdLogObs)
+map_logSdLogObs[fix_pos] <- NA
+
+# 固定したい値を初期値として入れる（logをとること）
+input$p0.list$logSdLogObs[fix_pos] <- log(0.2)
+input$map.add <- list(logSdLogObs = factor(map_logSdLogObs))
+
+res_sigma02 <- do.call(sam, input)
+
+# 固定したグループが 0.2 になっていることを確認する
+res_sigma02$sigma.logC
+abs(res_sigma02$sigma.logC - 0.2) < 1e-6
+
+# 固定したパラメータは opt$par には出てこない
+res_sigma02$opt$par[names(res_sigma02$opt$par) == "logSdLogObs"]
+```
+
+### VPAと同じような設定で解析したい
+
+- SAMで、VPAの仮定を同じような設定をすることによって、VPAのようなモデルを解析することができる
+- ①年齢別漁獲尾数の観測誤差を小さくする、②1歳魚以上の資源尾数の過程誤差を小さくする、③FのRandom walkにおける年齢間の相関をゼロにし、各年齢の観測誤差のSDを（なるべく）別々に推定する、ことによって、VPAの仕様に近づけることになります。
+- ①については、`varC`, `sdLogObs.init`, `map.add` を以下のようにすることで実行できます（[ある固定効果パラメータをある値に固定して使いたい](#fix-SDlogC)も参照のこと）
+- ②については、`varN`, `varN.fix` を以下のように設定してください（[資源尾数Nのプロセス誤差を小さい値に固定したい](#fix-SDlogN)も参照のこと）
+- ③については、`varF`, `rho.mode`を以下のように設定してください
+- ここではやっていませんが、上記の設定のon/offを組み合わせることで、catch at ageの観測誤差、1歳魚以上の過程誤差, Fのランダムウォークに相対的影響を評価することもできるかと思います
+
+```{r vpa-like model1, echo = TRUE}
+res_vpalike  <- sam(
+  dat_ex,
+  last.catch.zero = TRUE, #最終年のcatchがzeroかどうか
+  abund = c("N","N","N","SSB","B"),
+  min.age=c(0,0,1,0,0),
+  max.age = c(0,0,1,6,6),
+  rec.age = 0,
+  index.key=0:4,
+  b.est=FALSE,
+  SR = "RW",
+  varC = c(0,0,0,0,0,0,0), #すべての年齢で観測誤差が共通
+  sdLogObs.init = c(0.01, rep(0.5, nrow(dat_ex$index))), #catch at ageのSDの初期値0.01とし、Indexについては0.5とする
+  map.add = list(logSdLogObs = factor(c(NA,1:rep(nrow(dat_ex$index))))),　#catch at ageのSDのみmapで初期値に固定する
+  varN = c(0,1,1,1,1,1,1),
+  varN.fix = c(NA,0.0001),
+  varF = c(0,1,2,3,4,5,5), #年齢別に推定するが、最高齢とその1歳前は同じ数字にしてください（収束しない場合は共通する）
+  rho.mode=0, #Fのrandom wallk process errorの年齢間の相関なし
+  bias.correct = FALSE,
+  silent = TRUE
+)
+
+check_fit_sam(res_vpalike, verbose = FALSE)
+
+res_vpalike$sigma.logC #Catch at ageの観測誤差が小さくなっていることを確認
+# res_vpalike$sigma.logF
+
+res_vpalike$sigma.logN #N at age 1+の仮定誤差が小さくなっていることを確認
+
+plot_samvpa(list(res_rw, res_vpalike), scenario_name = c("SAM","VPA-like"))
+
+```
 
 
-### Indexの観測誤差(`sigma`)を共通にしたい
+- 以下のコードで、catch-at-ageへの当てはまりを比較することができます
+- VPA-like modelの方は、catch-at-ageの観測値とほぼ変わらない値が推定できることが分かります
+
+```{r compare-caa-fit-vpalike, echo = TRUE}
+caa_to_long <- function(x, value_name) {
+  out <- as.data.frame(as.table(as.matrix(x)), stringsAsFactors = FALSE)
+  names(out) <- c("Age", "Year", value_name)
+  out$Age <- as.numeric(as.character(out$Age))
+  out$Year <- as.numeric(as.character(out$Year))
+  out
+}
+
+caa_obs <- caa_to_long(res_rw$input$dat$caa, "Catch")
+if (isTRUE(res_rw$input$last.catch.zero)) {
+  caa_obs <- caa_obs[caa_obs$Year < max(caa_obs$Year), ]
+}
+
+caa_pred_sam <- caa_to_long(res_rw$caa, "Catch")
+caa_pred_sam$Model <- "SAM"
+
+caa_pred_vpalike <- caa_to_long(res_vpalike$caa, "Catch")
+caa_pred_vpalike$Model <- "VPA-like"
+
+caa_pred <- rbind(caa_pred_sam, caa_pred_vpalike)
+caa_pred <- caa_pred[
+  caa_pred$Year %in% caa_obs$Year &
+    caa_pred$Age %in% caa_obs$Age,
+]
+
+ggplot2::ggplot() +
+  ggplot2::geom_point(
+    data = caa_obs,
+    ggplot2::aes(x = Year, y = Catch),
+    colour = "black",
+    size = 1.6
+  ) +
+  ggplot2::geom_line(
+    data = caa_pred,
+    ggplot2::aes(x = Year, y = Catch, colour = Model, linetype = Model),
+    linewidth = 0.8
+  ) +
+  ggplot2::facet_wrap(ggplot2::vars(Age), scales = "free_y") +
+  ggplot2::labs(
+    x = "Year",
+    y = "Catch at age",
+    colour = "Model",
+    linetype = "Model"
+  ) +
+  # + scale_y_log10()　#縦軸をlog scaleにした方がよければコメントアウトを外してください
+  ggplot2::theme_bw() 
+```
+
+- 以下のコードで、F-at-ageや選択率を比較することができます
+- VPA-like modelのほうがFや選択率がギザギザしており、SAMは平滑化されていることが分かります
+
+```{r compare-faa-saa-vpalike, echo = TRUE}
+age_year_to_long <- function(x, model, metric) {
+  out <- as.data.frame(as.table(as.matrix(x)), stringsAsFactors = FALSE)
+  names(out) <- c("Age", "Year", "Value")
+  out$Age <- factor(out$Age, levels = rownames(x))
+  out$Year <- as.numeric(as.character(out$Year))
+  out$Model <- model
+  out$Metric <- metric
+  out
+}
+
+faa_saa_dat <- rbind(
+  age_year_to_long(res_rw$faa, "SAM", "F-at-age"),
+  age_year_to_long(res_vpalike$faa, "VPA-like", "F-at-age"),
+  age_year_to_long(res_rw$saa, "SAM", "Selectivity at age"),
+  age_year_to_long(res_vpalike$saa, "VPA-like", "Selectivity at age")
+)
+
+faa_saa_dat$Model <- factor(faa_saa_dat$Model, levels = c("SAM", "VPA-like"))
+faa_saa_dat$Metric <- factor(
+  faa_saa_dat$Metric,
+  levels = c("F-at-age", "Selectivity at age")
+)
+
+age_levels <- levels(faa_saa_dat$Age)
+linetype_values <- rep(c("solid", "dashed", "dotted", "dotdash", "longdash", "twodash"),
+                       length.out = length(age_levels))
+names(linetype_values) <- age_levels
+
+ggplot2::ggplot(
+  faa_saa_dat,
+  ggplot2::aes(x = Year, y = Value, colour = Age, linetype = Age)
+) +
+  ggplot2::geom_line(linewidth = 0.8) +
+  ggplot2::facet_grid(
+    ggplot2::vars(Metric),
+    ggplot2::vars(Model),
+    scales = "free_y"
+  ) +
+  ggplot2::scale_linetype_manual(values = linetype_values) +
+  ggplot2::labs(
+    x = "Year",
+    y = NULL,
+    colour = "Age",
+    linetype = "Age"
+  ) +
+  ggplot2::theme_bw()
+```
+
+
+
+### Indexの観測誤差のSD`sigma`を共通に解析したい
 
 - すべてのIndexで同じSDを使用する場合は（`frasyr::vpa()`の`est.method="ls"`に相当）、引数を`input$index.key <- rep(0, length(input$abund))`のように設定する
 - 特定のIndexにおいて共通のSDを使用する場合は`input$index.key <- c(0,0,1,2,3)`のように設定する（1番目と2番目のIndexのSDが等しい場合）
