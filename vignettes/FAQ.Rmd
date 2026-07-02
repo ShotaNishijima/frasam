@@ -90,12 +90,12 @@ res_rw  <- sam(
   min.age=c(0,0,1,0,0),
   max.age = c(0,0,1,6,6),
   rec.age = 0,
-  index.key=0:4,
+  index.key=0:4, #すべてのindexの観測誤差のSDが異なる、という設定
   b.est=FALSE,
   SR = "RW",
-  varC = c(0,0,1,1,1,2,2),
-  varF = c(0,0,1,1,1,1,1),
-  varN = c(0,1,1,1,1,1,1),
+  varC = c(0,0,1,1,1,2,2), #0-1歳, 2-4歳, 5-6+歳でcatch at ageの観測誤差のSDが共通
+  varF = c(0,0,1,1,1,1,1), #0-1歳, 2-6+歳でF at ageの過程誤差のSDが共通
+  varN = c(0,1,1,1,1,1,1), #0歳, 1-6+歳でN at ageの過程誤差のSDが共通
   rho.mode=3,
   bias.correct = FALSE,
   silent = TRUE
