@@ -3,18 +3,18 @@ title: "FAQ on how to use 'frasam'"
 author: "Shota Nishijima (FRA)"
 date: "`r format(Sys.Date())`"
 output:
-  rmarkdown::html_vignette:
-    css: style.css
-    toc: true
-    toc_depth: 3
   rmarkdown::md_document:
     variant: markdown_github
     toc: true
     toc_depth: 3
+  rmarkdown::html_vignette:
+    css: style.css
+    toc: true
+    toc_depth: 3
 vignette: >
   %\VignetteIndexEntry{FAQ on how to use 'frasam'}
-  %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
 ---
 
 # Frequently Asked Questions
@@ -41,14 +41,27 @@ vignette: >
 
 ## インストールと依存パッケージ
 
+### どのブランチを`frasam` を使えばよい？
+
+- このvignetteにある仕様を使う場合は`frasam` は `faq`をインストールしてください
+- いずれ、開発版は`dev`に置く予定です
+
+```{r install-frasam, eval = FALSE}
+install.packages("remotes")
+remotes::install_github("ShotaNishijima/frasyr@dev")
+# remotes::install_github("ShotaNishijima/frasyr@faq")
+
+library(frasam)
+```
+
 ### `frasyr` がないと言われます
 
 `frasam` は `frasyr` に依存しています。未インストールの場合は、開発版の `frasyr` を入れてから再実行してください。
 
 ```{r install-frasyr, eval = FALSE}
-install.packages("remotes")
 remotes::install_github("ichimomo/frasyr@dev")
 ```
+
 
 ## SAMの実行
 
@@ -172,6 +185,111 @@ length(res_fixed_p0$input$abund)
 ```
 
 モデル設定を変えた後に以前の推定値を初期値として使いたい場合は、まず `p0.list <- NULL` で一度実行し、その結果の `par_list` や `init` を次の解析に使うと、構造の不一致を避けやすくなります。
+
+### モデルがちゃんと収束しているか判別したい
+
+`check_fit_sam()` を使うと、`sam()` の結果について、収束コード、Hessian、勾配、標準誤差、極端なパラメータ値などをまとめて確認できます。
+返り値の `ok` が `TRUE` なら、基本的な診断項目はすべて通っています。
+
+```{r check-fit-sam-basic, echo = TRUE}
+fit_check <- check_fit_sam(res_rw)
+
+fit_check$ok
+fit_check$checks
+```
+
+`verbose = FALSE` を指定すると、実行時に表を表示せず、結果だけをオブジェクトとして保存できます。
+複数のモデルを比較するときは、`ok` や `checks` を取り出して使います。
+
+```{r check-fit-sam-compare, echo = TRUE}
+fit_checks <- list(
+  RW = check_fit_sam(res_rw, verbose = FALSE),
+  BH = check_fit_sam(res_bh, verbose = FALSE),
+  RI = check_fit_sam(res_ri, verbose = FALSE)
+)
+
+sapply(fit_checks, function(x) x$ok)
+```
+
+特定の診断だけを詳しく見たい場合は、`checks` から該当行を取り出します。
+例えば、最大勾配や Hessian の状態は以下のように確認できます。
+
+```{r check-fit-sam-detail, echo = TRUE}
+fit_check$checks[
+  fit_check$checks$check %in% c(
+    "maximum fixed-effect gradient",
+    "positive definite Hessian",
+    "reported sigma range"
+  ),
+]
+```
+
+`fixed` には固定効果パラメータごとの推定値、標準誤差、勾配が入っています。
+標準誤差が大きいパラメータや、勾配が大きいパラメータを確認したいときに使います。
+
+```{r check-fit-sam-fixed, echo = TRUE}
+head(fit_check$fixed)
+
+fit_check$fixed[
+  order(abs(fit_check$fixed$gradient), decreasing = TRUE),
+][1:5, ]
+```
+
+診断のしきい値は引数で変更できます。
+例えば、勾配をより厳しく見る場合は `gradient_tol` を小さくします。
+
+```{r check-fit-sam-strict, echo = TRUE}
+check_fit_sam(res_rw, gradient_tol = 1e-4, verbose = FALSE)$checks
+```
+
+`reported sigma range` が `FALSE` になった場合は、`sigma` テーブルを見ると、どの種類・何番目の sigma がしきい値の外にあるかを確認できます。
+
+```{r check-fit-sam-sigma, echo = TRUE}
+fit_check$sigma
+
+fit_check$sigma[!fit_check$sigma$ok, ]
+```
+
+しきい値を変えて確認したい場合は、`sigma_range` を指定します。
+例えば、以下では説明用にかなり狭い範囲を指定しています。
+
+```{r check-fit-sam-sigma-strict, echo = TRUE}
+fit_check_strict_sigma <- check_fit_sam(
+  res_rw,
+  sigma_range = c(0.5, 1),
+  verbose = FALSE
+)
+
+fit_check_strict_sigma$checks[
+  fit_check_strict_sigma$checks$check == "reported sigma range",
+]
+
+fit_check_strict_sigma$sigma[!fit_check_strict_sigma$sigma$ok, ]
+```
+
+### 資源尾数Nのプロセス誤差を小さい値に固定したい
+
+- SAMではVPAと異なり、加入以降の個体数が、漁獲死亡(F)と自然死亡係数(M)以外の要因（プロセス誤差）によっても変化することを仮定します
+- その値を小さくすることで、VPAと同じ個体群動態になります
+- 上の診断例のように、`sigma.logN` が極端に小さい場合は、以下の設定で1歳以上のsigma.logNを小さい値で固定して、推定しないことが推奨されます
+- `varN.fix = c(NA, 0.0001)`のように引数を設定してください。NAは0歳（加入）を推定すること、1歳魚以上の過程誤差の分散を0.0001に固定することを意味しています。
+- 設定するのはSDではなく分散であることに注意してください。つまり0.0001とするとSDは0.01で固定されます
+- `varN.fix`の長さは、`unique(varN)`の長さと一致しなくてはいけません
+
+```{r fix-sigmaN, echo = TRUE}
+
+input <- res_rw$input
+input$varN #1歳魚以上が共通
+input$varN.fix <- c(NA,0.0001) #SDではなくて分散
+
+res_varNfix = do.call(sam, input)
+res_varNfix$sigma.logN #1歳魚以上はSD=0.01に固定
+
+check_fit_sam(res_varNfix, verbose = TRUE) #すべてOKになる
+```
+
+### 
+
 
 ### Indexの観測誤差(`sigma`)を共通にしたい
 
