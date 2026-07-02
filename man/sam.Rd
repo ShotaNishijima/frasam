@@ -21,7 +21,6 @@ sam(
   varN = 0,
   varF = 0,
   varN.fix = NULL,
-  est.method = "ml",
   SR = "BH",
   AR = 0,
   rho.mode = 2,
@@ -107,8 +106,6 @@ sam(
 
 \item{varF}{??}
 
-\item{est.method}{Index間の観測誤差sigmaをばらばらにするか（"ml"、デフォルト)、共通にするか（"ls")．\code{frasyr::vpa()}と同じ使い方．}
-
 \item{SR}{再生産関係："RW"(Random walk), "BH", "RI", "HS", "Mesnil", or "Const"}
 
 \item{AR}{再生産関係の残差の自己相関パラメータを推定する（１）、推定しない（0, デフォルト） ?? これでいい？}
@@ -159,7 +156,7 @@ sam(
 
 \item{lower}{推定パラメータの下限値。固定効果の数のLengthを持つ必要あり。NULL（デフォルト）の場合-Inf}
 
-\item{index.key}{Indexのsigmaの制約 ??  どうやって使う？？}
+\item{index.key}{Index間の観測誤差sigmaの制約。NULLの場合はIndexごとに別々、rep(0, length(abund))の場合は全Indexで共通。}
 
 \item{index.b.key}{Indexのbの制約 ??  どうやって使う？？}
 

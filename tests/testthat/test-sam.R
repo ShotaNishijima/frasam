@@ -15,6 +15,15 @@ test_that("test input",{
   input$no_est <- TRUE
   testres = safe_do_call(sam,input)
 
+  bad_input <- input
+  bad_input$q.init <- rep(1, length(bad_input$abund) + 1)
+  expect_error(safe_do_call(sam,bad_input), "'q.init' must have length")
+
+  bad_input <- input
+  bad_input$p0.list <- testres$init
+  bad_input$p0.list$logQ <- c(bad_input$p0.list$logQ, 0)
+  expect_error(safe_do_call(sam,bad_input), "'p0.list' does not match the current model parameter structure")
+
   testcontents <-c("SR","b.est","b.fix","varC","varF","varN")
   for(i in 1:length(testcontents)){
     expect_equal(eval(parse(text=paste0("input$",testcontents[i]))),eval(parse(text=paste("testres$input$",testcontents[i]))))
@@ -84,4 +93,13 @@ test_that("test output",{
   expect_error(testres4 <- safe_do_call(sam,input),NA)
   expect_false(all(testres4$sigma.logN ==  testres$sigma.logN))
   expect_equal(sd(testres4$sigma.logN[-1]),0)
+
+  ## index.key = rep(0, nindex) should report the common index sigma for all indices
+  input = testres$input
+  input$index.key <- rep(0, length(input$abund))
+  input$p0.list <- NULL
+  expect_error(testres_ls <- safe_do_call(sam,input),NA)
+  expect_equal(length(testres_ls$sigma), length(input$abund))
+  expect_equal(sd(testres_ls$sigma), 0, tolerance = 1.0e-8)
+  expect_false(any(is.na(testres_ls$sigma)))
 })

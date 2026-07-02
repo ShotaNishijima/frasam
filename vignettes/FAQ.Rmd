@@ -5,23 +5,19 @@ date: "`r format(Sys.Date())`"
 output:
   rmarkdown::html_vignette:
     css: style.css
+    toc: true
+    toc_depth: 3
+  rmarkdown::md_document:
+    variant: markdown_github
+    toc: true
+    toc_depth: 3
 vignette: >
   %\VignetteIndexEntry{FAQ on how to use 'frasam'}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r setup, include = FALSE}
-options(rmarkdown.html_vignette.check_title = FALSE)
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>",
-  message = FALSE,
-  warning = FALSE
-)
-```
-
-# FAQ
+# Frequently Asked Questions
 
 この文書は、`frasam` を使うときによくある質問と対応方針をまとめるためのものです。
 解析の詳細な手順は通常のvignetteに残し、ここではエラー対応、確認方法、開発時の注意点を短く整理します。
@@ -33,11 +29,16 @@ knitr::opts_chunk$set(
     collapse = TRUE,
     comment = "#>",
     message = FALSE,
-    warning = FALSE
+    warning = FALSE,
+    fig.width = 10,
+    fig.height = 6,
+    out.width = "100%"
   )
 
-  library(frasam)
+  # library(frasam)
+  devtools::load_all()
 ```
+
 ## インストールと依存パッケージ
 
 ### `frasyr` がないと言われます
@@ -118,6 +119,82 @@ plot_samvpa(list(res_ri, res_rho2), CI=0.8,
             scenario_name=rev(c("Rho3","Rho2")))
 
 ```
+
+### 引数の形式がデータと合っていないことによるエラーを修正したい
+
+`sam()` では、`q.init` などの初期値や `p0.list` の構造が現在のデータ・モデル設定と合っていない場合、TMB に渡す前にエラーとして止まります。
+この場合は、エラーメッセージに出ている引数の長さや構造を、現在の解析設定に合わせて修正します。
+
+例えば、`q.init` は index の数と同じ長さで与える必要があります。
+以下では、あえて 1 つ長い `q.init` を与えてエラーにしています。
+
+```{r wrong-q-init, echo = TRUE, error = TRUE}
+bad_input <- res_ri$input
+bad_input$p0.list <- NULL
+bad_input$q.init <- rep(1, length(bad_input$abund) + 1)
+
+res_bad_q <- do.call(sam, bad_input)
+```
+
+`bad_input$abund` の長さが index の数なので、`q.init` も同じ長さに直します。
+特に初期値を指定する必要がなければ、`NULL` に戻してデフォルト初期値を使うのも安全です。
+
+```{r fix-q-init, echo = TRUE}
+fixed_input <- bad_input
+fixed_input$q.init <- rep(1, length(fixed_input$abund))
+
+res_fixed_q <- do.call(sam, fixed_input)
+length(res_fixed_q$input$q.init)
+length(res_fixed_q$input$abund)
+```
+
+以前の解析結果を初期値として使う場合は、`p0.list` の各パラメータの名前・長さ・次元が、現在のモデル設定と一致している必要があります。
+以下では、`logQ` だけをあえて 1 つ長くして、構造が合わない例を作っています。
+
+```{r wrong-p0-list, echo = TRUE, error = TRUE}
+bad_input <- res_ri$input
+bad_input$p0.list <- res_ri$init
+bad_input$p0.list$logQ <- c(bad_input$p0.list$logQ, 0)
+
+res_bad_p0 <- do.call(sam, bad_input)
+```
+
+このような場合は、壊れた要素だけを手で直すより、同じモデル構造から得られた `init` や `par_list` を使い直すのが安全です。
+モデル構造を変えた場合は、`p0.list <- NULL` としてデフォルト初期値から再実行してください。
+
+```{r fix-p0-list, echo = TRUE}
+fixed_input <- bad_input
+fixed_input$p0.list <- res_ri$init
+
+res_fixed_p0 <- do.call(sam, fixed_input)
+length(res_fixed_p0$init$logQ)
+length(res_fixed_p0$input$abund)
+```
+
+モデル設定を変えた後に以前の推定値を初期値として使いたい場合は、まず `p0.list <- NULL` で一度実行し、その結果の `par_list` や `init` を次の解析に使うと、構造の不一致を避けやすくなります。
+
+### Indexの観測誤差(`sigma`)を共通にしたい
+
+- すべてのIndexで同じSDを使用する場合は（`frasyr::vpa()`の`est.method="ls"`に相当）、引数を`input$index.key <- rep(0, length(input$abund))`のように設定する
+- 特定のIndexにおいて共通のSDを使用する場合は`input$index.key <- c(0,0,1,2,3)`のように設定する（1番目と2番目のIndexのSDが等しい場合）
+
+```{r index-common, echo = TRUE}
+res_rw$sigma #index毎に異なる
+
+input <- res_rw$input
+input$index.key <- rep(0, length(input$abund))
+res_ls <- do.call(sam, input)
+res_ls$sigma
+
+input$index.key <- c(0,0,1,2,3)
+res_rw2 <- do.call(sam, input)
+res_rw2$sigma
+
+#AICの比較
+c(res_rw$aic, res_ls$aic, res_rw2$aic)
+```
+
+
 
 ## SAMの結果の出力
 

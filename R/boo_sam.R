@@ -21,7 +21,7 @@ boo_sam <- function(Res,n=100,seed=1,est=TRUE,method="p",use_p0=TRUE){
     boot.list <- list()
     pred.index <- Res$pred.index
     pred.caa <- Res$caa
-    if (Res$input$est.method == "ml") sigma.index <- Res$sigma else sigma.index <- rep(Res$sigma,nrow(pred.index))
+    sigma.index <- Res$sigma
     sigma.caa <- Res$sigma.logC
     resid.index <- log(as.matrix(Res$input$dat$index))-log(as.matrix(Res$pred.index))
     resid.caa <- log(Res$input$dat$caa)-log(Res$caa)

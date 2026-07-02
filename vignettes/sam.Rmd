@@ -90,7 +90,7 @@ res_sam <- sam(dat,
                rec.age = 0,
                plus.group = TRUE,
                alpha = 1, # 最高年齢と最高年齢-1歳のFが同じと仮定（VPAと同じ仮定)
-               est.method = "ml",
+               # est.method = "ml",
                # 資源量指数に関わる設定。資源量指数の数だけベクトルで与える。
                abund = c("SSB", "N"),
                min.age = c(0, 0),

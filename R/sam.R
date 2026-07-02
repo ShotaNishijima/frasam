@@ -11,7 +11,6 @@
 #' @param max.age Indexの最高年齢 (\code{frasyr::vpa()}と同じで最小の年齢を0とする) 用いるIndexの長さのベクトル
 #' @param b.est Indexと資源量の間の非線形関係を考慮しない（FALSE, デフォルト）、考慮する(TRUE)
 #' @param b.fix b.est=TRUEの場合、非線形パラメータbを推定するか（NA）、固定するか（固定する値） ??
-#' @param index.key Indexのsigmaの制約 ??  どうやって使う？？
 #' @param index.b.key Indexのbの制約 ??  どうやって使う？？
 #' @param sel.def 選択率の定義。"max"（デフォルト）の場合、最大年齢を１とする。
 #' @param use.index この仕様は設定ミスを引き起こしやすいので廃止しました。使用するIndexのみデータに入れてください
@@ -23,7 +22,8 @@
 #' @param no_est 推定しない(TRUE)、パラメータ推定する（FALSE, デフォルト）
 #' @param getJointPrecision JointPrecision matrixを計算しない（FALSE, デフォルト）、計算する（TRUE)
 #' @param loopnum 最適化を繰り返す回数．デフォルトは2
-#' @param est.method Index間の観測誤差sigmaをばらばらにするか（"ml"、デフォルト)、共通にするか（"ls")．\code{frasyr::vpa()}と同じ使い方．
+#' @param index.key Index間の観測誤差sigmaの制約。NULLの場合はIndexごとに別々、rep(0, length(abund))の場合は全Indexで共通。
+# @param est.method Index間の観測誤差sigmaをばらばらにするか（"ml"、デフォルト)、共通にするか（"ls")．index.keyに統一したため廃止。
 #' @param plus.group プラスグループを考慮する（TRUE, デフォルト）、考慮しない（FALSE）
 #' @param SR 再生産関係："RW"(Random walk), "BH", "RI", "HS", "Mesnil", or "Const"
 #' @param AR 再生産関係の残差の自己相関パラメータを推定する（１）、推定しない（0, デフォルト） ?? これでいい？
@@ -89,7 +89,7 @@ sam <- function(dat,
                 varN = 0,
                 varF = 0,
                 varN.fix = NULL,
-                est.method = "ml",
+                # est.method = "ml",
                 SR = "BH", #"RW": random walk, "RI": Ricker
                 AR = 0,
                 rho.mode = 2,
@@ -266,15 +266,14 @@ sam <- function(dat,
     }
 
     data$keyVarObs[1,] <- varC
-    if (est.method == "ls") {
-      if(!is.null(index.key)) warning("'index.key' does not work when est.method='ls'. Use est.method='ml'.")
-      for (i in 1:nindex) data$keyVarObs[i+1,index.age[i]+1] <- max(varC)+1
+    if (is.null(index.key)) {
+      for (i in 1:nindex) data$keyVarObs[i+1,index.age[i]+1] <- max(varC)+i
     } else {
-      if (est.method == "ml") {
-        for (i in 1:nindex) data$keyVarObs[i+1,index.age[i]+1] <- max(varC)+i
+      if (length(index.key) != nindex) {
+        stop("'index.key' must have the same length as the number of indices")
       }
-      if (!is.null(index.key)) {
-        for (i in 1:nindex) data$keyVarObs[i+1,index.age[i]+1] <- max(varC)+index.key[i]-min(index.key)+1
+      for (i in 1:nindex) {
+        data$keyVarObs[i+1,index.age[i]+1] <- max(varC)+index.key[i]-min(index.key)+1
       }
     }
 
@@ -500,6 +499,90 @@ sam <- function(dat,
     matrix(-1,nrow=max(data$keyLogFsta)+1,ncol=data$noYears)
     )
 
+  check_init_length <- function(x, name, expected_length, positive = FALSE, open_unit = FALSE) {
+    if (is.null(x)) return(invisible(TRUE))
+    if (!is.numeric(x)) {
+      stop(sprintf("'%s' must be numeric.", name), call. = FALSE)
+    }
+    if (length(x) != expected_length) {
+      stop(
+        sprintf("'%s' must have length %d, but length %d was supplied.", name, expected_length, length(x)),
+        call. = FALSE
+      )
+    }
+    if (any(!is.finite(x))) {
+      stop(sprintf("'%s' must contain only finite values.", name), call. = FALSE)
+    }
+    if (isTRUE(positive) && any(x <= 0)) {
+      stop(sprintf("'%s' must contain only positive values.", name), call. = FALSE)
+    }
+    if (isTRUE(open_unit) && any(x <= 0 | x >= 1)) {
+      stop(sprintf("'%s' must be between 0 and 1.", name), call. = FALSE)
+    }
+    invisible(TRUE)
+  }
+
+  check_init_length(q.init, "q.init", nindex, positive = TRUE)
+  check_init_length(sdFsta.init, "sdFsta.init", max(data$keyVarF)+1, positive = TRUE)
+  check_init_length(sdLogN.init, "sdLogN.init", max(data$keyVarLogN)+1, positive = TRUE)
+  check_init_length(sdLogObs.init, "sdLogObs.init", max(data$keyVarObs)+1, positive = TRUE)
+  check_init_length(a.init, "a.init", 1, positive = TRUE)
+  check_init_length(b.init, "b.init", 1, positive = TRUE)
+  check_init_length(rho.init, "rho.init", 1, open_unit = TRUE)
+
+  validate_p0_list <- function(p0.list, expected, skip_structure = character()) {
+    if (!is.list(p0.list)) {
+      stop("'p0.list' must be a list.", call. = FALSE)
+    }
+
+    missing_names <- setdiff(names(expected), names(p0.list))
+    extra_names <- setdiff(names(p0.list), names(expected))
+    if (length(missing_names) > 0 || length(extra_names) > 0) {
+      msg <- c()
+      if (length(missing_names) > 0) msg <- c(msg, paste0("missing: ", paste(missing_names, collapse = ", ")))
+      if (length(extra_names) > 0) msg <- c(msg, paste0("unexpected: ", paste(extra_names, collapse = ", ")))
+      stop(
+        sprintf("'p0.list' does not match the current model parameter names (%s).", paste(msg, collapse = "; ")),
+        call. = FALSE
+      )
+    }
+
+    format_dim <- function(x) {
+      if (is.null(dim(x))) "NULL" else paste(dim(x), collapse = " x ")
+    }
+
+    problems <- character()
+    for (nm in names(expected)) {
+      x <- p0.list[[nm]]
+      ref <- expected[[nm]]
+      if (!is.numeric(x)) {
+        problems <- c(problems, sprintf("%s must be numeric", nm))
+        next
+      }
+      if (any(!is.finite(x))) {
+        problems <- c(problems, sprintf("%s contains non-finite values", nm))
+        next
+      }
+      if (nm %in% skip_structure) next
+      if (!identical(dim(x), dim(ref))) {
+        problems <- c(problems, sprintf("%s has dim %s; expected %s", nm, format_dim(x), format_dim(ref)))
+        next
+      }
+      if (length(x) != length(ref)) {
+        problems <- c(problems, sprintf("%s has length %d; expected %d", nm, length(x), length(ref)))
+        next
+      }
+    }
+
+    if (length(problems) > 0) {
+      stop(
+        sprintf("'p0.list' does not match the current model parameter structure:\n- %s", paste(problems, collapse = "\n- ")),
+        call. = FALSE
+      )
+    }
+    invisible(TRUE)
+  }
+
   logSdLogN_init = if (is.null(sdLogN.init)) rep(0.356675,max(data$keyVarLogN)+1) else log(sdLogN.init)
 
   if(SR == "Const") logSdLogN_init[1] <- log(2)
@@ -515,8 +598,7 @@ sam <- function(dat,
   logB_init = sapply(1:nindex, function(i) ifelse(is.na(b.fix[i]), 0, log(b.fix[i])))
   if(!is.null(index.b.key)) logB_init <- logB_init[unique(index.b.key-min(index.b.key)+1)]
 
-  if (is.null(p0.list)){
-    params <- list(
+  default_params <- list(
       logQ      = if (is.null(q.init)) rep(-5,nindex) else log(q.init),
       logB      = logB_init,
       logSdLogFsta = if (is.null(sdFsta.init)) rep(-0.693147,max(data$keyVarF)+1) else log(sdFsta.init),
@@ -551,8 +633,15 @@ sam <- function(dat,
       beta_g = beta_g,
       rec_logk = log(1)
     )
+
+  if (is.null(p0.list)){
+    params <- default_params
   } else {
-    params <- p0.list
+    skip_structure <- character()
+    if (isTRUE(model_wm[1])) skip_structure <- c(skip_structure, "beta_w0", "alpha_w", "rho_w", "omicron", "logCV_w")
+    if (isTRUE(model_wm[2])) skip_structure <- c(skip_structure, "alpha_g", "psi", "logdisp", "beta_g")
+    validate_p0_list(p0.list, default_params, skip_structure = skip_structure)
+    params <- p0.list[names(default_params)]
   }
 
   if(is.null(map)) {

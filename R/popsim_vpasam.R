@@ -13,7 +13,6 @@ popsim_vpasam = function(Res,n=5,seed=1){
     pred.index <- Res$pred.index
     pred.caa <- Res$caa
     sigma.index = Res$sigma
-    if (Res$input$est.method == "ls" && is.null(Res$input$index.key)) sigma.index <- rep(Res$sigma,nrow(pred.index))
     sigma.caa <- Res$sigma.logC
     resid.index <- log(as.matrix(Res$input$dat$index))-log(as.matrix(Res$pred.index))
     resid.caa <- log(Res$input$dat$caa)-log(Res$caa)
@@ -36,7 +35,6 @@ popsim_vpasam = function(Res,n=5,seed=1){
     dat.list <- list()
     pred.index <- Res$pred.index
     sigma.index = Res$sigma
-    if (Res$input$est.method == "ls") sigma.index <- rep(Res$sigma,nrow(pred.index))
     resid.index <- log(as.matrix(Res$input$dat$index))-log(as.matrix(Res$pred.index))
     for (j in 1:n) {
       sim.dat <- Res$input$dat
