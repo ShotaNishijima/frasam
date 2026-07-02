@@ -90,26 +90,6 @@ plot_samvpa(list(res_rw,res_bh,res_ri), CI=0.8,
 
 ![](FAQ_files/figure-html/use-do.call-1.png)
 
-#### 以前の解析結果の初期値を利用したい
-
-\-`par_list`に固定効果とランダム効果のパラメータ推定値がリスト形式で与えられている -
-これを次の解析の初期値として使うことで、推定を安定化させることができる -
-ただし、固定効果とランダム効果の数や構造が変わるとうまく行かないので、注意すること -
-ここでは`rho.mode`を変更したときを例に説明する
-
-``` r
-
-
-input$p0.list <- res_ri$par_list
-input$rho.mode <- 2
-res_rho2 <- do.call(sam, input)
-
-plot_samvpa(list(res_ri, res_rho2), CI=0.8,
-            scenario_name=rev(c("Rho3","Rho2")))
-```
-
-![](FAQ_files/figure-html/use-p0-1.png)
-
 #### 引数の形式がデータと合っていないことによるエラーを修正したい
 
 [`sam()`](https://shotanishijima.github.io/frasam/reference/sam.md)
@@ -423,6 +403,119 @@ fit_check_strict_sigma$sigma[!fit_check_strict_sigma$sigma$ok, ]
 #> 26    sigma.logN     7 0.0000561208 FALSE too small
 ```
 
+#### 以前の解析結果の初期値を利用したい
+
+\-`par_list`に固定効果とランダム効果のパラメータ推定値がリスト形式で与えられている -
+これを次の解析の初期値として使うことで、推定を安定化させることができる -
+ただし、固定効果とランダム効果の数や構造が変わるとうまく行かないので、注意すること -
+ここでは`rho.mode`を変更したときを例に説明する
+
+``` r
+
+
+input$p0.list <- res_ri$par_list
+input$rho.mode <- 2
+res_rho2 <- do.call(sam, input)
+
+plot_samvpa(list(res_ri, res_rho2), CI=0.8,
+            scenario_name=rev(c("Rho3","Rho2")))
+```
+
+![](FAQ_files/figure-html/use-p0-1.png)
+
+#### 初期値を設定する方法
+
+収束しにくい場合や、勾配がやや大きい場合は、初期値を変更して再解析することが有効な場合があります。
+[`sam()`](https://shotanishijima.github.io/frasam/reference/sam.md)
+では、主な固定効果パラメータの初期値を `xx.init`
+という引数で指定できます。 これらの引数は、内部で
+[`log()`](https://rdrr.io/r/base/Log.html) や `logit()`
+に変換されるため、基本的には通常のスケールで値を与えます。
+
+- `q.init`: index ごとの q の初期値。長さは index の数と同じにします
+- `sdFsta.init`: F のランダムウォークのプロセス誤差 SD の初期値。長さは
+  `unique(varF)` の数と対応します
+- `sdLogN.init`: 資源尾数 N のプロセス誤差 SD の初期値。長さは
+  `unique(varN)` の数と対応します
+- `sdLogObs.init`: catch at age と index の観測誤差 SD の初期値。長さは
+  `unique(varC)` と `unique(index.key)` を合わせた数と対応します
+- `rho.init`: F
+  のランダムウォークの年齢間相関係数の初期値。0から1の間の値を指定します
+- `a.init`, `b.init`: 再生産関係パラメータの初期値。正の値を指定します
+
+例えば、VPAで得られた q を `q.init`
+として使う場合は、以下のように指定します。
+
+``` r
+
+
+# last catch zeroのとき最終年の加入IndexがあるとInfがでるとqが推定できないので除いておく
+dat_ex2 <- dat_ex
+dat_ex2$index[1:2,ncol(dat_ex2$index)] <- NA_real_
+
+res_vpa <- frasyr::vpa(
+  dat_ex2,
+  last.catch.zero = TRUE,
+  fc.year=2011:2013,
+  tf.year = 2010:2012,
+  term.F="max",
+  stat.tf="mean",
+  Pope=TRUE,
+  tune=TRUE,
+  p.init=0.5, 
+  abund = c("N","N","N","SSB","B"),
+  min.age=c(0,0,1,0,0),
+  max.age = c(0,0,1,6,6), 
+  sel.update=TRUE)
+
+q_init <- res_vpa$q #VPAの推定値を持ってくる
+input <- res_rw$input
+input$q.init <- q_init
+
+res_qinit <- do.call(sam,input)
+```
+
+#### 初期値をランダムに変えてよい解を探したい
+
+初期値に依存して局所解に入っている可能性がある場合は、[`do_jitter()`](https://shotanishijima.github.io/frasam/reference/do_jitter.md)
+で初期値をランダムに少しずつ変えて、複数回推定することができます。
+[`do_jitter()`](https://shotanishijima.github.io/frasam/reference/do_jitter.md)
+は各試行の目的関数値を `resdat` に保存します。
+同じモデル・同じデータで比較する場合は、`obj_value`
+が小さいものを、尤度が高い解として選びます。 `ID = 0` は jitter
+する前の元の結果を表します。 `ID > 0`
+が選ばれた場合は、初期値を変えることで目的関数値が改善したことを意味します。
+ただし、[`do_jitter()`](https://shotanishijima.github.io/frasam/reference/do_jitter.md)
+の `reslist`
+に保存される結果は、[`sam()`](https://shotanishijima.github.io/frasam/reference/sam.md)
+の完全な出力ではなく、目的関数値の比較に使う簡易的な結果です。
+通常の図や出力には、改めて
+[`sam()`](https://shotanishijima.github.io/frasam/reference/sam.md)
+の結果オブジェクトを使ってください。
+
+``` r
+
+jitter_res <- do_jitter(
+  res_rw,
+  SD = 0.1,   # 初期値に加える正規乱数の標準偏差
+  nsim = 20,  # jitterする回数
+  seed = 1
+)
+
+jitter_res$resdat
+
+best_id <- jitter_res$resdat$ID[which.min(jitter_res$resdat$obj_value)]
+best_id
+
+if (best_id == 0) {
+    res_best <- res_rw
+  } else {
+    input <- res_rw$input
+    input$p0.list <- jitter_res$reslist[[best_id]]$obj$env$parList()
+    res_best <- do.call(sam, input)
+  }
+```
+
 #### 資源尾数Nのプロセス誤差を小さい値に固定したい
 
 - SAMではVPAと異なり、加入以降の個体数が、漁獲死亡(F)と自然死亡係数(M)以外の要因（プロセス誤差）によっても変化することを仮定します
@@ -722,6 +815,41 @@ res_rw2$sigma
 #AICの比較
 c(res_rw$aic, res_ls$aic, res_rw2$aic)
 #> [1]  976.4474 1053.1456  976.3553
+```
+
+#### IndexとAbundanceの間の非線形性を推定したい
+
+デフォルトでは `b.est = FALSE` として、index
+と資源量の関係を比例関係、つまり `b = 1` として扱います。 一方、index
+が資源量に対して非線形に反応すると考えられる場合は、`b.est = TRUE`
+として `b` を推定できます。 `b.fix` に `NA` を指定した index では `b`
+を推定し、数値を指定した index ではその値に固定します。 例えば
+`b.fix = c(1, 1, 1, NA, NA)` とすると、1から3番目の index は `b = 1`
+に固定し、4から5番目の index だけで `b` を推定します。
+1以外の値に固定することもできます。
+
+`b` を推定するとパラメータ数が増えるため、収束状況や `b`
+の推定値が極端でないかを確認し、AIC などでモデルを比較します。
+
+``` r
+
+
+input <- res_rw$input
+input$b.est <- TRUE
+input$p0.list <- res_rw$par_list
+res_estb_full <- do.call(sam, input)
+res_estb_full$b #すべてのindexでbが推定される
+#> [1] 0.9775703 0.9484969 1.0082841 0.9249488 0.8870791
+check_fit_sam(res_estb_full, verbose = FALSE)
+
+input$b.fix <- c(1,1,1,NA,NA) #1-3番目のindexはb=1に固定し、4-5番目のindexはb推定を行う
+res_estb_45 <- do.call(sam, input)
+res_estb_45$b #
+#> [1] 1.0000000 1.0000000 1.0000000 0.9249928 0.8877377
+check_fit_sam(res_estb_45, verbose = FALSE)
+
+c(res_rw$aic, res_estb_full$aic, res_estb_45$aic)
+#> [1] 976.4474 982.5655 976.6881
 ```
 
 ### SAMの結果の出力

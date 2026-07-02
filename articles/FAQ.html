@@ -158,24 +158,6 @@
 <p><img src="FAQ_files/figure-html/use-do.call-1.png" class="r-plt" alt="" width="100%"></p>
 </div>
 <div class="section level4">
-<h4 id="以前の解析結果の初期値を利用したい">以前の解析結果の初期値を利用したい<a class="anchor" aria-label="anchor" href="#%E4%BB%A5%E5%89%8D%E3%81%AE%E8%A7%A3%E6%9E%90%E7%B5%90%E6%9E%9C%E3%81%AE%E5%88%9D%E6%9C%9F%E5%80%A4%E3%82%92%E5%88%A9%E7%94%A8%E3%81%97%E3%81%9F%E3%81%84"></a>
-</h4>
-<p>-<code>par_list</code>に固定効果とランダム効果のパラメータ推定値がリスト形式で与えられている
-- これを次の解析の初期値として使うことで、推定を安定化させることができる
--
-ただし、固定効果とランダム効果の数や構造が変わるとうまく行かないので、注意すること
-- ここでは<code>rho.mode</code>を変更したときを例に説明する</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
-<span><span class="va">input</span><span class="op">$</span><span class="va">p0.list</span> <span class="op">&lt;-</span> <span class="va">res_ri</span><span class="op">$</span><span class="va">par_list</span></span>
-<span><span class="va">input</span><span class="op">$</span><span class="va">rho.mode</span> <span class="op">&lt;-</span> <span class="fl">2</span></span>
-<span><span class="va">res_rho2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">sam</span>, <span class="va">input</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="../reference/plot_samvpa.html">plot_samvpa</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">res_ri</span>, <span class="va">res_rho2</span><span class="op">)</span>, CI<span class="op">=</span><span class="fl">0.8</span>,</span>
-<span>            scenario_name<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/rev.html" class="external-link">rev</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Rho3"</span>,<span class="st">"Rho2"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="FAQ_files/figure-html/use-p0-1.png" class="r-plt" alt="" width="100%"></p>
-</div>
-<div class="section level4">
 <h4 id="引数の形式がデータと合っていないことによるエラーを修正したい">引数の形式がデータと合っていないことによるエラーを修正したい<a class="anchor" aria-label="anchor" href="#%E5%BC%95%E6%95%B0%E3%81%AE%E5%BD%A2%E5%BC%8F%E3%81%8C%E3%83%87%E3%83%BC%E3%82%BF%E3%81%A8%E5%90%88%E3%81%A3%E3%81%A6%E3%81%84%E3%81%AA%E3%81%84%E3%81%93%E3%81%A8%E3%81%AB%E3%82%88%E3%82%8B%E3%82%A8%E3%83%A9%E3%83%BC%E3%82%92%E4%BF%AE%E6%AD%A3%E3%81%97%E3%81%9F%E3%81%84"></a>
 </h4>
 <p><code><a href="../reference/sam.html">sam()</a></code> では、<code>q.init</code> などの初期値や
@@ -186,7 +168,7 @@
 <p>例えば、<code>q.init</code> は index
 の数と同じ長さで与える必要があります。 以下では、あえて 1 つ長い
 <code>q.init</code> を与えてエラーにしています。</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">bad_input</span> <span class="op">&lt;-</span> <span class="va">res_ri</span><span class="op">$</span><span class="va">input</span></span>
 <span><span class="va">bad_input</span><span class="op">$</span><span class="va">p0.list</span> <span class="op">&lt;-</span> <span class="cn">NULL</span></span>
 <span><span class="va">bad_input</span><span class="op">$</span><span class="va">q.init</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">bad_input</span><span class="op">$</span><span class="va">abund</span><span class="op">)</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span></span>
@@ -198,7 +180,7 @@
 の数なので、<code>q.init</code> も同じ長さに直します。
 特に初期値を指定する必要がなければ、<code>NULL</code>
 に戻してデフォルト初期値を使うのも安全です。</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fixed_input</span> <span class="op">&lt;-</span> <span class="va">bad_input</span></span>
 <span><span class="va">fixed_input</span><span class="op">$</span><span class="va">q.init</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">fixed_input</span><span class="op">$</span><span class="va">abund</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
@@ -211,7 +193,7 @@
 の各パラメータの名前・長さ・次元が、現在のモデル設定と一致している必要があります。
 以下では、<code>logQ</code> だけをあえて 1
 つ長くして、構造が合わない例を作っています。</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">bad_input</span> <span class="op">&lt;-</span> <span class="va">res_ri</span><span class="op">$</span><span class="va">input</span></span>
 <span><span class="va">bad_input</span><span class="op">$</span><span class="va">p0.list</span> <span class="op">&lt;-</span> <span class="va">res_ri</span><span class="op">$</span><span class="va">init</span></span>
 <span><span class="va">bad_input</span><span class="op">$</span><span class="va">p0.list</span><span class="op">$</span><span class="va">logQ</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">bad_input</span><span class="op">$</span><span class="va">p0.list</span><span class="op">$</span><span class="va">logQ</span>, <span class="fl">0</span><span class="op">)</span></span>
@@ -224,7 +206,7 @@
 <code>init</code> や <code>par_list</code> を使い直すのが安全です。
 モデル構造を変えた場合は、<code>p0.list &lt;- NULL</code>
 としてデフォルト初期値から再実行してください。</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fixed_input</span> <span class="op">&lt;-</span> <span class="va">bad_input</span></span>
 <span><span class="va">fixed_input</span><span class="op">$</span><span class="va">p0.list</span> <span class="op">&lt;-</span> <span class="va">res_ri</span><span class="op">$</span><span class="va">init</span></span>
 <span></span>
@@ -245,7 +227,7 @@
 の結果について、収束コード、Hessian、勾配、標準誤差、極端なパラメータ値などをまとめて確認できます。
 返り値の <code>ok</code> が <code>TRUE</code>
 なら、基本的な診断項目はすべて通っています。</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fit_check</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/check_fit_sam.html">check_fit_sam</a></span><span class="op">(</span><span class="va">res_rw</span><span class="op">)</span></span>
 <span><span class="co">#&gt;                          check    ok              value       threshold</span></span>
 <span><span class="co">#&gt;          optimizer convergence  TRUE                  0               0</span></span>
@@ -295,7 +277,7 @@
 を指定すると、実行時に表を表示せず、結果だけをオブジェクトとして保存できます。
 複数のモデルを比較するときは、<code>ok</code> や <code>checks</code>
 を取り出して使います。</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fit_checks</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  RW <span class="op">=</span> <span class="fu"><a href="../reference/check_fit_sam.html">check_fit_sam</a></span><span class="op">(</span><span class="va">res_rw</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>,</span>
 <span>  BH <span class="op">=</span> <span class="fu"><a href="../reference/check_fit_sam.html">check_fit_sam</a></span><span class="op">(</span><span class="va">res_bh</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>,</span>
@@ -308,7 +290,7 @@
 <p>特定の診断だけを詳しく見たい場合は、<code>checks</code>
 から該当行を取り出します。 例えば、最大勾配や Hessian
 の状態は以下のように確認できます。</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fit_check</span><span class="op">$</span><span class="va">checks</span><span class="op">[</span></span>
 <span>  <span class="va">fit_check</span><span class="op">$</span><span class="va">checks</span><span class="op">$</span><span class="va">check</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
 <span>    <span class="st">"maximum fixed-effect gradient"</span>,</span>
@@ -327,7 +309,7 @@
 <p><code>fixed</code>
 には固定効果パラメータごとの推定値、標準誤差、勾配が入っています。
 標準誤差が大きいパラメータや、勾配が大きいパラメータを確認したいときに使います。</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">fit_check</span><span class="op">$</span><span class="va">fixed</span><span class="op">)</span></span>
 <span><span class="co">#&gt;           name   estimate         se      gradient</span></span>
 <span><span class="co">#&gt; 1         logQ -5.3393468 0.17712387 -9.534776e-07</span></span>
@@ -349,7 +331,7 @@
 <p>診断のしきい値は引数で変更できます。
 例えば、勾配をより厳しく見る場合は <code>gradient_tol</code>
 を小さくします。</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/check_fit_sam.html">check_fit_sam</a></span><span class="op">(</span><span class="va">res_rw</span>, gradient_tol <span class="op">=</span> <span class="fl">1e-4</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">$</span><span class="va">checks</span></span>
 <span><span class="co">#&gt;                           check    ok              value       threshold</span></span>
 <span><span class="co">#&gt; 1         optimizer convergence  TRUE                  0               0</span></span>
@@ -374,7 +356,7 @@
 <p><code>reported sigma range</code> が <code>FALSE</code>
 になった場合は、<code>sigma</code> テーブルを見ると、どの種類・何番目の
 sigma がしきい値の外にあるかを確認できます。</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fit_check</span><span class="op">$</span><span class="va">sigma</span></span>
 <span><span class="co">#&gt;             type index        value    ok   problem</span></span>
 <span><span class="co">#&gt; 1          sigma     1 1.0984898146  TRUE          </span></span>
@@ -415,7 +397,7 @@ sigma がしきい値の外にあるかを確認できます。</p>
 <p>しきい値を変えて確認したい場合は、<code>sigma_range</code>
 を指定します。
 例えば、以下では説明用にかなり狭い範囲を指定しています。</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fit_check_strict_sigma</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/check_fit_sam.html">check_fit_sam</a></span><span class="op">(</span></span>
 <span>  <span class="va">res_rw</span>,</span>
 <span>  sigma_range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fl">1</span><span class="op">)</span>,</span>
@@ -454,6 +436,119 @@ sigma がしきい値の外にあるかを確認できます。</p>
 <span><span class="co">#&gt; 26    sigma.logN     7 0.0000561208 FALSE too small</span></span></code></pre></div>
 </div>
 <div class="section level4">
+<h4 id="以前の解析結果の初期値を利用したい">以前の解析結果の初期値を利用したい<a class="anchor" aria-label="anchor" href="#%E4%BB%A5%E5%89%8D%E3%81%AE%E8%A7%A3%E6%9E%90%E7%B5%90%E6%9E%9C%E3%81%AE%E5%88%9D%E6%9C%9F%E5%80%A4%E3%82%92%E5%88%A9%E7%94%A8%E3%81%97%E3%81%9F%E3%81%84"></a>
+</h4>
+<p>-<code>par_list</code>に固定効果とランダム効果のパラメータ推定値がリスト形式で与えられている
+- これを次の解析の初期値として使うことで、推定を安定化させることができる
+-
+ただし、固定効果とランダム効果の数や構造が変わるとうまく行かないので、注意すること
+- ここでは<code>rho.mode</code>を変更したときを例に説明する</p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span><span class="va">input</span><span class="op">$</span><span class="va">p0.list</span> <span class="op">&lt;-</span> <span class="va">res_ri</span><span class="op">$</span><span class="va">par_list</span></span>
+<span><span class="va">input</span><span class="op">$</span><span class="va">rho.mode</span> <span class="op">&lt;-</span> <span class="fl">2</span></span>
+<span><span class="va">res_rho2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">sam</span>, <span class="va">input</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/plot_samvpa.html">plot_samvpa</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">res_ri</span>, <span class="va">res_rho2</span><span class="op">)</span>, CI<span class="op">=</span><span class="fl">0.8</span>,</span>
+<span>            scenario_name<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/rev.html" class="external-link">rev</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Rho3"</span>,<span class="st">"Rho2"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p><img src="FAQ_files/figure-html/use-p0-1.png" class="r-plt" alt="" width="100%"></p>
+</div>
+<div class="section level4">
+<h4 id="初期値を設定する方法">初期値を設定する方法<a class="anchor" aria-label="anchor" href="#%E5%88%9D%E6%9C%9F%E5%80%A4%E3%82%92%E8%A8%AD%E5%AE%9A%E3%81%99%E3%82%8B%E6%96%B9%E6%B3%95"></a>
+</h4>
+<p>収束しにくい場合や、勾配がやや大きい場合は、初期値を変更して再解析することが有効な場合があります。
+<code><a href="../reference/sam.html">sam()</a></code> では、主な固定効果パラメータの初期値を
+<code>xx.init</code> という引数で指定できます。 これらの引数は、内部で
+<code><a href="https://rdrr.io/r/base/Log.html" class="external-link">log()</a></code> や <code>logit()</code>
+に変換されるため、基本的には通常のスケールで値を与えます。</p>
+<ul>
+<li>
+<code>q.init</code>: index ごとの q の初期値。長さは index
+の数と同じにします</li>
+<li>
+<code>sdFsta.init</code>: F のランダムウォークのプロセス誤差 SD
+の初期値。長さは <code>unique(varF)</code> の数と対応します</li>
+<li>
+<code>sdLogN.init</code>: 資源尾数 N のプロセス誤差 SD
+の初期値。長さは <code>unique(varN)</code> の数と対応します</li>
+<li>
+<code>sdLogObs.init</code>: catch at age と index の観測誤差 SD
+の初期値。長さは <code>unique(varC)</code> と
+<code>unique(index.key)</code> を合わせた数と対応します</li>
+<li>
+<code>rho.init</code>: F
+のランダムウォークの年齢間相関係数の初期値。0から1の間の値を指定します</li>
+<li>
+<code>a.init</code>, <code>b.init</code>:
+再生産関係パラメータの初期値。正の値を指定します</li>
+</ul>
+<p>例えば、VPAで得られた q を <code>q.init</code>
+として使う場合は、以下のように指定します。</p>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span><span class="co"># last catch zeroのとき最終年の加入IndexがあるとInfがでるとqが推定できないので除いておく</span></span>
+<span><span class="va">dat_ex2</span> <span class="op">&lt;-</span> <span class="va">dat_ex</span></span>
+<span><span class="va">dat_ex2</span><span class="op">$</span><span class="va">index</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span>,<span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">dat_ex2</span><span class="op">$</span><span class="va">index</span><span class="op">)</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="cn">NA_real_</span></span>
+<span></span>
+<span><span class="va">res_vpa</span> <span class="op">&lt;-</span> <span class="fu">frasyr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/frasyr/man/vpa.html" class="external-link">vpa</a></span><span class="op">(</span></span>
+<span>  <span class="va">dat_ex2</span>,</span>
+<span>  last.catch.zero <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  fc.year<span class="op">=</span><span class="fl">2011</span><span class="op">:</span><span class="fl">2013</span>,</span>
+<span>  tf.year <span class="op">=</span> <span class="fl">2010</span><span class="op">:</span><span class="fl">2012</span>,</span>
+<span>  term.F<span class="op">=</span><span class="st">"max"</span>,</span>
+<span>  stat.tf<span class="op">=</span><span class="st">"mean"</span>,</span>
+<span>  Pope<span class="op">=</span><span class="cn">TRUE</span>,</span>
+<span>  tune<span class="op">=</span><span class="cn">TRUE</span>,</span>
+<span>  p.init<span class="op">=</span><span class="fl">0.5</span>, </span>
+<span>  abund <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"N"</span>,<span class="st">"N"</span>,<span class="st">"N"</span>,<span class="st">"SSB"</span>,<span class="st">"B"</span><span class="op">)</span>,</span>
+<span>  min.age<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">0</span>,<span class="fl">1</span>,<span class="fl">0</span>,<span class="fl">0</span><span class="op">)</span>,</span>
+<span>  max.age <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">0</span>,<span class="fl">1</span>,<span class="fl">6</span>,<span class="fl">6</span><span class="op">)</span>, </span>
+<span>  sel.update<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">q_init</span> <span class="op">&lt;-</span> <span class="va">res_vpa</span><span class="op">$</span><span class="va">q</span> <span class="co">#VPAの推定値を持ってくる</span></span>
+<span><span class="va">input</span> <span class="op">&lt;-</span> <span class="va">res_rw</span><span class="op">$</span><span class="va">input</span></span>
+<span><span class="va">input</span><span class="op">$</span><span class="va">q.init</span> <span class="op">&lt;-</span> <span class="va">q_init</span></span>
+<span></span>
+<span><span class="va">res_qinit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">sam</span>,<span class="va">input</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level4">
+<h4 id="初期値をランダムに変えてよい解を探したい">初期値をランダムに変えてよい解を探したい<a class="anchor" aria-label="anchor" href="#%E5%88%9D%E6%9C%9F%E5%80%A4%E3%82%92%E3%83%A9%E3%83%B3%E3%83%80%E3%83%A0%E3%81%AB%E5%A4%89%E3%81%88%E3%81%A6%E3%82%88%E3%81%84%E8%A7%A3%E3%82%92%E6%8E%A2%E3%81%97%E3%81%9F%E3%81%84"></a>
+</h4>
+<p>初期値に依存して局所解に入っている可能性がある場合は、<code><a href="../reference/do_jitter.html">do_jitter()</a></code>
+で初期値をランダムに少しずつ変えて、複数回推定することができます。
+<code><a href="../reference/do_jitter.html">do_jitter()</a></code> は各試行の目的関数値を <code>resdat</code>
+に保存します。
+同じモデル・同じデータで比較する場合は、<code>obj_value</code>
+が小さいものを、尤度が高い解として選びます。 <code>ID = 0</code> は
+jitter する前の元の結果を表します。 <code>ID &gt; 0</code>
+が選ばれた場合は、初期値を変えることで目的関数値が改善したことを意味します。
+ただし、<code><a href="../reference/do_jitter.html">do_jitter()</a></code> の <code>reslist</code>
+に保存される結果は、<code><a href="../reference/sam.html">sam()</a></code>
+の完全な出力ではなく、目的関数値の比較に使う簡易的な結果です。
+通常の図や出力には、改めて <code><a href="../reference/sam.html">sam()</a></code>
+の結果オブジェクトを使ってください。</p>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">jitter_res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/do_jitter.html">do_jitter</a></span><span class="op">(</span></span>
+<span>  <span class="va">res_rw</span>,</span>
+<span>  SD <span class="op">=</span> <span class="fl">0.1</span>,   <span class="co"># 初期値に加える正規乱数の標準偏差</span></span>
+<span>  nsim <span class="op">=</span> <span class="fl">20</span>,  <span class="co"># jitterする回数</span></span>
+<span>  seed <span class="op">=</span> <span class="fl">1</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">jitter_res</span><span class="op">$</span><span class="va">resdat</span></span>
+<span></span>
+<span><span class="va">best_id</span> <span class="op">&lt;-</span> <span class="va">jitter_res</span><span class="op">$</span><span class="va">resdat</span><span class="op">$</span><span class="va">ID</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/which.min.html" class="external-link">which.min</a></span><span class="op">(</span><span class="va">jitter_res</span><span class="op">$</span><span class="va">resdat</span><span class="op">$</span><span class="va">obj_value</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="va">best_id</span></span>
+<span></span>
+<span><span class="kw">if</span> <span class="op">(</span><span class="va">best_id</span> <span class="op">==</span> <span class="fl">0</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="va">res_best</span> <span class="op">&lt;-</span> <span class="va">res_rw</span></span>
+<span>  <span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
+<span>    <span class="va">input</span> <span class="op">&lt;-</span> <span class="va">res_rw</span><span class="op">$</span><span class="va">input</span></span>
+<span>    <span class="va">input</span><span class="op">$</span><span class="va">p0.list</span> <span class="op">&lt;-</span> <span class="va">jitter_res</span><span class="op">$</span><span class="va">reslist</span><span class="op">[[</span><span class="va">best_id</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">obj</span><span class="op">$</span><span class="va">env</span><span class="op">$</span><span class="fu">parList</span><span class="op">(</span><span class="op">)</span></span>
+<span>    <span class="va">res_best</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">sam</span>, <span class="va">input</span><span class="op">)</span></span>
+<span>  <span class="op">}</span></span></code></pre></div>
+</div>
+<div class="section level4">
 <h4 id="fix-SDlogN">資源尾数Nのプロセス誤差を小さい値に固定したい<a class="anchor" aria-label="anchor" href="#fix-SDlogN"></a>
 </h4>
 <ul>
@@ -467,7 +562,7 @@ sigma がしきい値の外にあるかを確認できます。</p>
 <li>
 <code>varN.fix</code>の長さは、<code>unique(varN)</code>の長さと一致しなくてはいけません</li>
 </ul>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">input</span> <span class="op">&lt;-</span> <span class="va">res_rw</span><span class="op">$</span><span class="va">input</span></span>
 <span><span class="va">input</span><span class="op">$</span><span class="va">varN</span> <span class="co">#1歳魚以上が共通</span></span>
@@ -513,7 +608,7 @@ ageの観測誤差の分散が事前に分かっている場合はその値を�
 <li>SAMではcatch at
 ageの観測誤差とIndexの観測誤差（のSDのlog）が共にlogSdLogObsというパラメータで推定されているので、その場所を見つける必要がある</li>
 </ul>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">input</span> <span class="op">&lt;-</span> <span class="va">res_varNfix</span><span class="op">$</span><span class="va">input</span></span>
 <span></span>
 <span><span class="co"># 現在の推定値を次の初期値に使う</span></span>
@@ -585,7 +680,7 @@ walkにおける年齢間の相関をゼロにし、各年齢の観測誤差のS
 at ageの観測誤差、1歳魚以上の過程誤差,
 Fのランダムウォークに相対的影響を評価することもできるかと思います</li>
 </ul>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">res_vpalike</span>  <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sam.html">sam</a></span><span class="op">(</span></span>
 <span>  <span class="va">dat_ex</span>,</span>
 <span>  last.catch.zero <span class="op">=</span> <span class="cn">TRUE</span>, <span class="co">#最終年のcatchがzeroかどうか</span></span>
@@ -623,7 +718,7 @@ Fのランダムウォークに相対的影響を評価することもできる�
 <li>VPA-like
 modelの方は、catch-at-ageの観測値とほぼ変わらない値が推定できることが分かります</li>
 </ul>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">caa_to_long</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">value_name</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">out</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">as.table</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span>, stringsAsFactors <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">out</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Age"</span>, <span class="st">"Year"</span>, <span class="va">value_name</span><span class="op">)</span></span>
@@ -676,7 +771,7 @@ modelの方は、catch-at-ageの観測値とほぼ変わらない値が推定で
 <li>VPA-like
 modelのほうがFや選択率がギザギザしており、SAMは平滑化されていることが分かります</li>
 </ul>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">age_year_to_long</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">model</span>, <span class="va">metric</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">out</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">as.table</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span>, stringsAsFactors <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">out</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Age"</span>, <span class="st">"Year"</span>, <span class="st">"Value"</span><span class="op">)</span></span>
@@ -732,7 +827,7 @@ modelのほうがFや選択率がギザギザしており、SAMは平滑化さ�
 <li>すべてのIndexで同じSDを使用する場合は（<code><a href="https://rdrr.io/pkg/frasyr/man/vpa.html" class="external-link">frasyr::vpa()</a></code>の<code>est.method="ls"</code>に相当）、引数を<code>input$index.key &lt;- rep(0, length(input$abund))</code>のように設定する</li>
 <li>特定のIndexにおいて共通のSDを使用する場合は<code>input$index.key &lt;- c(0,0,1,2,3)</code>のように設定する（1番目と2番目のIndexのSDが等しい場合）</li>
 </ul>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">res_rw</span><span class="op">$</span><span class="va">sigma</span> <span class="co">#index毎に異なる</span></span>
 <span><span class="co">#&gt; [1] 1.0984898 1.3729720 0.4887155 0.3385310 0.7328952</span></span>
 <span></span>
@@ -751,6 +846,41 @@ modelのほうがFや選択率がギザギザしており、SAMは平滑化さ�
 <span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">res_rw</span><span class="op">$</span><span class="va">aic</span>, <span class="va">res_ls</span><span class="op">$</span><span class="va">aic</span>, <span class="va">res_rw2</span><span class="op">$</span><span class="va">aic</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1]  976.4474 1053.1456  976.3553</span></span></code></pre></div>
 </div>
+<div class="section level4">
+<h4 id="indexとabundanceの間の非線形性を推定したい">IndexとAbundanceの間の非線形性を推定したい<a class="anchor" aria-label="anchor" href="#index%E3%81%A8abundance%E3%81%AE%E9%96%93%E3%81%AE%E9%9D%9E%E7%B7%9A%E5%BD%A2%E6%80%A7%E3%82%92%E6%8E%A8%E5%AE%9A%E3%81%97%E3%81%9F%E3%81%84"></a>
+</h4>
+<p>デフォルトでは <code>b.est = FALSE</code> として、index
+と資源量の関係を比例関係、つまり <code>b = 1</code> として扱います。
+一方、index
+が資源量に対して非線形に反応すると考えられる場合は、<code>b.est = TRUE</code>
+として <code>b</code> を推定できます。 <code>b.fix</code> に
+<code>NA</code> を指定した index では <code>b</code>
+を推定し、数値を指定した index ではその値に固定します。 例えば
+<code>b.fix = c(1, 1, 1, NA, NA)</code> とすると、1から3番目の index は
+<code>b = 1</code> に固定し、4から5番目の index だけで <code>b</code>
+を推定します。 1以外の値に固定することもできます。</p>
+<p><code>b</code> を推定するとパラメータ数が増えるため、収束状況や
+<code>b</code> の推定値が極端でないかを確認し、AIC
+などでモデルを比較します。</p>
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span><span class="va">input</span> <span class="op">&lt;-</span> <span class="va">res_rw</span><span class="op">$</span><span class="va">input</span></span>
+<span><span class="va">input</span><span class="op">$</span><span class="va">b.est</span> <span class="op">&lt;-</span> <span class="cn">TRUE</span></span>
+<span><span class="va">input</span><span class="op">$</span><span class="va">p0.list</span> <span class="op">&lt;-</span> <span class="va">res_rw</span><span class="op">$</span><span class="va">par_list</span></span>
+<span><span class="va">res_estb_full</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">sam</span>, <span class="va">input</span><span class="op">)</span></span>
+<span><span class="va">res_estb_full</span><span class="op">$</span><span class="va">b</span> <span class="co">#すべてのindexでbが推定される</span></span>
+<span><span class="co">#&gt; [1] 0.9775703 0.9484969 1.0082841 0.9249488 0.8870791</span></span>
+<span><span class="fu"><a href="../reference/check_fit_sam.html">check_fit_sam</a></span><span class="op">(</span><span class="va">res_estb_full</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">input</span><span class="op">$</span><span class="va">b.fix</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="cn">NA</span>,<span class="cn">NA</span><span class="op">)</span> <span class="co">#1-3番目のindexはb=1に固定し、4-5番目のindexはb推定を行う</span></span>
+<span><span class="va">res_estb_45</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">sam</span>, <span class="va">input</span><span class="op">)</span></span>
+<span><span class="va">res_estb_45</span><span class="op">$</span><span class="va">b</span> <span class="co">#</span></span>
+<span><span class="co">#&gt; [1] 1.0000000 1.0000000 1.0000000 0.9249928 0.8877377</span></span>
+<span><span class="fu"><a href="../reference/check_fit_sam.html">check_fit_sam</a></span><span class="op">(</span><span class="va">res_estb_45</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">res_rw</span><span class="op">$</span><span class="va">aic</span>, <span class="va">res_estb_full</span><span class="op">$</span><span class="va">aic</span>, <span class="va">res_estb_45</span><span class="op">$</span><span class="va">aic</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 976.4474 982.5655 976.6881</span></span></code></pre></div>
+</div>
 </div>
 <div class="section level3">
 <h3 id="samの結果の出力">SAMの結果の出力<a class="anchor" aria-label="anchor" href="#sam%E3%81%AE%E7%B5%90%E6%9E%9C%E3%81%AE%E5%87%BA%E5%8A%9B"></a>
@@ -767,7 +897,7 @@ modelのほうがFや選択率がギザギザしており、SAMは平滑化さ�
 <li><p>下の例では、加入量は元のスケールで表示し、資源量と親魚量は
 <code>10000</code> で割って表示しています。</p></li>
 </ul>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">gg1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_samvpa.html">plot_samvpa</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">res_rw</span>, <span class="va">res_bh</span>, <span class="va">res_ri</span><span class="op">)</span>,</span>
 <span>  CI <span class="op">=</span> <span class="fl">0.8</span>,</span>
@@ -781,7 +911,7 @@ modelのほうがFや選択率がギザギザしており、SAMは平滑化さ�
 <ul>
 <li>以下のやり方で、表示名を事後的に変えて、日本語表記や単位を含めることができます</li>
 </ul>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">gg1</span> <span class="op">+</span></span>
 <span>    <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span></span>
 <span>      <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/vars.html" class="external-link">vars</a></span><span class="op">(</span><span class="va">stat_f</span><span class="op">)</span>,</span>
