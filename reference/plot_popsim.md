@@ -33,5 +33,5 @@ plot_popsim(
 
 - fit2PS:
 
-  [`fit2PSdata()`](fit2PSdata.md)
+  [`fit2PSdata()`](https://shotanishijima.github.io/frasam/reference/fit2PSdata.md)
   で得られる、疑似データにフィットさせた結果オブジェクト

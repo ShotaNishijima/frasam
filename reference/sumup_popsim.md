@@ -16,7 +16,7 @@ sumup_popsim(res_true, fit2PS, percent = FALSE, CI = 0.95, ...)
 
 - fit2PS:
 
-  [`fit2PSdata()`](fit2PSdata.md)
+  [`fit2PSdata()`](https://shotanishijima.github.io/frasam/reference/fit2PSdata.md)
   で得られる、疑似データにフィットさせた結果オブジェクト
 
 - percent:

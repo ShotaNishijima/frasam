@@ -22,7 +22,6 @@ sam(
   varN = 0,
   varF = 0,
   varN.fix = NULL,
-  est.method = "ml",
   SR = "BH",
   AR = 0,
   rho.mode = 2,
@@ -145,10 +144,6 @@ sam(
 
   ??
 
-- est.method:
-
-  Index間の観測誤差sigmaをばらばらにするか（"ml"、デフォルト)、共通にするか（"ls")．[`frasyr::vpa()`](https://rdrr.io/pkg/frasyr/man/vpa.html)と同じ使い方．
-
 - SR:
 
   再生産関係："RW"(Random walk), "BH", "RI", "HS", "Mesnil", or "Const"
@@ -215,9 +210,29 @@ sam(
 
   MakeADfunのときの標準出力あり（TRUE: デフォルト）、なし（FALSE）
 
+- remove.Fprocess.year:
+
+  Years to remove from the F process model.
+
+- RW.Forder:
+
+  Order of the random-walk process for fishing mortality.
+
+- map.add:
+
+  Additional TMB map settings.
+
+- p0.list:
+
+  Initial parameter list.
+
 - scale:
 
   資源量のスケーリングファクター。資源量はscaleで割った値となる
+
+- gamma:
+
+  Gamma parameter setting.
 
 - sel.def:
 
@@ -237,7 +252,8 @@ sam(
 
 - index.key:
 
-  Indexのsigmaの制約 ?? どうやって使う？？
+  Index間の観測誤差sigmaの制約。NULLの場合はIndexごとに別々、rep(0,
+  length(abund))の場合は全Indexで共通。
 
 - index.b.key:
 
@@ -260,19 +276,73 @@ sam(
   [`TMB::FreeADFun`](https://rdrr.io/pkg/TMB/man/FreeADFun.html)を使う場合、TRUEにする。See
   [`?TMB::FreeADFun`](https://rdrr.io/pkg/TMB/man/FreeADFun.html).
 
+- add_random:
+
+  Additional random effects.
+
 - lambda_Mesnil:
 
   SRを"Mesnil"にした場合のラムダの値??
+
+- tmbdata:
+
+  TMB data list.
+
+- map:
+
+  TMB parameter map.
 
 - model_wm:
 
   weightとmaturityの成長をモデリングするかどうか
 
+- w0_factor:
+
+  Factor setting for initial weight.
+
+- weight_factor:
+
+  Factor setting for weight-at-age.
+
+- family_w:
+
+  Error distribution for weight observations.
+
+- maturity_factor:
+
+  Factor setting for maturity-at-age.
+
 - scale_number:
 
   尾数のスケーリングファクター。尾数はscaleで割った値となる
 
+- weight_weight:
+
+  Weight assigned to weight-at-age likelihood components.
+
+- maturity_weight:
+
+  Weight assigned to maturity-at-age likelihood components.
+
+- g_fix:
+
+  Fixed value setting for growth parameter g.
+
+- CV_w_fix:
+
+  Fixed value setting for weight coefficient of variation.
+
+- w_link:
+
+  Link function for weight model.
+
+- sep_omicron:
+
+  Whether to separate omicron parameters.
+
 - growth_regime:
+
+  Growth regime setting.
 
 - catch_prop:
 

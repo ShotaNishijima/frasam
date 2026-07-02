@@ -6,6 +6,7 @@
 
 ``` r
 
+
 ## インストール (最新ブランチはcmsa11→vignetteとかが追加されたcreate_vignette)
 #devtools::install_github("ShotaNishijima/frasam@create_vignette") # frasam
 ## frasyrも使うのでfrasyrもインストールしてください
@@ -30,6 +31,7 @@ VPAを適用するときのデータセットと同じ形式のデータセッ�
 
 ``` r
 
+
 caa   <- read.csv("https://raw.githubusercontent.com/ichimomo/frasyr/dev/data-raw/ex1_caa.csv",  row.names=1)
 waa   <- read.csv("https://raw.githubusercontent.com/ichimomo/frasyr/dev/data-raw/ex1_waa.csv",  row.names=1)
 maa   <- read.csv("https://raw.githubusercontent.com/ichimomo/frasyr/dev/data-raw/ex1_maa.csv",  row.names=1)
@@ -50,6 +52,7 @@ dat <- data.handler(caa=caa, waa=waa, maa=maa, M=0.5, index=index)
 ### 基本的な設定で解析と結果の出力
 
 ``` r
+
 # まずはsamのhelpファイルを閲覧してどんなオプションがあるか把握しましょう
 #help(sam)
 
@@ -66,7 +69,7 @@ res_sam <- sam(dat,
                rec.age = 0,
                plus.group = TRUE,
                alpha = 1, # 最高年齢と最高年齢-1歳のFが同じと仮定（VPAと同じ仮定)
-               est.method = "ml",
+               # est.method = "ml",
                # 資源量指数に関わる設定。資源量指数の数だけベクトルで与える。
                abund = c("SSB", "N"),
                min.age = c(0, 0),
@@ -203,6 +206,7 @@ knitr::kable(fixef)
 
 ``` r
 
+
 ## 結果のプロット
 # デルタ法にかかる信頼区間が描かれる
 plot_samvpa(res_sam, CI=0.95)
@@ -212,6 +216,7 @@ plot_samvpa(res_sam, CI=0.95)
 
 ``` r
 
+
 ## 結果の出力
 out_sam(res_sam, filename="sam")
 ```
@@ -219,6 +224,7 @@ out_sam(res_sam, filename="sam")
 ### VPAや、異なる設定のSAMとの比較
 
 ``` r
+
 ## VPAもやってみる
 res_vpa <- vpa(dat,fc.year=1998:2000,tf.year = 1998:1999,
                term.F="max",stat.tf="mean",Pope=TRUE,tune=TRUE,p.init=0.5, abund=c("SSB","N"), min.age=c(0,0), max.age=c(6,0), sel.update=TRUE)
@@ -233,12 +239,14 @@ print(gg_graph1)
 ![](sam_files/figure-html/comparison-1.png)
 
 ``` r
+
 print(gg_graph2)
 ```
 
 ![](sam_files/figure-html/comparison-2.png)
 
 ``` r
+
 
 
 ## 設定を少し変えてもう一度実行する場合
@@ -344,6 +352,7 @@ plot_samvpa(list(SAM=res_sam, SAM2=res_sam2,SAM3=res_sam3),
 
 ``` r
 
+
 ## F at age by year (境さんコード、関数化必要？時系列が長い場合への対応が必要)
 res_samdata <- make_assess_result(res_sam)　# 境さん関数(make_assess_result)
 
@@ -367,6 +376,7 @@ res_samdata <- make_assess_result(res_sam)　# 境さん関数(make_assess_resul
 ![](sam_files/figure-html/comparison-4.png)
 
 ``` r
+
 
 ## F at age by year
 (gg <- res_samdata %>% dplyr::filter(stat=="faa") %>%
@@ -397,6 +407,7 @@ res_samdata <- make_assess_result(res_sam)　# 境さん関数(make_assess_resul
   - いろいろ試してAICの小さいものを選ぶ。（最新のcAICというものもあるようだが、未実装）
 
 ``` r
+
 ## varF(Fのプロセス誤差)とvarC（CAAの観測誤差）をどの年齢間で分けるかをstepAICで検討する
 
 # いまは1歳魚以上のvarNを固定しているが、それも検討することも可能
@@ -444,6 +455,7 @@ res_select$tbl_sigma %>% knitr::kable()
 ``` r
 
 
+
 ## Best modelの結果チェック
 # FAAの誤差が0歳と1歳以上で分かれる
 res_best <- res_select$bestres #AIC最少をベストモデルとする
@@ -469,6 +481,7 @@ cbind(
 
 ``` r
 
+
 ## 単純なプロット
 plot_SR_simple(res_sam2) #BHモデルを例に
 ```
@@ -476,6 +489,7 @@ plot_SR_simple(res_sam2) #BHモデルを例に
 ![](sam_files/figure-html/plot_SR_simple-1.png)
 
 ``` r
+
 
 ## SAMの結果からfraysrで使える再生産関係のオブジェクトを作成するとfrasyrの関数が使える
 SR_sam0 <- res_sam2 %>% make_SRres
@@ -491,6 +505,7 @@ refF_res <- ref.F(res_sam2,Fcurrent=Fcurrent,Pope=FALSE)
 ![](sam_files/figure-html/plot_SR_simple-2.png)
 
 ``` r
+
 refF_res$summary
 #>            Fcurrent Fmed Flow Fhigh      Fmax      F0.1 Fmean FpSPR.10.SPR
 #> max       0.4565963   NA   NA    NA 0.5620096 0.3383543    NA    0.6752882
@@ -513,6 +528,7 @@ refF_res$summary
 - 初期値を変えて再推定し、目的関数（負の対数尤度）の値が変わらないかをチェックする
 
 ``` r
+
 # ここでは10回だけ
 jitterres = do_jitter(res_best,SD=0.1,nsim=10) #SDは初期値を乱数発生させる際のSD
 #> 0: -16.089
@@ -547,6 +563,7 @@ knitr::kable(jitterres$resdat) #変わらない
 
 ``` r
 
+
 ## 資源量指数 (frasyrのplot_residual_vpaと統合してもよい？）
 ## - これは通常のresidual
 resid_sam <- index_plot(res_best); wrap_plots(resid_sam,nrow=1)
@@ -556,6 +573,7 @@ resid_sam <- index_plot(res_best); wrap_plots(resid_sam,nrow=1)
 
 ``` r
 
+
 ## catch at age
 caa_resid <- caa_plot(res_best); wrap_plots(caa_resid,ncol=2)
 ```
@@ -563,6 +581,7 @@ caa_resid <- caa_plot(res_best); wrap_plots(caa_resid,ncol=2)
 ![](sam_files/figure-html/plot_residual-2.png)
 
 ``` r
+
 
 ## total catch weight の比較も必要かも
 # 今関数はない
@@ -600,6 +619,7 @@ g1 <- ggplot() +
 - ’TMB::oneStepPredict’を使って行うが、SAM用の関数’do_osa_resid()’を用意してある
 
 ``` r
+
 osa.simple <- do_osa_resid(res_best)
 #> [1] 90
 #> [1] 89
@@ -702,6 +722,7 @@ gg_osa = plot_osa_resid(osa.simple); wrap_plots(gg_osa,ncol=2)
 - Retrospective forecastingも同時に実行可能でプロットもできる
 
 ``` r
+
 retro_res = retro_sam(res_best,n=5) #nは年数
 
 (g_retro = retro_plot(res_best,retro_res,start_year=1991,mohn_position="bottomleft"))
@@ -710,6 +731,7 @@ retro_res = retro_sam(res_best,n=5) #nは年数
 ![](sam_files/figure-html/retro-1.png)
 
 ``` r
+
 
 # retrospective forecastingもできる
 (g_retro2 = retro_plot(res_best,retro_res,start_year=1991,mohn_position="bottomleft", forecast=TRUE))
@@ -724,12 +746,14 @@ retro_res = retro_sam(res_best,n=5) #nは年数
 - Mean absolute scaled error (MASE) で予測精度を評価する
 
 ``` r
+
 (g_hindcast <- plot_hindcastCV(res_best, retro_res, show_mase = TRUE, mase_position = "bottomleft", use_index = 1:2, log = FALSE))
 ```
 
 ![](sam_files/figure-html/hindcasting-1.png)
 
 ``` r
+
 
 # MASEの結果を取り出す場合
 res_mase = calc_mase(res_best, retro_res, log = FALSE)
@@ -747,6 +771,7 @@ res_mase$mase %>% knitr::kable()
 - ’do_loo_index()’という関数を使って実行する
 
 ``` r
+
 loo_res <- do_loo_index(res_best)
 reslist <- list()
 for ( j in 0:length(loo_res)) {
@@ -768,6 +793,7 @@ for ( j in 0:length(loo_res)) {
   qなどを変化させたときの対数尤度を調べて、収束しているか、どの程度尤度が変わるか（不確実性の程度、信頼区間）を調べる
 
 ``` r
+
 # Catchabilityに対するプロファイル尤度
 # 同じ名前のパラメータが複数ある場合は引数'which_param'で位置を指定できる
 res_profile <- samprofile(res_best, "logQ", which_param=1, param_range=c(8, 11), length=25)
@@ -781,6 +807,7 @@ res_profile$obj_tbl[-1,] %>%
 ![](sam_files/figure-html/profile_likelihood-1.png)
 
 ``` r
+
 
 
 # Mのプロファイル尤度 => 関数がないからこんな感じで手動で
@@ -805,6 +832,7 @@ data.frame(
 
 ``` r
 
+
 plot_samvpa(samres_Mlist,scenario_name=scns,CI=0.)
 ```
 
@@ -817,6 +845,7 @@ plot_samvpa(samres_Mlist,scenario_name=scns,CI=0.)
 - delta法で求めたCIも図に加える場合は’draw_deltaCI=TRUE’
 
 ``` r
+
 
 res_boot <- boo_sam(res_best, n=20,method="p",seed=1) #時間節約のため20回
 #> -----1-----
@@ -854,6 +883,7 @@ res_boot <- boo_sam(res_best, n=20,method="p",seed=1) #時間節約のため20�
   (cross test) を調べられる
 
 ``` r
+
 ## 真のモデルはSAM
 # pseudo dataを生成
 pdata_sam <- popsim_vpasam(res_best, n=20)
@@ -865,26 +895,28 @@ metric_sam2sam = sumup_popsim(res_best,fit_sam2sam) #真のモデルの結果を
 metric_sam2sam$summary %>% filter(stat=="SSB") %>% knitr::kable()
 ```
 
-| stat | year | age |      RMSE |      MAE |     RMSRE |     MARE |    MedBias | MedRelBias |    Median |       CV | value_true |     lower |    upper |
-|:-----|-----:|----:|----------:|---------:|----------:|---------:|-----------:|-----------:|----------:|---------:|-----------:|----------:|---------:|
-| SSB  | 1991 |  NA |  96262.07 | 21528.51 |  801.2566 | 179.1968 |  1.6557709 |  0.0137821 | 121.79464 | 4.447057 |  120.13887 | 113.26746 | 226135.2 |
-| SSB  | 1992 |  NA | 103773.23 | 23208.33 |  860.6119 | 192.4713 |  1.4633539 |  0.0121359 | 122.04410 | 4.448805 |  120.58075 | 112.58742 | 243771.1 |
-| SSB  | 1993 |  NA | 110255.84 | 24658.07 |  910.1839 | 203.5572 |  0.5281819 |  0.0043602 | 121.66397 | 4.450090 |  121.13579 | 114.07817 | 258994.5 |
-| SSB  | 1994 |  NA | 117114.74 | 26191.17 | 1050.5720 | 234.9466 | -0.5552580 | -0.0049809 | 110.92186 | 4.452982 |  111.47711 | 107.61641 | 275087.5 |
-| SSB  | 1995 |  NA | 123716.25 | 27667.42 | 1201.5596 | 268.7121 | -0.7903540 | -0.0076761 | 102.17270 | 4.455436 |  102.96306 |  98.82600 | 290580.7 |
-| SSB  | 1996 |  NA | 128514.97 | 28740.72 | 1449.1871 | 324.0920 | -1.2458636 | -0.0140489 |  87.43486 | 4.458343 |   88.68073 |  82.41123 | 301834.8 |
-| SSB  | 1997 |  NA | 131688.45 | 29451.14 | 1796.8078 | 401.8427 | -1.4834311 | -0.0202405 |  71.80679 | 4.461028 |   73.29023 |  65.95243 | 309272.2 |
-| SSB  | 1998 |  NA | 133517.90 | 29861.36 | 2286.8410 | 511.4533 | -2.5340113 | -0.0434015 |  55.85129 | 4.463367 |   58.38530 |  51.51799 | 313554.4 |
-| SSB  | 1999 |  NA | 134641.20 | 30116.15 | 2444.3240 | 546.7392 | -5.3210389 | -0.0966000 |  49.76216 | 4.464039 |   55.08320 |  44.06890 | 316193.9 |
-| SSB  | 2000 |  NA | 135429.14 | 30296.66 | 2490.0301 | 557.0411 | -7.8548661 | -0.1444213 |  46.53369 | 4.464263 |   54.38855 |  37.48370 | 318049.4 |
+| stat | year | age | RMSE | MAE | RMSRE | MARE | MedBias | MedRelBias | Median | CV | value_true | lower | upper |
+|:---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| SSB | 1991 | NA | 4.885009 | 3.663438 | 0.0406614 | 0.0304934 | 1.3537238 | 0.0112680 | 121.49259 | 0.0383750 | 120.13887 | 114.70558 | 131.08413 |
+| SSB | 1992 | NA | 4.540857 | 3.363346 | 0.0376582 | 0.0278929 | 1.3723178 | 0.0113809 | 121.95306 | 0.0358979 | 120.58075 | 116.14669 | 131.24347 |
+| SSB | 1993 | NA | 4.375012 | 3.352437 | 0.0361166 | 0.0276750 | -0.5293403 | -0.0043698 | 120.60645 | 0.0369249 | 121.13579 | 114.34490 | 130.79388 |
+| SSB | 1994 | NA | 3.561613 | 2.881947 | 0.0319493 | 0.0258524 | -0.1128623 | -0.0010124 | 111.36425 | 0.0326085 | 111.47711 | 106.02801 | 118.06175 |
+| SSB | 1995 | NA | 3.703742 | 2.993403 | 0.0359716 | 0.0290726 | 0.3918396 | 0.0038056 | 103.35490 | 0.0367932 | 102.96306 | 97.26898 | 110.42653 |
+| SSB | 1996 | NA | 4.262722 | 3.584949 | 0.0480682 | 0.0404253 | 0.1663558 | 0.0018759 | 88.84708 | 0.0490676 | 88.68073 | 81.72075 | 96.53333 |
+| SSB | 1997 | NA | 5.312750 | 4.239548 | 0.0724892 | 0.0578460 | -0.0231080 | -0.0003153 | 73.26712 | 0.0740995 | 73.29023 | 65.63869 | 83.66299 |
+| SSB | 1998 | NA | 6.023260 | 4.677459 | 0.1031640 | 0.0801136 | -0.1613193 | -0.0027630 | 58.22398 | 0.1042538 | 58.38530 | 51.47112 | 71.16356 |
+| SSB | 1999 | NA | 7.527757 | 5.901446 | 0.1366616 | 0.1071370 | -0.9603433 | -0.0174344 | 54.12286 | 0.1400315 | 55.08320 | 45.43264 | 70.64158 |
+| SSB | 2000 | NA | 10.490437 | 8.320479 | 0.1928795 | 0.1529822 | -3.3838403 | -0.0622160 | 51.00471 | 0.1997777 | 54.38855 | 39.79421 | 76.49195 |
 
 ``` r
+
 (g_sam2sam <- plot_popsim(res_best,fit_sam2sam))
 ```
 
 ![](sam_files/figure-html/cross_test-1.png)
 
 ``` r
+
 
 # cross-test (VPAで推定)
 # 前述のブートストラップと同じ（はず）
@@ -894,26 +926,28 @@ metric_vpa2sam = sumup_popsim(res_best,fit_vpa2sam) #こっちでは真のモデ
 metric_vpa2sam$summary %>% filter(stat=="SSB") %>% knitr::kable()
 ```
 
-| stat | year | age |      RMSE |       MAE |     RMSRE |      MARE |    MedBias | MedRelBias |    Median |        CV | value_true |     lower |     upper |
-|:-----|-----:|----:|----------:|----------:|----------:|----------:|-----------:|-----------:|----------:|----------:|-----------:|----------:|----------:|
-| SSB  | 1991 |  NA |  6.605296 |  5.336627 | 0.0549805 | 0.0444205 |  4.3995653 |  0.0366207 | 124.53844 | 0.0383705 |  120.13887 | 117.28245 | 133.76663 |
-| SSB  | 1992 |  NA |  6.836060 |  5.646956 | 0.0566928 | 0.0468313 |  4.1252020 |  0.0342111 | 124.70595 | 0.0386172 |  120.58075 | 117.24014 | 133.99612 |
-| SSB  | 1993 |  NA |  7.200028 |  5.712401 | 0.0594377 | 0.0471570 |  4.2354347 |  0.0349644 | 125.37122 | 0.0393156 |  121.13579 | 119.24504 | 135.32616 |
-| SSB  | 1994 |  NA |  6.118520 |  4.829909 | 0.0548859 | 0.0433265 |  4.5479614 |  0.0407973 | 116.02508 | 0.0344211 |  111.47711 | 110.90897 | 123.11240 |
-| SSB  | 1995 |  NA |  5.392741 |  4.526218 | 0.0523755 | 0.0439596 |  4.3518814 |  0.0422664 | 107.31494 | 0.0345545 |  102.96306 | 100.93189 | 112.34283 |
-| SSB  | 1996 |  NA |  5.019985 |  4.420800 | 0.0566074 | 0.0498507 |  3.5027798 |  0.0394988 |  92.18351 | 0.0470418 |   88.68073 |  83.87558 |  97.04532 |
-| SSB  | 1997 |  NA |  5.269523 |  4.524783 | 0.0718994 | 0.0617379 |  2.4844352 |  0.0338986 |  75.77466 | 0.0670101 |   73.29023 |  67.34191 |  82.99795 |
-| SSB  | 1998 |  NA |  6.380105 |  5.383204 | 0.1092759 | 0.0922014 |  0.2418703 |  0.0041427 |  58.62717 | 0.1070840 |   58.38530 |  51.25621 |  69.66393 |
-| SSB  | 1999 |  NA | 10.802357 |  8.840768 | 0.1961098 | 0.1604984 | -0.1770578 | -0.0032144 |  54.90615 | 0.1921374 |   55.08320 |  44.84134 |  77.35118 |
-| SSB  | 2000 |  NA | 17.519385 | 13.486490 | 0.3221153 | 0.2479656 | -0.9818225 | -0.0180520 |  53.40673 | 0.3075988 |   54.38855 |  39.36882 |  92.82609 |
+| stat | year | age | RMSE | MAE | RMSRE | MARE | MedBias | MedRelBias | Median | CV | value_true | lower | upper |
+|:---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| SSB | 1991 | NA | 7.298957 | 5.905254 | 0.0607543 | 0.0491536 | 5.328397 | 0.0443520 | 125.46727 | 0.0364352 | 120.13887 | 119.45662 | 134.28582 |
+| SSB | 1992 | NA | 7.086254 | 6.122930 | 0.0587677 | 0.0507787 | 5.708749 | 0.0473438 | 126.28949 | 0.0345721 | 120.58075 | 118.21211 | 133.52383 |
+| SSB | 1993 | NA | 6.299736 | 5.303367 | 0.0520056 | 0.0437803 | 4.680014 | 0.0386344 | 125.81580 | 0.0375056 | 121.13579 | 116.91897 | 134.95113 |
+| SSB | 1994 | NA | 5.847256 | 4.686710 | 0.0524525 | 0.0420419 | 3.963158 | 0.0355513 | 115.44027 | 0.0385929 | 111.47711 | 108.04890 | 123.22402 |
+| SSB | 1995 | NA | 5.684298 | 4.363655 | 0.0552072 | 0.0423808 | 2.245500 | 0.0218088 | 105.20856 | 0.0397255 | 102.96306 | 100.55971 | 114.52254 |
+| SSB | 1996 | NA | 6.335595 | 4.867949 | 0.0714427 | 0.0548930 | 2.607321 | 0.0294012 | 91.28805 | 0.0587142 | 88.68073 | 83.16994 | 101.26155 |
+| SSB | 1997 | NA | 7.757632 | 5.774150 | 0.1058481 | 0.0787847 | 1.824573 | 0.0248952 | 75.11480 | 0.0950666 | 73.29023 | 65.78407 | 89.49907 |
+| SSB | 1998 | NA | 8.444147 | 6.579923 | 0.1446280 | 0.1126983 | 2.773381 | 0.0475014 | 61.15868 | 0.1291861 | 58.38530 | 52.16088 | 77.92094 |
+| SSB | 1999 | NA | 10.212570 | 8.120903 | 0.1854026 | 0.1474297 | 4.383097 | 0.0795723 | 59.46630 | 0.1641773 | 55.08320 | 47.20529 | 78.84803 |
+| SSB | 2000 | NA | 12.921275 | 10.411244 | 0.2375734 | 0.1914234 | 4.620857 | 0.0849601 | 59.00941 | 0.2135483 | 54.38855 | 41.55761 | 83.49743 |
 
 ``` r
+
 (g_vpa2sam <- plot_popsim(res_best,fit_vpa2sam))
 ```
 
 ![](sam_files/figure-html/cross_test-2.png)
 
 ``` r
+
 
 # SAMの結果（res_best）の代わりに、VPAの結果をoperating model (真のモデル) として入れ替えて、VPAデータに対するself-test / cross-testもできます
 ```

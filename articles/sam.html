@@ -7,8 +7,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>SAMを使った資源量推定 • frasam</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="SAMを使った資源量推定">
 </head>
@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">frasam</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.4.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -33,7 +33,8 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/sam.html">SAMを使った資源量推定</a></li>
+<li><a class="dropdown-item" href="../articles/FAQ.html">FAQ on how to use 'frasam'</a></li>
+    <li><a class="dropdown-item" href="../articles/sam.html">SAMを使った資源量推定</a></li>
   </ul>
 </li>
       </ul>
@@ -53,7 +54,7 @@
       <h1>SAMを使った資源量推定</h1>
                         <h4 data-toc-skip class="author">市野川桃子・西嶋翔太</h4>
             
-            <h4 data-toc-skip class="date">2025-12-09</h4>
+            <h4 data-toc-skip class="date">2026-07-02</h4>
       
 
       <div class="d-none name"><code>sam.Rmd</code></div>
@@ -131,7 +132,7 @@
 <span>               rec.age <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>               plus.group <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>               alpha <span class="op">=</span> <span class="fl">1</span>, <span class="co"># 最高年齢と最高年齢-1歳のFが同じと仮定（VPAと同じ仮定)</span></span>
-<span>               est.method <span class="op">=</span> <span class="st">"ml"</span>,</span>
+<span>               <span class="co"># est.method = "ml",</span></span>
 <span>               <span class="co"># 資源量指数に関わる設定。資源量指数の数だけベクトルで与える。</span></span>
 <span>               abund <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"SSB"</span>, <span class="st">"N"</span><span class="op">)</span>,</span>
 <span>               min.age <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>,</span>
@@ -331,7 +332,7 @@
 <span><span class="co">## 結果のプロット</span></span>
 <span><span class="co"># デルタ法にかかる信頼区間が描かれる</span></span>
 <span><span class="fu"><a href="../reference/plot_samvpa.html">plot_samvpa</a></span><span class="op">(</span><span class="va">res_sam</span>, CI<span class="op">=</span><span class="fl">0.95</span><span class="op">)</span></span></code></pre></div>
-<p><img src="sam_files/figure-html/initial%20analysis-1.png" class="r-plt" width="100%" style="display: block; margin: auto;"></p>
+<p><img src="sam_files/figure-html/initial%20analysis-1.png" class="r-plt" alt="" width="100%" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co">## 結果の出力</span></span>
@@ -350,10 +351,10 @@
 <span><span class="va">gg_graph2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/frasyr/man/plot_vpa.html" class="external-link">plot_vpa</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>VPA<span class="op">=</span><span class="va">res_vpa</span>, SAM<span class="op">=</span><span class="va">res_sam</span><span class="op">)</span>, what.plot<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"fishing_mortality"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">gg_graph1</span><span class="op">)</span></span></code></pre></div>
-<p><img src="sam_files/figure-html/comparison-1.png" class="r-plt" width="100%" style="display: block; margin: auto;"></p>
+<p><img src="sam_files/figure-html/comparison-1.png" class="r-plt" alt="" width="100%" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">gg_graph2</span><span class="op">)</span></span></code></pre></div>
-<p><img src="sam_files/figure-html/comparison-2.png" class="r-plt" width="100%" style="display: block; margin: auto;"></p>
+<p><img src="sam_files/figure-html/comparison-2.png" class="r-plt" alt="" width="100%" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span></span>
@@ -454,7 +455,7 @@
 <span><span class="co">## - VPAの結果も並列で示せるが、その場合vpa関数の実行にはTMB=TRUEオプションをつける必要あり</span></span>
 <span><span class="fu"><a href="../reference/plot_samvpa.html">plot_samvpa</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>SAM<span class="op">=</span><span class="va">res_sam</span>, SAM2<span class="op">=</span><span class="va">res_sam2</span>,SAM3<span class="op">=</span><span class="va">res_sam3</span><span class="op">)</span>,</span>
 <span>            what.plot <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"biomass"</span>,<span class="st">"SSB"</span>,<span class="st">"Recruitment"</span>,<span class="st">"U"</span>,<span class="st">"catch"</span>,<span class="st">"fishing_mortality"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="sam_files/figure-html/comparison-3.png" class="r-plt" width="100%" style="display: block; margin: auto;"></p>
+<p><img src="sam_files/figure-html/comparison-3.png" class="r-plt" alt="" width="100%" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co">## F at age by year (境さんコード、関数化必要？時系列が長い場合への対応が必要)</span></span>
@@ -475,7 +476,7 @@
 <span>          axis.text.y <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">11</span>, color <span class="op">=</span> <span class="st">"black"</span><span class="op">)</span>,</span>
 <span>          axis.line.x <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_line</a></span><span class="op">(</span>linewidth <span class="op">=</span> <span class="fl">0.3528</span><span class="op">)</span>, axis.line.y <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_line</a></span><span class="op">(</span>linewidth <span class="op">=</span> <span class="fl">0.3528</span><span class="op">)</span>,</span>
 <span>          axis.minor.ticks.length <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">rel</a></span><span class="op">(</span><span class="fl">0.5</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="sam_files/figure-html/comparison-4.png" class="r-plt" width="100%" style="display: block; margin: auto;"></p>
+<p><img src="sam_files/figure-html/comparison-4.png" class="r-plt" alt="" width="100%" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co">## F at age by year</span></span>
@@ -495,7 +496,7 @@
 <span>          axis.text.y <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">11</span>, color <span class="op">=</span> <span class="st">"black"</span><span class="op">)</span>,</span>
 <span>          axis.line.x <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_line</a></span><span class="op">(</span>linewidth <span class="op">=</span> <span class="fl">0.3528</span><span class="op">)</span>, axis.line.y <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_line</a></span><span class="op">(</span>linewidth <span class="op">=</span> <span class="fl">0.3528</span><span class="op">)</span>,</span>
 <span>          axis.minor.ticks.length <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">rel</a></span><span class="op">(</span><span class="fl">0.5</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="sam_files/figure-html/comparison-5.png" class="r-plt" width="100%" style="display: block; margin: auto;"></p>
+<p><img src="sam_files/figure-html/comparison-5.png" class="r-plt" alt="" width="100%" style="display: block; margin: auto;"></p>
 </div>
 </div>
 <div class="section level2">
@@ -844,7 +845,7 @@
 <code class="sourceCode R"><span></span>
 <span><span class="co">## 単純なプロット</span></span>
 <span><span class="fu"><a href="../reference/plot_SR_simple.html">plot_SR_simple</a></span><span class="op">(</span><span class="va">res_sam2</span><span class="op">)</span> <span class="co">#BHモデルを例に</span></span></code></pre></div>
-<p><img src="sam_files/figure-html/plot_SR_simple-1.png" class="r-plt" width="100%" style="display: block; margin: auto;"></p>
+<p><img src="sam_files/figure-html/plot_SR_simple-1.png" class="r-plt" alt="" width="100%" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co">## SAMの結果からfraysrで使える再生産関係のオブジェクトを作成するとfrasyrの関数が使える</span></span>
@@ -856,7 +857,7 @@
 <span><span class="co"># FcurrentとPope=FALSEを明示的に引数に含める必要がある</span></span>
 <span><span class="va">Fcurrent</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">rowMeans</a></span><span class="op">(</span><span class="va">res_sam2</span><span class="op">$</span><span class="va">faa</span><span class="op">[</span>,<span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="fl">1998</span><span class="op">:</span><span class="fl">2000</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="va">refF_res</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/frasyr/man/ref.F.html" class="external-link">ref.F</a></span><span class="op">(</span><span class="va">res_sam2</span>,Fcurrent<span class="op">=</span><span class="va">Fcurrent</span>,Pope<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="sam_files/figure-html/plot_SR_simple-2.png" class="r-plt" width="100%" style="display: block; margin: auto;"></p>
+<p><img src="sam_files/figure-html/plot_SR_simple-2.png" class="r-plt" alt="" width="100%" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">refF_res</span><span class="op">$</span><span class="va">summary</span></span>
 <span><span class="co">#&gt;            Fcurrent Fmed Flow Fhigh      Fmax      F0.1 Fmean FpSPR.10.SPR</span></span>
@@ -957,12 +958,12 @@
 <span><span class="co">## 資源量指数 (frasyrのplot_residual_vpaと統合してもよい？）</span></span>
 <span><span class="co">## - これは通常のresidual</span></span>
 <span><span class="va">resid_sam</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/index_plot.html">index_plot</a></span><span class="op">(</span><span class="va">res_best</span><span class="op">)</span>; <span class="fu"><a href="https://patchwork.data-imaginist.com/reference/wrap_plots.html" class="external-link">wrap_plots</a></span><span class="op">(</span><span class="va">resid_sam</span>,nrow<span class="op">=</span><span class="fl">1</span><span class="op">)</span></span></code></pre></div>
-<p><img src="sam_files/figure-html/plot_residual-1.png" class="r-plt" width="100%" style="display: block; margin: auto;"></p>
+<p><img src="sam_files/figure-html/plot_residual-1.png" class="r-plt" alt="" width="100%" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co">## catch at age</span></span>
 <span><span class="va">caa_resid</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/caa_plot.html">caa_plot</a></span><span class="op">(</span><span class="va">res_best</span><span class="op">)</span>; <span class="fu"><a href="https://patchwork.data-imaginist.com/reference/wrap_plots.html" class="external-link">wrap_plots</a></span><span class="op">(</span><span class="va">caa_resid</span>,ncol<span class="op">=</span><span class="fl">2</span><span class="op">)</span></span></code></pre></div>
-<p><img src="sam_files/figure-html/plot_residual-2.png" class="r-plt" width="100%" style="display: block; margin: auto;"></p>
+<p><img src="sam_files/figure-html/plot_residual-2.png" class="r-plt" alt="" width="100%" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co">## total catch weight の比較も必要かも</span></span>
@@ -1094,7 +1095,7 @@ prediction）とデータとの残差 (OSA residuals)
 <span><span class="co">#&gt; [1] 2</span></span>
 <span><span class="co">#&gt; [1] 1</span></span>
 <span><span class="va">gg_osa</span> <span class="op">=</span> <span class="fu"><a href="../reference/plot_osa_resid.html">plot_osa_resid</a></span><span class="op">(</span><span class="va">osa.simple</span><span class="op">)</span>; <span class="fu"><a href="https://patchwork.data-imaginist.com/reference/wrap_plots.html" class="external-link">wrap_plots</a></span><span class="op">(</span><span class="va">gg_osa</span>,ncol<span class="op">=</span><span class="fl">2</span><span class="op">)</span></span></code></pre></div>
-<p><img src="sam_files/figure-html/OSA%20residual-1.png" class="r-plt" width="100%" style="display: block; margin: auto;"></p>
+<p><img src="sam_files/figure-html/OSA%20residual-1.png" class="r-plt" alt="" width="100%" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level3">
 <h3 id="レトロスペクティブ解析">レトロスペクティブ解析<a class="anchor" aria-label="anchor" href="#%E3%83%AC%E3%83%88%E3%83%AD%E3%82%B9%E3%83%9A%E3%82%AF%E3%83%86%E3%82%A3%E3%83%96%E8%A7%A3%E6%9E%90"></a>
@@ -1107,12 +1108,12 @@ prediction）とデータとの残差 (OSA residuals)
 <code class="sourceCode R"><span><span class="va">retro_res</span> <span class="op">=</span> <span class="fu"><a href="../reference/retro_sam.html">retro_sam</a></span><span class="op">(</span><span class="va">res_best</span>,n<span class="op">=</span><span class="fl">5</span><span class="op">)</span> <span class="co">#nは年数</span></span>
 <span></span>
 <span><span class="op">(</span><span class="va">g_retro</span> <span class="op">=</span> <span class="fu"><a href="../reference/retro_plot.html">retro_plot</a></span><span class="op">(</span><span class="va">res_best</span>,<span class="va">retro_res</span>,start_year<span class="op">=</span><span class="fl">1991</span>,mohn_position<span class="op">=</span><span class="st">"bottomleft"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="sam_files/figure-html/retro-1.png" class="r-plt" width="100%" style="display: block; margin: auto;"></p>
+<p><img src="sam_files/figure-html/retro-1.png" class="r-plt" alt="" width="100%" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co"># retrospective forecastingもできる</span></span>
 <span><span class="op">(</span><span class="va">g_retro2</span> <span class="op">=</span> <span class="fu"><a href="../reference/retro_plot.html">retro_plot</a></span><span class="op">(</span><span class="va">res_best</span>,<span class="va">retro_res</span>,start_year<span class="op">=</span><span class="fl">1991</span>,mohn_position<span class="op">=</span><span class="st">"bottomleft"</span>, forecast<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="sam_files/figure-html/retro-2.png" class="r-plt" width="100%" style="display: block; margin: auto;"></p>
+<p><img src="sam_files/figure-html/retro-2.png" class="r-plt" alt="" width="100%" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level3">
 <h3 id="hindcast-cross-validation">Hindcast cross validation<a class="anchor" aria-label="anchor" href="#hindcast-cross-validation"></a>
@@ -1124,7 +1125,7 @@ cross validationを実行する</li>
 </ul>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">g_hindcast</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_hindcastCV.html">plot_hindcastCV</a></span><span class="op">(</span><span class="va">res_best</span>, <span class="va">retro_res</span>, show_mase <span class="op">=</span> <span class="cn">TRUE</span>, mase_position <span class="op">=</span> <span class="st">"bottomleft"</span>, use_index <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">2</span>, log <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="sam_files/figure-html/hindcasting-1.png" class="r-plt" width="100%" style="display: block; margin: auto;"></p>
+<p><img src="sam_files/figure-html/hindcasting-1.png" class="r-plt" alt="" width="100%" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co"># MASEの結果を取り出す場合</span></span>
@@ -1175,7 +1176,7 @@ cross validationを実行する</li>
 <span><span class="op">}</span></span>
 <span><span class="op">(</span><span class="va">g_loo</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_samvpa.html">plot_samvpa</a></span><span class="op">(</span><span class="va">reslist</span>,CI<span class="op">=</span><span class="fl">0</span>,</span>
 <span>                    scenario_name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"full"</span>,<span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span><span class="op">:</span><span class="op">-</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="sam_files/figure-html/loo-index-1.png" class="r-plt" width="100%" style="display: block; margin: auto;"></p>
+<p><img src="sam_files/figure-html/loo-index-1.png" class="r-plt" alt="" width="100%" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level3">
 <h3 id="プロファイル尤度">プロファイル尤度<a class="anchor" aria-label="anchor" href="#%E3%83%97%E3%83%AD%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB%E5%B0%A4%E5%BA%A6"></a>
@@ -1193,7 +1194,7 @@ qなどを変化させたときの対数尤度を調べて、収束している�
 <span><span class="va">res_profile</span><span class="op">$</span><span class="va">obj_tbl</span><span class="op">[</span><span class="op">-</span><span class="fl">1</span>,<span class="op">]</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">par</span>, y<span class="op">=</span><span class="va">obj_value</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span>linewidth<span class="op">=</span><span class="fl">0.5</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">res_profile</span><span class="op">$</span><span class="va">obj_tbl</span><span class="op">[</span><span class="fl">1</span>,<span class="op">]</span>,colour<span class="op">=</span><span class="st">"red"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="sam_files/figure-html/profile_likelihood-1.png" class="r-plt" width="100%" style="display: block; margin: auto;"></p>
+<p><img src="sam_files/figure-html/profile_likelihood-1.png" class="r-plt" alt="" width="100%" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span></span>
@@ -1213,11 +1214,11 @@ qなどを変化させたときの対数尤度を調べて、収束している�
 <span>  M <span class="op">=</span> <span class="va">Ms</span>,</span>
 <span>  obj_value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">samres_Mlist</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="va">x</span><span class="op">$</span><span class="va">opt</span><span class="op">$</span><span class="va">objective</span><span class="op">)</span></span>
 <span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">M</span>,y<span class="op">=</span><span class="va">obj_value</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="sam_files/figure-html/profile_likelihood-2.png" class="r-plt" width="100%" style="display: block; margin: auto;"></p>
+<p><img src="sam_files/figure-html/profile_likelihood-2.png" class="r-plt" alt="" width="100%" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="fu"><a href="../reference/plot_samvpa.html">plot_samvpa</a></span><span class="op">(</span><span class="va">samres_Mlist</span>,scenario_name<span class="op">=</span><span class="va">scns</span>,CI<span class="op">=</span><span class="fl">0.</span><span class="op">)</span></span></code></pre></div>
-<p><img src="sam_files/figure-html/profile_likelihood-3.png" class="r-plt" width="100%" style="display: block; margin: auto;"></p>
+<p><img src="sam_files/figure-html/profile_likelihood-3.png" class="r-plt" alt="" width="100%" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level3">
 <h3 id="ブートストラップ">ブートストラップ<a class="anchor" aria-label="anchor" href="#%E3%83%96%E3%83%BC%E3%83%88%E3%82%B9%E3%83%88%E3%83%A9%E3%83%83%E3%83%97"></a>
@@ -1251,7 +1252,7 @@ qなどを変化させたときの対数尤度を調べて、収束している�
 <span><span class="co">#&gt; -----19-----</span></span>
 <span><span class="co">#&gt; -----20-----</span></span>
 <span><span class="op">(</span><span class="va">g1</span> <span class="op">=</span> <span class="fu"><a href="../reference/plot_boosam.html">plot_boosam</a></span><span class="op">(</span><span class="va">res_best</span>,<span class="va">res_boot</span>, CI<span class="op">=</span><span class="fl">0.95</span>, draw_deltaCI <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="sam_files/figure-html/bootstrap-1.png" class="r-plt" width="100%" style="display: block; margin: auto;"></p>
+<p><img src="sam_files/figure-html/bootstrap-1.png" class="r-plt" alt="" width="100%" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level3">
 <h3 id="self-test-cross-test">Self-test / cross test<a class="anchor" aria-label="anchor" href="#self-test-cross-test"></a>
@@ -1276,19 +1277,19 @@ SAMのモデルを疑似データにフィットさせるというシミュレ�
 <span><span class="va">metric_sam2sam</span><span class="op">$</span><span class="va">summary</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">stat</span><span class="op">==</span><span class="st">"SSB"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <table class="table">
 <colgroup>
-<col width="4%">
-<col width="4%">
 <col width="3%">
+<col width="3%">
+<col width="3%">
+<col width="7%">
+<col width="7%">
+<col width="7%">
+<col width="7%">
 <col width="8%">
+<col width="8%">
+<col width="7%">
 <col width="7%">
 <col width="8%">
 <col width="7%">
-<col width="8%">
-<col width="8%">
-<col width="8%">
-<col width="7%">
-<col width="8%">
-<col width="8%">
 <col width="7%">
 </colgroup>
 <thead><tr class="header">
@@ -1312,167 +1313,167 @@ SAMのモデルを疑似データにフィットさせるというシミュレ�
 <td align="left">SSB</td>
 <td align="right">1991</td>
 <td align="right">NA</td>
-<td align="right">96262.07</td>
-<td align="right">21528.51</td>
-<td align="right">801.2566</td>
-<td align="right">179.1968</td>
-<td align="right">1.6557709</td>
-<td align="right">0.0137821</td>
-<td align="right">121.79464</td>
-<td align="right">4.447057</td>
+<td align="right">4.885009</td>
+<td align="right">3.663438</td>
+<td align="right">0.0406614</td>
+<td align="right">0.0304934</td>
+<td align="right">1.3537238</td>
+<td align="right">0.0112680</td>
+<td align="right">121.49259</td>
+<td align="right">0.0383750</td>
 <td align="right">120.13887</td>
-<td align="right">113.26746</td>
-<td align="right">226135.2</td>
+<td align="right">114.70558</td>
+<td align="right">131.08413</td>
 </tr>
 <tr class="even">
 <td align="left">SSB</td>
 <td align="right">1992</td>
 <td align="right">NA</td>
-<td align="right">103773.23</td>
-<td align="right">23208.33</td>
-<td align="right">860.6119</td>
-<td align="right">192.4713</td>
-<td align="right">1.4633539</td>
-<td align="right">0.0121359</td>
-<td align="right">122.04410</td>
-<td align="right">4.448805</td>
+<td align="right">4.540857</td>
+<td align="right">3.363346</td>
+<td align="right">0.0376582</td>
+<td align="right">0.0278929</td>
+<td align="right">1.3723178</td>
+<td align="right">0.0113809</td>
+<td align="right">121.95306</td>
+<td align="right">0.0358979</td>
 <td align="right">120.58075</td>
-<td align="right">112.58742</td>
-<td align="right">243771.1</td>
+<td align="right">116.14669</td>
+<td align="right">131.24347</td>
 </tr>
 <tr class="odd">
 <td align="left">SSB</td>
 <td align="right">1993</td>
 <td align="right">NA</td>
-<td align="right">110255.84</td>
-<td align="right">24658.07</td>
-<td align="right">910.1839</td>
-<td align="right">203.5572</td>
-<td align="right">0.5281819</td>
-<td align="right">0.0043602</td>
-<td align="right">121.66397</td>
-<td align="right">4.450090</td>
+<td align="right">4.375012</td>
+<td align="right">3.352437</td>
+<td align="right">0.0361166</td>
+<td align="right">0.0276750</td>
+<td align="right">-0.5293403</td>
+<td align="right">-0.0043698</td>
+<td align="right">120.60645</td>
+<td align="right">0.0369249</td>
 <td align="right">121.13579</td>
-<td align="right">114.07817</td>
-<td align="right">258994.5</td>
+<td align="right">114.34490</td>
+<td align="right">130.79388</td>
 </tr>
 <tr class="even">
 <td align="left">SSB</td>
 <td align="right">1994</td>
 <td align="right">NA</td>
-<td align="right">117114.74</td>
-<td align="right">26191.17</td>
-<td align="right">1050.5720</td>
-<td align="right">234.9466</td>
-<td align="right">-0.5552580</td>
-<td align="right">-0.0049809</td>
-<td align="right">110.92186</td>
-<td align="right">4.452982</td>
+<td align="right">3.561613</td>
+<td align="right">2.881947</td>
+<td align="right">0.0319493</td>
+<td align="right">0.0258524</td>
+<td align="right">-0.1128623</td>
+<td align="right">-0.0010124</td>
+<td align="right">111.36425</td>
+<td align="right">0.0326085</td>
 <td align="right">111.47711</td>
-<td align="right">107.61641</td>
-<td align="right">275087.5</td>
+<td align="right">106.02801</td>
+<td align="right">118.06175</td>
 </tr>
 <tr class="odd">
 <td align="left">SSB</td>
 <td align="right">1995</td>
 <td align="right">NA</td>
-<td align="right">123716.25</td>
-<td align="right">27667.42</td>
-<td align="right">1201.5596</td>
-<td align="right">268.7121</td>
-<td align="right">-0.7903540</td>
-<td align="right">-0.0076761</td>
-<td align="right">102.17270</td>
-<td align="right">4.455436</td>
+<td align="right">3.703742</td>
+<td align="right">2.993403</td>
+<td align="right">0.0359716</td>
+<td align="right">0.0290726</td>
+<td align="right">0.3918396</td>
+<td align="right">0.0038056</td>
+<td align="right">103.35490</td>
+<td align="right">0.0367932</td>
 <td align="right">102.96306</td>
-<td align="right">98.82600</td>
-<td align="right">290580.7</td>
+<td align="right">97.26898</td>
+<td align="right">110.42653</td>
 </tr>
 <tr class="even">
 <td align="left">SSB</td>
 <td align="right">1996</td>
 <td align="right">NA</td>
-<td align="right">128514.97</td>
-<td align="right">28740.72</td>
-<td align="right">1449.1871</td>
-<td align="right">324.0920</td>
-<td align="right">-1.2458636</td>
-<td align="right">-0.0140489</td>
-<td align="right">87.43486</td>
-<td align="right">4.458343</td>
+<td align="right">4.262722</td>
+<td align="right">3.584949</td>
+<td align="right">0.0480682</td>
+<td align="right">0.0404253</td>
+<td align="right">0.1663558</td>
+<td align="right">0.0018759</td>
+<td align="right">88.84708</td>
+<td align="right">0.0490676</td>
 <td align="right">88.68073</td>
-<td align="right">82.41123</td>
-<td align="right">301834.8</td>
+<td align="right">81.72075</td>
+<td align="right">96.53333</td>
 </tr>
 <tr class="odd">
 <td align="left">SSB</td>
 <td align="right">1997</td>
 <td align="right">NA</td>
-<td align="right">131688.45</td>
-<td align="right">29451.14</td>
-<td align="right">1796.8078</td>
-<td align="right">401.8427</td>
-<td align="right">-1.4834311</td>
-<td align="right">-0.0202405</td>
-<td align="right">71.80679</td>
-<td align="right">4.461028</td>
+<td align="right">5.312750</td>
+<td align="right">4.239548</td>
+<td align="right">0.0724892</td>
+<td align="right">0.0578460</td>
+<td align="right">-0.0231080</td>
+<td align="right">-0.0003153</td>
+<td align="right">73.26712</td>
+<td align="right">0.0740995</td>
 <td align="right">73.29023</td>
-<td align="right">65.95243</td>
-<td align="right">309272.2</td>
+<td align="right">65.63869</td>
+<td align="right">83.66299</td>
 </tr>
 <tr class="even">
 <td align="left">SSB</td>
 <td align="right">1998</td>
 <td align="right">NA</td>
-<td align="right">133517.90</td>
-<td align="right">29861.36</td>
-<td align="right">2286.8410</td>
-<td align="right">511.4533</td>
-<td align="right">-2.5340113</td>
-<td align="right">-0.0434015</td>
-<td align="right">55.85129</td>
-<td align="right">4.463367</td>
+<td align="right">6.023260</td>
+<td align="right">4.677459</td>
+<td align="right">0.1031640</td>
+<td align="right">0.0801136</td>
+<td align="right">-0.1613193</td>
+<td align="right">-0.0027630</td>
+<td align="right">58.22398</td>
+<td align="right">0.1042538</td>
 <td align="right">58.38530</td>
-<td align="right">51.51799</td>
-<td align="right">313554.4</td>
+<td align="right">51.47112</td>
+<td align="right">71.16356</td>
 </tr>
 <tr class="odd">
 <td align="left">SSB</td>
 <td align="right">1999</td>
 <td align="right">NA</td>
-<td align="right">134641.20</td>
-<td align="right">30116.15</td>
-<td align="right">2444.3240</td>
-<td align="right">546.7392</td>
-<td align="right">-5.3210389</td>
-<td align="right">-0.0966000</td>
-<td align="right">49.76216</td>
-<td align="right">4.464039</td>
+<td align="right">7.527757</td>
+<td align="right">5.901446</td>
+<td align="right">0.1366616</td>
+<td align="right">0.1071370</td>
+<td align="right">-0.9603433</td>
+<td align="right">-0.0174344</td>
+<td align="right">54.12286</td>
+<td align="right">0.1400315</td>
 <td align="right">55.08320</td>
-<td align="right">44.06890</td>
-<td align="right">316193.9</td>
+<td align="right">45.43264</td>
+<td align="right">70.64158</td>
 </tr>
 <tr class="even">
 <td align="left">SSB</td>
 <td align="right">2000</td>
 <td align="right">NA</td>
-<td align="right">135429.14</td>
-<td align="right">30296.66</td>
-<td align="right">2490.0301</td>
-<td align="right">557.0411</td>
-<td align="right">-7.8548661</td>
-<td align="right">-0.1444213</td>
-<td align="right">46.53369</td>
-<td align="right">4.464263</td>
+<td align="right">10.490437</td>
+<td align="right">8.320479</td>
+<td align="right">0.1928795</td>
+<td align="right">0.1529822</td>
+<td align="right">-3.3838403</td>
+<td align="right">-0.0622160</td>
+<td align="right">51.00471</td>
+<td align="right">0.1997777</td>
 <td align="right">54.38855</td>
-<td align="right">37.48370</td>
-<td align="right">318049.4</td>
+<td align="right">39.79421</td>
+<td align="right">76.49195</td>
 </tr>
 </tbody>
 </table>
 <div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">g_sam2sam</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_popsim.html">plot_popsim</a></span><span class="op">(</span><span class="va">res_best</span>,<span class="va">fit_sam2sam</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="sam_files/figure-html/cross_test-1.png" class="r-plt" width="100%" style="display: block; margin: auto;"></p>
+<p><img src="sam_files/figure-html/cross_test-1.png" class="r-plt" alt="" width="100%" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co"># cross-test (VPAで推定)</span></span>
@@ -1483,20 +1484,20 @@ SAMのモデルを疑似データにフィットさせるというシミュレ�
 <span><span class="va">metric_vpa2sam</span><span class="op">$</span><span class="va">summary</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">stat</span><span class="op">==</span><span class="st">"SSB"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <table style="width:100%;" class="table">
 <colgroup>
+<col width="4%">
+<col width="4%">
 <col width="3%">
-<col width="3%">
-<col width="3%">
-<col width="7%">
-<col width="7%">
-<col width="7%">
-<col width="7%">
+<col width="8%">
+<col width="8%">
 <col width="8%">
 <col width="8%">
 <col width="7%">
-<col width="7%">
 <col width="8%">
-<col width="7%">
-<col width="7%">
+<col width="8%">
+<col width="8%">
+<col width="8%">
+<col width="8%">
+<col width="8%">
 </colgroup>
 <thead><tr class="header">
 <th align="left">stat</th>
@@ -1519,167 +1520,167 @@ SAMのモデルを疑似データにフィットさせるというシミュレ�
 <td align="left">SSB</td>
 <td align="right">1991</td>
 <td align="right">NA</td>
-<td align="right">6.605296</td>
-<td align="right">5.336627</td>
-<td align="right">0.0549805</td>
-<td align="right">0.0444205</td>
-<td align="right">4.3995653</td>
-<td align="right">0.0366207</td>
-<td align="right">124.53844</td>
-<td align="right">0.0383705</td>
+<td align="right">7.298957</td>
+<td align="right">5.905254</td>
+<td align="right">0.0607543</td>
+<td align="right">0.0491536</td>
+<td align="right">5.328397</td>
+<td align="right">0.0443520</td>
+<td align="right">125.46727</td>
+<td align="right">0.0364352</td>
 <td align="right">120.13887</td>
-<td align="right">117.28245</td>
-<td align="right">133.76663</td>
+<td align="right">119.45662</td>
+<td align="right">134.28582</td>
 </tr>
 <tr class="even">
 <td align="left">SSB</td>
 <td align="right">1992</td>
 <td align="right">NA</td>
-<td align="right">6.836060</td>
-<td align="right">5.646956</td>
-<td align="right">0.0566928</td>
-<td align="right">0.0468313</td>
-<td align="right">4.1252020</td>
-<td align="right">0.0342111</td>
-<td align="right">124.70595</td>
-<td align="right">0.0386172</td>
+<td align="right">7.086254</td>
+<td align="right">6.122930</td>
+<td align="right">0.0587677</td>
+<td align="right">0.0507787</td>
+<td align="right">5.708749</td>
+<td align="right">0.0473438</td>
+<td align="right">126.28949</td>
+<td align="right">0.0345721</td>
 <td align="right">120.58075</td>
-<td align="right">117.24014</td>
-<td align="right">133.99612</td>
+<td align="right">118.21211</td>
+<td align="right">133.52383</td>
 </tr>
 <tr class="odd">
 <td align="left">SSB</td>
 <td align="right">1993</td>
 <td align="right">NA</td>
-<td align="right">7.200028</td>
-<td align="right">5.712401</td>
-<td align="right">0.0594377</td>
-<td align="right">0.0471570</td>
-<td align="right">4.2354347</td>
-<td align="right">0.0349644</td>
-<td align="right">125.37122</td>
-<td align="right">0.0393156</td>
+<td align="right">6.299736</td>
+<td align="right">5.303367</td>
+<td align="right">0.0520056</td>
+<td align="right">0.0437803</td>
+<td align="right">4.680014</td>
+<td align="right">0.0386344</td>
+<td align="right">125.81580</td>
+<td align="right">0.0375056</td>
 <td align="right">121.13579</td>
-<td align="right">119.24504</td>
-<td align="right">135.32616</td>
+<td align="right">116.91897</td>
+<td align="right">134.95113</td>
 </tr>
 <tr class="even">
 <td align="left">SSB</td>
 <td align="right">1994</td>
 <td align="right">NA</td>
-<td align="right">6.118520</td>
-<td align="right">4.829909</td>
-<td align="right">0.0548859</td>
-<td align="right">0.0433265</td>
-<td align="right">4.5479614</td>
-<td align="right">0.0407973</td>
-<td align="right">116.02508</td>
-<td align="right">0.0344211</td>
+<td align="right">5.847256</td>
+<td align="right">4.686710</td>
+<td align="right">0.0524525</td>
+<td align="right">0.0420419</td>
+<td align="right">3.963158</td>
+<td align="right">0.0355513</td>
+<td align="right">115.44027</td>
+<td align="right">0.0385929</td>
 <td align="right">111.47711</td>
-<td align="right">110.90897</td>
-<td align="right">123.11240</td>
+<td align="right">108.04890</td>
+<td align="right">123.22402</td>
 </tr>
 <tr class="odd">
 <td align="left">SSB</td>
 <td align="right">1995</td>
 <td align="right">NA</td>
-<td align="right">5.392741</td>
-<td align="right">4.526218</td>
-<td align="right">0.0523755</td>
-<td align="right">0.0439596</td>
-<td align="right">4.3518814</td>
-<td align="right">0.0422664</td>
-<td align="right">107.31494</td>
-<td align="right">0.0345545</td>
+<td align="right">5.684298</td>
+<td align="right">4.363655</td>
+<td align="right">0.0552072</td>
+<td align="right">0.0423808</td>
+<td align="right">2.245500</td>
+<td align="right">0.0218088</td>
+<td align="right">105.20856</td>
+<td align="right">0.0397255</td>
 <td align="right">102.96306</td>
-<td align="right">100.93189</td>
-<td align="right">112.34283</td>
+<td align="right">100.55971</td>
+<td align="right">114.52254</td>
 </tr>
 <tr class="even">
 <td align="left">SSB</td>
 <td align="right">1996</td>
 <td align="right">NA</td>
-<td align="right">5.019985</td>
-<td align="right">4.420800</td>
-<td align="right">0.0566074</td>
-<td align="right">0.0498507</td>
-<td align="right">3.5027798</td>
-<td align="right">0.0394988</td>
-<td align="right">92.18351</td>
-<td align="right">0.0470418</td>
+<td align="right">6.335595</td>
+<td align="right">4.867949</td>
+<td align="right">0.0714427</td>
+<td align="right">0.0548930</td>
+<td align="right">2.607321</td>
+<td align="right">0.0294012</td>
+<td align="right">91.28805</td>
+<td align="right">0.0587142</td>
 <td align="right">88.68073</td>
-<td align="right">83.87558</td>
-<td align="right">97.04532</td>
+<td align="right">83.16994</td>
+<td align="right">101.26155</td>
 </tr>
 <tr class="odd">
 <td align="left">SSB</td>
 <td align="right">1997</td>
 <td align="right">NA</td>
-<td align="right">5.269523</td>
-<td align="right">4.524783</td>
-<td align="right">0.0718994</td>
-<td align="right">0.0617379</td>
-<td align="right">2.4844352</td>
-<td align="right">0.0338986</td>
-<td align="right">75.77466</td>
-<td align="right">0.0670101</td>
+<td align="right">7.757632</td>
+<td align="right">5.774150</td>
+<td align="right">0.1058481</td>
+<td align="right">0.0787847</td>
+<td align="right">1.824573</td>
+<td align="right">0.0248952</td>
+<td align="right">75.11480</td>
+<td align="right">0.0950666</td>
 <td align="right">73.29023</td>
-<td align="right">67.34191</td>
-<td align="right">82.99795</td>
+<td align="right">65.78407</td>
+<td align="right">89.49907</td>
 </tr>
 <tr class="even">
 <td align="left">SSB</td>
 <td align="right">1998</td>
 <td align="right">NA</td>
-<td align="right">6.380105</td>
-<td align="right">5.383204</td>
-<td align="right">0.1092759</td>
-<td align="right">0.0922014</td>
-<td align="right">0.2418703</td>
-<td align="right">0.0041427</td>
-<td align="right">58.62717</td>
-<td align="right">0.1070840</td>
+<td align="right">8.444147</td>
+<td align="right">6.579923</td>
+<td align="right">0.1446280</td>
+<td align="right">0.1126983</td>
+<td align="right">2.773381</td>
+<td align="right">0.0475014</td>
+<td align="right">61.15868</td>
+<td align="right">0.1291861</td>
 <td align="right">58.38530</td>
-<td align="right">51.25621</td>
-<td align="right">69.66393</td>
+<td align="right">52.16088</td>
+<td align="right">77.92094</td>
 </tr>
 <tr class="odd">
 <td align="left">SSB</td>
 <td align="right">1999</td>
 <td align="right">NA</td>
-<td align="right">10.802357</td>
-<td align="right">8.840768</td>
-<td align="right">0.1961098</td>
-<td align="right">0.1604984</td>
-<td align="right">-0.1770578</td>
-<td align="right">-0.0032144</td>
-<td align="right">54.90615</td>
-<td align="right">0.1921374</td>
+<td align="right">10.212570</td>
+<td align="right">8.120903</td>
+<td align="right">0.1854026</td>
+<td align="right">0.1474297</td>
+<td align="right">4.383097</td>
+<td align="right">0.0795723</td>
+<td align="right">59.46630</td>
+<td align="right">0.1641773</td>
 <td align="right">55.08320</td>
-<td align="right">44.84134</td>
-<td align="right">77.35118</td>
+<td align="right">47.20529</td>
+<td align="right">78.84803</td>
 </tr>
 <tr class="even">
 <td align="left">SSB</td>
 <td align="right">2000</td>
 <td align="right">NA</td>
-<td align="right">17.519385</td>
-<td align="right">13.486490</td>
-<td align="right">0.3221153</td>
-<td align="right">0.2479656</td>
-<td align="right">-0.9818225</td>
-<td align="right">-0.0180520</td>
-<td align="right">53.40673</td>
-<td align="right">0.3075988</td>
+<td align="right">12.921275</td>
+<td align="right">10.411244</td>
+<td align="right">0.2375734</td>
+<td align="right">0.1914234</td>
+<td align="right">4.620857</td>
+<td align="right">0.0849601</td>
+<td align="right">59.00941</td>
+<td align="right">0.2135483</td>
 <td align="right">54.38855</td>
-<td align="right">39.36882</td>
-<td align="right">92.82609</td>
+<td align="right">41.55761</td>
+<td align="right">83.49743</td>
 </tr>
 </tbody>
 </table>
 <div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">g_vpa2sam</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_popsim.html">plot_popsim</a></span><span class="op">(</span><span class="va">res_best</span>,<span class="va">fit_vpa2sam</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="sam_files/figure-html/cross_test-2.png" class="r-plt" width="100%" style="display: block; margin: auto;"></p>
+<p><img src="sam_files/figure-html/cross_test-2.png" class="r-plt" alt="" width="100%" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co"># SAMの結果（res_best）の代わりに、VPAの結果をoperating model (真のモデル) として入れ替えて、VPAデータに対するself-test / cross-testもできます</span></span></code></pre></div>

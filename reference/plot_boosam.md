@@ -28,11 +28,19 @@ plot_boosam(
 
 - samres:
 
-  [`sam()`](sam.md)の結果オブジェクト
+  [`sam()`](https://shotanishijima.github.io/frasam/reference/sam.md)の結果オブジェクト
 
 - boores:
 
   `boo_sam`の結果オブジェクト
+
+- CI:
+
+  Confidence interval width. Set 0 to omit confidence intervals.
+
+- what.plot:
+
+  Statistics to plot.
 
 - draw_deltaCI:
 
@@ -41,3 +49,39 @@ plot_boosam(
 - scenario_name:
 
   推定値の結果、ブートストラップの結果の凡例に使う名前
+
+- alpha:
+
+  Alpha value for confidence interval ribbons.
+
+- size:
+
+  Line width.
+
+- base_size:
+
+  Base font size.
+
+- log_scale:
+
+  If `TRUE`, use a log scale on the y-axis.
+
+- legend_name:
+
+  Legend title.
+
+- legend_nrow:
+
+  Number of rows in the legend.
+
+- legend_position:
+
+  Legend position.
+
+- years:
+
+  Years to include in the plot.
+
+- ncol:
+
+  Number of columns in the facet plot.
