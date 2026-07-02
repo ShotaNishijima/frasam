@@ -34,9 +34,12 @@ vignette: >
     fig.height = 6,
     out.width = "100%"
   )
-
-  # library(frasam)
-  devtools::load_all()
+  
+  if (requireNamespace("devtools", quietly = TRUE)) {
+    devtools::load_all()
+  } else {
+    library(frasam)
+  }
 ```
 
 ## インストールと依存パッケージ
