@@ -13,7 +13,7 @@ test_that("test input",{
   input$cpp.file.name <- args_def$cpp.file.name
   input$p0.list <- NULL
   input$no_est <- TRUE
-  testres = safe_do_call(sam,input)
+  testres <- safe_do_call(sam,input)
 
   bad_input <- input
   bad_input$q.init <- rep(1, length(bad_input$abund) + 1)
@@ -54,6 +54,17 @@ test_that("test output",{
   for(i in 1:length(testcontents)){
     expect_equal(eval(parse(text=paste0("samres$",testcontents[i]))),eval(parse(text=paste0("testres$",testcontents[i]))),tolerance = 1e-3)
   }
+
+  ## test the case with caa matrix
+  # pull request #36 https://github.com/ShotaNishijima/frasam/pull/36
+  # test-pseudo-samよりcaaがmatrixの場合でもうまく行くかのテストをこちらに移行
+  expect_equal(testres$opt$convergence,0)
+  testres$input$dat$caa <- as.matrix(testres$input$dat$caa)
+  testres$input$p0.list <- testres$par_list
+  expect_true(is.matrix(testres$input$dat$caa))
+  testres2 <- do.call(sam, testres$input)
+  expect_equal(testres2$opt$convergence, 0)
+  expect_true(is.data.frame(testres2$input$dat$caa))
 
   ## b.fix check
   input = testres$input
