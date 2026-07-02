@@ -605,10 +605,16 @@ sam <- function(dat,
     invisible(TRUE)
   }
 
-  logSdLogN_init = if (is.null(sdLogN.init)) rep(0.356675,max(data$keyVarLogN)+1) else log(sdLogN.init)
+  logSdLogN_init <- if (is.null(sdLogN.init)) rep(0.356675,max(data$keyVarLogN)+1) else log(sdLogN.init)
 
   if(SR == "Const") logSdLogN_init[1] <- log(2)
   if (!is.null(varN.fix)) {
+    if (length(varN.fix) != max(data$keyVarLogN) + 1) {
+      stop("'varN.fix' must have length max(data$keyVarLogN) + 1.", call. = FALSE)
+    }
+    if (any(!is.na(varN.fix) & varN.fix <= 0)) {
+      stop("'varN.fix' must contain positive values or NA.", call. = FALSE)
+    }
     map_logSdLogN = 0:max(data$keyVarLogN)
     for(i in 1:(max(data$keyVarLogN)+1)) {
       if(!is.na(varN.fix[i])){
@@ -618,8 +624,22 @@ sam <- function(dat,
     }
   }
 
-  # b.fixを使うときにp0.listも使っていると、b.fixが効かなくなるので追加&修正　2026/7/2
 
+
+  ## p0.listとvarN.fixが両方使われてる場合に、varN.fixが効くように修正する (2026/07/02)
+
+  if (!is.null(p0.list) && !is.null(varN.fix) && any(!is.na(varN.fix))) {
+    if (length(p0.list$logSdLogN) != length(logSdLogN_init)) {
+      stop("'p0.list$logSdLogN' and 'varN.fix' have incompatible lengths.", call. = FALSE)
+    }
+
+    fixed_varN <- !is.na(varN.fix)
+    p0.list$logSdLogN[fixed_varN] <- logSdLogN_init[fixed_varN]
+
+    message("Initial values for fixed 'logSdLogN' were overwritten by 'varN.fix'.")
+  }
+
+  # b.fixを使うときにp0.listも使っていると、b.fixが効かなくなるので追加&修正　2026/7/2
   if (is.null(index.b.key)) {
     logB_init <- sapply(
       seq_len(nindex),

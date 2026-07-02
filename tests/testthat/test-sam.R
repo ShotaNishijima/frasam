@@ -82,6 +82,15 @@ test_that("test output",{
   expect_equal(exp(testres_bfix2$par_list$logB)[1], 2, tolerance = 1.0e-3)
   expect_equal(testres_bfix2$b[1], 2, tolerance = 1.0e-3)
 
+  ## varN.fix check with p0.list
+  input_varNfix <- testres$input
+  input_varNfix$p0.list <- testres$par_list
+  input_varNfix$varN.fix <- rep(NA, length(testres$par_list$logSdLogN))
+  input_varNfix$varN.fix[1] <- 0.2^2
+  testres_varNfix <- safe_do_call(sam, input_varNfix)
+  expect_equal(exp(testres_varNfix$par_list$logSdLogN)[1], 0.2, tolerance = 1.0e-3)
+  expect_equal(testres_varNfix$sigma.logN[1], 0.2, tolerance = 1.0e-3)
+
   ## abund check
   # SSBに比例しているか
   expect_equal(sd(log(testres$pred.index[3,]/colSums(testres$ssb))),0,tolerance = 1.0e-3)
