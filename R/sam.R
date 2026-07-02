@@ -13,7 +13,7 @@
 #' @param b.fix b.est=TRUEの場合、非線形パラメータbを推定するか（NA）、固定するか（固定する値） ??
 #' @param index.b.key Indexのbの制約 ??  どうやって使う？？
 #' @param sel.def 選択率の定義。"max"（デフォルト）の場合、最大年齢を１とする。
-#' @param use.index この仕様は設定ミスを引き起こしやすいので廃止しました。使用するIndexのみデータに入れてください
+#' @param use.index この仕様は設定ミスを引き起こしやすいので廃止しました。\code{sam()}を使用するまえに、Indexのデータを使用するもののみにsubsetするようにしてください
 #' @param varC CAAの観測誤差
 #' @param varN ??
 #' @param varF ??
@@ -23,7 +23,7 @@
 #' @param getJointPrecision JointPrecision matrixを計算しない（FALSE, デフォルト）、計算する（TRUE)
 #' @param loopnum 最適化を繰り返す回数．デフォルトは2
 #' @param index.key Index間の観測誤差sigmaの制約。NULLの場合はIndexごとに別々、rep(0, length(abund))の場合は全Indexで共通。
-# @param est.method Index間の観測誤差sigmaをばらばらにするか（"ml"、デフォルト)、共通にするか（"ls")．index.keyに統一したため廃止。
+#' @param est.method Deprecated. Use \code{index.key} instead. If \code{"ls"} is supplied and \code{index.key = NULL}, all index observation-error sigmas are shared.
 #' @param plus.group プラスグループを考慮する（TRUE, デフォルト）、考慮しない（FALSE）
 #' @param SR 再生産関係："RW"(Random walk), "BH", "RI", "HS", "Mesnil", or "Const"
 #' @param AR 再生産関係の残差の自己相関パラメータを推定する（１）、推定しない（0, デフォルト） ?? これでいい？
@@ -89,7 +89,7 @@ sam <- function(dat,
                 varN = 0,
                 varF = 0,
                 varN.fix = NULL,
-                # est.method = "ml",
+                est.method = NULL,
                 SR = "BH", #"RW": random walk, "RI": Ricker
                 AR = 0,
                 rho.mode = 2,
@@ -151,6 +151,19 @@ sam <- function(dat,
   arglist <- lapply(argname,function(xx) eval(parse(text=xx)))
   names(arglist) <- argname
 
+  if (!is.null(est.method)) {
+    warning(
+      "'est.method' is deprecated. Please use 'index.key' instead. ",
+      "For the old est.method = 'ls' behavior, use index.key = rep(0, length(abund)).",
+      call. = FALSE
+    )
+
+    if (identical(est.method, "ls") && is.null(index.key)) {
+      index.key <- rep(0, length(abund))
+    }
+  }
+  arglist$index.key <- index.key
+
   index.age <- min.age
 
   if (is.null(tmbdata)) {
@@ -182,13 +195,11 @@ sam <- function(dat,
     index <- dat$index
 
     if (!is.null(use.index)) {
-      index <- index[use.index,]
-      abund <- abund[use.index]
-      if (isTRUE(b.est)) {
-        b.fix <- b.fix[use.index]
-      }
-    } else {
-      use.index <- 1:nrow(index)
+      warning(
+        "'use.index' is deprecated. Please subset dat$index, abund, min.age, max.age, index.key, and related arguments
+  before calling sam().",
+        call. = FALSE
+      )
     }
 
     for(i in 1:length(abund)) {
@@ -606,8 +617,31 @@ sam <- function(dat,
       }
     }
   }
-  logB_init = sapply(1:nindex, function(i) ifelse(is.na(b.fix[i]), 0, log(b.fix[i])))
-  if(!is.null(index.b.key)) logB_init <- logB_init[unique(index.b.key-min(index.b.key)+1)]
+
+  # b.fixを使うときにp0.listも使っていると、b.fixが効かなくなるので追加&修正　2026/7/2
+
+  if (is.null(index.b.key)) {
+    logB_init <- sapply(
+      seq_len(nindex),
+      function(i) ifelse(is.na(b.fix[i]), 0, log(b.fix[i]))
+    )
+  } else {
+    logB_init <- sapply(
+      seq_along(b.fix),
+      function(i) ifelse(is.na(b.fix[i]), 0, log(b.fix[i]))
+    )
+  }
+
+  if (!is.null(p0.list) && isTRUE(b.est) && !is.null(b.fix) && any(!is.na(b.fix))) {
+    if (length(p0.list$logB) != length(logB_init)) {
+      stop("'p0.list$logB' and 'b.fix' have incompatible lengths.", call. = FALSE)
+    }
+
+    fixed_b <- !is.na(b.fix)
+    p0.list$logB[fixed_b] <- logB_init[fixed_b]
+
+    message("Initial values for fixed 'logB' were overwritten by 'b.fix'.")
+  }
 
   default_params <- list(
       logQ      = if (is.null(q.init)) rep(-5,nindex) else log(q.init),
@@ -662,7 +696,17 @@ sam <- function(dat,
       if (!isTRUE(b.est)) map$logB <- factor(rep(NA,nindex)) else {
         if (!is.null(b.fix)) {
           map$logB <- 0:max(data$keyLogB)
-          for (i in 1:nindex) if (!is.na(b.fix[i])) map$logB[i] <- NA
+
+          if (is.null(index.b.key)) {
+            for (i in seq_len(nindex)) {
+              if (!is.na(b.fix[i])) map$logB[i] <- NA
+            }
+          } else {
+            for (i in seq_along(b.fix)) {
+              if (!is.na(b.fix[i])) map$logB[i] <- NA
+            }
+          }
+
           map$logB <- factor(map$logB)
         }
       }

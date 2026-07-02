@@ -21,6 +21,7 @@ sam(
   varN = 0,
   varF = 0,
   varN.fix = NULL,
+  est.method = NULL,
   SR = "BH",
   AR = 0,
   rho.mode = 2,
@@ -106,6 +107,8 @@ sam(
 
 \item{varF}{??}
 
+\item{est.method}{Deprecated. Use \code{index.key} instead. If \code{"ls"} is supplied and \code{index.key = NULL}, all index observation-error sigmas are shared.}
+
 \item{SR}{再生産関係："RW"(Random walk), "BH", "RI", "HS", "Mesnil", or "Const"}
 
 \item{AR}{再生産関係の残差の自己相関パラメータを推定する（１）、推定しない（0, デフォルト） ?? これでいい？}
@@ -150,7 +153,7 @@ sam(
 
 \item{sel.def}{選択率の定義。"max"（デフォルト）の場合、最大年齢を１とする。}
 
-\item{use.index}{この仕様は設定ミスを引き起こしやすいので廃止しました。使用するIndexのみデータに入れてください}
+\item{use.index}{この仕様は設定ミスを引き起こしやすいので廃止しました。\code{sam()}を使用するまえに、Indexのデータを使用するもののみにsubsetするようにしてください}
 
 \item{upper}{推定パラメータの上限値。固定効果の数のLengthを持つ必要あり。NULL（デフォルト）の場合Inf}
 

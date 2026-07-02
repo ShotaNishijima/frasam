@@ -66,12 +66,21 @@ test_that("test output",{
   expect_equal(testres2$opt$convergence, 0)
   expect_true(is.data.frame(testres2$input$dat$caa))
 
-  ## b.fix check
-  input = testres$input
-  input$b.fix[1] <- 2
-  testres = safe_do_call(sam,input)
-  expect_equal(exp(testres$par_list$logB)[1],2,tolerance = 1.0e-3)
-  expect_equal(testres$b[1],2,tolerance = 1.0e-3)
+  ## b.fix check with p0.list
+  input_bfix <- testres$input
+  expect_false(is.null(input_bfix$p0.list))
+  input_bfix$b.fix[1] <- 2
+  testres_bfix <- safe_do_call(sam, input_bfix)
+  expect_equal(exp(testres_bfix$par_list$logB)[1], 2, tolerance = 1.0e-3)
+  expect_equal(testres_bfix$b[1], 2, tolerance = 1.0e-3)
+
+  ## b.fix check without p0.list
+  input_bfix2 <- testres$input
+  input_bfix2$b.fix[1] <- 2
+  input_bfix2$p0.list <- NULL
+  testres_bfix2 <- safe_do_call(sam, input_bfix2)
+  expect_equal(exp(testres_bfix2$par_list$logB)[1], 2, tolerance = 1.0e-3)
+  expect_equal(testres_bfix2$b[1], 2, tolerance = 1.0e-3)
 
   ## abund check
   # SSBに比例しているか
