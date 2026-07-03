@@ -17,21 +17,25 @@
 
 use_sam_tmb <- function(TmbFile = "sam2",
                         CppDir = system.file("executable", package = "frasam"),
+                        RunDir = getwd(),
                         overwrite = FALSE,
-                        auto_update = TRUE,
+                        compile = c("auto", "always", "never"),
+                        auto_update = NULL,
                         ...) {
-  src <- file.path(CppDir, paste0(TmbFile, ".cpp"))
-  dst <- paste0(TmbFile, ".cpp")
+  compile <- match.arg(compile)
 
-  if (isTRUE(auto_update) && file.exists(src) && file.exists(dst)) {
-    overwrite <- file.info(src)$mtime > file.info(dst)$mtime
+  if (!is.null(auto_update)) {
+    warning("'auto_update' is deprecated. Please use 'compile = \"auto\"' instead.",
+            call. = FALSE)
   }
 
   test <- try(
     frasyr::use_rvpa_tmb(
       TmbFile = TmbFile,
       CppDir = CppDir,
+      RunDir = RunDir,
       overwrite = overwrite,
+      compile = compile,
       ...
     )
   )

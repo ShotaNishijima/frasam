@@ -8,8 +8,10 @@
 use_sam_tmb(
   TmbFile = "sam2",
   CppDir = system.file("executable", package = "frasam"),
+  RunDir = getwd(),
   overwrite = FALSE,
-  auto_update = TRUE,
+  compile = c("auto", "always", "never"),
+  auto_update = NULL,
   ...
 )
 }

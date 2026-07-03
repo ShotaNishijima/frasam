@@ -887,9 +887,8 @@ sam <- function(dat,
         logF[nrow(logF),] <- log(data$alpha)+logF[nrow(logF),]
         tmp = rep$value[names(rep$value)=="stockMeanWeight_true"]
         waa_est = t(matrix(tmp,nrow=ncol(logN)))
-        # waa_obs = dat$waa
-        colnames(logN) <- colnames(logF) <- colnames(waa_est) <- data$years
-        rownames(logN) <- rownames(logF) <- rownames(waa_est) <- data$minAge:data$maxAge
+        tmp = rep$value[names(rep$value)=="caa_est"]
+        caa_est = matrix(tmp, ncol = data$noYears)
         naa <- exp(logN)
         faa <- exp(logF)
       } else {
@@ -899,19 +898,20 @@ sam <- function(dat,
         faa <- matrix(rep$unbiased$value[names(rep$unbiased$value)=="exp_logF"],ncol=data$noYears)
         faa <- faa[data$keyLogFsta[1,]+1,]
         faa[nrow(faa),] <- data$alpha*faa[nrow(faa),]
-        tmp = rep$unbiased$value[names(rep$value)=="stockMeanWeight_true"]
+        tmp = rep$unbiased$value[names(rep$unbiased$value)=="stockMeanWeight_true"]
         waa_est = t(matrix(tmp,nrow=ncol(naa)))
-        colnames(naa) <- colnames(faa) <- colnames(waa_est) <- data$years
-        rownames(naa) <- rownames(faa) <- rownames(waa_est) <- data$minAge:data$maxAge
+        tmp = rep$unbiased$value[names(rep$unbiased$value)=="caa_est"]
+        caa_est = matrix(tmp, ncol = data$noYears)
         logN <- log(naa)
         logF <- log(faa)
       }
+      colnames(logN) <- colnames(logF) <- colnames(waa_est) <- colnames(caa_est) <- data$years
+      rownames(logN) <- rownames(logF) <- rownames(waa_est) <- rownames(caa_est) <- data$minAge:data$maxAge
+
       waa_obs = dat$waa
 
       ref.year1 <- data$noYears-ref.year+1
 
-      # naa <- exp(logN)
-      # faa <- exp(logF)
       baa <- naa*waa_est
       ssb <- baa*t(data$propMat)
       if(sel.def=="max"){
@@ -924,7 +924,8 @@ sam <- function(dat,
         saa <- sweep(faa,2,faa[nrow(faa),],FUN="/")
       }
       zaa <- faa+t(data$natMor)
-      caa <- faa/zaa*naa*(1-exp(-zaa))
+      # caa <- faa/zaa*naa*(1-exp(-zaa))
+      caa <- caa_est #issue 33への対応
 
       SR.rec <- rec.par <- BRP0 <- BRPmsy <- NULL
       if (is.SR){
