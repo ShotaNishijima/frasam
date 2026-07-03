@@ -31,6 +31,7 @@ Suggests:
     testthat,
     knitr,
     rmarkdown,
-    lemon
+    lemon,
+    gridExtra
 VignetteBuilder: knitr
 Config/roxygen2/version: 8.0.0

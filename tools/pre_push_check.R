@@ -29,9 +29,11 @@ if (!requireNamespace("devtools", quietly = TRUE)) {
 devtools::load_all()
 devtools::document()
 devtools::test()
+# devtools::test(filter = "sam")
 
 devtools::check(vignettes = FALSE)
 #vignetteの作成をスキップする場合
+
 devtools::check()
 
 

@@ -48,7 +48,11 @@ get_predSR <- function(samres,max.ssb.pred=1.3,length=100){
   data_SR$SSB <- data_SR$SSB/samres$input$scale
   data_SR$R <- data_SR$R/samres$input$scale_number
 
-  ssb_c = seq(from=0,to=max(data_SR$SSB)*max.ssb.pred,length=length)
+  # rec.age>0のときにRをずらす
+  # yearはSSBに合わせる（つまり何年生まれかを表す）
+  data_SR <- shift_SRdata_rec_age(data_SR, samres$input$rec.age)
+
+  ssb_c = seq(from=0,to=max(data_SR$SSB, na.rm = TRUE)*max.ssb.pred,length=length)
   R_c = purrr::map_dbl(ssb_c,SRF,a=a,b=b)
   pred_data = data.frame(SSB=ssb_c,R=R_c)
 

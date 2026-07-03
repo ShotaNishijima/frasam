@@ -370,9 +370,10 @@ Type objective_function<Type>::operator() ()
   array<Type> logN_resid(stateDimN,timeSteps); // N process error residual
 
   int start_timeStep=1+recAge;
-  if(stockRecruitmentModelCode==0){ // if RW
-    start_timeStep=1;
-    }
+  // if(stockRecruitmentModelCode==0){ // if RW
+  //   start_timeStep=1;
+  //   }  // SRのときとAICを比較できるようにするため、RWのときもstart_timestepを遅らせる
+
   //Now take care of N
   matrix<Type> nvar(stateDimN,stateDimN);  // logNのvcov
   for(int k=0; k<stateDimN; ++k){

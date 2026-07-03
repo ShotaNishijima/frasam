@@ -620,6 +620,28 @@ check_fit_sam(res_estb_45, verbose = FALSE)
 c(res_rw$aic, res_estb_full$aic, res_estb_45$aic)
 ```
 
+### 加入年齢を1歳にしたい
+
+`rec.age` を指定すると、再生産関係で対応させる親魚量と加入尾数の年をずらして解析できます。
+過程誤差の推定開始年を`rec.age`の年数分遅らせることになります。
+そのため、過程誤差の数が違うので、異なる`rec.age`の場合でAICや尤度を比較することはできません。
+以下では、`rec.age = 0` と `rec.age = 1` の再生産関係のプロットを横に並べて比較します。
+`rec.age = 1` の図では、加入尾数の点が親魚量の年に対応するように自動的にずれて表示されます。
+
+```{r rec_age1, echo = TRUE}
+input <- res_bh$input
+input$rec.age <- 1
+input$p0.list <- res_bh$par_list
+res_bh_rec1 <- do.call(sam, input)
+
+g0 <- plot_SR_simple(res_bh) +
+  ggplot2::labs(title = "Recruitment age 0")
+g1 <- plot_SR_simple(res_bh_rec1) +
+  ggplot2::labs(title = "Recruitment age 1")
+
+gridExtra::grid.arrange(g0, g1, nrow=1)
+```
+
 
 ## SAMの結果の出力
 

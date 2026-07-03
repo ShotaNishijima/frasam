@@ -135,6 +135,27 @@ get_pm <- function(res_sam,
   return(res)
 }
 
+#' rec.age>0のときにRをずらす関数
+#'
+#' yearはSSBに合わせる（つまり何年生まれかを表す）
+#'
+#' @encoding UTF-8
+#'
+shift_SRdata_rec_age <- function(SRdata, rec_age) {
+  if (is.null(rec_age) || is.na(rec_age)) rec_age <- 0
+  if (rec_age <= 0) return(SRdata)
+
+  data_R <- SRdata %>%
+    dplyr::select(year, R) %>%
+    dplyr::mutate(year = year - rec_age)
+
+  dplyr::right_join(
+    data_R,
+    SRdata %>% dplyr::select(-R),
+    by = "year"
+  )
+}
+
 #' @export
 #'
 #' @encoding UTF-8
@@ -148,11 +169,16 @@ make_SRres <- function(res_sam, multi_ssb=1.3, get_rand=FALSE, nsim=10000){
   res_SR$input <- res_sam2$input
   res_SR$input$type <- "L2"
   res_SR$input$SRdata <- get.SRdata(res_sam)
+
+  res_SR$input$SRdata <- shift_SRdata_rec_age(
+    res_SR$input$SRdata,
+    res_sam$input$rec.age
+  )
+
   res_SR$input$SR <- res_sam$input$SR
   ssb <- seq(from=1,to=multi_ssb*max(colSums(res_sam2$ssb)),length=100)
   scale_ssb <- res_sam$input$scale
   scale_R <- res_sam$input$scale_number
-  # browser()
   if(res_SR$input$SR=="BHS"){
     # res_SR$pred <- tibble(SSB=ssb/1000,R=1000*frasyr::SRF_BHS(ssb/1000,res_SR$pars$a,res_SR$pars$b,1)) #最後1じゃない方が良い気がするがとりあえず放置
     res_SR$pred <- tibble(SSB=ssb,R=scale_R*frasyr::SRF_BHS(ssb/scale_ssb,res_SR$pars$a,res_SR$pars$b,exp(res_sam$par_list$rec_logk))) #最後1じゃない方が良い気がするがとりあえず放置
@@ -166,6 +192,7 @@ make_SRres <- function(res_sam, multi_ssb=1.3, get_rand=FALSE, nsim=10000){
 
   return(res_SR)
 }
+
 
 #' @export
 #'
@@ -243,6 +270,7 @@ do_allboot <- function(res_sam_list, nsim=100, year_biol=2020:2022){
     res_SR_boot[[i]] <- purrr::map(res_sam_boot[[i]], function(x) make_SRres(x, multi_ssb=1))
     res_SR_fit[[i]] <- purrr::map(res_sam_boot[[i]], function(x){
         SRdata <- get.SRdata(x)
+        SRdata <- shift_SRdata_rec_age(SRdata, x$input$rec.age)
         fit.SR(SRdata, SR="BH")
     })
   }
