@@ -35,7 +35,9 @@ vignette: >
     out.width = "100%"
   )
   
-  if (requireNamespace("devtools", quietly = TRUE)) {
+  if (requireNamespace("pkgload", quietly = TRUE)) {
+    pkgload::load_all(export_all = FALSE)
+  } else if (requireNamespace("devtools", quietly = TRUE)) {
     devtools::load_all()
   } else {
     library(frasam)
@@ -113,7 +115,6 @@ res_bh <- do.call(sam, input)
 input$SR <- "RI"
 res_ri <- do.call(sam, input)
 
-devtools::load_all
 plot_samvpa(list(res_rw,res_bh,res_ri), CI=0.8,
             scenario_name=rev(c("RW","BH","RI")))
 ```
