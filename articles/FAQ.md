@@ -17,7 +17,7 @@
 ``` r
 
 install.packages("remotes")
-remotes::install_github("ShotaNishijima/frasyr@create_vignette")
+remotes::install_github("ShotaNishijima/frasam@create_vignette")
 # remotes::install_github("ShotaNishijima/frasyr@dev")
 
 library(frasam)
