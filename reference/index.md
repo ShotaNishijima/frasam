@@ -107,6 +107,8 @@
 - [`select_sigma_grid()`](https://shotanishijima.github.io/frasam/reference/select_sigma_grid.md)
   :
   観測誤差やプロセス誤差のステップ形式のモデル選択（複数の変数について）
+- [`shift_SRdata_rec_age()`](https://shotanishijima.github.io/frasam/reference/shift_SRdata_rec_age.md)
+  : rec.age\>0のときにRをずらす関数
 - [`sumup_popsim()`](https://shotanishijima.github.io/frasam/reference/sumup_popsim.md)
   : Self-test, Cross-testの結果をまとめるための関数
 - [`update_sam()`](https://shotanishijima.github.io/frasam/reference/update_sam.md)

@@ -8,6 +8,8 @@ SAMでTMBで実行するためにcppファイルのコンパイル等をする�
 use_sam_tmb(
   TmbFile = "sam2",
   CppDir = system.file("executable", package = "frasam"),
+  overwrite = FALSE,
+  auto_update = TRUE,
   ...
 )
 ```

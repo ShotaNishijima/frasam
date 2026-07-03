@@ -101,7 +101,8 @@ sam(
 
 - rec.age:
 
-  加入年齢 (default: 0)
+  加入年齢 (default:
+  0)。1以上の場合でも、min.ageやmax.ageは0歳始まりとしての年齢を入れること。
 
 - min.age:
 
