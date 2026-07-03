@@ -16,11 +16,25 @@
 #' @export
 
 use_sam_tmb <- function(TmbFile = "sam2",
-                         CppDir = system.file("executable",package="frasam"),...) {
-  test <- try(frasyr::use_rvpa_tmb(TmbFile=TmbFile,CppDir=CppDir,...))
-  if (class(test) == "DLLInfo") {
-    return(TRUE)
-  } else {
-      return(FALSE)
-    }
+                        CppDir = system.file("executable", package = "frasam"),
+                        overwrite = FALSE,
+                        auto_update = TRUE,
+                        ...) {
+  src <- file.path(CppDir, paste0(TmbFile, ".cpp"))
+  dst <- paste0(TmbFile, ".cpp")
+
+  if (isTRUE(auto_update) && file.exists(src) && file.exists(dst)) {
+    overwrite <- file.info(src)$mtime > file.info(dst)$mtime
+  }
+
+  test <- try(
+    frasyr::use_rvpa_tmb(
+      TmbFile = TmbFile,
+      CppDir = CppDir,
+      overwrite = overwrite,
+      ...
+    )
+  )
+
+  if (inherits(test, "DLLInfo")) TRUE else FALSE
 }
