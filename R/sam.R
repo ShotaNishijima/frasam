@@ -1,7 +1,7 @@
 #' SAMによる資源計算を実施する
 #'
 #' @param dat samに使用するdataでrvpaと同じフォーマットで利用可能
-#' @param rec.age 加入年齢 (default: 0)
+#' @param rec.age 加入年齢 (default: 0)。1以上の場合でも、min.ageやmax.ageは0歳始まりとしての年齢を入れること。
 #' @param alpha 最高年齢-1歳へのFに対する最高年齢のFの比
 #' @param upper 推定パラメータの上限値。固定効果の数のLengthを持つ必要あり。NULL（デフォルト）の場合Inf
 #' @param lower 推定パラメータの下限値。固定効果の数のLengthを持つ必要あり。NULL（デフォルト）の場合-Inf
@@ -202,10 +202,33 @@ sam <- function(dat,
       )
     }
 
+    if (!is.numeric(rec.age) || length(rec.age) != 1 || !is.finite(rec.age)) {
+      stop("'rec.age' must be a single finite numeric value.", call. = FALSE)
+    }
+    if (rec.age < 0) {
+      stop("'rec.age' must be non-negative.", call. = FALSE)
+    }
+    if (rec.age != floor(rec.age)) {
+      stop("'rec.age' must be an integer value.", call. = FALSE)
+    }
+    rec.age <- as.integer(rec.age)
+
+    if (rec.age > 0) {
+      warning(
+        "'rec.age > 0' is experimental. ",
+        "Input age matrices and min.age/max.age are assumed to be indexed from age 0. ",
+        "'rec.age' is intended to shift the stock-recruitment timing only.",
+        call. = FALSE
+      )
+    }
+
     for(i in 1:length(abund)) {
       if (abund[i]=="SSB") {
-        index.age[i] <- rec.age
-        max.age[i] <- rec.age + nrow(waa)-1
+        # index.age[i] <- rec.age
+        # max.age[i] <- rec.age + nrow(waa)-1
+        # ここはrec.ageでずらさない
+        index.age[i] <- 0
+        max.age[i] <- 0 + nrow(waa)-1
       }
     }
 
@@ -225,8 +248,11 @@ sam <- function(dat,
     rownames(obs) <- NULL
 
     obs <- as.matrix(obs)
-    obs[,"age"] <- obs[,"age"]+rec.age
-    obs[,"maxage"] <- obs[,"maxage"]+rec.age
+    # obs[,"age"] <- obs[,"age"]+rec.age
+    # obs[,"maxage"] <- obs[,"maxage"]+rec.age
+    # ここはrec.ageでずらさない
+    obs[,"age"] <- obs[,"age"]+0
+    obs[,"maxage"] <- obs[,"maxage"]+0
 
     if (tmb.run) {
       # library(TMB)
@@ -263,9 +289,13 @@ sam <- function(dat,
     data$propMat <- data$propMat2 <- as.matrix(t(maa))
     data$stockMeanWeight <- data$catchMeanWeight <- as.matrix(t(waa))
     data$natMor <- as.matrix(t(M))
-    data$minAge <- as.matrix(rec.age)
-    data$maxAge <- as.matrix(rec.age+nrow(caa)-1) #cppファイルには使わないデータ
+    # data$minAge <- as.matrix(rec.age)
+    # data$maxAge <- as.matrix(rec.age+nrow(caa)-1) #cppファイルには使わないデータ
+    # ここは0歳始まりとする
+    data$minAge <- as.matrix(0)
+    data$maxAge <- as.matrix(0+nrow(caa)-1) #cppファイルには使わないデータ
     data$maxAgePlusGroup <- ifelse(isTRUE(plus.group), 1, 0)
+    data$recAge <- as.integer(rec.age)
     data$rhoMode <- rho.mode
     ncol1 <- as.numeric(data$maxAge-data$minAge+1)
     data$landFrac <- data$disMeanWeight <- data$landMeanWeight <- data$propF <- data$propM <- matrix(0, nrow=data$noYears, ncol=ncol1)
@@ -273,7 +303,9 @@ sam <- function(dat,
     basemat <- matrix(-1, ncol = ncol1, nrow = max(data$obs[,2]))
     data$keyLogFsta <- data$keyLogQ <- data$keyLogB <- data$keyVarObs <- data$keyVarF <- data$keyVarLogN <- basemat
 
-    data$keyLogFsta[1,] <- c(0:(data$maxAge-1-rec.age),(data$maxAge-1-rec.age))
+    # data$keyLogFsta[1,] <- c(0:(data$maxAge-1-rec.age),(data$maxAge-1-rec.age))
+    # ここはrec.ageでずらさない
+    data$keyLogFsta[1,] <- c(0:(data$maxAge-1),(data$maxAge-1))
     for (i in 1:nindex) data$keyLogQ[i+1,index.age[i]+1] <- i-1
     if (isTRUE(b.est)) {
       if(is.null(index.b.key)) {

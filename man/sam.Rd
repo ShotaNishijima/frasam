@@ -87,7 +87,7 @@ sam(
 
 \item{abund}{Indexの種類。用いるIndexの長さのベクトル。"B": 資源量、"SSB"：親魚資源量、"N"：尾数、"Bs"：資源量×fleetごとの選択率、"Bf"：資源量×選択率．合計する年齢の幅については\code{min.age}と\code{max.age}}
 
-\item{rec.age}{加入年齢 (default: 0)}
+\item{rec.age}{加入年齢 (default: 0)。1以上の場合でも、min.ageやmax.ageは0歳始まりとしての年齢を入れること。}
 
 \item{min.age}{Indexの最低年齢 (\code{frasyr::vpa()}と同じで最小の年齢を0とする) 用いるIndexの長さのベクトル}
 
