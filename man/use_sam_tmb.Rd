@@ -11,14 +11,21 @@ use_sam_tmb(
   RunDir = getwd(),
   overwrite = FALSE,
   compile = c("auto", "always", "never"),
-  auto_update = NULL,
-  ...
+  auto_update = NULL
 )
 }
 \arguments{
 \item{TmbFile}{Cppファイルの名前}
 
 \item{CppDir}{Cppファイルが格納されているディレクトリ}
+
+\item{RunDir}{CppファイルとDLLを配置するディレクトリ}
+
+\item{overwrite}{RunDirのCppファイルを上書きするかどうか}
+
+\item{compile}{DLLをコンパイルするかどうか。"auto"ではCppファイルがDLLより新しい場合にコンパイルする}
+
+\item{auto_update}{互換性のために残している引数。compile = "auto"を使用してください}
 }
 \description{
 SAMでTMBで実行するためにcppファイルのコンパイル等をする関数
