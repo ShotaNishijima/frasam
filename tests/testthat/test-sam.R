@@ -91,6 +91,17 @@ test_that("test output",{
   expect_equal(exp(testres_varNfix$par_list$logSdLogN)[1], 0.2, tolerance = 1.0e-3)
   expect_equal(testres_varNfix$sigma.logN[1], 0.2, tolerance = 1.0e-3)
 
+  ## rec.age > 0 should run without errors
+  input_recage <- testres$input
+  input_recage$rec.age <- 1
+  input_recage$p0.list <- testres$par_list
+  expect_warning(
+    expect_error(testres_recage <- safe_do_call(sam, input_recage), NA),
+    "rec.age > 0"
+  )
+  expect_equal(testres_recage$data$recAge, 1)
+  expect_equal(as.numeric(testres_recage$data$minAge), 0)
+
   ## abund check
   # SSBに比例しているか
   expect_equal(sd(log(testres$pred.index[3,]/colSums(testres$ssb))),0,tolerance = 1.0e-3)
