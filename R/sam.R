@@ -905,8 +905,16 @@ sam <- function(dat,
         logN <- log(naa)
         logF <- log(faa)
       }
-      colnames(logN) <- colnames(logF) <- colnames(waa_est) <- colnames(caa_est) <- data$years
-      rownames(logN) <- rownames(logF) <- rownames(waa_est) <- rownames(caa_est) <- data$minAge:data$maxAge
+      age_names <- as.character(data$minAge:data$maxAge)
+      year_names <- as.character(data$years)
+
+      colnames(naa) <- colnames(faa) <- colnames(waa_est) <- colnames(caa_est) <- year_names
+      rownames(naa) <- rownames(faa) <- rownames(waa_est) <- rownames(caa_est) <- age_names
+
+      logN <- log(naa)
+      logF <- log(faa)
+      colnames(logN) <- colnames(logF) <- year_names
+      rownames(logN) <- rownames(logF) <- age_names
 
       waa_obs = dat$waa
 

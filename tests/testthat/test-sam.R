@@ -8,7 +8,7 @@ test_that("test input",{
   data("samres_example",package="frasam")
   input = samres$input
   tmbdata = samres$data
-  use_sam_tmb(overwrite=FALSE)
+  ensure_sam_tmb_loaded()
   args_def = formals(sam)
   input$cpp.file.name <- args_def$cpp.file.name
   input$p0.list <- NULL
@@ -46,10 +46,18 @@ test_that("test output",{
   input = samres$input
   input$p0.list <- NULL
   # tmbdata = samres$data
-  use_sam_tmb(overwrite=FALSE)
+  ensure_sam_tmb_loaded()
   args_def = formals(sam)
   input$cpp.file.name <- args_def$cpp.file.name
   testres = safe_do_call(sam,input)
+
+  expect_equal(rownames(testres$naa), as.character(testres$data$minAge:testres$data$maxAge))
+  expect_equal(rownames(testres$faa), as.character(testres$data$minAge:testres$data$maxAge))
+  expect_equal(rownames(testres$caa), as.character(testres$data$minAge:testres$data$maxAge))
+  expect_equal(colnames(testres$naa), as.character(testres$data$years))
+  expect_equal(colnames(testres$faa), as.character(testres$data$years))
+  expect_equal(colnames(testres$caa), as.character(testres$data$years))
+
   testcontents <-c("loglik","aic","q","b","opt$par","sigma","sigma.logC","sigma.logFsta","rho","phi","F","faa","N","naa")
   for(i in 1:length(testcontents)){
     expect_equal(eval(parse(text=paste0("samres$",testcontents[i]))),eval(parse(text=paste0("testres$",testcontents[i]))),tolerance = 1e-3)
@@ -90,6 +98,22 @@ test_that("test output",{
   testres_varNfix <- safe_do_call(sam, input_varNfix)
   expect_equal(exp(testres_varNfix$par_list$logSdLogN)[1], 0.2, tolerance = 1.0e-3)
   expect_equal(testres_varNfix$sigma.logN[1], 0.2, tolerance = 1.0e-3)
+
+  ## bias-corrected catch-at-age should be consistent with reported catch biomass
+  input_bias_correct <- testres$input
+  input_bias_correct$p0.list <- testres$par_list
+  input_bias_correct$bias.correct <- TRUE
+  testres_bias_correct <- safe_do_call(sam, input_bias_correct)
+  catch_biomass_sdr <- summary(testres_bias_correct$rep)
+  catch_biomass_sdr <- catch_biomass_sdr[
+    rownames(catch_biomass_sdr) == "Catch_biomass",
+    "Est. (bias.correct)"
+  ]
+  catch_biomass_caa <- colSums(testres_bias_correct$caa * testres_bias_correct$waa_est)
+  expect_lt(
+    max(abs(catch_biomass_caa - catch_biomass_sdr) / abs(catch_biomass_sdr)),
+    1.0e-5
+  )
 
   ## rec.age > 0 should run without errors
   input_recage <- testres$input
