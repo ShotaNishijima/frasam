@@ -24,6 +24,87 @@
 #'
 NULL
 
+#' Update a future projection plot legend for SAM
+#'
+#' `frasyr::plot_futures()` labels the historical assessment line as VPA.
+#' This helper updates only the legend labels of the returned ggplot object so
+#' the historical line is shown as SAM when a SAM result was supplied.
+#'
+#' @param plot A ggplot object returned by \code{frasyr::plot_futures()}.
+#' @param sam_label Label used for the historical SAM line.
+#' @param scenario_labels Optional labels for future scenarios. Supply either a
+#'   named character vector whose names match the current scenario names, or an
+#'   unnamed vector with the same length as the non-SAM scenarios.
+#' @param legend_title Legend title.
+#' @param ncol_legend Number of columns in the colour legend.
+#'
+#' @return A ggplot object with updated colour and fill legend labels.
+#' @export
+#'
+plot_update2sam <- function(plot,
+                            sam_label = "SAM",
+                            scenario_labels = NULL,
+                            legend_title = "",
+                            ncol_legend = 2) {
+  if (!inherits(plot, "ggplot")) {
+    stop("'plot' must be a ggplot object.", call. = FALSE)
+  }
+  if (is.null(plot$data) || !all(c("scenario", "col") %in% names(plot$data))) {
+    stop("'plot' must contain 'scenario' and 'col' columns in plot$data.", call. = FALSE)
+  }
+
+  style_def <- plot$data %>%
+    dplyr::ungroup() %>%
+    dplyr::select(scenario, col, dplyr::any_of("lty")) %>%
+    dplyr::filter(!is.na(col)) %>%
+    dplyr::distinct(col, .keep_all = TRUE)
+
+  labels <- as.character(style_def$scenario)
+  is_sam_line <- is.na(labels) | labels == "VPA" | style_def$col == "black"
+  labels[is_sam_line] <- sam_label
+
+  if (!is.null(scenario_labels)) {
+    scenario_labels <- as.character(scenario_labels)
+    future_idx <- which(!is_sam_line)
+    if (!is.null(names(scenario_labels)) && any(nzchar(names(scenario_labels)))) {
+      matched <- match(labels[future_idx], names(scenario_labels))
+      replace_idx <- future_idx[!is.na(matched)]
+      labels[replace_idx] <- scenario_labels[matched[!is.na(matched)]]
+    } else {
+      if (length(scenario_labels) != length(future_idx)) {
+        stop(
+          "'scenario_labels' must have the same length as the non-SAM scenarios.",
+          call. = FALSE
+        )
+      }
+      labels[future_idx] <- scenario_labels
+    }
+  }
+
+  lty <- if ("lty" %in% names(style_def)) style_def$lty else rep("solid", nrow(style_def))
+  lty[is.na(lty)] <- "solid"
+
+  plot +
+    ggplot2::scale_color_identity(
+      guide = "legend",
+      breaks = style_def$col,
+      labels = labels
+    ) +
+    ggplot2::scale_fill_identity(
+      guide = "legend",
+      breaks = style_def$col,
+      labels = labels
+    ) +
+    ggplot2::guides(
+      color = ggplot2::guide_legend(
+        title = legend_title,
+        ncol = ncol_legend,
+        override.aes = list(linetype = lty, color = style_def$col, lwd = 0.7)
+      ),
+      fill = ggplot2::guide_legend(title = legend_title, ncol = 1)
+    )
+}
+
 #' SAMで推定された再生産関係の予測値
 #'
 #' @param samres samの結果オブジェクト

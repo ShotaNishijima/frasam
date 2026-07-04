@@ -32,3 +32,4 @@ tools/**/*.rda
 tools/**/*.cpp
 
 res_sam.Rmd
+Rplots.pdf
