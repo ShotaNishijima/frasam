@@ -85,6 +85,8 @@
   : Popsimの結果ををプロットする関数
 - [`plot_samvpa()`](https://shotanishijima.github.io/frasam/reference/plot_samvpa.md)
   : Plot SAM or VPA results
+- [`plot_update2sam()`](https://shotanishijima.github.io/frasam/reference/plot_update2sam.md)
+  : Update a future projection plot legend for SAM
 - [`popsim_vpasam()`](https://shotanishijima.github.io/frasam/reference/popsim_vpasam.md)
   : Popsimと同じ手法でSAMとVPAの疑似データを生成する
 - [`retro_plot()`](https://shotanishijima.github.io/frasam/reference/retro_plot.md)

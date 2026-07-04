@@ -34,6 +34,7 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="../articles/FAQ.html">FAQ on how to use 'frasam'</a></li>
+    <li><a class="dropdown-item" href="../articles/future_sam.html">SAMの結果から将来予測とMSY管理基準値計算をする方法</a></li>
     <li><a class="dropdown-item" href="../articles/sam.html">SAMを使った資源量推定</a></li>
   </ul>
 </li>
@@ -55,7 +56,7 @@
                         <h4 data-toc-skip class="author">Shota Nishijima
 (FRA)</h4>
             
-            <h4 data-toc-skip class="date">2026-07-03</h4>
+            <h4 data-toc-skip class="date">2026-07-04</h4>
       
 
       <div class="d-none name"><code>FAQ.Rmd</code></div>
@@ -230,18 +231,18 @@
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fit_check</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/check_fit_sam.html">check_fit_sam</a></span><span class="op">(</span><span class="va">res_rw</span><span class="op">)</span></span>
 <span><span class="co">#&gt;                          check    ok              value       threshold</span></span>
-<span><span class="co">#&gt;          optimizer convergence FALSE                  1               0</span></span>
-<span><span class="co">#&gt;      positive definite Hessian  TRUE               TRUE            TRUE</span></span>
-<span><span class="co">#&gt;  maximum fixed-effect gradient  TRUE           7.79e-05            0.01</span></span>
-<span><span class="co">#&gt;    finite fixed effects and SE  TRUE              18/18             all</span></span>
-<span><span class="co">#&gt;        maximum fixed-effect SE  TRUE              39.72             Inf</span></span>
-<span><span class="co">#&gt;  maximum absolute fixed effect  TRUE              10.24             Inf</span></span>
-<span><span class="co">#&gt;           reported sigma range FALSE 3.569e-05 to 1.373     1e-04 to 10</span></span>
+<span><span class="co">#&gt;          optimizer convergence  TRUE                  0               0</span></span>
+<span><span class="co">#&gt;      positive definite Hessian FALSE              FALSE            TRUE</span></span>
+<span><span class="co">#&gt;  maximum fixed-effect gradient  TRUE          6.795e-06            0.01</span></span>
+<span><span class="co">#&gt;    finite fixed effects and SE FALSE              17/18             all</span></span>
+<span><span class="co">#&gt;        maximum fixed-effect SE  TRUE             0.6787             Inf</span></span>
+<span><span class="co">#&gt;  maximum absolute fixed effect  TRUE              9.788             Inf</span></span>
+<span><span class="co">#&gt;           reported sigma range FALSE 5.612e-05 to 1.373     1e-04 to 10</span></span>
 <span><span class="co">#&gt;             reported rho range  TRUE   0.9796 to 0.9796 1e-04 to 0.9999</span></span>
 <span><span class="co">#&gt;  parameters near finite bounds  TRUE                  0               0</span></span>
 <span><span class="co">#&gt;                                                                         message</span></span>
-<span><span class="co">#&gt;                                               nlminb convergence code is not 0.</span></span>
-<span><span class="co">#&gt;                                                 sdreport reports pdHess = TRUE.</span></span>
+<span><span class="co">#&gt;                                                   nlminb convergence code is 0.</span></span>
+<span><span class="co">#&gt;                                         sdreport does not report pdHess = TRUE.</span></span>
 <span><span class="co">#&gt;                                         Maximum absolute fixed-effect gradient.</span></span>
 <span><span class="co">#&gt;                    Fixed-effect estimates and standard errors should be finite.</span></span>
 <span><span class="co">#&gt;                         Large standard errors can indicate weak identification.</span></span>
@@ -254,18 +255,18 @@
 <span><span class="co">#&gt; [1] FALSE</span></span>
 <span><span class="va">fit_check</span><span class="op">$</span><span class="va">checks</span></span>
 <span><span class="co">#&gt;                           check    ok              value       threshold</span></span>
-<span><span class="co">#&gt; 1         optimizer convergence FALSE                  1               0</span></span>
-<span><span class="co">#&gt; 2     positive definite Hessian  TRUE               TRUE            TRUE</span></span>
-<span><span class="co">#&gt; 3 maximum fixed-effect gradient  TRUE           7.79e-05            0.01</span></span>
-<span><span class="co">#&gt; 4   finite fixed effects and SE  TRUE              18/18             all</span></span>
-<span><span class="co">#&gt; 5       maximum fixed-effect SE  TRUE              39.72             Inf</span></span>
-<span><span class="co">#&gt; 6 maximum absolute fixed effect  TRUE              10.24             Inf</span></span>
-<span><span class="co">#&gt; 7          reported sigma range FALSE 3.569e-05 to 1.373     1e-04 to 10</span></span>
+<span><span class="co">#&gt; 1         optimizer convergence  TRUE                  0               0</span></span>
+<span><span class="co">#&gt; 2     positive definite Hessian FALSE              FALSE            TRUE</span></span>
+<span><span class="co">#&gt; 3 maximum fixed-effect gradient  TRUE          6.795e-06            0.01</span></span>
+<span><span class="co">#&gt; 4   finite fixed effects and SE FALSE              17/18             all</span></span>
+<span><span class="co">#&gt; 5       maximum fixed-effect SE  TRUE             0.6787             Inf</span></span>
+<span><span class="co">#&gt; 6 maximum absolute fixed effect  TRUE              9.788             Inf</span></span>
+<span><span class="co">#&gt; 7          reported sigma range FALSE 5.612e-05 to 1.373     1e-04 to 10</span></span>
 <span><span class="co">#&gt; 8            reported rho range  TRUE   0.9796 to 0.9796 1e-04 to 0.9999</span></span>
 <span><span class="co">#&gt; 9 parameters near finite bounds  TRUE                  0               0</span></span>
 <span><span class="co">#&gt;                                                                          message</span></span>
-<span><span class="co">#&gt; 1                                              nlminb convergence code is not 0.</span></span>
-<span><span class="co">#&gt; 2                                                sdreport reports pdHess = TRUE.</span></span>
+<span><span class="co">#&gt; 1                                                  nlminb convergence code is 0.</span></span>
+<span><span class="co">#&gt; 2                                        sdreport does not report pdHess = TRUE.</span></span>
 <span><span class="co">#&gt; 3                                        Maximum absolute fixed-effect gradient.</span></span>
 <span><span class="co">#&gt; 4                   Fixed-effect estimates and standard errors should be finite.</span></span>
 <span><span class="co">#&gt; 5                        Large standard errors can indicate weak identification.</span></span>
@@ -299,11 +300,11 @@
 <span>  <span class="op">)</span>,</span>
 <span><span class="op">]</span></span>
 <span><span class="co">#&gt;                           check    ok              value   threshold</span></span>
-<span><span class="co">#&gt; 2     positive definite Hessian  TRUE               TRUE        TRUE</span></span>
-<span><span class="co">#&gt; 3 maximum fixed-effect gradient  TRUE           7.79e-05        0.01</span></span>
-<span><span class="co">#&gt; 7          reported sigma range FALSE 3.569e-05 to 1.373 1e-04 to 10</span></span>
+<span><span class="co">#&gt; 2     positive definite Hessian FALSE              FALSE        TRUE</span></span>
+<span><span class="co">#&gt; 3 maximum fixed-effect gradient  TRUE          6.795e-06        0.01</span></span>
+<span><span class="co">#&gt; 7          reported sigma range FALSE 5.612e-05 to 1.373 1e-04 to 10</span></span>
 <span><span class="co">#&gt;                                                                          message</span></span>
-<span><span class="co">#&gt; 2                                                sdreport reports pdHess = TRUE.</span></span>
+<span><span class="co">#&gt; 2                                        sdreport does not report pdHess = TRUE.</span></span>
 <span><span class="co">#&gt; 3                                        Maximum absolute fixed-effect gradient.</span></span>
 <span><span class="co">#&gt; 7 Reported standard deviations should be finite and within the diagnostic range.</span></span></code></pre></div>
 <p><code>fixed</code>
@@ -312,40 +313,40 @@
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">fit_check</span><span class="op">$</span><span class="va">fixed</span><span class="op">)</span></span>
 <span><span class="co">#&gt;           name   estimate         se      gradient</span></span>
-<span><span class="co">#&gt; 1         logQ -5.3393491 0.17712441 -7.524611e-05</span></span>
-<span><span class="co">#&gt; 2         logQ -4.7404497 0.21984695  6.189780e-06</span></span>
-<span><span class="co">#&gt; 3         logQ -5.5526327 0.08309922 -1.919871e-05</span></span>
-<span><span class="co">#&gt; 4         logQ  0.3089116 0.06075805  5.924947e-05</span></span>
-<span><span class="co">#&gt; 5         logQ -4.0119936 0.11963074 -1.829045e-06</span></span>
-<span><span class="co">#&gt; 6 logSdLogFsta -0.4669707 0.16208579 -4.416485e-05</span></span>
+<span><span class="co">#&gt; 1         logQ -5.3393468 0.17712387 -9.534776e-07</span></span>
+<span><span class="co">#&gt; 2         logQ -4.7404500 0.21984587  7.940808e-07</span></span>
+<span><span class="co">#&gt; 3         logQ -5.5526326 0.08309909 -4.086623e-06</span></span>
+<span><span class="co">#&gt; 4         logQ  0.3089114 0.06075810  3.044420e-06</span></span>
+<span><span class="co">#&gt; 5         logQ -4.0119936 0.11963056 -2.135708e-06</span></span>
+<span><span class="co">#&gt; 6 logSdLogFsta -0.4669702 0.16208347 -1.079564e-06</span></span>
 <span></span>
 <span><span class="va">fit_check</span><span class="op">$</span><span class="va">fixed</span><span class="op">[</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/order.html" class="external-link">order</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">fit_check</span><span class="op">$</span><span class="va">fixed</span><span class="op">$</span><span class="va">gradient</span><span class="op">)</span>, decreasing <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
 <span><span class="op">]</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>, <span class="op">]</span></span>
-<span><span class="co">#&gt;           name   estimate         se      gradient</span></span>
-<span><span class="co">#&gt; 14 logSdLogObs  0.3169786 0.11343048  7.790195e-05</span></span>
-<span><span class="co">#&gt; 1         logQ -5.3393491 0.17712441 -7.524611e-05</span></span>
-<span><span class="co">#&gt; 16 logSdLogObs -1.0831406 0.11898626 -6.172030e-05</span></span>
-<span><span class="co">#&gt; 4         logQ  0.3089116 0.06075805  5.924947e-05</span></span>
-<span><span class="co">#&gt; 15 logSdLogObs -0.7159739 0.12362977  5.611228e-05</span></span></code></pre></div>
+<span><span class="co">#&gt;            name    estimate         se      gradient</span></span>
+<span><span class="co">#&gt; 13  logSdLogObs  0.09393634 0.11460027 -6.795203e-06</span></span>
+<span><span class="co">#&gt; 14  logSdLogObs  0.31697774 0.11343008  6.336297e-06</span></span>
+<span><span class="co">#&gt; 3          logQ -5.55263262 0.08309909 -4.086623e-06</span></span>
+<span><span class="co">#&gt; 7  logSdLogFsta -1.16227806 0.15671268  3.722154e-06</span></span>
+<span><span class="co">#&gt; 4          logQ  0.30891139 0.06075810  3.044420e-06</span></span></code></pre></div>
 <p>診断のしきい値は引数で変更できます。
 例えば、勾配をより厳しく見る場合は <code>gradient_tol</code>
 を小さくします。</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/check_fit_sam.html">check_fit_sam</a></span><span class="op">(</span><span class="va">res_rw</span>, gradient_tol <span class="op">=</span> <span class="fl">1e-4</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">$</span><span class="va">checks</span></span>
 <span><span class="co">#&gt;                           check    ok              value       threshold</span></span>
-<span><span class="co">#&gt; 1         optimizer convergence FALSE                  1               0</span></span>
-<span><span class="co">#&gt; 2     positive definite Hessian  TRUE               TRUE            TRUE</span></span>
-<span><span class="co">#&gt; 3 maximum fixed-effect gradient  TRUE           7.79e-05           1e-04</span></span>
-<span><span class="co">#&gt; 4   finite fixed effects and SE  TRUE              18/18             all</span></span>
-<span><span class="co">#&gt; 5       maximum fixed-effect SE  TRUE              39.72             Inf</span></span>
-<span><span class="co">#&gt; 6 maximum absolute fixed effect  TRUE              10.24             Inf</span></span>
-<span><span class="co">#&gt; 7          reported sigma range FALSE 3.569e-05 to 1.373     1e-04 to 10</span></span>
+<span><span class="co">#&gt; 1         optimizer convergence  TRUE                  0               0</span></span>
+<span><span class="co">#&gt; 2     positive definite Hessian FALSE              FALSE            TRUE</span></span>
+<span><span class="co">#&gt; 3 maximum fixed-effect gradient  TRUE          6.795e-06           1e-04</span></span>
+<span><span class="co">#&gt; 4   finite fixed effects and SE FALSE              17/18             all</span></span>
+<span><span class="co">#&gt; 5       maximum fixed-effect SE  TRUE             0.6787             Inf</span></span>
+<span><span class="co">#&gt; 6 maximum absolute fixed effect  TRUE              9.788             Inf</span></span>
+<span><span class="co">#&gt; 7          reported sigma range FALSE 5.612e-05 to 1.373     1e-04 to 10</span></span>
 <span><span class="co">#&gt; 8            reported rho range  TRUE   0.9796 to 0.9796 1e-04 to 0.9999</span></span>
 <span><span class="co">#&gt; 9 parameters near finite bounds  TRUE                  0               0</span></span>
 <span><span class="co">#&gt;                                                                          message</span></span>
-<span><span class="co">#&gt; 1                                              nlminb convergence code is not 0.</span></span>
-<span><span class="co">#&gt; 2                                                sdreport reports pdHess = TRUE.</span></span>
+<span><span class="co">#&gt; 1                                                  nlminb convergence code is 0.</span></span>
+<span><span class="co">#&gt; 2                                        sdreport does not report pdHess = TRUE.</span></span>
 <span><span class="co">#&gt; 3                                        Maximum absolute fixed-effect gradient.</span></span>
 <span><span class="co">#&gt; 4                   Fixed-effect estimates and standard errors should be finite.</span></span>
 <span><span class="co">#&gt; 5                        Large standard errors can indicate weak identification.</span></span>
@@ -359,41 +360,41 @@ sigma がしきい値の外にあるかを確認できます。</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fit_check</span><span class="op">$</span><span class="va">sigma</span></span>
 <span><span class="co">#&gt;             type index        value    ok   problem</span></span>
-<span><span class="co">#&gt; 1          sigma     1 1.098489e+00  TRUE          </span></span>
-<span><span class="co">#&gt; 2          sigma     2 1.372973e+00  TRUE          </span></span>
-<span><span class="co">#&gt; 3          sigma     3 4.887159e-01  TRUE          </span></span>
-<span><span class="co">#&gt; 4          sigma     4 3.385307e-01  TRUE          </span></span>
-<span><span class="co">#&gt; 5          sigma     5 7.328951e-01  TRUE          </span></span>
-<span><span class="co">#&gt; 6     sigma.logC     1 5.552488e-01  TRUE          </span></span>
-<span><span class="co">#&gt; 7     sigma.logC     2 5.552488e-01  TRUE          </span></span>
-<span><span class="co">#&gt; 8     sigma.logC     3 2.702570e-01  TRUE          </span></span>
-<span><span class="co">#&gt; 9     sigma.logC     4 2.702570e-01  TRUE          </span></span>
-<span><span class="co">#&gt; 10    sigma.logC     5 2.702570e-01  TRUE          </span></span>
-<span><span class="co">#&gt; 11    sigma.logC     6 4.575534e-01  TRUE          </span></span>
-<span><span class="co">#&gt; 12    sigma.logC     7 4.575534e-01  TRUE          </span></span>
-<span><span class="co">#&gt; 13 sigma.logFsta     1 6.268985e-01  TRUE          </span></span>
-<span><span class="co">#&gt; 14 sigma.logFsta     2 6.268985e-01  TRUE          </span></span>
-<span><span class="co">#&gt; 15 sigma.logFsta     3 3.127728e-01  TRUE          </span></span>
-<span><span class="co">#&gt; 16 sigma.logFsta     4 3.127728e-01  TRUE          </span></span>
-<span><span class="co">#&gt; 17 sigma.logFsta     5 3.127728e-01  TRUE          </span></span>
-<span><span class="co">#&gt; 18 sigma.logFsta     6 3.127728e-01  TRUE          </span></span>
-<span><span class="co">#&gt; 19 sigma.logFsta     7 3.127728e-01  TRUE          </span></span>
-<span><span class="co">#&gt; 20    sigma.logN     1 6.279345e-01  TRUE          </span></span>
-<span><span class="co">#&gt; 21    sigma.logN     2 3.569467e-05 FALSE too small</span></span>
-<span><span class="co">#&gt; 22    sigma.logN     3 3.569467e-05 FALSE too small</span></span>
-<span><span class="co">#&gt; 23    sigma.logN     4 3.569467e-05 FALSE too small</span></span>
-<span><span class="co">#&gt; 24    sigma.logN     5 3.569467e-05 FALSE too small</span></span>
-<span><span class="co">#&gt; 25    sigma.logN     6 3.569467e-05 FALSE too small</span></span>
-<span><span class="co">#&gt; 26    sigma.logN     7 3.569467e-05 FALSE too small</span></span>
+<span><span class="co">#&gt; 1          sigma     1 1.0984898146  TRUE          </span></span>
+<span><span class="co">#&gt; 2          sigma     2 1.3729720116  TRUE          </span></span>
+<span><span class="co">#&gt; 3          sigma     3 0.4887155303  TRUE          </span></span>
+<span><span class="co">#&gt; 4          sigma     4 0.3385309609  TRUE          </span></span>
+<span><span class="co">#&gt; 5          sigma     5 0.7328951790  TRUE          </span></span>
+<span><span class="co">#&gt; 6     sigma.logC     1 0.5552486816  TRUE          </span></span>
+<span><span class="co">#&gt; 7     sigma.logC     2 0.5552486816  TRUE          </span></span>
+<span><span class="co">#&gt; 8     sigma.logC     3 0.2702569865  TRUE          </span></span>
+<span><span class="co">#&gt; 9     sigma.logC     4 0.2702569865  TRUE          </span></span>
+<span><span class="co">#&gt; 10    sigma.logC     5 0.2702569865  TRUE          </span></span>
+<span><span class="co">#&gt; 11    sigma.logC     6 0.4575531134  TRUE          </span></span>
+<span><span class="co">#&gt; 12    sigma.logC     7 0.4575531134  TRUE          </span></span>
+<span><span class="co">#&gt; 13 sigma.logFsta     1 0.6268987810  TRUE          </span></span>
+<span><span class="co">#&gt; 14 sigma.logFsta     2 0.6268987810  TRUE          </span></span>
+<span><span class="co">#&gt; 15 sigma.logFsta     3 0.3127728525  TRUE          </span></span>
+<span><span class="co">#&gt; 16 sigma.logFsta     4 0.3127728525  TRUE          </span></span>
+<span><span class="co">#&gt; 17 sigma.logFsta     5 0.3127728525  TRUE          </span></span>
+<span><span class="co">#&gt; 18 sigma.logFsta     6 0.3127728525  TRUE          </span></span>
+<span><span class="co">#&gt; 19 sigma.logFsta     7 0.3127728525  TRUE          </span></span>
+<span><span class="co">#&gt; 20    sigma.logN     1 0.6279343136  TRUE          </span></span>
+<span><span class="co">#&gt; 21    sigma.logN     2 0.0000561208 FALSE too small</span></span>
+<span><span class="co">#&gt; 22    sigma.logN     3 0.0000561208 FALSE too small</span></span>
+<span><span class="co">#&gt; 23    sigma.logN     4 0.0000561208 FALSE too small</span></span>
+<span><span class="co">#&gt; 24    sigma.logN     5 0.0000561208 FALSE too small</span></span>
+<span><span class="co">#&gt; 25    sigma.logN     6 0.0000561208 FALSE too small</span></span>
+<span><span class="co">#&gt; 26    sigma.logN     7 0.0000561208 FALSE too small</span></span>
 <span></span>
 <span><span class="va">fit_check</span><span class="op">$</span><span class="va">sigma</span><span class="op">[</span><span class="op">!</span><span class="va">fit_check</span><span class="op">$</span><span class="va">sigma</span><span class="op">$</span><span class="va">ok</span>, <span class="op">]</span></span>
-<span><span class="co">#&gt;          type index        value    ok   problem</span></span>
-<span><span class="co">#&gt; 21 sigma.logN     2 3.569467e-05 FALSE too small</span></span>
-<span><span class="co">#&gt; 22 sigma.logN     3 3.569467e-05 FALSE too small</span></span>
-<span><span class="co">#&gt; 23 sigma.logN     4 3.569467e-05 FALSE too small</span></span>
-<span><span class="co">#&gt; 24 sigma.logN     5 3.569467e-05 FALSE too small</span></span>
-<span><span class="co">#&gt; 25 sigma.logN     6 3.569467e-05 FALSE too small</span></span>
-<span><span class="co">#&gt; 26 sigma.logN     7 3.569467e-05 FALSE too small</span></span></code></pre></div>
+<span><span class="co">#&gt;          type index       value    ok   problem</span></span>
+<span><span class="co">#&gt; 21 sigma.logN     2 5.61208e-05 FALSE too small</span></span>
+<span><span class="co">#&gt; 22 sigma.logN     3 5.61208e-05 FALSE too small</span></span>
+<span><span class="co">#&gt; 23 sigma.logN     4 5.61208e-05 FALSE too small</span></span>
+<span><span class="co">#&gt; 24 sigma.logN     5 5.61208e-05 FALSE too small</span></span>
+<span><span class="co">#&gt; 25 sigma.logN     6 5.61208e-05 FALSE too small</span></span>
+<span><span class="co">#&gt; 26 sigma.logN     7 5.61208e-05 FALSE too small</span></span></code></pre></div>
 <p>しきい値を変えて確認したい場合は、<code>sigma_range</code>
 を指定します。
 例えば、以下では説明用にかなり狭い範囲を指定しています。</p>
@@ -408,32 +409,32 @@ sigma がしきい値の外にあるかを確認できます。</p>
 <span>  <span class="va">fit_check_strict_sigma</span><span class="op">$</span><span class="va">checks</span><span class="op">$</span><span class="va">check</span> <span class="op">==</span> <span class="st">"reported sigma range"</span>,</span>
 <span><span class="op">]</span></span>
 <span><span class="co">#&gt;                  check    ok              value threshold</span></span>
-<span><span class="co">#&gt; 7 reported sigma range FALSE 3.569e-05 to 1.373  0.5 to 1</span></span>
+<span><span class="co">#&gt; 7 reported sigma range FALSE 5.612e-05 to 1.373  0.5 to 1</span></span>
 <span><span class="co">#&gt;                                                                          message</span></span>
 <span><span class="co">#&gt; 7 Reported standard deviations should be finite and within the diagnostic range.</span></span>
 <span></span>
 <span><span class="va">fit_check_strict_sigma</span><span class="op">$</span><span class="va">sigma</span><span class="op">[</span><span class="op">!</span><span class="va">fit_check_strict_sigma</span><span class="op">$</span><span class="va">sigma</span><span class="op">$</span><span class="va">ok</span>, <span class="op">]</span></span>
 <span><span class="co">#&gt;             type index        value    ok   problem</span></span>
-<span><span class="co">#&gt; 1          sigma     1 1.098489e+00 FALSE too large</span></span>
-<span><span class="co">#&gt; 2          sigma     2 1.372973e+00 FALSE too large</span></span>
-<span><span class="co">#&gt; 3          sigma     3 4.887159e-01 FALSE too small</span></span>
-<span><span class="co">#&gt; 4          sigma     4 3.385307e-01 FALSE too small</span></span>
-<span><span class="co">#&gt; 8     sigma.logC     3 2.702570e-01 FALSE too small</span></span>
-<span><span class="co">#&gt; 9     sigma.logC     4 2.702570e-01 FALSE too small</span></span>
-<span><span class="co">#&gt; 10    sigma.logC     5 2.702570e-01 FALSE too small</span></span>
-<span><span class="co">#&gt; 11    sigma.logC     6 4.575534e-01 FALSE too small</span></span>
-<span><span class="co">#&gt; 12    sigma.logC     7 4.575534e-01 FALSE too small</span></span>
-<span><span class="co">#&gt; 15 sigma.logFsta     3 3.127728e-01 FALSE too small</span></span>
-<span><span class="co">#&gt; 16 sigma.logFsta     4 3.127728e-01 FALSE too small</span></span>
-<span><span class="co">#&gt; 17 sigma.logFsta     5 3.127728e-01 FALSE too small</span></span>
-<span><span class="co">#&gt; 18 sigma.logFsta     6 3.127728e-01 FALSE too small</span></span>
-<span><span class="co">#&gt; 19 sigma.logFsta     7 3.127728e-01 FALSE too small</span></span>
-<span><span class="co">#&gt; 21    sigma.logN     2 3.569467e-05 FALSE too small</span></span>
-<span><span class="co">#&gt; 22    sigma.logN     3 3.569467e-05 FALSE too small</span></span>
-<span><span class="co">#&gt; 23    sigma.logN     4 3.569467e-05 FALSE too small</span></span>
-<span><span class="co">#&gt; 24    sigma.logN     5 3.569467e-05 FALSE too small</span></span>
-<span><span class="co">#&gt; 25    sigma.logN     6 3.569467e-05 FALSE too small</span></span>
-<span><span class="co">#&gt; 26    sigma.logN     7 3.569467e-05 FALSE too small</span></span></code></pre></div>
+<span><span class="co">#&gt; 1          sigma     1 1.0984898146 FALSE too large</span></span>
+<span><span class="co">#&gt; 2          sigma     2 1.3729720116 FALSE too large</span></span>
+<span><span class="co">#&gt; 3          sigma     3 0.4887155303 FALSE too small</span></span>
+<span><span class="co">#&gt; 4          sigma     4 0.3385309609 FALSE too small</span></span>
+<span><span class="co">#&gt; 8     sigma.logC     3 0.2702569865 FALSE too small</span></span>
+<span><span class="co">#&gt; 9     sigma.logC     4 0.2702569865 FALSE too small</span></span>
+<span><span class="co">#&gt; 10    sigma.logC     5 0.2702569865 FALSE too small</span></span>
+<span><span class="co">#&gt; 11    sigma.logC     6 0.4575531134 FALSE too small</span></span>
+<span><span class="co">#&gt; 12    sigma.logC     7 0.4575531134 FALSE too small</span></span>
+<span><span class="co">#&gt; 15 sigma.logFsta     3 0.3127728525 FALSE too small</span></span>
+<span><span class="co">#&gt; 16 sigma.logFsta     4 0.3127728525 FALSE too small</span></span>
+<span><span class="co">#&gt; 17 sigma.logFsta     5 0.3127728525 FALSE too small</span></span>
+<span><span class="co">#&gt; 18 sigma.logFsta     6 0.3127728525 FALSE too small</span></span>
+<span><span class="co">#&gt; 19 sigma.logFsta     7 0.3127728525 FALSE too small</span></span>
+<span><span class="co">#&gt; 21    sigma.logN     2 0.0000561208 FALSE too small</span></span>
+<span><span class="co">#&gt; 22    sigma.logN     3 0.0000561208 FALSE too small</span></span>
+<span><span class="co">#&gt; 23    sigma.logN     4 0.0000561208 FALSE too small</span></span>
+<span><span class="co">#&gt; 24    sigma.logN     5 0.0000561208 FALSE too small</span></span>
+<span><span class="co">#&gt; 25    sigma.logN     6 0.0000561208 FALSE too small</span></span>
+<span><span class="co">#&gt; 26    sigma.logN     7 0.0000561208 FALSE too small</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="以前の解析結果の初期値を利用したい">以前の解析結果の初期値を利用したい<a class="anchor" aria-label="anchor" href="#%E4%BB%A5%E5%89%8D%E3%81%AE%E8%A7%A3%E6%9E%90%E7%B5%90%E6%9E%9C%E3%81%AE%E5%88%9D%E6%9C%9F%E5%80%A4%E3%82%92%E5%88%A9%E7%94%A8%E3%81%97%E3%81%9F%E3%81%84"></a>
@@ -577,7 +578,7 @@ jitter する前の元の結果を表します。 <code>ID &gt; 0</code>
 <span><span class="co">#&gt;                          check   ok            value       threshold</span></span>
 <span><span class="co">#&gt;          optimizer convergence TRUE                0               0</span></span>
 <span><span class="co">#&gt;      positive definite Hessian TRUE             TRUE            TRUE</span></span>
-<span><span class="co">#&gt;  maximum fixed-effect gradient TRUE        0.0003848            0.01</span></span>
+<span><span class="co">#&gt;  maximum fixed-effect gradient TRUE        0.0003751            0.01</span></span>
 <span><span class="co">#&gt;    finite fixed effects and SE TRUE            17/17             all</span></span>
 <span><span class="co">#&gt;        maximum fixed-effect SE TRUE           0.6788             Inf</span></span>
 <span><span class="co">#&gt;  maximum absolute fixed effect TRUE            5.553             Inf</span></span>
@@ -635,9 +636,9 @@ ageの観測誤差とIndexの観測誤差（のSDのlog）が共にlogSdLogObs�
 <span><span class="va">idx_logC</span></span>
 <span><span class="co">#&gt; [1] 1 2 3</span></span>
 <span><span class="va">sigma_hat</span><span class="op">[</span><span class="va">idx_logC</span><span class="op">]</span></span>
-<span><span class="co">#&gt; [1] 0.5552559 0.2700807 0.4574299</span></span>
+<span><span class="co">#&gt; [1] 0.5552559 0.2700808 0.4574299</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">input</span><span class="op">$</span><span class="va">p0.list</span><span class="op">$</span><span class="va">logSdLogObs</span><span class="op">[</span><span class="va">idx_logC</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 0.5552559 0.2700807 0.4574299</span></span>
+<span><span class="co">#&gt; [1] 0.5552559 0.2700808 0.4574299</span></span>
 <span></span>
 <span><span class="co"># 例: すべてのsigma.logCを 0.2 に固定する</span></span>
 <span><span class="va">fix_pos</span> <span class="op">&lt;-</span> <span class="va">idx_logC</span><span class="op">[</span><span class="op">]</span></span>
@@ -661,7 +662,7 @@ ageの観測誤差とIndexの観測誤差（のSDのlog）が共にlogSdLogObs�
 <span><span class="co"># 固定したパラメータは opt$par には出てこない</span></span>
 <span><span class="va">res_sigma02</span><span class="op">$</span><span class="va">opt</span><span class="op">$</span><span class="va">par</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">res_sigma02</span><span class="op">$</span><span class="va">opt</span><span class="op">$</span><span class="va">par</span><span class="op">)</span> <span class="op">==</span> <span class="st">"logSdLogObs"</span><span class="op">]</span></span>
 <span><span class="co">#&gt; logSdLogObs logSdLogObs logSdLogObs logSdLogObs logSdLogObs </span></span>
-<span><span class="co">#&gt;   0.1326081   0.3298166  -0.6822944  -1.0575823  -0.2981363</span></span></code></pre></div>
+<span><span class="co">#&gt;   0.1326099   0.3298195  -0.6822912  -1.0575798  -0.2981344</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="vpaと同じような設定で解析したい">VPAと同じような設定で解析したい<a class="anchor" aria-label="anchor" href="#vpa%E3%81%A8%E5%90%8C%E3%81%98%E3%82%88%E3%81%86%E3%81%AA%E8%A8%AD%E5%AE%9A%E3%81%A7%E8%A7%A3%E6%9E%90%E3%81%97%E3%81%9F%E3%81%84"></a>
@@ -829,22 +830,22 @@ modelのほうがFや選択率がギザギザしており、SAMは平滑化さ�
 </ul>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">res_rw</span><span class="op">$</span><span class="va">sigma</span> <span class="co">#index毎に異なる</span></span>
-<span><span class="co">#&gt; [1] 1.0984893 1.3729732 0.4887159 0.3385307 0.7328951</span></span>
+<span><span class="co">#&gt; [1] 1.0984898 1.3729720 0.4887155 0.3385310 0.7328952</span></span>
 <span></span>
 <span><span class="va">input</span> <span class="op">&lt;-</span> <span class="va">res_rw</span><span class="op">$</span><span class="va">input</span></span>
 <span><span class="va">input</span><span class="op">$</span><span class="va">index.key</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">input</span><span class="op">$</span><span class="va">abund</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">res_ls</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">sam</span>, <span class="va">input</span><span class="op">)</span></span>
 <span><span class="va">res_ls</span><span class="op">$</span><span class="va">sigma</span></span>
-<span><span class="co">#&gt; [1] 0.8865263 0.8865263 0.8865263 0.8865263 0.8865263</span></span>
+<span><span class="co">#&gt; [1] 0.8865264 0.8865264 0.8865264 0.8865264 0.8865264</span></span>
 <span></span>
 <span><span class="va">input</span><span class="op">$</span><span class="va">index.key</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">0</span>,<span class="fl">1</span>,<span class="fl">2</span>,<span class="fl">3</span><span class="op">)</span></span>
 <span><span class="va">res_rw2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">sam</span>, <span class="va">input</span><span class="op">)</span></span>
 <span><span class="va">res_rw2</span><span class="op">$</span><span class="va">sigma</span></span>
-<span><span class="co">#&gt; [1] 1.2438603 1.2438603 0.4909691 0.3384183 0.7341527</span></span>
+<span><span class="co">#&gt; [1] 1.2438612 1.2438612 0.4909690 0.3384183 0.7341527</span></span>
 <span></span>
 <span><span class="co">#AICの比較</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">res_rw</span><span class="op">$</span><span class="va">aic</span>, <span class="va">res_ls</span><span class="op">$</span><span class="va">aic</span>, <span class="va">res_rw2</span><span class="op">$</span><span class="va">aic</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1]  976.4474 1053.1456  976.3630</span></span></code></pre></div>
+<span><span class="co">#&gt; [1]  976.4474 1053.1456  976.3553</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="indexとabundanceの間の非線形性を推定したい">IndexとAbundanceの間の非線形性を推定したい<a class="anchor" aria-label="anchor" href="#index%E3%81%A8abundance%E3%81%AE%E9%96%93%E3%81%AE%E9%9D%9E%E7%B7%9A%E5%BD%A2%E6%80%A7%E3%82%92%E6%8E%A8%E5%AE%9A%E3%81%97%E3%81%9F%E3%81%84"></a>
@@ -869,13 +870,13 @@ modelのほうがFや選択率がギザギザしており、SAMは平滑化さ�
 <span><span class="va">input</span><span class="op">$</span><span class="va">p0.list</span> <span class="op">&lt;-</span> <span class="va">res_rw</span><span class="op">$</span><span class="va">par_list</span></span>
 <span><span class="va">res_estb_full</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">sam</span>, <span class="va">input</span><span class="op">)</span></span>
 <span><span class="va">res_estb_full</span><span class="op">$</span><span class="va">b</span> <span class="co">#すべてのindexでbが推定される</span></span>
-<span><span class="co">#&gt; [1] 0.9775692 0.9484937 1.0082822 0.9249498 0.8870770</span></span>
+<span><span class="co">#&gt; [1] 0.9775703 0.9484969 1.0082841 0.9249488 0.8870791</span></span>
 <span><span class="fu"><a href="../reference/check_fit_sam.html">check_fit_sam</a></span><span class="op">(</span><span class="va">res_estb_full</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">input</span><span class="op">$</span><span class="va">b.fix</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="cn">NA</span>,<span class="cn">NA</span><span class="op">)</span> <span class="co">#1-3番目のindexはb=1に固定し、4-5番目のindexはb推定を行う</span></span>
 <span><span class="va">res_estb_45</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">sam</span>, <span class="va">input</span><span class="op">)</span></span>
 <span><span class="va">res_estb_45</span><span class="op">$</span><span class="va">b</span> <span class="co">#</span></span>
-<span><span class="co">#&gt; [1] 1.0000000 1.0000000 1.0000000 0.9249925 0.8877414</span></span>
+<span><span class="co">#&gt; [1] 1.0000000 1.0000000 1.0000000 0.9249928 0.8877377</span></span>
 <span><span class="fu"><a href="../reference/check_fit_sam.html">check_fit_sam</a></span><span class="op">(</span><span class="va">res_estb_45</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">res_rw</span><span class="op">$</span><span class="va">aic</span>, <span class="va">res_estb_full</span><span class="op">$</span><span class="va">aic</span>, <span class="va">res_estb_45</span><span class="op">$</span><span class="va">aic</span><span class="op">)</span></span>

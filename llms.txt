@@ -92,6 +92,8 @@ Fisheries Research Agency (FRA) develops a State-space Assessment Model
   : Popsimの結果ををプロットする関数
 - [`plot_samvpa()`](https://shotanishijima.github.io/frasam/reference/plot_samvpa.md)
   : Plot SAM or VPA results
+- [`plot_update2sam()`](https://shotanishijima.github.io/frasam/reference/plot_update2sam.md)
+  : Update a future projection plot legend for SAM
 - [`popsim_vpasam()`](https://shotanishijima.github.io/frasam/reference/popsim_vpasam.md)
   : Popsimと同じ手法でSAMとVPAの疑似データを生成する
 - [`retro_plot()`](https://shotanishijima.github.io/frasam/reference/retro_plot.md)
@@ -129,4 +131,5 @@ Fisheries Research Agency (FRA) develops a State-space Assessment Model
 
 - [FAQ on how to use
   'frasam'](https://shotanishijima.github.io/frasam/articles/FAQ.md):
+- [SAMの結果から将来予測とMSY管理基準値計算をする方法](https://shotanishijima.github.io/frasam/articles/future_sam.md):
 - [SAMを使った資源量推定](https://shotanishijima.github.io/frasam/articles/sam.md):
