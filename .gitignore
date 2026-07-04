@@ -21,6 +21,7 @@ tools/Data/*
 docs
 .positai
 
+tools/TMI/*
 FEpar.csv
 
 tools/**/*.RDS
