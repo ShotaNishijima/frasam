@@ -753,17 +753,17 @@ Number at ageの過程誤差は、以下のようにプロットできる。こ�
 
   colnames(logNresid) <- colnames(samres$naa)
 
-  logNresid_long = logNresid %>% as.data.frame() %>% mutate(age = 1:n()-1) %>%
-    mutate(Age = ifelse(age == max(age),str_c("Age ",age,"+"),str_c("Age ", age))) %>%
-    dplyr::select(-age) %>%
-    pivot_longer(cols=-Age,names_to="Year",values_to="Residual") %>%
-    mutate(Var = "logN") %>%
+  logNresid_long = logNresid |> as.data.frame() |> mutate(age = 1:n()-1) |>
+    mutate(Age = ifelse(age == max(age),str_c("Age ",age,"+"),str_c("Age ", age))) |>
+    dplyr::select(-age) |>
+    pivot_longer(cols=-Age,names_to="Year",values_to="Residual") |>
+    mutate(Var = "logN") |>
     dplyr::filter(Year>min(Year)) #最初の年は0なので除く
 
 resid_long <- logNresid_long |> 
   mutate(Year = as.numeric(Year))
 
-(g_proc_resid = resid_long %>%
+(g_proc_resid = resid_long |>
       ggplot(aes(x=Year,y=Age,col=Residual,size=abs(Residual)))+
       # geom_hline(yintercept=0) +
       geom_point()+
@@ -775,17 +775,17 @@ resid_long <- logNresid_long |>
 # Biomassレベルでの影響
 logBresid = samres$baa*(exp(logNresid)-1)
   
-  Bresid_long = logBresid %>% as.data.frame() %>% mutate(age = 1:n()-1) %>%
-    dplyr::filter(age > 0) %>%  #age 0 を入れたければ不要
-    mutate(Age = ifelse(age == max(age),str_c("Age ",age,"+"),str_c("Age ", age))) %>%
-    dplyr::select(-age) %>%
-    pivot_longer(cols=-Age,names_to="Year",values_to="Residual") %>%
-    mutate(Var = "B_by_age") %>%
-    dplyr::filter(Year>min(Year)) %>% #最初の年は0なので除く
-    mutate(Value = Residual/1000) %>%
+  Bresid_long = logBresid |> as.data.frame() |> mutate(age = 1:n()-1) |>
+    dplyr::filter(age > 0) |>  #age 0 を入れたければ不要
+    mutate(Age = ifelse(age == max(age),str_c("Age ",age,"+"),str_c("Age ", age))) |>
+    dplyr::select(-age) |>
+    pivot_longer(cols=-Age,names_to="Year",values_to="Residual") |>
+    mutate(Var = "B_by_age") |>
+    dplyr::filter(Year>min(Year)) |> #最初の年は0なので除く
+    mutate(Value = Residual/1000) |>
     mutate(Age = forcats::fct_rev(Age))
 
-  (g_proc_resid2 = Bresid_long %>%
+  (g_proc_resid2 = Bresid_long |>
       ggplot(aes(x=as.numeric(Year),y=Value,fill=Age)) +
       geom_bar(stat="identity") +
       ylab("Effect of process error on biomass")+
@@ -799,17 +799,17 @@ logBresid = samres$baa*(exp(logNresid)-1)
 固定効果の相関は以下のようなコードでプロットできます。
 
 ```{r plot-FEcorrelation, echo = TRUE}
-cor_mat = samres$rep$cov.fixed %>% cov2cor()
+cor_mat = samres$rep$cov.fixed |> cov2cor()
 
-tmp = data.frame(varname = colnames(cor_mat)) %>%
-    group_by(varname) %>%
-    mutate(id = 1:n(), n = n()) %>%
+tmp = data.frame(varname = colnames(cor_mat)) |>
+    group_by(varname) |>
+    mutate(id = 1:n(), n = n()) |>
     mutate(varname2= ifelse(n==1, varname, str_c(varname,id)))
 
 varname = tmp$varname2
 colnames(cor_mat) <- rownames(cor_mat) <- varname
 
-  (g_cor = cor_mat %>% ggcorrplot::ggcorrplot(.,lab=TRUE,type="upper",lab_size=1.5,digits=2,colors=c("lightblue","white","darkorange")) +
+  (g_cor = cor_mat |> ggcorrplot::ggcorrplot(.,lab=TRUE,type="upper",lab_size=1.5,digits=2,colors=c("lightblue","white","darkorange")) +
       theme_bw(base_size=9) +
       theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1),
             legend.justification=c(0.99,0.01),
