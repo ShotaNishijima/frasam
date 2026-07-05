@@ -479,6 +479,8 @@ Type objective_function<Type>::operator() ()
   Type predObs=0, zz, var;
   vector<Type> pred_log(nobs); //
   vector<Type> ans_obs(nobs);
+  ans_obs.setZero();
+  Type predcaa=0;
 
   if (minAge != 0) {
     error("minAge must be 0. Age inputs are assumed to be indexed from age 0.");
@@ -491,6 +493,11 @@ Type objective_function<Type>::operator() ()
     // minAge = 0 が必ず入るようにする
     a=CppAD::Integer(obs(i,2))-minAge;  // age
     amax=CppAD::Integer(obs(i,4))-minAge; //maxage
+
+    if(a < 0 || amax < a || amax >= stateDimN) {
+      error("Invalid age range in obs.");
+    }
+
     if(a<(stateDimN-1)){
       zz=exp(logF((keyLogFsta(0,a)),y))+natMor(y,a);  // total mortality
     }else{
@@ -498,14 +505,26 @@ Type objective_function<Type>::operator() ()
     }
 
     if(ft==0){// residual fleet
-      predObs=logN(a,y)-log(zz)+log(1-exp(-zz));
-      if((keyLogFsta(f-1,a))>(-1)){
-        if(a<(stateDimN-1)){
-          predObs+=logF((keyLogFsta(0,a)),y);  // 漁獲方程式
+      // caaもage aggregateに対応（2026/07/05）
+      predObs=0.0;
+      for(int j=a; j<amax+1; ++j){
+        if(j<(stateDimN-1)){
+          zz=exp(logF((keyLogFsta(0,j)),y))+natMor(y,j);  // total mortality
         }else{
-          predObs+=log(alpha)+logF((keyLogFsta(0,a)),y);  // 漁獲方程式
+          zz=alpha*exp(logF((keyLogFsta(0,j)),y))+natMor(y,j);  // total mortality
         }
+        predcaa=logN(j,y)-log(zz)+log(1-exp(-zz));
+        if((keyLogFsta(f-1,j))>(-1)){
+          if(j<(stateDimN-1)){
+            predcaa+=logF((keyLogFsta(0,j)),y);  // 漁獲方程式
+          }else{
+            predcaa+=log(alpha)+logF((keyLogFsta(0,j)),y);  // 漁獲方程式
+          }
+        }
+        predcaa=exp(predcaa); //log(caa) -> caaに変換
+        predObs+=predcaa; //caa scale
       }
+      predObs=log(predObs); //caa scaleで足した後にlog scaleに戻す
     }else{
       if(ft==1){//Not used (same as ft==4)
          predObs=logN(a,y)-zz*sampleTimes(f-1);

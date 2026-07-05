@@ -276,3 +276,14 @@ do_allboot <- function(res_sam_list, nsim=100, year_biol=2020:2022){
   }
   list(pm=res_pm, SR=res_SR_boot, SR_fit=res_SR_fit, sam=res_sam_boot)
 }
+
+#'
+#' @export
+fill_last_na <- function(x) {
+  stopifnot(any(is.matrix(x)||is.data.frame(x)), ncol(x) >= 2)
+
+  is_na <- is.na(x[nrow(x), ])
+  x[nrow(x), is_na] <- x[nrow(x)-1, is_na]
+
+  x
+}

@@ -44,6 +44,7 @@
 #' @param get.random.vcov ランダム効果の分散共分散行列を推定する（TRUE、時間かかります）、推定しない（FALSE：デフォルト）
 #' @param silent MakeADfunのときの標準出力あり（TRUE: デフォルト）、なし（FALSE）
 #' @param model_wm weightとmaturityの成長をモデリングするかどうか
+#' @param change_plusgroup プラスグループが途中で変わるか
 #' @importFrom glmmTMB glmmTMB
 #' @param last.catch.zero 最終年の漁獲量がない場合。デフォルトはFALSE（最終年の漁獲量が利用できて用いる）
 #' @param cpp.file.name 推定に用いるcppファイル。デフォルトは最新版の"sam2"
@@ -144,7 +145,8 @@ sam <- function(dat,
                 getJointPrecision = FALSE,
                 loopnum = 2,
                 obj_overwrite=NULL,
-                ignore.parm.uncertainty = FALSE
+                ignore.parm.uncertainty = FALSE,
+                change_plusgroup = FALSE
 ){
 
   argname <- ls()
@@ -294,12 +296,7 @@ sam <- function(dat,
 
     data$noYears <- ncol(waa)
     data$years <- as.numeric(colnames(waa))
-    # if (retro.years>0) {
-    #   for(i in 1:retro.years) data$years <- c(data$years,max(data$years)+1)
-    # }
     data$iy <- data$obs[,1]-min(data$years) #year since the first year
-    data$nobs <- nrow(data$obs)
-    # colnames(maa) <- colnames(waa) <- colnames(M) <- range(data$obs[,1])[1]:((range(data$obs[,1])[2])+retro.years)
     data$propMat <- data$propMat2 <- as.matrix(t(maa))
     data$stockMeanWeight <- data$catchMeanWeight <- as.matrix(t(waa))
     data$natMor <- as.matrix(t(M))
@@ -465,7 +462,7 @@ sam <- function(dat,
       data$catch_prop4index <- catch_prop
     }
     assertthat::assert_that(all(dim(data$catch_prop4index) == c(dim(dat$waa),max(data$obs[,2]))))
-    data$logobs = log(obs[,4])
+    # data$logobs = log(obs[,4])
   } else {
     message("'dat' and related arguments are ignored when using 'tmbdata'")
     data = tmbdata
@@ -473,6 +470,12 @@ sam <- function(dat,
     nindex = max(data$obs[,"fleet"]-1)
     SR.mode = as.numeric(data$stockRecruitmentModelCode)
   }
+
+  if (isTRUE(change_plusgroup)) data$obs <- fix_maxage_and_remove_na(data$obs)
+
+  # 上でNA対応した後に移動
+  data$logobs = log(data$obs[,4]) #dataの方を使った方が良いかなと（NA対応しているので）
+  data$nobs <- nrow(data$obs) #nobsもここで定義する
 
   if(isTRUE(model_wm[1]) && is.null(p0.list)) {
     waa_dat = expand.grid(Age=as.numeric(rownames(dat$waa)),
@@ -1060,3 +1063,59 @@ sam <- function(dat,
   return(brp1)
 }
 
+
+
+fix_maxage_and_remove_na <- function(obs, fleet_id = 1, verbose = TRUE) {
+  obs <- as.data.frame(obs)
+
+  # 対象となる NA 行
+  idx_na <- which(obs$fleet == fleet_id & is.na(obs$obs) & obs$age==max(obs$age)) #最高齢の場合に限定
+
+  # 対象がなければ、そのまま返す
+  if (length(idx_na) == 0) {
+    return(obs)
+  }
+
+  if (verbose) {
+    message(
+      "fleet == ", fleet_id,
+      " に obs = NA の行が見つかりました。NA の age は観測されていない最高齢とみなし、",
+      "1歳若い age をプラスグループとして扱います。すなわち、同じ year の age - 1 の maxage を 1 増やし、",
+      "obs = NA の行を削除します。"
+    )
+  }
+
+  for (i in idx_na) {
+    yy <- obs$year[i]
+    aa <- obs$age[i]
+
+    # 同じ year, fleet, age - 1 の行
+    idx_prev <- which(
+      obs$year == yy &
+        obs$fleet == fleet_id &
+        obs$age == aa - 1
+    )
+
+    if (length(idx_prev) == 1) {
+      obs$maxage[idx_prev] <- obs$maxage[idx_prev] + 1
+    } else if (length(idx_prev) == 0) {
+      warning(
+        "No matching previous age found for year = ", yy,
+        ", fleet = ", fleet_id,
+        ", age = ", aa
+      )
+    } else {
+      warning(
+        "Multiple matching previous ages found for year = ", yy,
+        ", fleet = ", fleet_id,
+        ", age = ", aa
+      )
+    }
+  }
+
+  # 対象の NA 行を削除
+  obs <- obs[-idx_na, ]
+
+  rownames(obs) <- NULL
+  as.matrix(obs)
+}
