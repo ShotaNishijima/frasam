@@ -46,6 +46,7 @@ vignette: >
   library(forcats)
   library(magrittr)
   library(ggplot2)
+  library(ggcorrplot)
 ```
 
 ## インストールと依存パッケージ
