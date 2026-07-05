@@ -49,9 +49,9 @@ pkgdown::build_site(new_process = FALSE, install = FALSE)
 
 # パッケージの vignette として確認するなら:
 
-devtools::build_vignettes()
+# devtools::build_vignettes()
 
-devtools::build(args = "--resave-data")
+# devtools::build(args = "--resave-data")
 
 ## html_documentスタイルでpreviewフォルダにアップロード ----
 

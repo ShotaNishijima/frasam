@@ -3,12 +3,12 @@ title: "FAQ on how to use 'frasam'"
 author: "Shota Nishijima (FRA)"
 date: "`r format(Sys.Date())`"
 output:
-  rmarkdown::md_document:
-    variant: markdown_github
-    toc: true
-    toc_depth: 3
   rmarkdown::html_vignette:
     css: style.css
+    toc: true
+    toc_depth: 3
+  rmarkdown::md_document:
+    variant: markdown_github
     toc: true
     toc_depth: 3
 vignette: >
@@ -40,6 +40,11 @@ vignette: >
   } else {
     library(frasam)
   }
+  library(dplyr)
+  library(tidyr)
+  library(stringr)
+  library(forcats)
+  library(magrittr)
 ```
 
 ## インストールと依存パッケージ
@@ -54,6 +59,7 @@ remotes::install_github("ShotaNishijima/frasam@create_vignette")
 # remotes::install_github("ShotaNishijima/frasyr@dev")
 
 library(frasam)
+library(tidyverse)
 ```
 
 ### `frasyr` がないと言われます
@@ -62,6 +68,7 @@ library(frasam)
 
 ```{r install-frasyr, eval = FALSE}
 remotes::install_github("ichimomo/frasyr@dev")
+library(frasyr)
 ```
 
 
@@ -799,7 +806,7 @@ logBresid = samres$baa*(exp(logNresid)-1)
 固定効果の相関は以下のようなコードでプロットできます。
 
 ```{r plot-FEcorrelation, echo = TRUE}
-cor_mat = samres$rep$cov.fixed |> cov2cor()
+cor_mat = cov2cor(samres$rep$cov.fixed)
 
 tmp = data.frame(varname = colnames(cor_mat)) |>
     group_by(varname) |>
@@ -809,7 +816,7 @@ tmp = data.frame(varname = colnames(cor_mat)) |>
 varname = tmp$varname2
 colnames(cor_mat) <- rownames(cor_mat) <- varname
 
-  (g_cor = cor_mat |> ggcorrplot::ggcorrplot(.,lab=TRUE,type="upper",lab_size=1.5,digits=2,colors=c("lightblue","white","darkorange")) +
+  (g_cor = ggcorrplot::ggcorrplot(cor_mat ,lab=TRUE,type="upper",lab_size=1.5,digits=2,colors=c("lightblue","white","darkorange")) +
       theme_bw(base_size=9) +
       theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1),
             legend.justification=c(0.99,0.01),
