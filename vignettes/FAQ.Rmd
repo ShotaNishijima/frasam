@@ -45,7 +45,7 @@ vignette: >
   library(stringr)
   library(forcats)
   library(magrittr)
-  library(ggplots)
+  library(ggplot2)
 ```
 
 ## インストールと依存パッケージ
