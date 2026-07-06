@@ -48,6 +48,10 @@ Fisheries Research Agency (FRA) develops a State-space Assessment Model
   : Check convergence diagnostics for a SAM fit
 - [`convert_sam_tibble()`](https://shotanishijima.github.io/frasam/reference/convert_sam_tibble.md)
   : SAMの結果オブジェクトをtibble形式に変換する関数
+- [`decompose_biomass_effects()`](https://shotanishijima.github.io/frasam/reference/decompose_biomass_effects.md)
+  : Decompose biomass or spawning-stock-biomass changes by age
+- [`decompose_biomass_factors()`](https://shotanishijima.github.io/frasam/reference/decompose_biomass_factors.md)
+  : Decompose biomass changes from a VPA or SAM result
 - [`divide_sigma()`](https://shotanishijima.github.io/frasam/reference/divide_sigma.md)
   : 観測誤差とプロセス誤差をどこかの年齢間で分けて推定し直す関数
 - [`do_jitter()`](https://shotanishijima.github.io/frasam/reference/do_jitter.md)
@@ -81,6 +85,8 @@ Fisheries Research Agency (FRA) develops a State-space Assessment Model
   : output sam object results
 - [`plot_SR_simple()`](https://shotanishijima.github.io/frasam/reference/plot_SR_simple.md)
   : 再生産関係についてプロットする関数
+- [`plot_biomass_factors()`](https://shotanishijima.github.io/frasam/reference/plot_biomass_factors.md)
+  : Plot age-aggregated biomass factors
 - [`plot_boosam()`](https://shotanishijima.github.io/frasam/reference/plot_boosam.md)
   : ブートストラップについてプロットする関数
 - [`plot_hindcastCV()`](https://shotanishijima.github.io/frasam/reference/plot_hindcastCV.md)

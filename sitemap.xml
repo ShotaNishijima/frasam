@@ -22,10 +22,18 @@
 <url><loc>https://shotanishijima.github.io/frasam/reference/calc_metrics.html</loc></url>
 <url><loc>https://shotanishijima.github.io/frasam/reference/check_fit_sam.html</loc></url>
 <url><loc>https://shotanishijima.github.io/frasam/reference/convert_sam_tibble.html</loc></url>
+<url><loc>https://shotanishijima.github.io/frasam/reference/decompose_biomass_effects.html</loc></url>
+<url><loc>https://shotanishijima.github.io/frasam/reference/decompose_biomass_factors.html</loc></url>
 <url><loc>https://shotanishijima.github.io/frasam/reference/divide_sigma.html</loc></url>
 <url><loc>https://shotanishijima.github.io/frasam/reference/do_jitter.html</loc></url>
 <url><loc>https://shotanishijima.github.io/frasam/reference/do_loo_index.html</loc></url>
 <url><loc>https://shotanishijima.github.io/frasam/reference/do_osa_resid.html</loc></url>
+<url><loc>https://shotanishijima.github.io/frasam/reference/dot-add_decomposition_summaries.html</loc></url>
+<url><loc>https://shotanishijima.github.io/frasam/reference/dot-as_age_year_matrix.html</loc></url>
+<url><loc>https://shotanishijima.github.io/frasam/reference/dot-as_numeric_matrix.html</loc></url>
+<url><loc>https://shotanishijima.github.io/frasam/reference/dot-permutations.html</loc></url>
+<url><loc>https://shotanishijima.github.io/frasam/reference/dot-safe_ratio.html</loc></url>
+<url><loc>https://shotanishijima.github.io/frasam/reference/dot-shapley_transition.html</loc></url>
 <url><loc>https://shotanishijima.github.io/frasam/reference/est_fixed.html</loc></url>
 <url><loc>https://shotanishijima.github.io/frasam/reference/est_mixed.html</loc></url>
 <url><loc>https://shotanishijima.github.io/frasam/reference/fit2PSdata.html</loc></url>
@@ -39,6 +47,7 @@
 <url><loc>https://shotanishijima.github.io/frasam/reference/out_par.html</loc></url>
 <url><loc>https://shotanishijima.github.io/frasam/reference/out_sam.html</loc></url>
 <url><loc>https://shotanishijima.github.io/frasam/reference/plot_SR_simple.html</loc></url>
+<url><loc>https://shotanishijima.github.io/frasam/reference/plot_biomass_factors.html</loc></url>
 <url><loc>https://shotanishijima.github.io/frasam/reference/plot_boosam.html</loc></url>
 <url><loc>https://shotanishijima.github.io/frasam/reference/plot_hindcastCV.html</loc></url>
 <url><loc>https://shotanishijima.github.io/frasam/reference/plot_osa_resid.html</loc></url>

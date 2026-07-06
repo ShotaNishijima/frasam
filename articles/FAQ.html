@@ -56,7 +56,7 @@
                         <h4 data-toc-skip class="author">Shota Nishijima
 (FRA)</h4>
             
-            <h4 data-toc-skip class="date">2026-07-04</h4>
+            <h4 data-toc-skip class="date">2026-07-06</h4>
       
 
       <div class="d-none name"><code>FAQ.Rmd</code></div>
@@ -86,7 +86,8 @@
 <span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"ShotaNishijima/frasam@create_vignette"</span><span class="op">)</span></span>
 <span><span class="co"># remotes::install_github("ShotaNishijima/frasyr@dev")</span></span>
 <span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">frasam</span><span class="op">)</span></span></code></pre></div>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">frasam</span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org" class="external-link">tidyverse</a></span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="frasyr-がないと言われます">
@@ -96,7 +97,8 @@
 に依存しています。未インストールの場合は、開発版の <code>frasyr</code>
 を入れてから再実行してください。</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"ichimomo/frasyr@dev"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"ichimomo/frasyr@dev"</span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">frasyr</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level3">
@@ -120,7 +122,7 @@
 <h4 id="一部の引数のみを変更して解析したい">一部の引数のみを変更して解析したい<a class="anchor" aria-label="anchor" href="#%E4%B8%80%E9%83%A8%E3%81%AE%E5%BC%95%E6%95%B0%E3%81%AE%E3%81%BF%E3%82%92%E5%A4%89%E6%9B%B4%E3%81%97%E3%81%A6%E8%A7%A3%E6%9E%90%E3%81%97%E3%81%9F%E3%81%84"></a>
 </h4>
 <ul>
-<li>SAMの結果オブジェクトに格納されている<code>input</code>を使って、前までの設定を引き継いだ解析ができます</li>
+<li>SAMの結果オブジェクトに格納されている<code>input</code>と<code>do.call</code>（または<code><a href="https://rdrr.io/pkg/frasyr/man/safe_call.html" class="external-link">frasyr::safe_call</a></code>を使って、前までの設定を引き継いだ解析ができます</li>
 <li>ここでは再生産関係を変更した場合を例に説明します。</li>
 </ul>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
@@ -950,6 +952,848 @@ modelのほうがFや選択率がギザギザしており、SAMは平滑化さ�
 <span>      <span class="op">)</span><span class="op">)</span></span>
 <span>    <span class="op">)</span></span></code></pre></div>
 <p><img src="FAQ_files/figure-html/plot-samvpa-facet-label-1.png" class="r-plt" alt="" width="100%"></p>
+</div>
+<div class="section level4">
+<h4 id="資源量や親魚量の変動要因を明らかにしたい">資源量や親魚量の変動要因を明らかにしたい<a class="anchor" aria-label="anchor" href="#%E8%B3%87%E6%BA%90%E9%87%8F%E3%82%84%E8%A6%AA%E9%AD%9A%E9%87%8F%E3%81%AE%E5%A4%89%E5%8B%95%E8%A6%81%E5%9B%A0%E3%82%92%E6%98%8E%E3%82%89%E3%81%8B%E3%81%AB%E3%81%97%E3%81%9F%E3%81%84"></a>
+</h4>
+<p><code>decompose_biomass_factors</code>という関数を使って、ある年から翌年の資源量および親魚量の変化量（絶対値
+or パーセント）を、(1)新規個体の加入 (recruitment)、(2)漁獲による死亡
+(fishing)、(3)自然死亡 (natural)、(4)前年にいた個体の成長
+(growth)、(5)過程誤差 (process)、(6)前年にいた個体の成熟 (maturity,
+SSBのみ)に分解できます。これによって、どの要因が個体群動態を駆動しているかを、定量化・定量化できます。</p>
+<p>プロットには、<code>plot_biomass_factors</code>を用います。</p>
+<ul>
+<li>Shapley分解という手法で、年齢ごとに各要因の周辺効果を求めています。そのため、各要因・各年齢ごとに要因分解することも可能です。</li>
+<li>VPAでも動くようになっているので、両方で比較するのもありかも。</li>
+<li>前の年と評価が大きく変わった際の要因分析にも使えるかなと思います。</li>
+</ul>
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span><span class="co"># process errorが推定されるようなデータを作る（実際はこの手順は不要です）</span></span>
+<span><span class="va">input</span> <span class="op">&lt;-</span> <span class="va">res_rw</span><span class="op">$</span><span class="va">input</span></span>
+<span></span>
+<span><span class="va">caa2</span> <span class="op">&lt;-</span> <span class="va">input</span><span class="op">$</span><span class="va">dat</span><span class="op">$</span><span class="va">caa</span></span>
+<span><span class="va">caa2</span><span class="op">[</span>,<span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="fl">1985</span><span class="op">:</span><span class="fl">1994</span><span class="op">)</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">input</span><span class="op">$</span><span class="va">dat</span><span class="op">$</span><span class="va">caa</span><span class="op">[</span>,<span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="fl">1985</span><span class="op">:</span><span class="fl">1994</span><span class="op">)</span><span class="op">]</span><span class="op">^</span><span class="fl">1.5</span></span>
+<span></span>
+<span><span class="va">caa2</span><span class="op">[</span>,<span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="fl">2000</span><span class="op">:</span><span class="fl">2014</span><span class="op">)</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">input</span><span class="op">$</span><span class="va">dat</span><span class="op">$</span><span class="va">caa</span><span class="op">[</span>,<span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="fl">2000</span><span class="op">:</span><span class="fl">2014</span><span class="op">)</span><span class="op">]</span><span class="op">^</span><span class="fl">0.75</span></span>
+<span></span>
+<span><span class="va">input</span><span class="op">$</span><span class="va">dat</span><span class="op">$</span><span class="va">caa</span> <span class="op">&lt;-</span> <span class="va">caa2</span></span>
+<span><span class="co"># input$dat$M[] &lt;- 0.6</span></span>
+<span><span class="va">input</span><span class="op">$</span><span class="va">p0.list</span> <span class="op">&lt;-</span> <span class="cn">NULL</span></span>
+<span><span class="co"># res_rw$sigma.logN</span></span>
+<span></span>
+<span><span class="va">res_proc</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">sam</span>, <span class="va">input</span><span class="op">)</span></span>
+<span><span class="va">res_proc</span><span class="op">$</span><span class="va">sigma.logN</span></span>
+<span><span class="co">#&gt; [1] 0.5975384 0.1640797 0.1640797 0.1640797 0.1640797 0.1640797 0.1640797</span></span>
+<span></span>
+<span><span class="va">factor_b</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/decompose_biomass_factors.html">decompose_biomass_factors</a></span><span class="op">(</span></span>
+<span>    <span class="va">res_proc</span>,</span>
+<span>    target <span class="op">=</span> <span class="st">"biomass"</span></span>
+<span>  <span class="op">)</span></span>
+<span></span>
+<span><span class="co"># biomassの絶対量</span></span>
+<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">factor_b</span><span class="op">$</span><span class="va">age_aggregated</span><span class="op">)</span></span></code></pre></div>
+<table style="width:100%;" class="table">
+<colgroup>
+<col width="2%">
+<col width="1%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="1%">
+<col width="1%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="3%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+</colgroup>
+<thead><tr class="header">
+<th align="left"></th>
+<th align="right">1975</th>
+<th align="right">1976</th>
+<th align="right">1977</th>
+<th align="right">1978</th>
+<th align="right">1979</th>
+<th align="right">1980</th>
+<th align="right">1981</th>
+<th align="right">1982</th>
+<th align="right">1983</th>
+<th align="right">1984</th>
+<th align="right">1985</th>
+<th align="right">1986</th>
+<th align="right">1987</th>
+<th align="right">1988</th>
+<th align="right">1989</th>
+<th align="right">1990</th>
+<th align="right">1991</th>
+<th align="right">1992</th>
+<th align="right">1993</th>
+<th align="right">1994</th>
+<th align="right">1995</th>
+<th align="right">1996</th>
+<th align="right">1997</th>
+<th align="right">1998</th>
+<th align="right">1999</th>
+<th align="right">2000</th>
+<th align="right">2001</th>
+<th align="right">2002</th>
+<th align="right">2003</th>
+<th align="right">2004</th>
+<th align="right">2005</th>
+<th align="right">2006</th>
+<th align="right">2007</th>
+<th align="right">2008</th>
+<th align="right">2009</th>
+<th align="right">2010</th>
+<th align="right">2011</th>
+<th align="right">2012</th>
+<th align="right">2013</th>
+<th align="right">2014</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">recruitment</td>
+<td align="right">1899019</td>
+<td align="right">2746780.4</td>
+<td align="right">2319582.4</td>
+<td align="right">1218777.9</td>
+<td align="right">974175.4</td>
+<td align="right">1300263.6</td>
+<td align="right">1766566.8</td>
+<td align="right">2380311.1</td>
+<td align="right">2563593.434</td>
+<td align="right">3946424.2</td>
+<td align="right">6591958.5</td>
+<td align="right">3144129</td>
+<td align="right">1720912</td>
+<td align="right">524070.9</td>
+<td align="right">229790.377</td>
+<td align="right">209013.08</td>
+<td align="right">374794.116</td>
+<td align="right">568537.1</td>
+<td align="right">265439.99</td>
+<td align="right">138938.39</td>
+<td align="right">199712.24</td>
+<td align="right">292528.020</td>
+<td align="right">205740.29790</td>
+<td align="right">99983.29</td>
+<td align="right">111997.46</td>
+<td align="right">101084.82</td>
+<td align="right">135625.35</td>
+<td align="right">154296.473</td>
+<td align="right">176933.23</td>
+<td align="right">396695.613</td>
+<td align="right">286203.65</td>
+<td align="right">193079.114</td>
+<td align="right">312309.66</td>
+<td align="right">345684.149</td>
+<td align="right">534585.20</td>
+<td align="right">454419.70</td>
+<td align="right">492904.26</td>
+<td align="right">994496.32</td>
+<td align="right">2377627.043</td>
+<td align="right">5744316.9</td>
+</tr>
+<tr class="even">
+<td align="left">growth</td>
+<td align="right">0</td>
+<td align="right">2312905.4</td>
+<td align="right">2865695.4</td>
+<td align="right">2794485.5</td>
+<td align="right">1769580.4</td>
+<td align="right">1236487.0</td>
+<td align="right">1382513.0</td>
+<td align="right">1857532.9</td>
+<td align="right">2555485.321</td>
+<td align="right">3037354.9</td>
+<td align="right">4388192.3</td>
+<td align="right">6694213</td>
+<td align="right">4273701</td>
+<td align="right">2245679.3</td>
+<td align="right">693893.336</td>
+<td align="right">221811.63</td>
+<td align="right">204113.782</td>
+<td align="right">358990.1</td>
+<td align="right">573122.14</td>
+<td align="right">397857.72</td>
+<td align="right">167574.36</td>
+<td align="right">164068.619</td>
+<td align="right">261995.52851</td>
+<td align="right">243686.89</td>
+<td align="right">161689.25</td>
+<td align="right">140263.24</td>
+<td align="right">128624.34</td>
+<td align="right">156197.775</td>
+<td align="right">183240.44</td>
+<td align="right">212915.867</td>
+<td align="right">402082.97</td>
+<td align="right">396331.096</td>
+<td align="right">315131.98</td>
+<td align="right">366283.156</td>
+<td align="right">407130.90</td>
+<td align="right">584189.25</td>
+<td align="right">595144.11</td>
+<td align="right">621900.63</td>
+<td align="right">1014430.168</td>
+<td align="right">2310369.5</td>
+</tr>
+<tr class="odd">
+<td align="left">fishing</td>
+<td align="right">0</td>
+<td align="right">-729670.6</td>
+<td align="right">-1069622.0</td>
+<td align="right">-850315.5</td>
+<td align="right">-2196682.1</td>
+<td align="right">-778364.9</td>
+<td align="right">-554552.3</td>
+<td align="right">-426636.3</td>
+<td align="right">-493359.793</td>
+<td align="right">-385085.0</td>
+<td align="right">-363057.8</td>
+<td align="right">-3971854</td>
+<td align="right">-6751163</td>
+<td align="right">-3867284.9</td>
+<td align="right">-3074848.507</td>
+<td align="right">-363959.63</td>
+<td align="right">-138750.176</td>
+<td align="right">-95910.7</td>
+<td align="right">-191356.03</td>
+<td align="right">-395304.59</td>
+<td align="right">-586780.22</td>
+<td align="right">-84041.135</td>
+<td align="right">-123693.06567</td>
+<td align="right">-90354.19</td>
+<td align="right">-52479.41</td>
+<td align="right">-32235.51</td>
+<td align="right">-12470.20</td>
+<td align="right">-11537.329</td>
+<td align="right">-11350.80</td>
+<td align="right">-12832.191</td>
+<td align="right">-17670.35</td>
+<td align="right">-23296.504</td>
+<td align="right">-25556.76</td>
+<td align="right">-30845.711</td>
+<td align="right">-32446.58</td>
+<td align="right">-22354.54</td>
+<td align="right">-37638.40</td>
+<td align="right">-32050.03</td>
+<td align="right">-49341.907</td>
+<td align="right">-64073.3</td>
+</tr>
+<tr class="even">
+<td align="left">process</td>
+<td align="right">0</td>
+<td align="right">-233691.8</td>
+<td align="right">-191289.3</td>
+<td align="right">-218531.4</td>
+<td align="right">-196027.9</td>
+<td align="right">-158757.3</td>
+<td align="right">-131201.5</td>
+<td align="right">-116311.1</td>
+<td align="right">7237.033</td>
+<td align="right">163078.1</td>
+<td align="right">583321.3</td>
+<td align="right">1217119</td>
+<td align="right">1000081</td>
+<td align="right">519831.3</td>
+<td align="right">5053.001</td>
+<td align="right">-10011.75</td>
+<td align="right">1724.913</td>
+<td align="right">34971.1</td>
+<td align="right">84441.86</td>
+<td align="right">75483.31</td>
+<td align="right">-16910.41</td>
+<td align="right">-4386.091</td>
+<td align="right">-67.71783</td>
+<td align="right">-8384.98</td>
+<td align="right">-26009.42</td>
+<td align="right">-21719.90</td>
+<td align="right">-14892.05</td>
+<td align="right">-4667.845</td>
+<td align="right">-1527.12</td>
+<td align="right">-2235.776</td>
+<td align="right">21256.40</td>
+<td align="right">1991.771</td>
+<td align="right">-23484.44</td>
+<td align="right">3406.324</td>
+<td align="right">-34782.40</td>
+<td align="right">10996.26</td>
+<td align="right">14851.04</td>
+<td align="right">-27954.94</td>
+<td align="right">3192.676</td>
+<td align="right">137423.3</td>
+</tr>
+<tr class="odd">
+<td align="left">natural</td>
+<td align="right">0</td>
+<td align="right">-3257001.4</td>
+<td align="right">-3719538.9</td>
+<td align="right">-3843868.6</td>
+<td align="right">-2771281.4</td>
+<td align="right">-1924596.0</td>
+<td align="right">-1887351.2</td>
+<td align="right">-2326650.6</td>
+<td align="right">-3163725.142</td>
+<td align="right">-4040065.9</td>
+<td align="right">-5782200.9</td>
+<td align="right">-8104156</td>
+<td align="right">-6181397</td>
+<td align="right">-3522347.7</td>
+<td align="right">-1265381.530</td>
+<td align="right">-322648.74</td>
+<td align="right">-262040.469</td>
+<td align="right">-409006.3</td>
+<td align="right">-666362.09</td>
+<td align="right">-588924.28</td>
+<td align="right">-272912.48</td>
+<td align="right">-183300.858</td>
+<td align="right">-286412.08324</td>
+<td align="right">-312811.27</td>
+<td align="right">-263518.20</td>
+<td align="right">-232714.79</td>
+<td align="right">-216192.34</td>
+<td align="right">-236536.415</td>
+<td align="right">-271415.05</td>
+<td align="right">-313779.235</td>
+<td align="right">-499899.18</td>
+<td align="right">-578518.007</td>
+<td align="right">-543004.48</td>
+<td align="right">-579127.517</td>
+<td align="right">-628878.03</td>
+<td align="right">-805327.76</td>
+<td align="right">-906565.98</td>
+<td align="right">-976457.84</td>
+<td align="right">-1354852.066</td>
+<td align="right">-2659648.0</td>
+</tr>
+<tr class="even">
+<td align="left">maturity</td>
+<td align="right">0</td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">0.000</td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0.0</td>
+<td align="right">0.000</td>
+<td align="right">0.00</td>
+<td align="right">0.000</td>
+<td align="right">0.0</td>
+<td align="right">0.00</td>
+<td align="right">0.00</td>
+<td align="right">0.00</td>
+<td align="right">0.000</td>
+<td align="right">0.00000</td>
+<td align="right">0.00</td>
+<td align="right">0.00</td>
+<td align="right">0.00</td>
+<td align="right">0.00</td>
+<td align="right">0.000</td>
+<td align="right">0.00</td>
+<td align="right">0.000</td>
+<td align="right">0.00</td>
+<td align="right">0.000</td>
+<td align="right">0.00</td>
+<td align="right">0.000</td>
+<td align="right">0.00</td>
+<td align="right">0.00</td>
+<td align="right">0.00</td>
+<td align="right">0.00</td>
+<td align="right">0.000</td>
+<td align="right">0.0</td>
+</tr>
+</tbody>
+</table>
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># 前年のbiomass対する比率 (%)</span></span>
+<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">factor_b</span><span class="op">$</span><span class="va">percent_aggregated</span><span class="op">)</span></span></code></pre></div>
+<table class="table">
+<colgroup>
+<col width="2%">
+<col width="1%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+</colgroup>
+<thead><tr class="header">
+<th align="left"></th>
+<th align="right">1975</th>
+<th align="right">1976</th>
+<th align="right">1977</th>
+<th align="right">1978</th>
+<th align="right">1979</th>
+<th align="right">1980</th>
+<th align="right">1981</th>
+<th align="right">1982</th>
+<th align="right">1983</th>
+<th align="right">1984</th>
+<th align="right">1985</th>
+<th align="right">1986</th>
+<th align="right">1987</th>
+<th align="right">1988</th>
+<th align="right">1989</th>
+<th align="right">1990</th>
+<th align="right">1991</th>
+<th align="right">1992</th>
+<th align="right">1993</th>
+<th align="right">1994</th>
+<th align="right">1995</th>
+<th align="right">1996</th>
+<th align="right">1997</th>
+<th align="right">1998</th>
+<th align="right">1999</th>
+<th align="right">2000</th>
+<th align="right">2001</th>
+<th align="right">2002</th>
+<th align="right">2003</th>
+<th align="right">2004</th>
+<th align="right">2005</th>
+<th align="right">2006</th>
+<th align="right">2007</th>
+<th align="right">2008</th>
+<th align="right">2009</th>
+<th align="right">2010</th>
+<th align="right">2011</th>
+<th align="right">2012</th>
+<th align="right">2013</th>
+<th align="right">2014</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">recruitment</td>
+<td align="right">NA</td>
+<td align="right">43.508489</td>
+<td align="right">32.43025</td>
+<td align="right">16.565434</td>
+<td align="right">15.085012</td>
+<td align="right">32.203333</td>
+<td align="right">47.581725</td>
+<td align="right">55.502252</td>
+<td align="right">45.3178252</td>
+<td align="right">55.379460</td>
+<td align="right">66.937993</td>
+<td align="right">20.595532</td>
+<td align="right">12.08037</td>
+<td align="right">6.308289</td>
+<td align="right">5.4613110</td>
+<td align="right">26.254250</td>
+<td align="right">70.6737373</td>
+<td align="right">80.05782</td>
+<td align="right">22.731098</td>
+<td align="right">11.268089</td>
+<td align="right">23.19334</td>
+<td align="right">83.161405</td>
+<td align="right">38.3394702</td>
+<td align="right">16.826797</td>
+<td align="right">21.279727</td>
+<td align="right">22.071389</td>
+<td align="right">32.865474</td>
+<td align="right">35.604420</td>
+<td align="right">36.0267751</td>
+<td align="right">69.9643694</td>
+<td align="right">33.759949</td>
+<td align="right">18.5700420</td>
+<td align="right">30.341302</td>
+<td align="right">32.4672077</td>
+<td align="right">45.686426</td>
+<td align="right">32.0979680</td>
+<td align="right">30.0982619</td>
+<td align="right">55.362203</td>
+<td align="right">100.0567124</td>
+<td align="right">131.529101</td>
+</tr>
+<tr class="even">
+<td align="left">growth</td>
+<td align="right">NA</td>
+<td align="right">36.635990</td>
+<td align="right">40.06549</td>
+<td align="right">37.982201</td>
+<td align="right">27.401780</td>
+<td align="right">30.623793</td>
+<td align="right">37.237401</td>
+<td align="right">43.312515</td>
+<td align="right">45.1744944</td>
+<td align="right">42.622654</td>
+<td align="right">44.559865</td>
+<td align="right">43.850268</td>
+<td align="right">30.00032</td>
+<td align="right">27.031443</td>
+<td align="right">16.4914098</td>
+<td align="right">27.861884</td>
+<td align="right">38.4890883</td>
+<td align="right">50.55073</td>
+<td align="right">49.079625</td>
+<td align="right">32.266793</td>
+<td align="right">19.46105</td>
+<td align="right">46.642290</td>
+<td align="right">48.8225684</td>
+<td align="right">41.011550</td>
+<td align="right">30.721260</td>
+<td align="right">30.625811</td>
+<td align="right">31.168951</td>
+<td align="right">36.043151</td>
+<td align="right">37.3110372</td>
+<td align="right">37.5515229</td>
+<td align="right">47.428818</td>
+<td align="right">38.1184943</td>
+<td align="right">30.615495</td>
+<td align="right">34.4018994</td>
+<td align="right">34.793997</td>
+<td align="right">41.2642496</td>
+<td align="right">36.3413443</td>
+<td align="right">34.620328</td>
+<td align="right">42.6898524</td>
+<td align="right">52.901124</td>
+</tr>
+<tr class="odd">
+<td align="left">fishing</td>
+<td align="right">NA</td>
+<td align="right">-11.557846</td>
+<td align="right">-14.95446</td>
+<td align="right">-11.557352</td>
+<td align="right">-34.015408</td>
+<td align="right">-19.277588</td>
+<td align="right">-14.936632</td>
+<td align="right">-9.947975</td>
+<td align="right">-8.7213489</td>
+<td align="right">-5.403828</td>
+<td align="right">-3.686668</td>
+<td align="right">-26.017528</td>
+<td align="right">-47.39148</td>
+<td align="right">-46.550857</td>
+<td align="right">-73.0783597</td>
+<td align="right">-45.717175</td>
+<td align="right">-26.1636804</td>
+<td align="right">-13.50554</td>
+<td align="right">-16.386878</td>
+<td align="right">-32.059730</td>
+<td align="right">-68.14501</td>
+<td align="right">-23.891656</td>
+<td align="right">-23.0500619</td>
+<td align="right">-15.206257</td>
+<td align="right">-9.971186</td>
+<td align="right">-7.038469</td>
+<td align="right">-3.021847</td>
+<td align="right">-2.662277</td>
+<td align="right">-2.3112255</td>
+<td align="right">-2.2631864</td>
+<td align="right">-2.084355</td>
+<td align="right">-2.2406207</td>
+<td align="right">-2.482874</td>
+<td align="right">-2.8970785</td>
+<td align="right">-2.772932</td>
+<td align="right">-1.5790146</td>
+<td align="right">-2.2983175</td>
+<td align="right">-1.784180</td>
+<td align="right">-2.0764354</td>
+<td align="right">-1.467103</td>
+</tr>
+<tr class="even">
+<td align="left">process</td>
+<td align="right">NA</td>
+<td align="right">-3.701635</td>
+<td align="right">-2.67443</td>
+<td align="right">-2.970243</td>
+<td align="right">-3.035473</td>
+<td align="right">-3.931905</td>
+<td align="right">-3.533858</td>
+<td align="right">-2.712053</td>
+<td align="right">0.1279324</td>
+<td align="right">2.288446</td>
+<td align="right">5.923331</td>
+<td align="right">7.972706</td>
+<td align="right">7.02032</td>
+<td align="right">6.257256</td>
+<td align="right">0.1200921</td>
+<td align="right">-1.257582</td>
+<td align="right">0.3252614</td>
+<td align="right">4.92441</td>
+<td align="right">7.231225</td>
+<td align="right">6.121797</td>
+<td align="right">-1.96387</td>
+<td align="right">-1.246901</td>
+<td align="right">-0.0126191</td>
+<td align="right">-1.411159</td>
+<td align="right">-4.941839</td>
+<td align="right">-4.742436</td>
+<td align="right">-3.608723</td>
+<td align="right">-1.077121</td>
+<td align="right">-0.3109489</td>
+<td align="right">-0.3943191</td>
+<td align="right">2.507358</td>
+<td align="right">0.1915654</td>
+<td align="right">-2.281545</td>
+<td align="right">0.3199274</td>
+<td align="right">-2.972555</td>
+<td align="right">0.7767219</td>
+<td align="right">0.9068508</td>
+<td align="right">-1.556212</td>
+<td align="right">0.1343561</td>
+<td align="right">3.146616</td>
+</tr>
+<tr class="odd">
+<td align="left">natural</td>
+<td align="right">NA</td>
+<td align="right">-51.590294</td>
+<td align="right">-52.00314</td>
+<td align="right">-52.245249</td>
+<td align="right">-42.913021</td>
+<td align="right">-47.666032</td>
+<td align="right">-50.835004</td>
+<td align="right">-54.251039</td>
+<td align="right">-55.9266306</td>
+<td align="right">-56.693516</td>
+<td align="right">-58.715315</td>
+<td align="right">-53.086064</td>
+<td align="right">-43.39186</td>
+<td align="right">-42.398816</td>
+<td align="right">-30.0736789</td>
+<td align="right">-40.528090</td>
+<td align="right">-49.4121398</td>
+<td align="right">-57.59370</td>
+<td align="right">-57.064279</td>
+<td align="right">-47.762546</td>
+<td align="right">-31.69436</td>
+<td align="right">-52.109732</td>
+<td align="right">-53.3725655</td>
+<td align="right">-52.644913</td>
+<td align="right">-50.068951</td>
+<td align="right">-50.812166</td>
+<td align="right">-52.388906</td>
+<td align="right">-54.581557</td>
+<td align="right">-55.2649668</td>
+<td align="right">-55.3405825</td>
+<td align="right">-58.967000</td>
+<td align="right">-55.6409415</td>
+<td align="right">-52.753613</td>
+<td align="right">-54.3925819</td>
+<td align="right">-53.744828</td>
+<td align="right">-56.8843837</td>
+<td align="right">-55.3577289</td>
+<td align="right">-54.358027</td>
+<td align="right">-57.0156888</td>
+<td align="right">-60.898644</td>
+</tr>
+<tr class="even">
+<td align="left">maturity</td>
+<td align="right">NA</td>
+<td align="right">0.000000</td>
+<td align="right">0.00000</td>
+<td align="right">0.000000</td>
+<td align="right">0.000000</td>
+<td align="right">0.000000</td>
+<td align="right">0.000000</td>
+<td align="right">0.000000</td>
+<td align="right">0.0000000</td>
+<td align="right">0.000000</td>
+<td align="right">0.000000</td>
+<td align="right">0.000000</td>
+<td align="right">0.00000</td>
+<td align="right">0.000000</td>
+<td align="right">0.0000000</td>
+<td align="right">0.000000</td>
+<td align="right">0.0000000</td>
+<td align="right">0.00000</td>
+<td align="right">0.000000</td>
+<td align="right">0.000000</td>
+<td align="right">0.00000</td>
+<td align="right">0.000000</td>
+<td align="right">0.0000000</td>
+<td align="right">0.000000</td>
+<td align="right">0.000000</td>
+<td align="right">0.000000</td>
+<td align="right">0.000000</td>
+<td align="right">0.000000</td>
+<td align="right">0.0000000</td>
+<td align="right">0.0000000</td>
+<td align="right">0.000000</td>
+<td align="right">0.0000000</td>
+<td align="right">0.000000</td>
+<td align="right">0.0000000</td>
+<td align="right">0.000000</td>
+<td align="right">0.0000000</td>
+<td align="right">0.0000000</td>
+<td align="right">0.000000</td>
+<td align="right">0.0000000</td>
+<td align="right">0.000000</td>
+</tr>
+</tbody>
+</table>
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span><span class="va">factor_s</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/decompose_biomass_factors.html">decompose_biomass_factors</a></span><span class="op">(</span></span>
+<span>    <span class="va">res_proc</span>,</span>
+<span>    target <span class="op">=</span> <span class="st">"ssb"</span></span>
+<span>  <span class="op">)</span></span>
+<span></span>
+<span></span>
+<span><span class="va">g1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_biomass_factors.html">plot_biomass_factors</a></span><span class="op">(</span><span class="va">factor_b</span><span class="op">)</span></span>
+<span><span class="va">g2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_biomass_factors.html">plot_biomass_factors</a></span><span class="op">(</span><span class="va">factor_s</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">g3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_biomass_factors.html">plot_biomass_factors</a></span><span class="op">(</span><span class="va">factor_b</span>, type <span class="op">=</span> <span class="st">"absolute"</span>, scale <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span></span>
+<span><span class="va">g4</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_biomass_factors.html">plot_biomass_factors</a></span><span class="op">(</span><span class="va">factor_s</span>, type <span class="op">=</span> <span class="st">"absolute"</span>, scale <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">patchwork</span><span class="fu">::</span><span class="fu"><a href="https://patchwork.data-imaginist.com/reference/wrap_plots.html" class="external-link">wrap_plots</a></span><span class="op">(</span></span>
+<span>  <span class="va">g1</span>, <span class="va">g2</span>, <span class="va">g3</span>, <span class="va">g4</span>,</span>
+<span>  ncol <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>  guides <span class="op">=</span> <span class="st">"collect"</span></span>
+<span><span class="op">)</span> <span class="op">&amp;</span></span>
+<span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="FAQ_files/figure-html/decompose-biomass-effects-1.png" class="r-plt" alt="" width="100%"></p>
+</div>
+<div class="section level4">
+<h4 id="過程誤差をプロットする">過程誤差をプロットする<a class="anchor" aria-label="anchor" href="#%E9%81%8E%E7%A8%8B%E8%AA%A4%E5%B7%AE%E3%82%92%E3%83%97%E3%83%AD%E3%83%83%E3%83%88%E3%81%99%E3%82%8B"></a>
+</h4>
+<p>Number at
+ageの過程誤差は、以下のようにプロットできる。ここでは、残差をそのまま示す方法と、Biomasssの対する影響をプロットする方法を示します。</p>
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span>  <span class="va">samres</span> <span class="op">=</span> <span class="va">res_proc</span></span>
+<span>  <span class="va">rept</span> <span class="op">=</span> <span class="va">samres</span><span class="op">$</span><span class="va">obj</span><span class="op">$</span><span class="va">env</span><span class="op">$</span><span class="fu">report</span><span class="op">(</span><span class="va">samres</span><span class="op">$</span><span class="va">obj</span><span class="op">$</span><span class="va">env</span><span class="op">$</span><span class="va">last.par.best</span><span class="op">)</span></span>
+<span>  <span class="va">logNresid</span> <span class="op">=</span> <span class="va">rept</span><span class="op">$</span><span class="va">logN_resid</span></span>
+<span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">logNresid</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">samres</span><span class="op">$</span><span class="va">naa</span><span class="op">)</span></span>
+<span></span>
+<span>  <span class="va">logNresid_long</span> <span class="op">=</span> <span class="va">logNresid</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>age <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/context.html" class="external-link">n</a></span><span class="op">(</span><span class="op">)</span><span class="op">-</span><span class="fl">1</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>Age <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">age</span> <span class="op">==</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">age</span><span class="op">)</span>,<span class="fu"><a href="https://stringr.tidyverse.org/reference/str_c.html" class="external-link">str_c</a></span><span class="op">(</span><span class="st">"Age "</span>,<span class="va">age</span>,<span class="st">"+"</span><span class="op">)</span>,<span class="fu"><a href="https://stringr.tidyverse.org/reference/str_c.html" class="external-link">str_c</a></span><span class="op">(</span><span class="st">"Age "</span>, <span class="va">age</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">age</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://tidyr.tidyverse.org/reference/pivot_longer.html" class="external-link">pivot_longer</a></span><span class="op">(</span>cols<span class="op">=</span><span class="op">-</span><span class="va">Age</span>,names_to<span class="op">=</span><span class="st">"Year"</span>,values_to<span class="op">=</span><span class="st">"Residual"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>Var <span class="op">=</span> <span class="st">"logN"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">Year</span><span class="op">&gt;</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">Year</span><span class="op">)</span><span class="op">)</span> <span class="co">#最初の年は0なので除く</span></span>
+<span></span>
+<span><span class="va">resid_long</span> <span class="op">&lt;-</span> <span class="va">logNresid_long</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>Year <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">Year</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="op">(</span><span class="va">g_proc_resid</span> <span class="op">=</span> <span class="va">resid_long</span> <span class="op">|&gt;</span></span>
+<span>      <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">Year</span>,y<span class="op">=</span><span class="va">Age</span>,col<span class="op">=</span><span class="va">Residual</span>,size<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">Residual</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">+</span></span>
+<span>      <span class="co"># geom_hline(yintercept=0) +</span></span>
+<span>      <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="op">)</span><span class="op">+</span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"Process error"</span><span class="op">)</span><span class="op">+</span></span>
+<span>      <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_size.html" class="external-link">scale_size_continuous</a></span><span class="op">(</span>range<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">5</span><span class="op">)</span><span class="op">)</span><span class="op">+</span></span>
+<span>      <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_gradient.html" class="external-link">scale_colour_gradient2</a></span><span class="op">(</span>high<span class="op">=</span><span class="st">"red"</span>,low<span class="op">=</span><span class="st">"blue"</span>,mid<span class="op">=</span><span class="st">"gray"</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span></code></pre></div>
+<p><img src="FAQ_files/figure-html/plot-process-error-1.png" class="r-plt" alt="" width="100%"></p>
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span><span class="co"># Biomassレベルでの影響</span></span>
+<span><span class="va">logBresid</span> <span class="op">=</span> <span class="va">samres</span><span class="op">$</span><span class="va">baa</span><span class="op">*</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">logNresid</span><span class="op">)</span><span class="op">-</span><span class="fl">1</span><span class="op">)</span></span>
+<span>  </span>
+<span>  <span class="va">Bresid_long</span> <span class="op">=</span> <span class="va">logBresid</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>age <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/context.html" class="external-link">n</a></span><span class="op">(</span><span class="op">)</span><span class="op">-</span><span class="fl">1</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">age</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span> <span class="op">|&gt;</span>  <span class="co">#age 0 を入れたければ不要</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>Age <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">age</span> <span class="op">==</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">age</span><span class="op">)</span>,<span class="fu"><a href="https://stringr.tidyverse.org/reference/str_c.html" class="external-link">str_c</a></span><span class="op">(</span><span class="st">"Age "</span>,<span class="va">age</span>,<span class="st">"+"</span><span class="op">)</span>,<span class="fu"><a href="https://stringr.tidyverse.org/reference/str_c.html" class="external-link">str_c</a></span><span class="op">(</span><span class="st">"Age "</span>, <span class="va">age</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">age</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://tidyr.tidyverse.org/reference/pivot_longer.html" class="external-link">pivot_longer</a></span><span class="op">(</span>cols<span class="op">=</span><span class="op">-</span><span class="va">Age</span>,names_to<span class="op">=</span><span class="st">"Year"</span>,values_to<span class="op">=</span><span class="st">"Residual"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>Var <span class="op">=</span> <span class="st">"B_by_age"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">Year</span><span class="op">&gt;</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">Year</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="co">#最初の年は0なので除く</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>Value <span class="op">=</span> <span class="va">Residual</span><span class="op">/</span><span class="fl">1000</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>Age <span class="op">=</span> <span class="fu">forcats</span><span class="fu">::</span><span class="fu"><a href="https://forcats.tidyverse.org/reference/fct_rev.html" class="external-link">fct_rev</a></span><span class="op">(</span><span class="va">Age</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span>  <span class="op">(</span><span class="va">g_proc_resid2</span> <span class="op">=</span> <span class="va">Bresid_long</span> <span class="op">|&gt;</span></span>
+<span>      <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">Year</span><span class="op">)</span>,y<span class="op">=</span><span class="va">Value</span>,fill<span class="op">=</span><span class="va">Age</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>      <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html" class="external-link">geom_bar</a></span><span class="op">(</span>stat<span class="op">=</span><span class="st">"identity"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>      <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"Effect of process error on biomass"</span><span class="op">)</span><span class="op">+</span></span>
+<span>      <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_brewer.html" class="external-link">scale_fill_brewer</a></span><span class="op">(</span>palette<span class="op">=</span><span class="st">"Set3"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>      <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">xlab</a></span><span class="op">(</span><span class="st">"Year"</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span></code></pre></div>
+<p><img src="FAQ_files/figure-html/plot-process-error-2.png" class="r-plt" alt="" width="100%"></p>
+</div>
+<div class="section level4">
+<h4 id="固定効果間の相関をプロットする">固定効果間の相関をプロットする<a class="anchor" aria-label="anchor" href="#%E5%9B%BA%E5%AE%9A%E5%8A%B9%E6%9E%9C%E9%96%93%E3%81%AE%E7%9B%B8%E9%96%A2%E3%82%92%E3%83%97%E3%83%AD%E3%83%83%E3%83%88%E3%81%99%E3%82%8B"></a>
+</h4>
+<p>固定効果の相関は以下のようなコードでプロットできます。</p>
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">cor_mat</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/cor.html" class="external-link">cov2cor</a></span><span class="op">(</span><span class="va">samres</span><span class="op">$</span><span class="va">rep</span><span class="op">$</span><span class="va">cov.fixed</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">tmp</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>varname <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">cor_mat</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">varname</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>id <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/context.html" class="external-link">n</a></span><span class="op">(</span><span class="op">)</span>, n <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/context.html" class="external-link">n</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>varname2<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">n</span><span class="op">==</span><span class="fl">1</span>, <span class="va">varname</span>, <span class="fu"><a href="https://stringr.tidyverse.org/reference/str_c.html" class="external-link">str_c</a></span><span class="op">(</span><span class="va">varname</span>,<span class="va">id</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">varname</span> <span class="op">=</span> <span class="va">tmp</span><span class="op">$</span><span class="va">varname2</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">cor_mat</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">cor_mat</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">varname</span></span>
+<span></span>
+<span>  <span class="op">(</span><span class="va">g_cor</span> <span class="op">=</span> <span class="fu">ggcorrplot</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/ggcorrplot/man/ggcorrplot.html" class="external-link">ggcorrplot</a></span><span class="op">(</span><span class="va">cor_mat</span> ,lab<span class="op">=</span><span class="cn">TRUE</span>,type<span class="op">=</span><span class="st">"upper"</span>,lab_size<span class="op">=</span><span class="fl">1.5</span>,digits<span class="op">=</span><span class="fl">2</span>,colors<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"lightblue"</span>,<span class="st">"white"</span>,<span class="st">"darkorange"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>      <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span>base_size<span class="op">=</span><span class="fl">9</span><span class="op">)</span> <span class="op">+</span></span>
+<span>      <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>axis.text.x <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">45</span>, vjust <span class="op">=</span> <span class="fl">1</span>, hjust<span class="op">=</span><span class="fl">1</span><span class="op">)</span>,</span>
+<span>            legend.justification<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.99</span>,<span class="fl">0.01</span><span class="op">)</span>,</span>
+<span>            legend.position.inside<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.99</span>,<span class="fl">0.01</span><span class="op">)</span>,</span>
+<span>            legend.position <span class="op">=</span> <span class="st">"inside"</span><span class="op">)</span><span class="op">+</span></span>
+<span>      <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">xlab</a></span><span class="op">(</span><span class="st">""</span><span class="op">)</span><span class="op">+</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">""</span><span class="op">)</span></span>
+<span>    <span class="op">)</span></span></code></pre></div>
+<p><img src="FAQ_files/figure-html/plot-FEcorrelation-1.png" class="r-plt" alt="" width="100%"></p>
 </div>
 </div>
 </div>
