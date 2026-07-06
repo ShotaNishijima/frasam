@@ -974,3 +974,124 @@ plot_hindcastCV = function(samres,
   }
   gg
 }
+
+
+
+#' Plot age-aggregated biomass factors
+#'
+#' Draws a stacked bar chart of the age-aggregated contributions returned by
+#' [decompose_biomass_factors()]. Positive and negative contributions are
+#' stacked on opposite sides of zero.
+#'
+#' @param x Output from [decompose_biomass_factors()].
+#' @param type Output scale. `"percent"` (default) uses
+#'   `percent_aggregated`; `"absolute"` uses `age_aggregated`.
+#' @param scale Positive divisor applied to values when `type = "absolute"`.
+#'
+#' @return A `ggplot` object. The `effect` variable in the plot data is a
+#'   factor whose levels follow the row order of the aggregated matrix.
+#'
+#' @export
+plot_biomass_factors <- function(x,
+                                 type = c("percent", "absolute"),
+                                 scale = 1) {
+  type <- match.arg(type)
+  if (length(scale) != 1L || !is.finite(scale) || scale <= 0) {
+    stop("scale must be one positive finite number.", call. = FALSE)
+  }
+
+  component <- if (type == "percent") "percent_aggregated" else "age_aggregated"
+  values <- x[[component]]
+
+  if (is.null(values) || !is.matrix(values)) {
+    stop("x must be an output from decompose_biomass_factors().", call. = FALSE)
+  }
+  if (is.null(rownames(values)) || is.null(colnames(values))) {
+    stop(component, " must have row and column names.", call. = FALSE)
+  }
+
+  effect_levels <- rownames(values)
+  years <- suppressWarnings(as.numeric(colnames(values)))
+  if (any(!is.finite(years))) {
+    stop("Column names of aggregated results must be numeric years.", call. = FALSE)
+  }
+
+  plot_data <- data.frame(
+    effect = factor(rep(effect_levels, times = ncol(values)),
+                    levels = effect_levels),
+    year = rep(years, each = nrow(values)),
+    value = as.vector(values),
+    stringsAsFactors = FALSE
+  )
+
+  if (!is.null(x$annual_change) && length(x$annual_change) == ncol(values)) {
+    valid_years <- years[!is.na(x$annual_change)]
+    plot_data <- plot_data[plot_data$year %in% valid_years, , drop = FALSE]
+  }
+  plot_data <- plot_data[is.finite(plot_data$value), , drop = FALSE]
+  if (type == "absolute") plot_data$value <- plot_data$value / scale
+
+  y_label <- if (type == "percent") {
+    quantity <- if (identical(x$target, "ssb")) {
+      "SSB"
+    } else {
+      "biomass"
+    }
+    paste0("Contribution to ", quantity, " change (%)")
+  } else {
+    quantity <- if (identical(x$target, "ssb")) {
+      "SSB"
+    } else {
+      "biomass"
+    }
+    paste0("Contribution to ", quantity, " change")
+  }
+
+  year_breaks <- seq(
+    ceiling(min(plot_data$year) / 5) * 5,
+    floor(max(plot_data$year) / 5) * 5,
+    by = 5
+  )
+
+  ggplot2::ggplot(
+    plot_data,
+    ggplot2::aes(x = year, y = value, fill = effect)
+  ) +
+    ggplot2::geom_col() +
+    ggplot2::geom_hline(yintercept = 0, linewidth = 0.3) +
+    ggplot2::scale_x_continuous(breaks = year_breaks) +
+    ggplot2::labs(x = "Year", y = y_label, fill = "Factor") +
+    ggplot2::theme_bw()
+}
+#' Convert matrix or data.frame to numeric matrix
+#'
+#' @keywords internal
+.as_numeric_matrix <- function(x, name = deparse(substitute(x))) {
+  if (is.data.frame(x)) {
+    x <- as.data.frame(x, check.names = FALSE)
+
+    x <- lapply(x, function(z) {
+      if (is.factor(z)) z <- as.character(z)
+      suppressWarnings(as.numeric(z))
+    })
+
+    x <- as.data.frame(x, check.names = FALSE)
+    x <- as.matrix(x)
+  }
+
+  if (!is.matrix(x)) {
+    stop(name, " must be a matrix or data.frame.", call. = FALSE)
+  }
+
+  storage.mode(x) <- "numeric"
+
+  if (!is.numeric(x)) {
+    stop(name, " could not be converted to a numeric matrix.", call. = FALSE)
+  }
+
+  if (anyNA(x)) {
+    warning(name, " contains NA after numeric conversion.", call. = FALSE)
+  }
+
+  x
+}

@@ -40,6 +40,12 @@ vignette: >
   } else {
     library(frasam)
   }
+  library(dplyr)
+  library(tidyr)
+  library(stringr)
+  library(forcats)
+  library(magrittr)
+  library(ggplot2)
 ```
 
 ## インストールと依存パッケージ
@@ -54,6 +60,7 @@ remotes::install_github("ShotaNishijima/frasam@create_vignette")
 # remotes::install_github("ShotaNishijima/frasyr@dev")
 
 library(frasam)
+library(tidyverse)
 ```
 
 ### `frasyr` がないと言われます
@@ -62,6 +69,7 @@ library(frasam)
 
 ```{r install-frasyr, eval = FALSE}
 remotes::install_github("ichimomo/frasyr@dev")
+library(frasyr)
 ```
 
 
@@ -79,7 +87,7 @@ use_sam_tmb(overwrite = FALSE)
 
 ### 一部の引数のみを変更して解析したい
 
-- SAMの結果オブジェクトに格納されている`input`を使って、前までの設定を引き継いだ解析ができます
+- SAMの結果オブジェクトに格納されている`input`と`do.call`（または`frasyr::safe_call`を使って、前までの設定を引き継いだ解析ができます
 - ここでは再生産関係を変更した場合を例に説明します。
 
 ```{r use-do.call, eval = TRUE}
@@ -679,5 +687,142 @@ gg1 +
         "SSB" = "親魚量（万トン）",
         "Exploitation_rate" = "漁獲割合"
       ))
+    )
+```
+
+### 資源量や親魚量の変動要因を明らかにしたい
+
+`decompose_biomass_factors`という関数を使って、ある年から翌年の資源量および親魚量の変化量（絶対値 or パーセント）を、(1)新規個体の加入 (recruitment)、(2)漁獲による死亡 (fishing)、(3)自然死亡 (natural)、(4)前年にいた個体の成長 (growth)、(5)過程誤差 (process)、(6)前年にいた個体の成熟 (maturity, SSBのみ)に分解できます。これによって、どの要因が個体群動態を駆動しているかを、定量化・定量化できます。
+
+プロットには、`plot_biomass_factors`を用います。
+
+- Shapley分解という手法で、年齢ごとに各要因の周辺効果を求めています。そのため、各要因・各年齢ごとに要因分解することも可能です。
+- VPAでも動くようになっているので、両方で比較するのもありかも。
+- 前の年と評価が大きく変わった際の要因分析にも使えるかなと思います。
+
+```{r decompose-biomass-effects, eval = TRUE, echo = TRUE}
+
+# process errorが推定されるようなデータを作る（実際はこの手順は不要です）
+input <- res_rw$input
+
+caa2 <- input$dat$caa
+caa2[,as.character(1985:1994)] <- input$dat$caa[,as.character(1985:1994)]^1.5
+
+caa2[,as.character(2000:2014)] <- input$dat$caa[,as.character(2000:2014)]^0.75
+
+input$dat$caa <- caa2
+# input$dat$M[] <- 0.6
+input$p0.list <- NULL
+# res_rw$sigma.logN
+
+res_proc <- do.call(sam, input)
+res_proc$sigma.logN
+
+factor_b <- decompose_biomass_factors(
+    res_proc,
+    target = "biomass"
+  )
+
+# biomassの絶対量
+knitr::kable(factor_b$age_aggregated)
+# 前年のbiomass対する比率 (%)
+knitr::kable(factor_b$percent_aggregated)
+
+factor_s <- decompose_biomass_factors(
+    res_proc,
+    target = "ssb"
+  )
+
+
+g1 <- plot_biomass_factors(factor_b)
+g2 <- plot_biomass_factors(factor_s)
+
+g3 <- plot_biomass_factors(factor_b, type = "absolute", scale = 1000)
+g4 <- plot_biomass_factors(factor_s, type = "absolute", scale = 1000)
+
+patchwork::wrap_plots(
+  g1, g2, g3, g4,
+  ncol = 2,
+  guides = "collect"
+) &
+  ggplot2::theme(legend.position = "bottom")
+
+```
+
+### 過程誤差をプロットする
+
+Number at ageの過程誤差は、以下のようにプロットできる。ここでは、残差をそのまま示す方法と、Biomasssの対する影響をプロットする方法を示します。
+
+```{r plot-process-error}
+
+  samres = res_proc
+  rept = samres$obj$env$report(samres$obj$env$last.par.best)
+  logNresid = rept$logN_resid
+
+  colnames(logNresid) <- colnames(samres$naa)
+
+  logNresid_long = logNresid |> as.data.frame() |> mutate(age = 1:n()-1) |>
+    mutate(Age = ifelse(age == max(age),str_c("Age ",age,"+"),str_c("Age ", age))) |>
+    dplyr::select(-age) |>
+    pivot_longer(cols=-Age,names_to="Year",values_to="Residual") |>
+    mutate(Var = "logN") |>
+    dplyr::filter(Year>min(Year)) #最初の年は0なので除く
+
+resid_long <- logNresid_long |> 
+  mutate(Year = as.numeric(Year))
+
+(g_proc_resid = resid_long |>
+      ggplot(aes(x=Year,y=Age,col=Residual,size=abs(Residual)))+
+      # geom_hline(yintercept=0) +
+      geom_point()+
+    ylab("Process error")+
+      scale_size_continuous(range=c(0,5))+
+      scale_colour_gradient2(high="red",low="blue",mid="gray")
+  )
+
+# Biomassレベルでの影響
+logBresid = samres$baa*(exp(logNresid)-1)
+  
+  Bresid_long = logBresid |> as.data.frame() |> mutate(age = 1:n()-1) |>
+    dplyr::filter(age > 0) |>  #age 0 を入れたければ不要
+    mutate(Age = ifelse(age == max(age),str_c("Age ",age,"+"),str_c("Age ", age))) |>
+    dplyr::select(-age) |>
+    pivot_longer(cols=-Age,names_to="Year",values_to="Residual") |>
+    mutate(Var = "B_by_age") |>
+    dplyr::filter(Year>min(Year)) |> #最初の年は0なので除く
+    mutate(Value = Residual/1000) |>
+    mutate(Age = forcats::fct_rev(Age))
+
+  (g_proc_resid2 = Bresid_long |>
+      ggplot(aes(x=as.numeric(Year),y=Value,fill=Age)) +
+      geom_bar(stat="identity") +
+      ylab("Effect of process error on biomass")+
+      scale_fill_brewer(palette="Set3") +
+      theme_bw() + xlab("Year")
+  )
+```
+
+### 固定効果間の相関をプロットする 
+
+固定効果の相関は以下のようなコードでプロットできます。
+
+```{r plot-FEcorrelation, echo = TRUE}
+cor_mat = cov2cor(samres$rep$cov.fixed)
+
+tmp = data.frame(varname = colnames(cor_mat)) |>
+    group_by(varname) |>
+    mutate(id = 1:n(), n = n()) |>
+    mutate(varname2= ifelse(n==1, varname, str_c(varname,id)))
+
+varname = tmp$varname2
+colnames(cor_mat) <- rownames(cor_mat) <- varname
+
+  (g_cor = ggcorrplot::ggcorrplot(cor_mat ,lab=TRUE,type="upper",lab_size=1.5,digits=2,colors=c("lightblue","white","darkorange")) +
+      theme_bw(base_size=9) +
+      theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1),
+            legend.justification=c(0.99,0.01),
+            legend.position.inside=c(0.99,0.01),
+            legend.position = "inside")+
+      xlab("")+ylab("")
     )
 ```
