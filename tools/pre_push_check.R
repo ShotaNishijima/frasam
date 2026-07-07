@@ -30,7 +30,7 @@ if (!requireNamespace("devtools", quietly = TRUE)) {
 devtools::load_all()
 devtools::document()
 
-use_sam_tmb(overwrite = TRUE, compile = "always")
+# use_sam_tmb(overwrite = TRUE, compile = "always")
 
 devtools::test()
 
