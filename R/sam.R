@@ -189,6 +189,20 @@ sam <- function(dat,
     caa <- dat$caa
     if (last.catch.zero) caa[ncol(caa)] <- NULL
 
+    max_index_age <- nrow(caa) - 1L
+    if (any(min.age < 0 | min.age > max_index_age)) {
+      stop(
+        sprintf("'min.age' must be between 0 and %d (nrow(dat$caa) - 1).", max_index_age),
+        call. = FALSE
+      )
+    }
+    if (any(max.age < 0 | max.age > max_index_age)) {
+      stop(
+        sprintf("'max.age' must be between 0 and %d (nrow(dat$caa) - 1).", max_index_age),
+        call. = FALSE
+      )
+    }
+
     maa <- dat$maa
     waa <- dat$waa
     M <- dat$M

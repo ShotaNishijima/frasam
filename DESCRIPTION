@@ -28,12 +28,16 @@ Imports:
     forcats,
     readr
 Suggests:
+    abind,
     testthat,
     knitr,
     rmarkdown,
     lemon,
-    gridExtra
+    patchwork,
+    gridExtra,
+    ggcorrplot
 VignetteBuilder: knitr
 Config/roxygen2/version: 8.0.0
 URL: https://shotanishijima.github.io/frasam/, https://github.com/ShotaNishijima/frasam
 BugReports: https://github.com/ShotaNishijima/frasam/issues
+BuildResaveData: true

@@ -56,5 +56,23 @@ pkgdown::build_site(new_process = FALSE, install = FALSE)
 
 # パッケージの vignette として確認するなら:
 
-devtools::build_vignettes()
+# devtools::build_vignettes()
 
+# devtools::build(args = "--resave-data")
+
+## html_documentスタイルでpreviewフォルダにアップロード ----
+
+rmarkdown::render(
+  input = "vignettes/FAQ.Rmd",
+  output_format = rmarkdown::html_document(toc = TRUE),
+  output_dir = "preview"
+)
+
+rmarkdown::render(
+  input = "vignettes/future_sam.Rmd",
+  output_format = rmarkdown::html_document(toc = TRUE),
+  output_dir = "preview"
+)
+
+
+tools::resaveRdaFiles("data", compress = "xz")

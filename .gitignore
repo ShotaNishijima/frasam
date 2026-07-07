@@ -21,6 +21,7 @@ tools/Data/*
 docs
 .positai
 
+tools/TMI/*
 FEpar.csv
 
 tools/**/*.RDS
@@ -32,3 +33,6 @@ tools/**/*.rda
 tools/**/*.cpp
 
 res_sam.Rmd
+Rplots.pdf
+
+vignettes/*_files
