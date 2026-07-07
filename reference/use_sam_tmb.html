@@ -31,7 +31,7 @@
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>SAMでTMBで実行するためにcppファイルのコンパイル等をする関数</h1>
-
+      <small class="dont-index">Source: <a href="https://github.com/ShotaNishijima/frasam/blob/create_vignette/R/use_sam_tmb.R" class="external-link"><code>R/use_sam_tmb.R</code></a></small>
       <div class="d-none name"><code>use_sam_tmb.Rd</code></div>
     </div>
 
@@ -44,9 +44,10 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">use_sam_tmb</span><span class="op">(</span></span>
 <span>  TmbFile <span class="op">=</span> <span class="st">"sam2"</span>,</span>
 <span>  CppDir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"executable"</span>, package <span class="op">=</span> <span class="st">"frasam"</span><span class="op">)</span>,</span>
+<span>  RunDir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/getwd.html" class="external-link">getwd</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  overwrite <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  auto_update <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  <span class="va">...</span></span>
+<span>  compile <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"auto"</span>, <span class="st">"always"</span>, <span class="st">"never"</span><span class="op">)</span>,</span>
+<span>  auto_update <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -60,6 +61,22 @@
 
 <dt id="arg-cppdir">CppDir<a class="anchor" aria-label="anchor" href="#arg-cppdir"></a></dt>
 <dd><p>Cppファイルが格納されているディレクトリ</p></dd>
+
+
+<dt id="arg-rundir">RunDir<a class="anchor" aria-label="anchor" href="#arg-rundir"></a></dt>
+<dd><p>CppファイルとDLLを配置するディレクトリ</p></dd>
+
+
+<dt id="arg-overwrite">overwrite<a class="anchor" aria-label="anchor" href="#arg-overwrite"></a></dt>
+<dd><p>RunDirのCppファイルを上書きするかどうか</p></dd>
+
+
+<dt id="arg-compile">compile<a class="anchor" aria-label="anchor" href="#arg-compile"></a></dt>
+<dd><p>DLLをコンパイルするかどうか。"auto"ではCppファイルがDLLより新しい場合にコンパイルする</p></dd>
+
+
+<dt id="arg-auto-update">auto_update<a class="anchor" aria-label="anchor" href="#arg-auto-update"></a></dt>
+<dd><p>互換性のために残している引数。compile = "auto"を使用してください</p></dd>
 
 </dl></div>
 

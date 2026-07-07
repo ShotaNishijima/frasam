@@ -8,9 +8,10 @@ SAMでTMBで実行するためにcppファイルのコンパイル等をする�
 use_sam_tmb(
   TmbFile = "sam2",
   CppDir = system.file("executable", package = "frasam"),
+  RunDir = getwd(),
   overwrite = FALSE,
-  auto_update = TRUE,
-  ...
+  compile = c("auto", "always", "never"),
+  auto_update = NULL
 )
 ```
 
@@ -23,6 +24,22 @@ use_sam_tmb(
 - CppDir:
 
   Cppファイルが格納されているディレクトリ
+
+- RunDir:
+
+  CppファイルとDLLを配置するディレクトリ
+
+- overwrite:
+
+  RunDirのCppファイルを上書きするかどうか
+
+- compile:
+
+  DLLをコンパイルするかどうか。"auto"ではCppファイルがDLLより新しい場合にコンパイルする
+
+- auto_update:
+
+  互換性のために残している引数。compile = "auto"を使用してください
 
 ## Examples
 

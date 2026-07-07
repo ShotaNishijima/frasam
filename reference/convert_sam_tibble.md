@@ -10,6 +10,6 @@ convert_sam_tibble(samres)
 
 ## Arguments
 
-- vpares:
+- samres:
 
-  vpaの結果のオブジェクト
+  samまたはvpaの結果オブジェクト

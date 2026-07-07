@@ -45,7 +45,7 @@ library(frasyr)
 
 ``` r
 
-use_sam_tmb(overwrite = FALSE)
+ use_sam_tmb(overwrite = FALSE, compile = "auto")
 #> [1] TRUE
 ```
 
