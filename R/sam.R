@@ -1079,9 +1079,8 @@ fix_maxage_and_remove_na <- function(obs, fleet_id = 1, verbose = TRUE) {
   if (verbose) {
     message(
       "fleet == ", fleet_id,
-      " に obs = NA の行が見つかりました。NA の age は観測されていない最高齢とみなし、",
-      "1歳若い age をプラスグループとして扱います。すなわち、同じ year の age - 1 の maxage を 1 増やし、",
-      "obs = NA の行を削除します。"
+      " に obs = NA が見つかりました。NA の age は観測されていない最高齢とみなし、",
+      "1歳若い age をプラスグループとして扱います。"
     )
   }
 
