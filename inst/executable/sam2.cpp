@@ -549,7 +549,7 @@ Type objective_function<Type>::operator() ()
             if(ft==4){// Number (e.g.,Recruitment) survey
               predObs=0.0;
               for(int j=a; j<amax+1; ++j){
-                predObs=+exp(logN(j,y));
+                predObs+=exp(logN(j,y));
               }
               predObs=log(predObs);
               // predObs=logN(a,y)-zz*sampleTimes(f-1);
