@@ -1,7 +1,24 @@
+ensure_sam_tmb_loaded <- local({
+  loaded <- FALSE
+
+  function() {
+    if (!loaded) {
+      compile <- if (file.exists(paste0("sam2", .Platform$dynlib.ext))) "never" else "auto"
+      res <- use_sam_tmb(TmbFile = "sam2", overwrite = FALSE, compile = compile)
+      loaded <<- isTRUE(res)
+    } else {
+      res <- use_sam_tmb(TmbFile = "sam2", overwrite = FALSE, compile = "never")
+    }
+
+    testthat::expect_true(res)
+    invisible(res)
+  }
+})
+
 fit_pseudo_sam_example <- function() {
   data("dat_ex", package = "frasam")
 
-  use_sam_tmb(TmbFile = "sam2", overwrite = FALSE)
+  ensure_sam_tmb_loaded()
 
   sam(
     dat_ex,

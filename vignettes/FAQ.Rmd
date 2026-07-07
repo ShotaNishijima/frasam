@@ -35,7 +35,9 @@ vignette: >
     out.width = "100%"
   )
   
-  if (requireNamespace("devtools", quietly = TRUE)) {
+  if (requireNamespace("pkgload", quietly = TRUE)) {
+    pkgload::load_all(export_all = FALSE)
+  } else if (requireNamespace("devtools", quietly = TRUE)) {
     devtools::load_all()
   } else {
     library(frasam)
@@ -81,7 +83,7 @@ library(frasyr)
 - 通常のテストや例では、上書きしない設定にします。
 
 ```{r use-sam-tmb, eval = TRUE}
-use_sam_tmb(overwrite = FALSE)
+ use_sam_tmb(overwrite = FALSE, compile = "auto")
 ```
 
 

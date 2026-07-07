@@ -8,7 +8,7 @@
 convert_sam_tibble(samres)
 }
 \arguments{
-\item{vpares}{vpaの結果のオブジェクト}
+\item{samres}{samまたはvpaの結果オブジェクト}
 }
 \description{
 SAMの結果オブジェクトをtibble形式に変換する関数

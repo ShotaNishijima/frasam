@@ -9,7 +9,7 @@ test_that("test retrot",{
   retrores <- get(load(testthat::test_path("testdata", "retrores_example.rda")))
   input = samres$input
   input$p0.list <- NULL
-  use_sam_tmb(overwrite=FALSE)
+  ensure_sam_tmb_loaded()
   args_def = formals(sam)
   input$cpp.file.name <- args_def$cpp.file.name
   testres = safe_do_call(sam,input)
