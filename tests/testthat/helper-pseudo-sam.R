@@ -16,6 +16,7 @@ fit_pseudo_sam_example <- function() {
     varC = c(0, 0, 1, 1, 1, 2, 2),
     varF = c(0, 0, 1, 1, 1, 1, 1),
     varN = c(0, 1, 1, 1, 1, 1, 1),
+    varN.fix = c(NA, 0.0001),
     rho.mode = 3,
     bias.correct = FALSE,
     silent = TRUE
