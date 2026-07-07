@@ -919,6 +919,7 @@ sam <- function(dat,
         logN <- log(naa)
         logF <- log(faa)
       }
+
       age_names <- as.character(data$minAge:data$maxAge)
       year_names <- as.character(data$years)
 
