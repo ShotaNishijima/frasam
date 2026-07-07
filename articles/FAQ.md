@@ -844,14 +844,17 @@ res_estb_full$b #すべてのindexでbが推定される
 #> [1] 0.9775703 0.9484969 1.0082841 0.9249488 0.8870791
 check_fit_sam(res_estb_full, verbose = FALSE)
 
-input$b.fix <- c(1,1,1,NA,NA) #1-3番目のindexはb=1に固定し、4-5番目のindexはb推定を行う
+c(res_rw$aic, res_estb_full$aic)
+#> [1] 976.4474 982.5655
+
+input$b.fix <- c(1,1,1,1,NA) #1-4番目のindexはb=1に固定し、5番目のindexはb推定を行う
 res_estb_45 <- do.call(sam, input)
 res_estb_45$b #
-#> [1] 1.0000000 1.0000000 1.0000000 0.9249928 0.8877377
+#> [1] 1.0000000 1.0000000 1.0000000 1.0000000 0.8962082
 check_fit_sam(res_estb_45, verbose = FALSE)
 
 c(res_rw$aic, res_estb_full$aic, res_estb_45$aic)
-#> [1] 976.4474 982.5655 976.6881
+#> [1] 976.4474 982.5655 977.3648
 ```
 
 #### 加入年齢を1歳にしたい

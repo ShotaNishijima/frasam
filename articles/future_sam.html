@@ -185,30 +185,30 @@ et al. 2021</a>）</li>
 <span></span>
 <span><span class="co"># sigma.logNが固定されていることの確認</span></span>
 <span><span class="va">sam_bh</span><span class="op">$</span><span class="va">sigma.logN</span></span>
-<span><span class="co">#&gt; [1] 0.6983362 0.0100000 0.0100000 0.0100000 0.0100000 0.0100000 0.0100000</span></span>
+<span><span class="co">#&gt; [1] 0.6983394 0.0100000 0.0100000 0.0100000 0.0100000 0.0100000 0.0100000</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">sam_bh</span><span class="op">$</span><span class="va">rep</span>, <span class="st">"fixed"</span><span class="op">)</span> <span class="co">#logSdlogNはひとつだけ</span></span>
 <span><span class="co">#&gt;                Estimate Std. Error</span></span>
-<span><span class="co">#&gt; logQ         -5.3289994 0.18229819</span></span>
-<span><span class="co">#&gt; logQ         -4.7301089 0.21874219</span></span>
-<span><span class="co">#&gt; logQ         -5.5536349 0.08551880</span></span>
-<span><span class="co">#&gt; logQ          0.3038501 0.06107423</span></span>
-<span><span class="co">#&gt; logQ         -4.0057563 0.12202794</span></span>
-<span><span class="co">#&gt; logSdLogFsta -0.4379143 0.15944630</span></span>
-<span><span class="co">#&gt; logSdLogFsta -1.1649170 0.15605543</span></span>
-<span><span class="co">#&gt; logSdLogN    -0.3590547 0.13702709</span></span>
-<span><span class="co">#&gt; logSdLogObs  -0.5988738 0.10850653</span></span>
-<span><span class="co">#&gt; logSdLogObs  -1.3124158 0.10996348</span></span>
-<span><span class="co">#&gt; logSdLogObs  -0.7868328 0.10799850</span></span>
-<span><span class="co">#&gt; logSdLogObs   0.1230131 0.11605370</span></span>
-<span><span class="co">#&gt; logSdLogObs   0.3112426 0.11401068</span></span>
-<span><span class="co">#&gt; logSdLogObs  -0.6851338 0.12586752</span></span>
-<span><span class="co">#&gt; logSdLogObs  -1.0759439 0.11894638</span></span>
-<span><span class="co">#&gt; logSdLogObs  -0.2896758 0.11527654</span></span>
-<span><span class="co">#&gt; rec_loga     -4.0722970 0.16793087</span></span>
-<span><span class="co">#&gt; rec_logb     -6.9657805 0.69854050</span></span>
-<span><span class="co">#&gt; logit_rho     3.8554110 0.68077930</span></span>
+<span><span class="co">#&gt; logQ         -5.3289981 0.18229848</span></span>
+<span><span class="co">#&gt; logQ         -4.7300970 0.21874311</span></span>
+<span><span class="co">#&gt; logQ         -5.5536309 0.08551861</span></span>
+<span><span class="co">#&gt; logQ          0.3038523 0.06107457</span></span>
+<span><span class="co">#&gt; logQ         -4.0057541 0.12202772</span></span>
+<span><span class="co">#&gt; logSdLogFsta -0.4379183 0.15944641</span></span>
+<span><span class="co">#&gt; logSdLogFsta -1.1649190 0.15605516</span></span>
+<span><span class="co">#&gt; logSdLogN    -0.3590501 0.13702749</span></span>
+<span><span class="co">#&gt; logSdLogObs  -0.5988730 0.10850681</span></span>
+<span><span class="co">#&gt; logSdLogObs  -1.3124143 0.10996354</span></span>
+<span><span class="co">#&gt; logSdLogObs  -0.7868360 0.10799883</span></span>
+<span><span class="co">#&gt; logSdLogObs   0.1230147 0.11605390</span></span>
+<span><span class="co">#&gt; logSdLogObs   0.3112469 0.11401112</span></span>
+<span><span class="co">#&gt; logSdLogObs  -0.6851369 0.12586738</span></span>
+<span><span class="co">#&gt; logSdLogObs  -1.0759369 0.11894707</span></span>
+<span><span class="co">#&gt; logSdLogObs  -0.2896778 0.11527636</span></span>
+<span><span class="co">#&gt; rec_loga     -4.0722955 0.16793140</span></span>
+<span><span class="co">#&gt; rec_logb     -6.9657636 0.69853441</span></span>
+<span><span class="co">#&gt; logit_rho     3.8553618 0.68077255</span></span>
 <span><span class="va">sam_bh</span><span class="op">$</span><span class="va">par_list</span><span class="op">$</span><span class="va">logSdLogN</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="va">exp</span></span>
-<span><span class="co">#&gt; [1] 0.6983362 0.0100000</span></span>
+<span><span class="co">#&gt; [1] 0.6983394 0.0100000</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/plot_SR_simple.html">plot_SR_simple</a></span><span class="op">(</span><span class="va">sam_bh</span><span class="op">)</span> <span class="co">#BH stock-recruit relationship</span></span></code></pre></div>
 <p><img src="future_sam_files/figure-html/use_samSR-1.png" class="r-plt" alt="" width="100%"></p>
@@ -513,8 +513,8 @@ F（の選択率）を使用して、Fmsyを求める <code>faa_year</code>,
 <span>                     select_Bban<span class="op">=</span><span class="fl">0</span>,</span>
 <span>                     multi_upper_PGY<span class="op">=</span><span class="fl">10</span><span class="op">)</span></span>
 <span><span class="co">#&gt;         RP_name obj_value catch.mean  ssb.mean</span></span>
-<span><span class="co">#&gt; 1 PGY_0.1_lower  52256.29   52255.21  28908.19</span></span>
-<span><span class="co">#&gt; 2 PGY_0.6_lower 313537.73  313539.32 325668.96</span></span>
+<span><span class="co">#&gt; 1 PGY_0.1_lower  52255.65   52254.57  28907.71</span></span>
+<span><span class="co">#&gt; 2 PGY_0.6_lower 313533.90  313535.49 325663.48</span></span>
 <span></span>
 <span><span class="co"># 要約表</span></span>
 <span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">res_MSY</span><span class="op">$</span><span class="va">summary</span><span class="op">)</span></span></code></pre></div>
@@ -565,31 +565,31 @@ F（の選択率）を使用して、Fmsyを求める <code>faa_year</code>,
 <tr class="odd">
 <td align="left">MSY</td>
 <td align="left">Btarget0</td>
-<td align="right">1265118.50</td>
-<td align="right">0.3597913</td>
-<td align="right">4473821.9</td>
-<td align="right">4473821.9</td>
-<td align="right">0.1168046</td>
-<td align="right">522562.89</td>
-<td align="right">0.8515119</td>
-<td align="right">0.6588818</td>
-<td align="right">0.6588818</td>
-<td align="right">0.0647624</td>
-<td align="right">0.0754405</td>
-<td align="right">0.2636569</td>
-<td align="right">0.3936803</td>
-<td align="right">0.4604448</td>
-<td align="right">0.6782133</td>
-<td align="right">0.6782133</td>
-<td align="right">0.5522827</td>
+<td align="right">1265097.92</td>
+<td align="right">0.3597909</td>
+<td align="right">4473753.1</td>
+<td align="right">4473753.1</td>
+<td align="right">0.1168049</td>
+<td align="right">522556.50</td>
+<td align="right">0.8515086</td>
+<td align="right">0.6588833</td>
+<td align="right">0.6588833</td>
+<td align="right">0.0647628</td>
+<td align="right">0.0754406</td>
+<td align="right">0.2636583</td>
+<td align="right">0.3936812</td>
+<td align="right">0.4604475</td>
+<td align="right">0.6782154</td>
+<td align="right">0.6782154</td>
+<td align="right">0.5522816</td>
 </tr>
 <tr class="even">
 <td align="left">B0</td>
 <td align="left">NA</td>
-<td align="right">3516256.15</td>
+<td align="right">3516202.89</td>
 <td align="right">1.0000000</td>
-<td align="right">8714432.3</td>
-<td align="right">8714432.3</td>
+<td align="right">8714299.4</td>
+<td align="right">8714299.4</td>
 <td align="right">0.0000000</td>
 <td align="right">0.00</td>
 <td align="right">NaN</td>
@@ -607,44 +607,44 @@ F（の選択率）を使用して、Fmsyを求める <code>faa_year</code>,
 <tr class="odd">
 <td align="left">PGY_0.1_lower</td>
 <td align="left">Bban0</td>
-<td align="right">28908.19</td>
+<td align="right">28907.71</td>
 <td align="right">0.0082213</td>
-<td align="right">191156.2</td>
-<td align="right">191156.2</td>
-<td align="right">0.2733639</td>
-<td align="right">52255.21</td>
-<td align="right">1.6179194</td>
-<td align="right">2.6369600</td>
-<td align="right">2.6369600</td>
-<td align="right">0.2591903</td>
-<td align="right">0.3019259</td>
-<td align="right">1.0552010</td>
-<td align="right">1.5755773</td>
-<td align="right">1.8427804</td>
-<td align="right">2.7143279</td>
-<td align="right">2.7143279</td>
-<td align="right">0.2077001</td>
+<td align="right">191153.4</td>
+<td align="right">191153.4</td>
+<td align="right">0.2733646</td>
+<td align="right">52254.57</td>
+<td align="right">1.6179202</td>
+<td align="right">2.6369642</td>
+<td align="right">2.6369642</td>
+<td align="right">0.2591918</td>
+<td align="right">0.3019264</td>
+<td align="right">1.0552059</td>
+<td align="right">1.5755800</td>
+<td align="right">1.8427902</td>
+<td align="right">2.7143349</td>
+<td align="right">2.7143349</td>
+<td align="right">0.2076993</td>
 </tr>
 <tr class="even">
 <td align="left">PGY_0.6_lower</td>
 <td align="left">Blimit0</td>
-<td align="right">325668.96</td>
-<td align="right">0.0926181</td>
-<td align="right">1609937.0</td>
-<td align="right">1609937.0</td>
-<td align="right">0.1947525</td>
-<td align="right">313539.32</td>
-<td align="right">1.1779436</td>
-<td align="right">1.4847536</td>
-<td align="right">1.4847536</td>
-<td align="right">0.1459384</td>
-<td align="right">0.1700009</td>
-<td align="right">0.5941362</td>
-<td align="right">0.8871367</td>
-<td align="right">1.0375868</td>
-<td align="right">1.5283160</td>
-<td align="right">1.5283160</td>
-<td align="right">0.3418863</td>
+<td align="right">325663.48</td>
+<td align="right">0.0926179</td>
+<td align="right">1609912.7</td>
+<td align="right">1609912.7</td>
+<td align="right">0.1947531</td>
+<td align="right">313535.49</td>
+<td align="right">1.1779419</td>
+<td align="right">1.4847569</td>
+<td align="right">1.4847569</td>
+<td align="right">0.1459393</td>
+<td align="right">0.1700013</td>
+<td align="right">0.5941394</td>
+<td align="right">0.8871388</td>
+<td align="right">1.0375929</td>
+<td align="right">1.5283209</td>
+<td align="right">1.5283209</td>
+<td align="right">0.3418851</td>
 </tr>
 </tbody>
 </table>

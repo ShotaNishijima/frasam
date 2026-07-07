@@ -875,14 +875,17 @@ modelのほうがFや選択率がギザギザしており、SAMは平滑化さ�
 <span><span class="co">#&gt; [1] 0.9775703 0.9484969 1.0082841 0.9249488 0.8870791</span></span>
 <span><span class="fu"><a href="../reference/check_fit_sam.html">check_fit_sam</a></span><span class="op">(</span><span class="va">res_estb_full</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">input</span><span class="op">$</span><span class="va">b.fix</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="cn">NA</span>,<span class="cn">NA</span><span class="op">)</span> <span class="co">#1-3番目のindexはb=1に固定し、4-5番目のindexはb推定を行う</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">res_rw</span><span class="op">$</span><span class="va">aic</span>, <span class="va">res_estb_full</span><span class="op">$</span><span class="va">aic</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 976.4474 982.5655</span></span>
+<span></span>
+<span><span class="va">input</span><span class="op">$</span><span class="va">b.fix</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="cn">NA</span><span class="op">)</span> <span class="co">#1-4番目のindexはb=1に固定し、5番目のindexはb推定を行う</span></span>
 <span><span class="va">res_estb_45</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">sam</span>, <span class="va">input</span><span class="op">)</span></span>
 <span><span class="va">res_estb_45</span><span class="op">$</span><span class="va">b</span> <span class="co">#</span></span>
-<span><span class="co">#&gt; [1] 1.0000000 1.0000000 1.0000000 0.9249928 0.8877377</span></span>
+<span><span class="co">#&gt; [1] 1.0000000 1.0000000 1.0000000 1.0000000 0.8962082</span></span>
 <span><span class="fu"><a href="../reference/check_fit_sam.html">check_fit_sam</a></span><span class="op">(</span><span class="va">res_estb_45</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">res_rw</span><span class="op">$</span><span class="va">aic</span>, <span class="va">res_estb_full</span><span class="op">$</span><span class="va">aic</span>, <span class="va">res_estb_45</span><span class="op">$</span><span class="va">aic</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 976.4474 982.5655 976.6881</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] 976.4474 982.5655 977.3648</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="加入年齢を1歳にしたい">加入年齢を1歳にしたい<a class="anchor" aria-label="anchor" href="#%E5%8A%A0%E5%85%A5%E5%B9%B4%E9%BD%A2%E3%82%921%E6%AD%B3%E3%81%AB%E3%81%97%E3%81%9F%E3%81%84"></a>
