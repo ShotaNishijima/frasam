@@ -620,7 +620,9 @@ res_estb_full <- do.call(sam, input)
 res_estb_full$b #すべてのindexでbが推定される
 check_fit_sam(res_estb_full, verbose = FALSE)
 
-input$b.fix <- c(1,1,1,NA,NA) #1-3番目のindexはb=1に固定し、4-5番目のindexはb推定を行う
+c(res_rw$aic, res_estb_full$aic)
+
+input$b.fix <- c(1,1,1,1,NA) #1-4番目のindexはb=1に固定し、5番目のindexはb推定を行う
 res_estb_45 <- do.call(sam, input)
 res_estb_45$b #
 check_fit_sam(res_estb_45, verbose = FALSE)

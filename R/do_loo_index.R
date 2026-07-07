@@ -16,7 +16,7 @@ do_loo_index = function(samres) {
     if(!is.null(res$rec.par["a"])) {
       input$a.init <- as.numeric(res$rec.par["a"])
     }
-    if(!is.null(res$rec.par["b"])) {
+    if(!is.null(res$rec.par["b"]) && !is.na(res$rec.par["b"])) {
     input$b.init <- as.numeric(res$rec.par["b"])
     }
     input$q.init <- res$q[-j]
