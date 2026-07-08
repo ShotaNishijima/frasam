@@ -1,7 +1,7 @@
 Package: frasam
 Type: Package
 Title: Fisheries Research Agency (FRA) provides an R package for analyzing the State-space Assessment Model (SAM)
-Version: 1.0.4.9000
+Version: 1.0.5
 Authors@R: c(person(given="Shota", family="Nishijima", email = "nishijima_shota02@fra.go.jp", role = c("aut", "cre")), person(given="Momoko", family="Ichinokawa", email = "ichimomo@fra.affrc.go.jp", role = c("aut")))
 Maintainer: Shota Nishijima <nishijima_shota02@fra.go.jp>
 Description: More about what it does (maybe more than one line)
@@ -35,7 +35,8 @@ Suggests:
     lemon,
     patchwork,
     gridExtra,
-    ggcorrplot
+    ggcorrplot,
+    forcats
 VignetteBuilder: knitr
 Config/roxygen2/version: 8.0.0
 URL: https://shotanishijima.github.io/frasam/, https://github.com/ShotaNishijima/frasam

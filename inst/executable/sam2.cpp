@@ -480,6 +480,7 @@ Type objective_function<Type>::operator() ()
   Type predObs=0, zz, var;
   vector<Type> pred_log(nobs); //
   vector<Type> ans_obs(nobs);
+  ans_obs.setZero();
 
   if (minAge != 0) {
     error("minAge must be 0. Age inputs are assumed to be indexed from age 0.");

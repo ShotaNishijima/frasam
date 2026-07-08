@@ -1,5 +1,5 @@
 ---
-title: "SAMの結果から将来予測とMSY管理基準値計算をする方法"
+title: "将来予測とMSY管理基準値計算のやり方"
 author: "Shota Nishijima and Momoko Ichinokawa"
 date: "`r format(Sys.Date())`"
 output:
