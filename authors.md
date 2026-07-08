@@ -9,7 +9,7 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/ShotaNishijima/frasam/blob/create_vignette/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/ShotaNishijima/frasam/blob/v1.0.5/DESCRIPTION)
 
 Nishijima S, Ichinokawa M (2026). *frasam: Fisheries Research Agency
 (FRA) provides an R package for analyzing the State-space Assessment
