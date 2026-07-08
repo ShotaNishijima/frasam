@@ -24,6 +24,63 @@
 #'
 NULL
 
+#' 条件付き負の対数尤度を成分別に描画する
+#'
+#' [get_cond_nll()] の出力を横向きの棒グラフで表示します。
+#'
+#' @param x [get_cond_nll()] が返すデータフレーム。
+#' @param show_value 棒の外側に負の対数尤度を小数第1位まで表示するか。
+#'   既定値は `TRUE`。
+#'
+#' @return `ggplot` オブジェクト。
+#'
+#' @examples
+#' \dontrun{
+#' data("samres_example", package = "frasam")
+#' plot_cond_nll(get_cond_nll(samres))
+#' }
+#'
+#' @export
+plot_cond_nll <- function(x, show_value = TRUE) {
+  if (!is.data.frame(x) || !all(c("type", "nll") %in% names(x))) {
+    stop("'x' must be the output of get_cond_nll().", call. = FALSE)
+  }
+  if (!is.numeric(x$nll) || anyNA(x$nll) || any(!is.finite(x$nll))) {
+    stop("'x$nll' must contain only finite numeric values.", call. = FALSE)
+  }
+  if (!is.logical(show_value) || length(show_value) != 1L || is.na(show_value)) {
+    stop("'show_value' must be TRUE or FALSE.", call. = FALSE)
+  }
+
+  plot_data <- x
+  plot_data$type <- factor(plot_data$type, levels = unique(as.character(plot_data$type)))
+  plot_data$label <- sprintf("%.1f", plot_data$nll)
+  plot_data$label_hjust <- ifelse(plot_data$nll >= 0, -0.1, 1.1)
+  plot_data$type <- forcats::fct_rev(plot_data$type)
+
+  p <- ggplot2::ggplot(
+    plot_data,
+    ggplot2::aes(x = nll, y = type, fill = type)
+  ) +
+    ggplot2::geom_col() +
+    ggplot2::geom_vline(xintercept = 0, linewidth = 0.3) +
+    ggplot2::scale_x_continuous(
+      expand = ggplot2::expansion(mult = c(0.15, 0.15))
+    ) +
+    ggplot2::labs(x = "Conditional negative log-likelihood", y = NULL) +
+    ggplot2::guides(fill = "none") +
+    ggplot2::theme_bw()
+
+  if (show_value) {
+    p <- p + ggplot2::geom_text(
+      ggplot2::aes(label = label, hjust = label_hjust),
+      size = 3.5
+    )
+  }
+
+  p
+}
+
 #' Update a future projection plot legend for SAM
 #'
 #' `frasyr::plot_futures()` labels the historical assessment line as VPA.

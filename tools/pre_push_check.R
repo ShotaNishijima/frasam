@@ -36,7 +36,7 @@ devtools::test()
 
 # devtools::test(filter = "sam")
 
-devtools::test(filter = "pseudo-sam")
+# devtools::test(filter = "pseudo-sam")
 
 devtools::check(vignettes = FALSE)
 #vignetteの作成をスキップする場合
