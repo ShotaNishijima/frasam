@@ -59,6 +59,8 @@
   : TMB::MakeADFunに必要な引数から固定効果とランダム効果を推定する関数
 - [`fit2PSdata()`](https://shotanishijima.github.io/frasam/reference/fit2PSdata.md)
   : 生成された疑似データにVPA/SAMを推定し、Self-test/Cross-testを実行
+- [`get_cond_nll()`](https://shotanishijima.github.io/frasam/reference/get_cond_nll.md)
+  : 条件付き負の対数尤度を成分別に集計する
 - [`get_pm()`](https://shotanishijima.github.io/frasam/reference/get_pm.md)
   : utilities for extracting statistics
 - [`get_predSR()`](https://shotanishijima.github.io/frasam/reference/get_predSR.md)
@@ -82,6 +84,8 @@
   : Plot age-aggregated biomass factors
 - [`plot_boosam()`](https://shotanishijima.github.io/frasam/reference/plot_boosam.md)
   : ブートストラップについてプロットする関数
+- [`plot_cond_nll()`](https://shotanishijima.github.io/frasam/reference/plot_cond_nll.md)
+  : 条件付き負の対数尤度を成分別に描画する
 - [`plot_hindcastCV()`](https://shotanishijima.github.io/frasam/reference/plot_hindcastCV.md)
   : レトロの結果を使って資源量指標値に対するhindcast cross
   validationをプロットする関数

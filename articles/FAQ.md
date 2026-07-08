@@ -1113,3 +1113,46 @@ colnames(cor_mat) <- rownames(cor_mat) <- varname
 ```
 
 ![](FAQ_files/figure-html/plot-FEcorrelation-1.png)
+
+#### 成分ごとの条件付き負の対数尤度を求めて、プロットしたい
+
+[`get_cond_nll()`](https://shotanishijima.github.io/frasam/reference/get_cond_nll.md)を使うと、推定されたランダム効果に条件付けた負の対数尤度（negative
+log-likelihood;
+NLL）を、資源尾数Nの過程、漁獲死亡係数Fの過程、年齢別漁獲尾数、および各資源量指標に分けて確認できます。NLLが小さいほど、その成分について観測値または状態の変化がモデルの仮定の下で生じやすいことを表します。ただし、各成分ではデータ数、次元、分散、確率分布が異なるため、成分間のNLLの絶対値や正負をそのまま当てはまりの優劣として比較することはできません。特に、分散を小さな値に固定した正規分布では確率密度が1を超え、NLLが負になることがあります。また、ここで示す値はLaplace近似後の周辺負の対数尤度ではないことにも注意してください。
+
+以下では、1歳以上のNのプロセス誤差だけを小さく固定したモデル（varN-fix）と、さらに年齢別漁獲尾数の観測誤差を小さくし、Fのランダムウォークの年齢間相関をなくしたモデル（VPA-like）を比較します。この例では、1歳魚以上のNプロセス誤差が小さいのでProcess_Nのnllが非常に小さくなっています。VPA-likeモデルでは、年齢別漁獲尾数に強く適合するよう制約されるため、catch-at-ageのNLLは小さくなります。その一方で、年齢別漁獲尾数の年変動をFの変化として説明する必要が強くなるため、F過程のNLLは大きくなります。これは、観測への適合度とF過程の滑らかさの間のトレードオフを示しています。このようにモデル間のNLLを比較することで、それぞれのモデルの特徴を把握することができます。
+
+``` r
+
+
+cond_nll1 <- get_cond_nll(res_varNfix)
+knitr::kable(cond_nll1)
+```
+
+| type         |        nll |
+|:-------------|-----------:|
+| Process_N    | -827.21626 |
+| Process_F    | -290.70451 |
+| Catch_at_age |   82.62484 |
+| Index_1      |   60.06802 |
+| Index_2      |   69.16650 |
+| Index_3      |   26.34139 |
+| Index_4      |   12.16784 |
+| Index_5      |   43.96092 |
+
+``` r
+
+
+cond_nll2 <- get_cond_nll(res_vpalike)
+
+g1 <- plot_cond_nll(cond_nll1) + ggtitle("varN-fix")
+g2 <- plot_cond_nll(cond_nll2) + ggtitle("VPA-like")
+
+patchwork::wrap_plots(
+  g1, g2,
+  ncol = 2,
+  guides = "collect"
+) 
+```
+
+![](FAQ_files/figure-html/cond-nll-1.png)

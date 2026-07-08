@@ -37,6 +37,7 @@
 <url><loc>https://shotanishijima.github.io/frasam/reference/est_fixed.html</loc></url>
 <url><loc>https://shotanishijima.github.io/frasam/reference/est_mixed.html</loc></url>
 <url><loc>https://shotanishijima.github.io/frasam/reference/fit2PSdata.html</loc></url>
+<url><loc>https://shotanishijima.github.io/frasam/reference/get_cond_nll.html</loc></url>
 <url><loc>https://shotanishijima.github.io/frasam/reference/get_pm.html</loc></url>
 <url><loc>https://shotanishijima.github.io/frasam/reference/get_predSR.html</loc></url>
 <url><loc>https://shotanishijima.github.io/frasam/reference/index.html</loc></url>
@@ -49,6 +50,7 @@
 <url><loc>https://shotanishijima.github.io/frasam/reference/plot_SR_simple.html</loc></url>
 <url><loc>https://shotanishijima.github.io/frasam/reference/plot_biomass_factors.html</loc></url>
 <url><loc>https://shotanishijima.github.io/frasam/reference/plot_boosam.html</loc></url>
+<url><loc>https://shotanishijima.github.io/frasam/reference/plot_cond_nll.html</loc></url>
 <url><loc>https://shotanishijima.github.io/frasam/reference/plot_hindcastCV.html</loc></url>
 <url><loc>https://shotanishijima.github.io/frasam/reference/plot_osa_resid.html</loc></url>
 <url><loc>https://shotanishijima.github.io/frasam/reference/plot_popsim.html</loc></url>

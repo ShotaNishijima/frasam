@@ -3,7 +3,31 @@
 Fisheries Research Agency (FRA) develops a State-space Assessment Model
 (SAM)
 
-日本の水産資源用に開発された状態空間資源評価モデルです
+日本の水産資源用に開発された状態空間資源評価モデルを使うためのRパッケージです。
+
+## 使い方など
+
+以下のリンクに関数のリストやマニュアルが載っています:  
+<https://shotanishijima.github.io/frasam/>
+
+## インストール方法
+
+remotesを使ってインストールできます。
+現在の最新ブランチはcreate_vignetteになります。
+
+    install.packages("remotes")
+    remotes::install_github("ShotaNishijima/frasam@create_vignette")
+
+## マニュアル
+
+- [SAMを使った資源量推定](https://shotanishijima.github.io/frasam/articles/sam.html)
+- [FAQ on how to use
+  ‘frasam’](https://shotanishijima.github.io/frasam/articles/FAQ.html)
+- [将来予測とMSY管理基準値計算のやり方](https://shotanishijima.github.io/frasam/articles/future_sam.html)
+
+## Issues
+
+ご要望やバグの報告ございましたら[Issues](https://github.com/ShotaNishijima/frasam/issues)まで
 
 # Package index
 
@@ -66,6 +90,8 @@ Fisheries Research Agency (FRA) develops a State-space Assessment Model
   : TMB::MakeADFunに必要な引数から固定効果とランダム効果を推定する関数
 - [`fit2PSdata()`](https://shotanishijima.github.io/frasam/reference/fit2PSdata.md)
   : 生成された疑似データにVPA/SAMを推定し、Self-test/Cross-testを実行
+- [`get_cond_nll()`](https://shotanishijima.github.io/frasam/reference/get_cond_nll.md)
+  : 条件付き負の対数尤度を成分別に集計する
 - [`get_pm()`](https://shotanishijima.github.io/frasam/reference/get_pm.md)
   : utilities for extracting statistics
 - [`get_predSR()`](https://shotanishijima.github.io/frasam/reference/get_predSR.md)
@@ -89,6 +115,8 @@ Fisheries Research Agency (FRA) develops a State-space Assessment Model
   : Plot age-aggregated biomass factors
 - [`plot_boosam()`](https://shotanishijima.github.io/frasam/reference/plot_boosam.md)
   : ブートストラップについてプロットする関数
+- [`plot_cond_nll()`](https://shotanishijima.github.io/frasam/reference/plot_cond_nll.md)
+  : 条件付き負の対数尤度を成分別に描画する
 - [`plot_hindcastCV()`](https://shotanishijima.github.io/frasam/reference/plot_hindcastCV.md)
   : レトロの結果を使って資源量指標値に対するhindcast cross
   validationをプロットする関数
@@ -137,5 +165,5 @@ Fisheries Research Agency (FRA) develops a State-space Assessment Model
 
 - [FAQ on how to use
   'frasam'](https://shotanishijima.github.io/frasam/articles/FAQ.md):
-- [SAMの結果から将来予測とMSY管理基準値計算をする方法](https://shotanishijima.github.io/frasam/articles/future_sam.md):
+- [将来予測とMSY管理基準値計算のやり方](https://shotanishijima.github.io/frasam/articles/future_sam.md):
 - [SAMを使った資源量推定](https://shotanishijima.github.io/frasam/articles/sam.md):
