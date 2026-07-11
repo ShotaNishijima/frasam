@@ -22,6 +22,9 @@ docs
 .positai
 
 tools/TMI/*
+tools/sawara/*
+tools/PMI/*
+
 FEpar.csv
 
 tools/**/*.RDS
