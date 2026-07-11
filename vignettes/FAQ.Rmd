@@ -35,7 +35,9 @@ vignette: >
     out.width = "100%"
   )
   
-  if (requireNamespace("devtools", quietly = TRUE)) {
+  if (requireNamespace("pkgload", quietly = TRUE)) {
+    pkgload::load_all(export_all = FALSE)
+  } else if (requireNamespace("devtools", quietly = TRUE)) {
     devtools::load_all()
   } else {
     library(frasam)
@@ -57,7 +59,7 @@ vignette: >
 ```{r install-frasam, eval = FALSE}
 install.packages("remotes")
 remotes::install_github("ShotaNishijima/frasam@create_vignette")
-# remotes::install_github("ShotaNishijima/frasyr@dev")
+# remotes::install_github("ichimomo/frasyr@dev")
 
 library(frasam)
 library(tidyverse)
@@ -81,7 +83,7 @@ library(frasyr)
 - 通常のテストや例では、上書きしない設定にします。
 
 ```{r use-sam-tmb, eval = TRUE}
-use_sam_tmb(overwrite = FALSE)
+ use_sam_tmb(overwrite = FALSE, compile = "auto")
 ```
 
 
@@ -620,7 +622,9 @@ res_estb_full <- do.call(sam, input)
 res_estb_full$b #すべてのindexでbが推定される
 check_fit_sam(res_estb_full, verbose = FALSE)
 
-input$b.fix <- c(1,1,1,NA,NA) #1-3番目のindexはb=1に固定し、4-5番目のindexはb推定を行う
+c(res_rw$aic, res_estb_full$aic)
+
+input$b.fix <- c(1,1,1,1,NA) #1-4番目のindexはb=1に固定し、5番目のindexはb推定を行う
 res_estb_45 <- do.call(sam, input)
 res_estb_45$b #
 check_fit_sam(res_estb_45, verbose = FALSE)
@@ -825,4 +829,29 @@ colnames(cor_mat) <- rownames(cor_mat) <- varname
             legend.position = "inside")+
       xlab("")+ylab("")
     )
+```
+
+
+### 成分ごとの条件付き負の対数尤度を求めて、プロットしたい
+
+`get_cond_nll()`を使うと、推定されたランダム効果に条件付けた負の対数尤度（negative log-likelihood; NLL）を、資源尾数Nの過程、漁獲死亡係数Fの過程、年齢別漁獲尾数、および各資源量指標に分けて確認できます。NLLが小さいほど、その成分について観測値または状態の変化がモデルの仮定の下で生じやすいことを表します。ただし、各成分ではデータ数、次元、分散、確率分布が異なるため、成分間のNLLの絶対値や正負をそのまま当てはまりの優劣として比較することはできません。特に、分散を小さな値に固定した正規分布では確率密度が1を超え、NLLが負になることがあります。また、ここで示す値はLaplace近似後の周辺負の対数尤度ではないことにも注意してください。
+
+以下では、1歳以上のNのプロセス誤差だけを小さく固定したモデル（varN-fix）と、さらに年齢別漁獲尾数の観測誤差を小さくし、Fのランダムウォークの年齢間相関をなくしたモデル（VPA-like）を比較します。この例では、1歳魚以上のNプロセス誤差が小さいのでProcess_Nのnllが非常に小さくなっています。VPA-likeモデルでは、年齢別漁獲尾数に強く適合するよう制約されるため、catch-at-ageのNLLは小さくなります。その一方で、年齢別漁獲尾数の年変動をFの変化として説明する必要が強くなるため、F過程のNLLは大きくなります。これは、観測への適合度とF過程の滑らかさの間のトレードオフを示しています。このようにモデル間のNLLを比較することで、それぞれのモデルの特徴を把握することができます。
+
+```{r cond-nll, echo = TRUE}
+
+cond_nll1 <- get_cond_nll(res_varNfix)
+knitr::kable(cond_nll1)
+
+cond_nll2 <- get_cond_nll(res_vpalike)
+
+g1 <- plot_cond_nll(cond_nll1) + ggtitle("varN-fix")
+g2 <- plot_cond_nll(cond_nll2) + ggtitle("VPA-like")
+
+patchwork::wrap_plots(
+  g1, g2,
+  ncol = 2,
+  guides = "collect"
+) 
+
 ```

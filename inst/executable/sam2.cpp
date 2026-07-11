@@ -214,6 +214,7 @@ Type objective_function<Type>::operator() ()
   array<Type> logN(nlogN,U.cols()); // logN (7 x 50 matrix)
   array<Type> exp_logF(nlogF,U.cols()); // F (6 x 50 matrix)
   array<Type> exp_logN(nlogN,U.cols()); // N (7 x 50 matrix)
+  array<Type> caa_est(nlogN,U.cols());
 
   array<Type> stockMeanWeight_true(stockMeanWeight.rows(),stockMeanWeight.cols()); // N (7 x 50 matrix)
   // stockMeanWeight_true.fill(1.0);
@@ -567,7 +568,7 @@ Type objective_function<Type>::operator() ()
             if(ft==4){// Number (e.g.,Recruitment) survey
               predObs=0.0;
               for(int j=a; j<amax+1; ++j){
-                predObs=+exp(logN(j,y));
+                predObs+=exp(logN(j,y));
               }
               predObs=log(predObs);
               // predObs=logN(a,y)-zz*sampleTimes(f-1);
@@ -659,9 +660,11 @@ Type objective_function<Type>::operator() ()
       if (j<(stateDimN-1)) {
         zz=exp(logF((keyLogFsta(0,j)),i))+natMor(i,j);
         Catch_biomass(i)+=exp(logN(j,i))*stockMeanWeight_true(i,j)*exp(logF((keyLogFsta(0,j)),i))*(1-exp(-zz))/zz;
+        caa_est(j,i)=exp(logN(j,i))*exp(logF((keyLogFsta(0,j)),i))*(1-exp(-zz))/zz;
       } else {
         zz=alpha*exp(logF((keyLogFsta(0,j)),i))+natMor(i,j);
         Catch_biomass(i)+=exp(logN(j,i))*stockMeanWeight_true(i,j)*alpha*exp(logF((keyLogFsta(0,j)),i))*(1-exp(-zz))/zz;
+        caa_est(j,i)=exp(logN(j,i))*alpha*exp(logF((keyLogFsta(0,j)),i))*(1-exp(-zz))/zz;
       }
     }
     F_mean(i)/=stateDimN;
@@ -872,6 +875,7 @@ Type objective_function<Type>::operator() ()
   ADREPORT(Exploitation_rate);
   ADREPORT(scale_U);
   ADREPORT(stockMeanWeight_true);
+  ADREPORT(caa_est);
 
   REPORT(logF);
   REPORT(logN);

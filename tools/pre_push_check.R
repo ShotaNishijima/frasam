@@ -26,10 +26,17 @@ if (!requireNamespace("devtools", quietly = TRUE)) {
   stop("Package 'devtools' is required. Install it with install.packages('devtools').")
 }
 
+
 devtools::load_all()
 devtools::document()
+
+# use_sam_tmb(overwrite = TRUE, compile = "always")
+
 devtools::test()
+
 # devtools::test(filter = "sam")
+
+# devtools::test(filter = "pseudo-sam")
 
 devtools::check(vignettes = FALSE)
 #vignetteの作成をスキップする場合
