@@ -18,7 +18,7 @@
 
 install.packages("remotes")
 remotes::install_github("ShotaNishijima/frasam@create_vignette")
-# remotes::install_github("ShotaNishijima/frasyr@dev")
+# remotes::install_github("ichimomo/frasyr@dev")
 
 library(frasam)
 library(tidyverse)
