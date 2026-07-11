@@ -3,6 +3,9 @@
 #'
 #' retrospective forecasting is also possible
 #'
+#' @param res SAM object
+#' @param n the number of peels
+#'
 #' @export
 
 retro_sam <- function(res, n=5, stat="mean", b.fix=TRUE,remove_short_index=-1, map_add = NULL, p0_retro_list = NULL){
@@ -82,8 +85,6 @@ retro_sam <- function(res, n=5, stat="mean", b.fix=TRUE,remove_short_index=-1, m
       res.c$input$maturity_weight[,nc2] <- 0
     }
 
-    # res1 <- do.call(sam,res.c$input)
-    # browser()
     if (is.null(p0_retro_list)) {
       res1 <- try(do.call(sam,res.c$input),silent=TRUE)
     } else {
@@ -144,3 +145,109 @@ retro_sam <- function(res, n=5, stat="mean", b.fix=TRUE,remove_short_index=-1, m
               retro.n2=obj.n2, retro.b2=obj.b2, retro.s2=obj.s2, retro.r2=obj.r2, retro.f2=obj.f2, mohn_forecast=mohn2))
 }
 
+
+#' レトロの結果から各Indexに対する予測値を抽出して、Mean Absolute Scaled Errorを計算する関数
+#'
+#'
+#' @param samres SAM object
+#' @param retrores \code{retro_sam(res,...)}で実地されたレトロ解析の結果オブジェクト
+#' @param log MASEを計算するときに、Indexの観測値と予測値に対してlogを取るかどうか（デフォルトはFALSE）
+#' @param index_name 各Indexの名前ベクトル、Indexの数だけ必要
+#'
+#' @export
+
+calc_mase = function(samres,
+                     retrores,
+                     h = 1,
+                     log = FALSE,
+                     index_name = NULL) {
+
+  if (!is.null(index_name)) {
+    if(length(index_name) != nrow(samres$input$dat$index)) stop("'length(index_name)' doesn't match with the number of indices")
+  } else {
+    index_name = str_c("Index ",as.character(1:nrow(samres$input$dat$index)))
+  }
+
+  convert_idx2tbl = function(x,value_name) {
+    x %>% rownames_to_column(var="idx") %>%
+      pivot_longer(cols = -idx, names_to = "year", values_to = value_name) %>%
+      mutate(idx = as.integer(idx), year = as.integer(year)) %>%
+      mutate(index = index_name[idx]) %>%
+      mutate(index = fct_inorder(index))
+  }
+
+  obsdat = convert_idx2tbl(samres$input$dat$index,value_name="obs") %>%
+    na.omit()
+
+  fullpred = convert_idx2tbl(samres$pred.index,value_name="pred_full")
+
+  basedat = left_join(obsdat,fullpred) %>% suppressMessages()
+  nretro = length(retrores$Res)
+
+  # make basic data of T and h for each index
+  info = obsdat %>% group_by(idx, index) %>%
+    summarise(T_i = max(year),
+              T0_i = min(year),
+              h = h)
+  #
+
+  cv_grid = expand.grid(idx = info$idx, retro_id = 1:nretro) %>%
+    left_join(info) %>%
+    mutate(
+      year_target = T_i - retro_id + h,
+      year_cond = T_i - retro_id
+    )
+
+  cv_grid = left_join(
+    cv_grid,
+    basedat %>% rename(year_target = year)
+  ) %>% left_join(
+    obsdat %>% rename(year_cond = year, obs_cond = obs)
+  )
+
+  cv_res <- dat_removed <- data.frame()
+
+  for(i in 1:nretro) {
+    res2 = retrores$Res[[i]]
+    conddat = convert_idx2tbl(res2$pred.index,value_name="pred_cond")
+
+    cv_res = bind_rows(
+      cv_res,
+      cv_grid %>%
+      filter(retro_id==i) %>%
+      left_join(conddat  %>% rename(year_target = year))
+    ) %>% suppressMessages()
+
+    conddat2 = conddat %>%
+      left_join( cv_grid %>% filter(retro_id==i) %>% select(idx,year_target)) %>%
+      filter(year <= year_target) %>%
+      mutate(retro_id = i) %>% select(retro_id,everything()) %>%
+      suppressMessages()
+
+    dat_removed = bind_rows(
+      dat_removed,
+      conddat2
+    )
+  }
+
+  if(isTRUE(log)) {
+    cv_res = cv_res %>%
+      mutate(obs = log(obs), obs_cond = log(obs_cond),
+             pred_full = log(pred_full), pred_cond = log(pred_cond))
+  }
+  cv_res = cv_res %>%
+    mutate(error_denom = obs - obs_cond,
+           error_numer = obs - pred_cond) %>%
+    select(retro_id, everything())
+
+  mase_res = cv_res %>% group_by(idx, index) %>%
+    summarise(denominator = mean(abs(error_denom), na.rm = TRUE),
+              numerator = mean(abs(error_numer), na.rm = TRUE)) %>%
+    ungroup() %>%
+    mutate(MASE = numerator / denominator)
+
+  return(list(full = basedat,
+              removed = dat_removed,
+              cv = cv_res,
+              mase = mase_res))
+}

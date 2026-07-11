@@ -21,7 +21,7 @@ sam(
   varN = 0,
   varF = 0,
   varN.fix = NULL,
-  est.method = "ml",
+  est.method = NULL,
   SR = "BH",
   AR = 0,
   rho.mode = 2,
@@ -73,23 +73,147 @@ sam(
   catch_prop = NULL,
   no_est = FALSE,
   getJointPrecision = FALSE,
-  loopnum = 2
+  loopnum = 2,
+  obj_overwrite = NULL,
+  ignore.parm.uncertainty = FALSE
 )
 }
 \arguments{
 \item{dat}{samに使用するdataでrvpaと同じフォーマットで利用可能}
 
-\item{rec.age}{加入年齢 (default: 0)}
+\item{last.catch.zero}{最終年の漁獲量がない場合。デフォルトはFALSE（最終年の漁獲量が利用できて用いる）}
 
-\item{min.age}{Indexの最低年齢 (\code{frasyr::vpa()}と同じで最小の年齢を0とする)}
+\item{cpp.file.name}{推定に用いるcppファイル。デフォルトは最新版の"sam2"}
 
-\item{max.age}{Indexの最高年齢 (\code{frasyr::vpa()}と同じで最小の年齢を0とする)}
+\item{abund}{Indexの種類。用いるIndexの長さのベクトル。"B": 資源量、"SSB"：親魚資源量、"N"：尾数、"Bs"：資源量×fleetごとの選択率、"Bf"：資源量×選択率．合計する年齢の幅については\code{min.age}と\code{max.age}}
 
-\item{SR}{再生産関係："RW", "BH", "RI", "HS", "Mesnil", or "Const"}
+\item{rec.age}{加入年齢 (default: 0)。1以上の場合でも、min.ageやmax.ageは0歳始まりとしての年齢を入れること。}
 
-\item{index.key}{Indexのsigmaの制約}
+\item{min.age}{Indexの最低年齢 (\code{frasyr::vpa()}と同じで最小の年齢を0とする) 用いるIndexの長さのベクトル}
+
+\item{max.age}{Indexの最高年齢 (\code{frasyr::vpa()}と同じで最小の年齢を0とする) 用いるIndexの長さのベクトル}
+
+\item{plus.group}{プラスグループを考慮する（TRUE, デフォルト）、考慮しない（FALSE）}
+
+\item{alpha}{最高年齢-1歳へのFに対する最高年齢のFの比}
+
+\item{b.est}{Indexと資源量の間の非線形関係を考慮しない（FALSE, デフォルト）、考慮する(TRUE)}
+
+\item{b.fix}{b.est=TRUEの場合、非線形パラメータbを推定するか（NA）、固定するか（固定する値） ??}
+
+\item{varC}{CAAの観測誤差}
+
+\item{varN}{??}
+
+\item{varF}{??}
+
+\item{est.method}{Deprecated. Use \code{index.key} instead. If \code{"ls"} is supplied and \code{index.key = NULL}, all index observation-error sigmas are shared.}
+
+\item{SR}{再生産関係："RW"(Random walk), "BH", "RI", "HS", "Mesnil", or "Const"}
+
+\item{AR}{再生産関係の残差の自己相関パラメータを推定する（１）、推定しない（0, デフォルト） ?? これでいい？}
+
+\item{rho.mode}{Fの多変量Random walkの非対角成分の相関係数のタイプ。１ならすべての年齢間で相関係数1, 0なら完全にランダム, 2は任意の年齢間で共通のrhoを推定、3は年齢i,jの相関を\eqn{rho^|i-j|}で推定}
+
+\item{q.init}{パラメータqの初期値。NULLの場合にはexp(-5)が用いられる。}
+
+\item{sdFsta.init}{Fのランダムウォークのσの初期値。NULLの場合（デフォルト）にはlog_sigma=-0.693147が用いられる。初期値を与える場合には、ノーマルスケールでの値を与える。}
+
+\item{sdLogN.init}{Nのプロセス誤差のσの初期値。NULLの場合（デフォルト）にはlog_sigma=0.35が用いられる（←コード上はこうなっているがこれで良い？）。初期値を与える場合には、ノーマルスケールでの値を与える。}
+
+\item{sdLogObs.init}{Indexの観察誤差の初期値。NULLの場合（デフォルト）にはlog_sigma=-0.356675が用いられる。初期値を与える場合には、ノーマルスケールでの値を与える。}
+
+\item{rho.init}{rhoの初期値。NULLの場合（デフォルト）には0が用いられる。}
+
+\item{a.init}{再生産関係パラメータaの初期値。NULLの場合（デフォルト）、log_a=8 (SR="Const")またはlog_a=-4（SR="Const"以外）}
+
+\item{b.init}{再生産関係パラメータbの初期値。NULLの場合（デフォルト）、log_b=7 (SR="HS", "Mesnil", "BHS") またはlog_b=-8（それ以外）}
+
+\item{ref.year}{管理基準値を計算するときの参照年。最終年から何年分さかのぼるか。デフォルトは1:5（最新年からさかのぼって５年分）。}
+
+\item{bias.correct}{固定効果パラメータ？？のバイアスを補正する（TRUE：デフォルト）、補正しない（FALSE）}
+
+\item{bias.correct.sd}{ランダム効果のSDパラメータ？？のバイアスを補正する（TRUE）、補正しない（FALSE：デフォルト）}
+
+\item{get.random.vcov}{ランダム効果の分散共分散行列を推定する（TRUE、時間かかります）、推定しない（FALSE：デフォルト）}
+
+\item{silent}{MakeADfunのときの標準出力あり（TRUE: デフォルト）、なし（FALSE）}
+
+\item{remove.Fprocess.year}{Years to remove from the F process model.}
+
+\item{RW.Forder}{Order of the random-walk process for fishing mortality.}
+
+\item{map.add}{Additional TMB map settings.}
+
+\item{p0.list}{Initial parameter list.}
+
+\item{scale}{資源量のスケーリングファクター。資源量はscaleで割った値となる}
+
+\item{gamma}{Gamma parameter setting.}
+
+\item{sel.def}{選択率の定義。"max"（デフォルト）の場合、最大年齢を１とする。}
+
+\item{use.index}{この仕様は設定ミスを引き起こしやすいので廃止しました。\code{sam()}を使用するまえに、Indexのデータを使用するもののみにsubsetするようにしてください}
+
+\item{upper}{推定パラメータの上限値。固定効果の数のLengthを持つ必要あり。NULL（デフォルト）の場合Inf}
+
+\item{lower}{推定パラメータの下限値。固定効果の数のLengthを持つ必要あり。NULL（デフォルト）の場合-Inf}
+
+\item{index.key}{Index間の観測誤差sigmaの制約。NULLの場合はIndexごとに別々、rep(0, length(abund))の場合は全Indexで共通。}
+
+\item{index.b.key}{Indexのbの制約 ??  どうやって使う？？}
+
+\item{b_random}{再生産パラメータbをランダム効果として推定するかどうか??}
+
+\item{b_range}{再生産パラメータbの値の範囲}
+
+\item{lambda}{??}
+
+\item{FreeADFun}{\code{TMB::FreeADFun}を使う場合、TRUEにする。See \code{?TMB::FreeADFun}.}
+
+\item{add_random}{Additional random effects.}
+
+\item{lambda_Mesnil}{SRを"Mesnil"にした場合のラムダの値??}
+
+\item{tmbdata}{TMB data list.}
+
+\item{map}{TMB parameter map.}
 
 \item{model_wm}{weightとmaturityの成長をモデリングするかどうか}
+
+\item{w0_factor}{Factor setting for initial weight.}
+
+\item{weight_factor}{Factor setting for weight-at-age.}
+
+\item{family_w}{Error distribution for weight observations.}
+
+\item{maturity_factor}{Factor setting for maturity-at-age.}
+
+\item{scale_number}{尾数のスケーリングファクター。尾数はscaleで割った値となる}
+
+\item{weight_weight}{Weight assigned to weight-at-age likelihood components.}
+
+\item{maturity_weight}{Weight assigned to maturity-at-age likelihood components.}
+
+\item{g_fix}{Fixed value setting for growth parameter g.}
+
+\item{CV_w_fix}{Fixed value setting for weight coefficient of variation.}
+
+\item{w_link}{Link function for weight model.}
+
+\item{sep_omicron}{Whether to separate omicron parameters.}
+
+\item{growth_regime}{Growth regime setting.}
+
+\item{catch_prop}{abund="Bs"のとき、対象とするfleetのcatch at ageの全体に対する比率.}
+
+\item{no_est}{推定しない(TRUE)、パラメータ推定する（FALSE, デフォルト）}
+
+\item{getJointPrecision}{JointPrecision matrixを計算しない（FALSE, デフォルト）、計算する（TRUE)}
+
+\item{loopnum}{最適化を繰り返す回数．デフォルトは2}
+
+\item{varNfix}{??}
 }
 \description{
 SAMによる資源計算を実施する

@@ -2,7 +2,7 @@
 #' Calculate the relative number at age at the equilibrium.
 #'
 #' \emph{Calcu_N} calculates the relative number at age at the equilibrium (N) with a given fishing mortality value.
-#' 
+#'
 #' @param Fish_mort Fishing mortality to calculate SBR. Should be provided with a numeric value.
 #' @param M A vector of natural mortality rate at age a. The length should be A+1.
 #' @param Sel A vector of selectivity at age a. The length should be A+1.
@@ -32,9 +32,9 @@ Calcu_N <- function(Fish_mort, M, Sel, A = 6){
 #' @param A Plus group age. Default is 6.
 #' @return A value of spawing biomass par recruit with the given fishing mortality.
 #' @export
-#' 
 #'
- 
+#'
+
 
 Calcu_SBR <- function(Fish_mort, M, Sel, w, g, A = 6){
   ncura <- Calcu_N(Fish_mort = Fish_mort, M = M, Sel = Sel, A = A)
@@ -52,10 +52,10 @@ Calcu_SBR <- function(Fish_mort, M, Sel, w, g, A = 6){
 #' @param w A vector of weight at age a. The length should be A+1.
 #' @param g A vector of maturity at age a. The length should be A+1.
 #' @param A Plus group age. Default is 6.
-#' @param F_max 
+#' @param F_max
 #' This value should be large enough so that the true F\%SPR value be included (otherwise a warning message appears). Defalut is 1.
 #' @return A value of F\% SPR.
-#' 
+#'
 #' @export
 
 Calcu_SPR_X <- function(x, M, Sel, w, g, A = 6, F_max = 2){
@@ -98,7 +98,7 @@ Calcu_YPR <- function(Fish_mort, M, Sel, w, g, A = 6, method = "Baranov"){
 #' Calculate F0.1 value.
 #'
 #' \emph{Calcu_F0.1} calculates the fishing mortality rate at which the slope of the yield-per-recruit curve is 10\% of the slope of the curve at its origin.
-#' 
+#'
 #' @param M A vector of natural mortality rate at age a. The length should be A+1.
 #' @param Sel A vector of selectivity at age a. The length should be A+1.
 #' @param w A vector of weight at age a. The length should be A+1.
@@ -107,9 +107,9 @@ Calcu_YPR <- function(Fish_mort, M, Sel, w, g, A = 6, method = "Baranov"){
 #' @param method Method of the fishing equation. Either "Baranov" or "Pope" is allowed. Default is "Baranov".
 #' @param F_max  Maximum value of F values to be searched for determining F\%SPR. This value should be large enough so that the true F\%SPR value be included. Default is 10
 # #' @usage Calcu_F0.1(M = M, Sel = Sel, w = w, g = g, A = 6, method = "Baranov, F_max = 10)
-#' 
+#'
 #' @return A value of the F0.1.
-#' 
+#'
 #' @export
 
 Calcu_F0.1 <- function(M, Sel, w, g, A = 6, method = "Baranov", F_max = 10){
@@ -168,17 +168,17 @@ Calcu_Fmax <- function(M, Sel, w, g, A = 6, F_max = 10, method = "Baranov"){
 #' @param g A vector of maturity at age a. The length should be A+1.
 #' @param A Plus group age. Default is 6.
 #' @param method The type of the stock-recruitment relationship. At this stage, "BH" (Beverton-Holt) or "HS" (Hockey-stick) is allowed.
-#' @return Values of alpha and beta coefficients for the BH relationships or a value of SB0 for the HS relationships. 
+#' @return Values of alpha and beta coefficients for the BH relationships or a value of SB0 for the HS relationships.
 #' As for the BH, when h is not fixed (i.e. h_fix = T), the output from the optim() function is shown.
 #' @export
 
 Est_SR <- function(SBy, Ry, h, h_fix = T, inits = c(1,1), ref.year = c(1970:2019), SB0_max = max(SBy)*100,
                    M, w, g, A = 6, method){
-  
+
   SB_obs <- SBy[names(SBy) %in% ref.year]
   R_obs <- Ry[names(Ry) %in% ref.year]
   SBR0 <- Calcu_SBR(Fish_mort = 0, M = M, Sel = rep(1,A+1), w = w, g = g, A = A)
-  
+
   if(method == "BH"){
     if(isTRUE(h_fix)){
       alpha <- 4*h / (SBR0*(1-h))
@@ -202,7 +202,7 @@ Est_SR <- function(SBy, Ry, h, h_fix = T, inits = c(1,1), ref.year = c(1970:2019
       if(opt$convergence != 0) warning("Stock-recruitment parameter estimation may not converge")
       return(opt$par)
     }
-    
+
   } else if(method == "HS"){
     if(isTRUE(h_fix)){
       stop("Fixing F is not implemented for the Hockey-stick stock recruitment relationship.")
@@ -243,7 +243,7 @@ Est_SR <- function(SBy, Ry, h, h_fix = T, inits = c(1,1), ref.year = c(1970:2019
       # opt <- optim(par = inits, fn = obj_fun)
       # if(opt$convergence != 0) warning("Stock-recruitment parameter estimation may not converge")
       # return(c(alpha = opt$par[1], beta = opt$par[2]))
-      # 
+      #
       # obj_fun <- function(par){ # Estimate h and SB0.
       #   R0 <- par[2] / SBR0
       #   R_fit <- R0*SB_obs / ((1-par[1])*par[2])
@@ -257,7 +257,7 @@ Est_SR <- function(SBy, Ry, h, h_fix = T, inits = c(1,1), ref.year = c(1970:2019
       # alpha <- opt$par[2] / SBR0
       # return(c(alpha, beta))
     }
-    
+
   } else {
     stop("Unexpected method. Confirm that method is either BH or HS")
   }
@@ -266,7 +266,7 @@ Est_SR <- function(SBy, Ry, h, h_fix = T, inits = c(1,1), ref.year = c(1970:2019
 #' Calculate the fishing mortality that maximizes the maximum sustainable yield (Fmsy) with fixed steepness parameters (h) in the Bevertoh-Holt stock-recruitment relationship.
 #'
 #' \emph{Calcu_Fmsy} calculates the fishing mortality that maximizes the maximum sustainable yield (Fmsy) with fixed steepness parameters (h).
-# #' @usage 
+# #' @usage
 #' @param M A vector of natural mortality rate at age a. The length should be A+1.
 #' @param Sel A vector of selectivity at age a. The length should be A+1.
 #' @param w A vector of weight at age a. The length should be A+1.
@@ -290,8 +290,8 @@ Calcu_Fmsy <- function(M, Sel, w, g, A = 6, method,
     }
     opt <- optimize(obj_fun, interval = c(0, F_max))
     return(opt$minimum)
-    
-  } else if(method_SR == "HS"){
+
+  } else if(method_SR == "HS" | method_SR == "Const"){
     obj_fun_Fstar <- function(Fish_mort){
       SBRF <- Calcu_SBR(Fish_mort = Fish_mort, M = M, Sel = Sel, w = w, g = g, A = A)
       return((alpha*SBRF - 1)^2)
@@ -300,17 +300,16 @@ Calcu_Fmsy <- function(M, Sel, w, g, A = 6, method,
     F_star <- opt_Fstar$minimum
     obj_fun <- function(Fish_mort){
       YPRF <- Calcu_YPR(Fish_mort = Fish_mort, M = M, Sel = Sel, w = w, g = g, A = A, method = method)
-      # if(Fish_mort <= F_star){
+      if(method_SR == "HS"){
         SYF <- YPRF*alpha*beta
-      # } else {
-      #   SYF <- 0
-      # }
+      } else {
+        SYF <- YPRF*alpha #alpha = R0
+      }
       return(-SYF)
     }
     opt <- optimize(obj_fun, interval = c(0, F_star))
     # opt <- optimize(obj_fun, interval = c(0, F_max))
     return(opt$minimum)
-    
   } else {
     stop("Unexpected method. Confirm that method is either BH or HS")
   }
@@ -319,7 +318,7 @@ Calcu_Fmsy <- function(M, Sel, w, g, A = 6, method,
 #' Calculate the stock biomass at the maximum sustainable yield (Bmsy).
 #'
 #' \emph{Calcu_Bmsy} calculates the stock biomass at the maximum sustainable yield (Fmsy) for the Bevertoh-Holt stock-recruitment relationship.
-# #' @usage 
+# #' @usage
 #' @param M A vector of natural mortality rate at age a. The length should be A+1.
 #' @param Sel A vector of selectivity at age a. The length should be A+1.
 #' @param w A vector of weight at age a. The length should be A+1.
@@ -328,9 +327,9 @@ Calcu_Fmsy <- function(M, Sel, w, g, A = 6, method,
 #' @param alpha Estimated Parameter alpha in the Beverton-Holt stock recruitment relationship.
 #' @param beta Estimated Parameter beta in the Beverton-Holt stock recruitment relationship.
 #' @return A value of the stock biomass at the maximum sustainable yield (Bmsy).
-#' 
+#'
 #' @export
-#' 
+#'
 
 Calcu_Bmsy <- function(Fmsy, M, Sel, w, g, A = 6,
                        alpha, beta, method_SR){
@@ -342,7 +341,11 @@ Calcu_Bmsy <- function(Fmsy, M, Sel, w, g, A = 6,
   } else if(method_SR == "HS"){
     Bmsy <- sum(w*alpha*beta*ncura_msy)
   } else {
-    stop("Unexpected method. Confirm that method is either BH or HS")
+    if(method_SR == "Const"){
+      Bmsy <- sum(w*alpha*ncura_msy)
+    } else {
+      stop("Unexpected method. Confirm that method is either BH, HS or Const")
+    }
   }
   return(Bmsy)
 }
@@ -350,7 +353,7 @@ Calcu_Bmsy <- function(Fmsy, M, Sel, w, g, A = 6,
 #' Calculate the spawning stock biomass at the maximum sustainable yield (SSBmsy).
 #'
 #' \emph{Calcu_SBmsy} calculates the spawning stock biomass at the maximum sustainable yield (Fmsy) for the Bevertoh-Holt stock-recruitment relationship.
-# #' @usage 
+# #' @usage
 #' @param M A vector of natural mortality rate at age a. The length should be A+1.
 #' @param Sel A vector of selectivity at age a. The length should be A+1.
 #' @param w A vector of weight at age a. The length should be A+1.
@@ -369,7 +372,11 @@ Calcu_SBmsy <- function(Fmsy, M, Sel, w, g, A = 6,
   } else if(method_SR == "HS"){
     SBmsy <- alpha*beta*SBR_msy
   } else {
-    stop("Unexpected method. Confirm that method is either BH or HS")
+    if(method_SR == "Const"){
+      SBmsy <- alpha*SBR_msy
+    } else {
+    stop("Unexpected method. Confirm that method is either BH, HS, or Const")
+    }
   }
   return(SBmsy)
 }

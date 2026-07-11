@@ -9,33 +9,35 @@
 #' @param waa_biom weight at age for calculating biomass weight. If this is not given, sam_res$input$dat$waa is automatically used
 #' @param year_biol year range to derive biological parameters. Biological parameters are averaged by age during the given period
 #' @param year_Fcur year range to derive F at age considred as F current. Fs at age are averaged by age during the given period
-#' @param perSPR percent SPR (%) for calculating F%SPR
+#' @param perSPR percent SPR (\%) for calculating F\%SPR
 #'
 #' @examples
-#' \donotrun{
+#' \dontrun{
 #' res_pm_all <- purrr::map_dfr(basecase_list,
 #'                   function(x) get_pm(x, NULL, waa_catch=x$input$dat$waa), .id="id") %>%
 #'                   pivot_wider(values_from=value, names_from=stat)
 #' }
 #'
 #' @export
-#' 
+#'
 #' @encoding UTF-8
-#' 
+#'
 
 
 # get performance measures
 get_pm <- function(res_sam,
                    res_future=NULL,
-                   waa_catch=res_sam$input$dat$waa,                     
-                   last_year=2022,
+                   waa_catch=res_sam$input$dat$waa,
+                   last_year=2023,
                    waa_biom=res_sam$input$dat$waa,
-                   year_biol=2020:2022,
-                   year_Fcur=2020:2022,
-                   perSPR=c(30,40,50, 60, 70)
+                   year_biol=2016:2023,
+                   year_Fcur=2021:2023,
+                   perSPR=c(30,40,50, 60, 70),
+                   start_year=1970
                    ){
 
   # define year range
+  last10year <- (last_year-(9:0)) %>% as.character()
   last5year <- (last_year-(4:0)) %>% as.character()
   last3year <- (last_year-(2:0)) %>% as.character()
   last_year <- last_year %>% as.character()
@@ -44,7 +46,7 @@ get_pm <- function(res_sam,
   res_sam$input$dat$waa.catch <- waa_catch
 
 
-  if(res_sam$input$SR=="BHS"){
+  if(res_sam$input$SR=="BHS" | res_sam$input$SR=="Mesnil"){
     res_sam$input$SR <- res_sam$SR <- "HS"
   }
 
@@ -53,19 +55,24 @@ get_pm <- function(res_sam,
   Erate <- colSums(res_sam$caa * res_sam$input$dat$waa.catch)/colSums(res_sam$baa)
   ssb   <- colSums(res_sam$ssb)
 
+  aveF <- aveF[as.character(start_year:last_year)]
+  Erate <- Erate[as.character(start_year:last_year)]
+  ssb <- ssb[as.character(start_year:last_year)]
+
+
   # calculate biological reference points
   Fcurrent <- rowMeans(res_sam$faa[, as.character(year_Fcur)])
-  refs <- frasyr::ref.F(res_sam, Fcurrent=Fcurrent, pSPR=perSPR,rps.year=as.numeric(colnames(res_sam$naa)), 
+  refs <- frasyr::ref.F(res_sam, Fcurrent=Fcurrent, pSPR=perSPR,rps.year=as.numeric(colnames(res_sam$naa)),
                         M.year=year_biol, waa.year=year_biol, maa.year=year_biol,plot=FALSE)
   if(refs$Fmed[1]==0){
-    refs <- frasyr::ref.F(res_sam, Fcurrent=Fcurrent, pSPR=perSPR,rps.year=as.numeric(colnames(res_sam$naa)), 
-                          M.year=year_biol, waa.year=year_biol, maa.year=year_biol,plot=FALSE, Fem.init=-2) ## ad hoc fix  
+    refs <- frasyr::ref.F(res_sam, Fcurrent=Fcurrent, pSPR=perSPR,rps.year=as.numeric(colnames(res_sam$naa)),
+                          M.year=year_biol, waa.year=year_biol, maa.year=year_biol,plot=FALSE, Fem.init=-2) ## ad hoc fix
   }
   currentSPR <- refs$currentSPR$perSPR
   refs <- refs$summary
   refs <- refs[colnames(refs)%in%c("Fmed","F0.1",str_c("FpSPR.",perSPR,".SPR"))][3,]
   colnames(refs) <- str_c(colnames(refs),"/Fcur")
-    
+
 
   # calculate MSY reference points (use function copied from OMutility, OMutilityのときは6歳のF=1と定義していた。ここではどう定義する？)
   biopar <- derive_biopar(res_sam, year_biol)
@@ -77,7 +84,7 @@ get_pm <- function(res_sam,
     SBmsy   <- Calcu_SBmsy(RFmsy, M=biopar$M, Sel=Fcurrent, w=biopar$waa, g=biopar$maa, alpha=exp(res_sam$par_list$rec_loga), beta=exp(logb), method_SR=res_sam$SR)
 
     # calculate additional reference values
-    refs_msy <- frasyr::ref.F(res_sam, Fcurrent=Fcurrent*RFmsy, pSPR=perSPR,rps.year=as.numeric(colnames(res_sam$naa)), 
+    refs_msy <- frasyr::ref.F(res_sam, Fcurrent=Fcurrent*RFmsy, pSPR=perSPR,rps.year=as.numeric(colnames(res_sam$naa)),
                               M.year=year_biol, waa.year=year_biol, maa.year=year_biol,plot=FALSE)
     FmsySPR <- refs_msy$currentSPR$perSPR
     aa <- calc_steepness(SR=res_sam$SR, rec_pars=make_SRres(res_sam)$pars, M=biopar$M, waa=biopar$waa, maa=biopar$maa,Pope=FALSE,faa=Fcurrent)
@@ -91,62 +98,106 @@ get_pm <- function(res_sam,
   }
   TBy <- res_sam$baa[,last_year] %>% sum()
   SBy <- res_sam$ssb[,last_year] %>% sum()
-    
+
+  Scale <- res_sam$input$scale
+
   res <- tribble(~stat, ~value,
                  str_c("TBy",last_year), TBy,
-                 str_c("Sby",last_year), SBy,
+                 str_c("SBy",last_year), SBy,
                  str_c("Ry", last5year), res_sam$naa[1,last5year],
                  str_c("AFy",last5year), aveF[last5year],
                  str_c("Ey", last5year), Erate[last5year],
-                 "currentSPR"  , currentSPR,                 
-                 str_c("deple_median_last3"), mean(ssb[last3year])/median(ssb),
+                 "currentSPR/SPR0"  , currentSPR,
+                 str_c("SSB_50th"), median(ssb),
+                 str_c("deple_50th_last3"), mean(ssb[last3year])/median(ssb),
+                 str_c("SSB_25th"), quantile(ssb,probs=c(0.25))[1],
+                 str_c("deple_25th_last3"), mean(ssb[last3year])/quantile(ssb,probs=c(0.25))[1],
+                 str_c("SSB_70th"), quantile(ssb,probs=c(0.70))[1],
+                 str_c("deple_70th_last3"), mean(ssb[last3year])/quantile(ssb,probs=c(0.70))[1],
+                 # str_c("SSBmean"), mean(ssb),
+                 # str_c("deple_mean_last3"), mean(ssb[last3year])/mean(ssb),
+                 # str_c("SSBmax_last10"),max(ssb[last10year]),
+                 # str_c("deple_max_last10_last3"), mean(ssb[last3year])/max(ssb[last10year]),
                  names(refs) , as.numeric(unlist(refs)),
                  "Fmsy/Fcur"     , RFmsy,
-                 "Bmsy"      , Bmsy,
-                 "SBmsy"     , SBmsy,
+                 "Bmsy"      , Bmsy*Scale,
+                 "SBmsy"     , SBmsy*Scale,
                  "h"         , h,
-                 "SB0"       , SB0,
+                 "SB0"       , SB0*Scale,
                  "SBmsy/SB0" , SBmsy/SB0,
                  "FmsySPR"   , FmsySPR,
-                 "B/Bmsy"     , TBy/Bmsy/1000,
-                 "SB/SBmsy"    , SBy/SBmsy/1000,
-                 "SBmsy/SBmax"    , SBmsy*1000/max(ssb)
+                 "B/Bmsy"     , TBy/Bmsy/Scale,
+                 "SB/SBmsy"    , SBy/SBmsy/Scale,
+                 "SBmsy/SBmax"    , Scale*SBmsy/max(ssb)
                  ) %>%
     unnest(cols=c(stat, value))
 
   return(res)
 }
 
-#' @export
-#' 
+#' rec.age>0のときにRをずらす関数
+#'
+#' yearはSSBに合わせる（つまり何年生まれかを表す）
+#'
 #' @encoding UTF-8
-#' 
+#'
+shift_SRdata_rec_age <- function(SRdata, rec_age) {
+  if (is.null(rec_age) || is.na(rec_age)) rec_age <- 0
+  if (rec_age <= 0) return(SRdata)
 
-make_SRres <- function(res_sam, multi_ssb=100, get_rand=FALSE, nsim=10000){
+  data_R <- SRdata %>%
+    dplyr::select(year, R) %>%
+    dplyr::mutate(year = year - rec_age)
+
+  dplyr::right_join(
+    data_R,
+    SRdata %>% dplyr::select(-R),
+    by = "year"
+  )
+}
+
+#' @export
+#'
+#' @encoding UTF-8
+#'
+
+make_SRres <- function(res_sam, multi_ssb=1.3, get_rand=FALSE, nsim=10000){
   res_sam2 <- res_sam
   res_sam2$input$Pope <- FALSE
-  res_sam2$rec.par <- c(res_sam2$rec.par, sd=res_sam2$sigma.logN[1],rho=0)
+  res_sam2$rec.par <- c(res_sam2$rec.par, sd=res_sam2$sigma.logN[1],rho=0,gamma=res_sam2$input$gamma)
   res_SR <- list(pars=as.list(res_sam2$rec.par))
   res_SR$input <- res_sam2$input
   res_SR$input$type <- "L2"
   res_SR$input$SRdata <- get.SRdata(res_sam)
+
+  res_SR$input$SRdata <- shift_SRdata_rec_age(
+    res_SR$input$SRdata,
+    res_sam$input$rec.age
+  )
+
   res_SR$input$SR <- res_sam$input$SR
   ssb <- seq(from=1,to=multi_ssb*max(colSums(res_sam2$ssb)),length=100)
+  scale_ssb <- res_sam$input$scale
+  scale_R <- res_sam$input$scale_number
   if(res_SR$input$SR=="BHS"){
-    res_SR$pred <- tibble(SSB=ssb/1000,R=1000*frasyr::SRF_BHS(ssb/1000,res_SR$pars$a,res_SR$pars$b,1))
+    # res_SR$pred <- tibble(SSB=ssb/1000,R=1000*frasyr::SRF_BHS(ssb/1000,res_SR$pars$a,res_SR$pars$b,1)) #最後1じゃない方が良い気がするがとりあえず放置
+    res_SR$pred <- tibble(SSB=ssb,R=scale_R*frasyr::SRF_BHS(ssb/scale_ssb,res_SR$pars$a,res_SR$pars$b,exp(res_sam$par_list$rec_logk))) #最後1じゃない方が良い気がするがとりあえず放置
   }
   if(res_SR$input$SR=="BH"){
-    res_SR$pred <- tibble(SSB=ssb/1000,R=1000*frasyr::SRF_BH(ssb/1000,res_SR$pars$a,res_SR$pars$b,1))
+    res_SR$pred <- tibble(SSB=ssb/scale_ssb,R=scale_R*frasyr::SRF_BH(ssb/scale_ssb,res_SR$pars$a,res_SR$pars$b,1))
   }
+
+
   res_SR$AICc <- NA
 
   return(res_SR)
 }
 
+
 #' @export
-#' 
+#'
 #' @encoding UTF-8
-#' 
+#'
 
 get_randpar <- function(res_sam, nsim=10000, only_fix=TRUE){
   prec1 = res_sam$rep$jointPrecision
@@ -166,24 +217,21 @@ get_randpar <- function(res_sam, nsim=10000, only_fix=TRUE){
     fix.prec <- prec1[1:length(res_sam$opt$par),1:length(res_sam$opt$par)]
     fix.covar <- covar1[1:length(res_sam$opt$par),1:length(res_sam$opt$par)]
     parname <- coname[1:length(res_sam$opt$par)]
-    
+
 #    rand1 <- rmvnorm_prec(fix.par,fix.prec,n.sims=nsim)
-    rand <- MASS::mvrnorm(n=nsim,mu=fix.par,Sigma=fix.covar)  
+    rand <- MASS::mvrnorm(n=nsim,mu=fix.par,Sigma=fix.covar)
   }
   else{
     mu_est <- res_sam$obj$env$last.par.best
-    rand <- MASS::mvrnorm(n=nsim,mu=mu_est,Sigma=covar1) 
+    rand <- MASS::mvrnorm(n=nsim,mu=mu_est,Sigma=covar1)
   }
   rand %>% as_tibble(.name_repair="unique") %>% return()
 }
 
 #' @export
-#' 
+#'
 #' @encoding UTF-8
 #'
-#' @examples
-#' 
-
 make_samrand <- function(res_sam, nsim=1000){
 
   rand_par <- get_randpar(res_sam, nsim=nsim, only_fix=FALSE)
@@ -195,7 +243,7 @@ make_samrand <- function(res_sam, nsim=1000){
     res_rand[[i]]$par_list$rec_loga <- rand_par$rec_loga[i]
     res_rand[[i]]$par_list$rec_logb <- rand_par$rec_logb[i]
     if(!is.null(rand_par$rec_loga)) res_rand[[i]]$rec.par["a"] <- rand_par$rec_loga[i] %>% exp()
-    if(!is.null(rand_par$rec_logb)) res_rand[[i]]$rec.par["b"] <- rand_par$rec_logb[i] %>% exp()    
+    if(!is.null(rand_par$rec_logb)) res_rand[[i]]$rec.par["b"] <- rand_par$rec_logb[i] %>% exp()
     res_rand[[i]]$sigma.logN[1] <- rand_par$logSdLogN[i] %>% exp()
     res_rand[[i]]$naa[] <- naa_faa[i,1:7,] %>% exp()
     res_rand[[i]]$faa[] <- naa_faa[i,c(8:13,13),] %>% exp()
@@ -208,7 +256,7 @@ make_samrand <- function(res_sam, nsim=1000){
 
 #'
 #' @export
-#' 
+#'
 
 # calculate all confidence interval
 do_allboot <- function(res_sam_list, nsim=100, year_biol=2020:2022){
@@ -222,6 +270,7 @@ do_allboot <- function(res_sam_list, nsim=100, year_biol=2020:2022){
     res_SR_boot[[i]] <- purrr::map(res_sam_boot[[i]], function(x) make_SRres(x, multi_ssb=1))
     res_SR_fit[[i]] <- purrr::map(res_sam_boot[[i]], function(x){
         SRdata <- get.SRdata(x)
+        SRdata <- shift_SRdata_rec_age(SRdata, x$input$rec.age)
         fit.SR(SRdata, SR="BH")
     })
   }

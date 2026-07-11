@@ -7,7 +7,9 @@
 select_sigma_grid(
   samres,
   grid = expand.grid(var = c("varC", "varF", "varN", "index.key")[1:2], X = 1:2),
-  stopAIC = TRUE
+  stopAIC = TRUE,
+  check_converge = FALSE,
+  SEmax = 10
 )
 }
 \arguments{

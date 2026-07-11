@@ -9,11 +9,12 @@ get_pm(
   res_sam,
   res_future = NULL,
   waa_catch = res_sam$input$dat$waa,
-  last_year = 2022,
+  last_year = 2023,
   waa_biom = res_sam$input$dat$waa,
-  year_biol = 2020:2022,
-  year_Fcur = 2020:2022,
-  perSPR = c(30, 40, 50, 60, 70)
+  year_biol = 2016:2023,
+  year_Fcur = 2021:2023,
+  perSPR = c(30, 40, 50, 60, 70),
+  start_year = 1970
 )
 }
 \arguments{
@@ -31,13 +32,13 @@ get_pm(
 
 \item{year_Fcur}{year range to derive F at age considred as F current. Fs at age are averaged by age during the given period}
 
-\item{perSPR}{percent SPR (%) for calculating F%SPR}
+\item{perSPR}{percent SPR (\%) for calculating F\%SPR}
 }
 \description{
 utilities for extracting statistics
 }
 \examples{
-\donotrun{
+\dontrun{
 res_pm_all <- purrr::map_dfr(basecase_list,
                   function(x) get_pm(x, NULL, waa_catch=x$input$dat$waa), .id="id") \%>\%
                   pivot_wider(values_from=value, names_from=stat)

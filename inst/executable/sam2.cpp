@@ -146,6 +146,7 @@ Type objective_function<Type>::operator() ()
   DATA_ARRAY(propM);
   DATA_INTEGER(minAge);
   DATA_INTEGER(maxAgePlusGroup);
+  DATA_INTEGER(recAge);  // recruitment age
   DATA_INTEGER(rhoMode);
   DATA_IARRAY(keyLogFsta);
   DATA_ARRAY(keyLogQ);
@@ -157,7 +158,7 @@ Type objective_function<Type>::operator() ()
   DATA_SCALAR(scale);
   DATA_SCALAR(gamma);
   // DATA_VECTOR(fbarRange);
-  DATA_INTEGER(sel_def); // selectivity difenition: devided by maxF(0), meanF(1), maxage(2)
+  DATA_INTEGER(sel_def); // selectivity definition: divided by maxF(0), meanF(1), maxage(2)
   DATA_INTEGER(b_random); // if 1, nonlinear coefficient b estimated by random effects
 
   PARAMETER_VECTOR(logQ);
@@ -213,6 +214,7 @@ Type objective_function<Type>::operator() ()
   array<Type> logN(nlogN,U.cols()); // logN (7 x 50 matrix)
   array<Type> exp_logF(nlogF,U.cols()); // F (6 x 50 matrix)
   array<Type> exp_logN(nlogN,U.cols()); // N (7 x 50 matrix)
+  array<Type> caa_est(nlogN,U.cols());
 
   array<Type> stockMeanWeight_true(stockMeanWeight.rows(),stockMeanWeight.cols()); // N (7 x 50 matrix)
   // stockMeanWeight_true.fill(1.0);
@@ -249,6 +251,7 @@ Type objective_function<Type>::operator() ()
   vector<Type> F_mean(timeSteps);
   vector<Type> Catch_biomass(timeSteps);
   vector<Type> Exploitation_rate(timeSteps);
+  vector<Type> scale_U(timeSteps);
 
   //First take care of F
   matrix<Type> fvar(stateDimF,stateDimF);  // Fの???散??????
@@ -367,10 +370,11 @@ Type objective_function<Type>::operator() ()
   vector<Type> recResid(timeSteps); //再生産関係からの残差
   array<Type> logN_resid(stateDimN,timeSteps); // N process error residual
 
-  int start_timeStep=1+minAge;
-  if(stockRecruitmentModelCode==0){ // if RW
-    start_timeStep=1;
-    }
+  int start_timeStep=1+recAge;
+  // if(stockRecruitmentModelCode==0){ // if RW
+  //   start_timeStep=1;
+  //   }  // SRのときとAICを比較できるようにするため、RWのときもstart_timestepを遅らせる
+
   //Now take care of N
   matrix<Type> nvar(stateDimN,stateDimN);  // logNのvcov
   for(int k=0; k<stateDimN; ++k){
@@ -399,22 +403,22 @@ Type objective_function<Type>::operator() ()
     }else{
       if(stockRecruitmentModelCode==1){//ricker
         // predN(0)=rec_loga+log(ssb(i-1))-exp(rec_logb)*ssb(i-1);
-        predN0(0)=rec_loga+log(ssb(i-minAge)/scale)-exp(rec_logb)*(ssb(i-minAge)/scale); //scaling SR (2023/10/10)
+        predN0(0)=rec_loga+log(ssb(i-recAge)/scale)-exp(rec_logb)*(ssb(i-recAge)/scale); //scaling SR (2023/10/10)
       }else{
         if(stockRecruitmentModelCode==2){//BH
           // predN(0)=rec_loga+log(ssb(i-1))-log(1.0+exp(rec_logb)*ssb(i-1));
-          predN0(0)=rec_loga+log(ssb(i-minAge)/scale)-log(Type(1.0)+exp(rec_logb)*(ssb(i-minAge)/scale));
+          predN0(0)=rec_loga+log(ssb(i-recAge)/scale)-log(Type(1.0)+exp(rec_logb)*(ssb(i-recAge)/scale));
         }else{
           if(stockRecruitmentModelCode==3){ //HS
-            predN0(0)=CppAD::CondExpLt(rec_logb,log(ssb(i-minAge)/scale),rec_loga+rec_logb,rec_loga+log(ssb(i-minAge)/scale));
+            predN0(0)=CppAD::CondExpLt(rec_logb,log(ssb(i-recAge)/scale),rec_loga+rec_logb,rec_loga+log(ssb(i-recAge)/scale));
             // vector<Type> rec_pred_HS(2);
             // rec_pred_HS(0)=rec_loga+rec_logb;
-            // rec_pred_HS(1)=rec_loga+log(ssb(i-minAge));
+            // rec_pred_HS(1)=rec_loga+log(ssb(i-recAge));
             //
             // predN0=min(rec_pred_HS);
           } else {
             if(stockRecruitmentModelCode==4){ //Mesnil HS
-              predN0(0)=ssb(i-minAge)/scale+sqrt(square(exp(rec_logb))+square(gamma)/Type(4.0))-sqrt(square(ssb(i-minAge)/scale-exp(rec_logb))+square(gamma)/Type(4.0));
+              predN0(0)=ssb(i-recAge)/scale+sqrt(square(exp(rec_logb))+square(gamma)/Type(4.0))-sqrt(square(ssb(i-recAge)/scale-exp(rec_logb))+square(gamma)/Type(4.0));
               predN0(0)*=exp(rec_loga)/Type(2.0);
               predN0(0)=log(predN0(0));
             }else{
@@ -422,12 +426,18 @@ Type objective_function<Type>::operator() ()
                 predN0(0)=rec_loga;
               }else{
                 if(stockRecruitmentModelCode==6){ //Proportional to SSB (no density-dependence)
-                  predN0(0)=rec_loga+log(ssb(i-minAge)/scale);
+                  predN0(0)=rec_loga+log(ssb(i-recAge)/scale);
                 }else{
-                  if(stockRecruitmentModelCode==7){ //HO model (HSの角が丸くなったモデル)
-                    predN0(0)=CppAD::CondExpLt(rec_logb,log(ssb(i-minAge)/scale),rec_loga+rec_logb,rec_loga+rec_logb+(Type(1.0)-pow((ssb(i-minAge)/scale)/exp(rec_logb),exp(rec_logk)))*(log(ssb(i-minAge)/scale)-rec_logb));
+                  if(stockRecruitmentModelCode==7){ //BHS model (HSの角が丸くなったモデル)
+                    predN0(0)=CppAD::CondExpLt(rec_logb,log(ssb(i-recAge)/scale),rec_loga+rec_logb,rec_loga+rec_logb+(Type(1.0)-pow((ssb(i-recAge)/scale)/exp(rec_logb),exp(rec_logk)))*(log(ssb(i-recAge)/scale)-rec_logb));
                   }else{
+                    if(stockRecruitmentModelCode==8){ //MR model (Mesnilでgammaを推定する場合)
+                      predN0(0)=ssb(i-recAge)/scale+sqrt(square(exp(rec_logb))+square(exp(rec_logk))/Type(4.0))-sqrt(square(ssb(i-recAge)/scale-exp(rec_logb))+square(exp(rec_logk))/Type(4.0));
+                      predN0(0)*=exp(rec_loga)/Type(2.0);
+                      predN0(0)=log(predN0(0));
+                    } else{
                     error("SR model code not recognized");
+                    }
                   }
                 }
               }
@@ -470,10 +480,17 @@ Type objective_function<Type>::operator() ()
   Type predObs=0, zz, var;
   vector<Type> pred_log(nobs); //
   vector<Type> ans_obs(nobs);
+  ans_obs.setZero();
+
+  if (minAge != 0) {
+    error("minAge must be 0. Age inputs are assumed to be indexed from age 0.");
+  }
+
   for(int i=0;i<nobs;i++){
     y=CppAD::Integer(obs(i,0))-minYear;   // 年のラベル
     f=CppAD::Integer(obs(i,1));    //  fleetのラベル
     ft=CppAD::Integer(fleetTypes(f-1));   // fleet typeが何にあたるか?0=caa, 2=survey biomass data, 3=survey SSB data, 4=survey recruitment data, 5=survey SSBm data
+    // minAge = 0 が必ず入るようにする
     a=CppAD::Integer(obs(i,2))-minAge;  // age
     amax=CppAD::Integer(obs(i,4))-minAge; //maxage
     if(a<(stateDimN-1)){
@@ -533,7 +550,7 @@ Type objective_function<Type>::operator() ()
             if(ft==4){// Number (e.g.,Recruitment) survey
               predObs=0.0;
               for(int j=a; j<amax+1; ++j){
-                predObs=+exp(logN(j,y));
+                predObs+=exp(logN(j,y));
               }
               predObs=log(predObs);
               // predObs=logN(a,y)-zz*sampleTimes(f-1);
@@ -625,13 +642,16 @@ Type objective_function<Type>::operator() ()
       if (j<(stateDimN-1)) {
         zz=exp(logF((keyLogFsta(0,j)),i))+natMor(i,j);
         Catch_biomass(i)+=exp(logN(j,i))*stockMeanWeight_true(i,j)*exp(logF((keyLogFsta(0,j)),i))*(1-exp(-zz))/zz;
+        caa_est(j,i)=exp(logN(j,i))*exp(logF((keyLogFsta(0,j)),i))*(1-exp(-zz))/zz;
       } else {
         zz=alpha*exp(logF((keyLogFsta(0,j)),i))+natMor(i,j);
         Catch_biomass(i)+=exp(logN(j,i))*stockMeanWeight_true(i,j)*alpha*exp(logF((keyLogFsta(0,j)),i))*(1-exp(-zz))/zz;
+        caa_est(j,i)=exp(logN(j,i))*alpha*exp(logF((keyLogFsta(0,j)),i))*(1-exp(-zz))/zz;
       }
     }
     F_mean(i)/=stateDimN;
     Exploitation_rate(i)=Catch_biomass(i)/B_total(i);
+    scale_U(i)=Exploitation_rate(i)/(1-Exploitation_rate(i));
   }
 
   ans = (Type(1.0)-lambda)*ans;
@@ -835,7 +855,9 @@ Type objective_function<Type>::operator() ()
   ADREPORT(phi1);
   ADREPORT(Catch_biomass);
   ADREPORT(Exploitation_rate);
+  ADREPORT(scale_U);
   ADREPORT(stockMeanWeight_true);
+  ADREPORT(caa_est);
 
   REPORT(logF);
   REPORT(logN);

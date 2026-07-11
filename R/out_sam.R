@@ -2,6 +2,10 @@
 #' output sam object results
 #' @param res sam object
 #'
+#' @importFrom readr write_csv
+#' @importFrom tibble rownames_to_column as_tibble
+#' @importFrom dplyr select
+#'
 #' @export
 
 out_sam <- function(res,
@@ -108,11 +112,13 @@ out_sam <- function(res,
   get.SPR(res)$ysdata %>% rownames_to_column(var="year") %>%
     as_tibble() %>%
     dplyr::select(-"F/Ftarget") %>%
-    write_csv(path=csvname,append=T, col_names=TRUE)
+    write_csv(file=csvname,append=T, col_names=TRUE)
 
   write("\n# stock-recruitment relationship",file=csvname,append=T)
-  write.table2(cbind("type"=res$input$SR,data.frame(t(res$rec.par)),"sigmaR"=res$sigma.logN[1]),
-               title.tmp="Stock-recuitment relationship",is.plot=FALSE)
+  if (!is.null(res$rec.par)) {
+    write.table2(cbind("type"=res$input$SR,data.frame(t(res$rec.par)),"sigmaR"=res$sigma.logN[1]),
+                 title.tmp="Stock-recuitment relationship",is.plot=FALSE)
+  }
 
   tmp <- sumrep[rownames(sumrep)=="exp_logN",]
   tmp <- cbind(expand.grid(age=rownames(res$naa),year=colnames(res$naa)),tmp) %>%

@@ -6,6 +6,9 @@
 \usage{
 plot_SR_simple(samres, length = 1000, base_size = 14, ...)
 }
+\arguments{
+\item{samres}{SAMの結果オブジェクト}
+}
 \description{
 再生産関係についてプロットする関数
 }

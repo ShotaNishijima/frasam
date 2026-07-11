@@ -1,0 +1,857 @@
+---
+title: "FAQ on how to use 'frasam'"
+author: "Shota Nishijima (FRA)"
+date: "`r format(Sys.Date())`"
+output:
+  rmarkdown::html_vignette:
+    css: style.css
+    toc: true
+    toc_depth: 3
+  rmarkdown::md_document:
+    variant: markdown_github
+    toc: true
+    toc_depth: 3
+vignette: >
+  %\VignetteIndexEntry{FAQ on how to use 'frasam'}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+
+# Frequently Asked Questions
+
+この文書は、`frasam` を使うときによくある質問・要望と対応方針をまとめるためのものです。
+解析の詳細な手順は通常のvignetteに残し、ここではエラー対応、確認方法、開発時の注意点を短く整理します。
+ここに載せてほしい項目は、[Issues](https://github.com/ShotaNishijima/frasam/issues)に書き込んでください。あるいは、ニシジマまで連絡してください。
+
+```{r setup, include = FALSE}
+  options(rmarkdown.html_vignette.check_title = FALSE)
+  knitr::opts_chunk$set(
+    collapse = TRUE,
+    comment = "#>",
+    message = FALSE,
+    warning = FALSE,
+    fig.width = 10,
+    fig.height = 6,
+    out.width = "100%"
+  )
+  
+  if (requireNamespace("pkgload", quietly = TRUE)) {
+    pkgload::load_all(export_all = FALSE)
+  } else if (requireNamespace("devtools", quietly = TRUE)) {
+    devtools::load_all()
+  } else {
+    library(frasam)
+  }
+  library(dplyr)
+  library(tidyr)
+  library(stringr)
+  library(forcats)
+  library(magrittr)
+  library(ggplot2)
+```
+
+## インストールと依存パッケージ
+
+### どのブランチを`frasam` を使えばよい？
+
+- このvignetteにある仕様を使う場合は`frasam` は `create_vignette`のブランチをインストールしてください
+
+```{r install-frasam, eval = FALSE}
+install.packages("remotes")
+remotes::install_github("ShotaNishijima/frasam@create_vignette")
+# remotes::install_github("ichimomo/frasyr@dev")
+
+library(frasam)
+library(tidyverse)
+```
+
+### `frasyr` がないと言われます
+
+`frasam` は `frasyr` に依存しています。未インストールの場合は、開発版の `frasyr` を入れてから再実行してください。
+
+```{r install-frasyr, eval = FALSE}
+remotes::install_github("ichimomo/frasyr@dev")
+library(frasyr)
+```
+
+
+## SAMの実行
+
+### `use_sam_tmb()` はいつ実行しますか？
+
+- `sam()` を実行する前に、TMBで使う実行ファイルを準備するために実行します。
+- 通常のテストや例では、上書きしない設定にします。
+
+```{r use-sam-tmb, eval = TRUE}
+ use_sam_tmb(overwrite = FALSE, compile = "auto")
+```
+
+
+### 一部の引数のみを変更して解析したい
+
+- SAMの結果オブジェクトに格納されている`input`と`do.call`（または`frasyr::safe_call`を使って、前までの設定を引き継いだ解析ができます
+- ここでは再生産関係を変更した場合を例に説明します。
+
+```{r use-do.call, eval = TRUE}
+data("dat_ex") #example data
+
+#Random walk (RW)
+res_rw  <- sam(
+  dat_ex,
+  last.catch.zero = TRUE, #最終年のcatchがzeroかどうか
+  abund = c("N","N","N","SSB","B"),
+  min.age=c(0,0,1,0,0),
+  max.age = c(0,0,1,6,6),
+  rec.age = 0,
+  index.key=0:4, #すべてのindexの観測誤差のSDが異なる、という設定
+  b.est=FALSE,
+  SR = "RW",
+  varC = c(0,0,1,1,1,2,2), #0-1歳, 2-4歳, 5-6+歳でcatch at ageの観測誤差のSDが共通
+  varF = c(0,0,1,1,1,1,1), #0-1歳, 2-6+歳でF at ageの過程誤差のSDが共通
+  varN = c(0,1,1,1,1,1,1), #0歳, 1-6+歳でN at ageの過程誤差のSDが共通
+  rho.mode=3,
+  bias.correct = FALSE,
+  silent = TRUE
+)
+
+# RW -> BH
+input <- res_rw$input
+input$SR <- "BH"
+res_bh <- do.call(sam, input)
+
+# RW -> RI
+input$SR <- "RI"
+res_ri <- do.call(sam, input)
+
+plot_samvpa(list(res_rw,res_bh,res_ri), CI=0.8,
+            scenario_name=rev(c("RW","BH","RI")))
+```
+
+### 引数の形式がデータと合っていないことによるエラーを修正したい
+
+`sam()` では、`q.init` などの初期値や `p0.list` の構造が現在のデータ・モデル設定と合っていない場合、TMB に渡す前にエラーとして止まります。
+この場合は、エラーメッセージに出ている引数の長さや構造を、現在の解析設定に合わせて修正します。
+
+例えば、`q.init` は index の数と同じ長さで与える必要があります。
+以下では、あえて 1 つ長い `q.init` を与えてエラーにしています。
+
+```{r wrong-q-init, echo = TRUE, error = TRUE}
+bad_input <- res_ri$input
+bad_input$p0.list <- NULL
+bad_input$q.init <- rep(1, length(bad_input$abund) + 1)
+
+res_bad_q <- do.call(sam, bad_input)
+```
+
+`bad_input$abund` の長さが index の数なので、`q.init` も同じ長さに直します。
+特に初期値を指定する必要がなければ、`NULL` に戻してデフォルト初期値を使うのも安全です。
+
+```{r fix-q-init, echo = TRUE}
+fixed_input <- bad_input
+fixed_input$q.init <- rep(1, length(fixed_input$abund))
+
+res_fixed_q <- do.call(sam, fixed_input)
+length(res_fixed_q$input$q.init)
+length(res_fixed_q$input$abund)
+```
+
+以前の解析結果を初期値として使う場合は、`p0.list` の各パラメータの名前・長さ・次元が、現在のモデル設定と一致している必要があります。
+以下では、`logQ` だけをあえて 1 つ長くして、構造が合わない例を作っています。
+
+```{r wrong-p0-list, echo = TRUE, error = TRUE}
+bad_input <- res_ri$input
+bad_input$p0.list <- res_ri$init
+bad_input$p0.list$logQ <- c(bad_input$p0.list$logQ, 0)
+
+res_bad_p0 <- do.call(sam, bad_input)
+```
+
+このような場合は、壊れた要素だけを手で直すより、同じモデル構造から得られた `init` や `par_list` を使い直すのが安全です。
+モデル構造を変えた場合は、`p0.list <- NULL` としてデフォルト初期値から再実行してください。
+
+```{r fix-p0-list, echo = TRUE}
+fixed_input <- bad_input
+fixed_input$p0.list <- res_ri$init
+
+res_fixed_p0 <- do.call(sam, fixed_input)
+length(res_fixed_p0$init$logQ)
+length(res_fixed_p0$input$abund)
+```
+
+モデル設定を変えた後に以前の推定値を初期値として使いたい場合は、まず `p0.list <- NULL` で一度実行し、その結果の `par_list` や `init` を次の解析に使うと、構造の不一致を避けやすくなります。
+
+### モデルがちゃんと収束しているか判別したい
+
+`check_fit_sam()` を使うと、`sam()` の結果について、収束コード、Hessian、勾配、標準誤差、極端なパラメータ値などをまとめて確認できます。
+返り値の `ok` が `TRUE` なら、基本的な診断項目はすべて通っています。
+
+```{r check-fit-sam-basic, echo = TRUE}
+fit_check <- check_fit_sam(res_rw)
+
+fit_check$ok
+fit_check$checks
+```
+
+`verbose = FALSE` を指定すると、実行時に表を表示せず、結果だけをオブジェクトとして保存できます。
+複数のモデルを比較するときは、`ok` や `checks` を取り出して使います。
+
+```{r check-fit-sam-compare, echo = TRUE}
+fit_checks <- list(
+  RW = check_fit_sam(res_rw, verbose = FALSE),
+  BH = check_fit_sam(res_bh, verbose = FALSE),
+  RI = check_fit_sam(res_ri, verbose = FALSE)
+)
+
+sapply(fit_checks, function(x) x$ok)
+```
+
+特定の診断だけを詳しく見たい場合は、`checks` から該当行を取り出します。
+例えば、最大勾配や Hessian の状態は以下のように確認できます。
+
+```{r check-fit-sam-detail, echo = TRUE}
+fit_check$checks[
+  fit_check$checks$check %in% c(
+    "maximum fixed-effect gradient",
+    "positive definite Hessian",
+    "reported sigma range"
+  ),
+]
+```
+
+`fixed` には固定効果パラメータごとの推定値、標準誤差、勾配が入っています。
+標準誤差が大きいパラメータや、勾配が大きいパラメータを確認したいときに使います。
+
+```{r check-fit-sam-fixed, echo = TRUE}
+head(fit_check$fixed)
+
+fit_check$fixed[
+  order(abs(fit_check$fixed$gradient), decreasing = TRUE),
+][1:5, ]
+```
+
+診断のしきい値は引数で変更できます。
+例えば、勾配をより厳しく見る場合は `gradient_tol` を小さくします。
+
+```{r check-fit-sam-strict, echo = TRUE}
+check_fit_sam(res_rw, gradient_tol = 1e-4, verbose = FALSE)$checks
+```
+
+`reported sigma range` が `FALSE` になった場合は、`sigma` テーブルを見ると、どの種類・何番目の sigma がしきい値の外にあるかを確認できます。
+
+```{r check-fit-sam-sigma, echo = TRUE}
+fit_check$sigma
+
+fit_check$sigma[!fit_check$sigma$ok, ]
+```
+
+しきい値を変えて確認したい場合は、`sigma_range` を指定します。
+例えば、以下では説明用にかなり狭い範囲を指定しています。
+
+```{r check-fit-sam-sigma-strict, echo = TRUE}
+fit_check_strict_sigma <- check_fit_sam(
+  res_rw,
+  sigma_range = c(0.5, 1),
+  verbose = FALSE
+)
+
+fit_check_strict_sigma$checks[
+  fit_check_strict_sigma$checks$check == "reported sigma range",
+]
+
+fit_check_strict_sigma$sigma[!fit_check_strict_sigma$sigma$ok, ]
+```
+
+### 以前の解析結果の初期値を利用したい
+
+-`par_list`に固定効果とランダム効果のパラメータ推定値がリスト形式で与えられている
+- これを次の解析の初期値として使うことで、推定を安定化させることができる
+- ただし、固定効果とランダム効果の数や構造が変わるとうまく行かないので、注意すること
+- ここでは`rho.mode`を変更したときを例に説明する
+
+```{r use-p0, eval = TRUE}
+
+input$p0.list <- res_ri$par_list
+input$rho.mode <- 2
+res_rho2 <- do.call(sam, input)
+
+plot_samvpa(list(res_ri, res_rho2), CI=0.8,
+            scenario_name=rev(c("Rho3","Rho2")))
+
+```
+
+### 初期値を設定する方法
+
+収束しにくい場合や、勾配がやや大きい場合は、初期値を変更して再解析することが有効な場合があります。
+`sam()` では、主な固定効果パラメータの初期値を `xx.init` という引数で指定できます。
+これらの引数は、内部で `log()` や `logit()` に変換されるため、基本的には通常のスケールで値を与えます。
+
+- `q.init`: index ごとの q の初期値。長さは index の数と同じにします
+- `sdFsta.init`: F のランダムウォークのプロセス誤差 SD の初期値。長さは `unique(varF)` の数と対応します
+- `sdLogN.init`: 資源尾数 N のプロセス誤差 SD の初期値。長さは `unique(varN)` の数と対応します
+- `sdLogObs.init`: catch at age と index の観測誤差 SD の初期値。長さは `unique(varC)` と `unique(index.key)` を合わせた数と対応します
+- `rho.init`: F のランダムウォークの年齢間相関係数の初期値。0から1の間の値を指定します
+- `a.init`, `b.init`: 再生産関係パラメータの初期値。正の値を指定します
+
+例えば、VPAで得られた q を `q.init` として使う場合は、以下のように指定します。
+
+```{r set-qinit, eval = FALSE}
+
+# last catch zeroのとき最終年の加入IndexがあるとInfがでるとqが推定できないので除いておく
+dat_ex2 <- dat_ex
+dat_ex2$index[1:2,ncol(dat_ex2$index)] <- NA_real_
+
+res_vpa <- frasyr::vpa(
+  dat_ex2,
+  last.catch.zero = TRUE,
+  fc.year=2011:2013,
+  tf.year = 2010:2012,
+  term.F="max",
+  stat.tf="mean",
+  Pope=TRUE,
+  tune=TRUE,
+  p.init=0.5, 
+  abund = c("N","N","N","SSB","B"),
+  min.age=c(0,0,1,0,0),
+  max.age = c(0,0,1,6,6), 
+  sel.update=TRUE)
+
+q_init <- res_vpa$q #VPAの推定値を持ってくる
+input <- res_rw$input
+input$q.init <- q_init
+
+res_qinit <- do.call(sam,input)
+```
+
+### 初期値をランダムに変えてよい解を探したい
+
+初期値に依存して局所解に入っている可能性がある場合は、`do_jitter()` で初期値をランダムに少しずつ変えて、複数回推定することができます。
+`do_jitter()` は各試行の目的関数値を `resdat` に保存します。
+同じモデル・同じデータで比較する場合は、`obj_value` が小さいものを、尤度が高い解として選びます。
+`ID = 0` は jitter する前の元の結果を表します。
+`ID > 0` が選ばれた場合は、初期値を変えることで目的関数値が改善したことを意味します。
+ただし、`do_jitter()` の `reslist` に保存される結果は、`sam()` の完全な出力ではなく、目的関数値の比較に使う簡易的な結果です。
+通常の図や出力には、改めて `sam()` の結果オブジェクトを使ってください。
+
+```{r jitter-initial-values, eval = FALSE}
+jitter_res <- do_jitter(
+  res_rw,
+  SD = 0.1,   # 初期値に加える正規乱数の標準偏差
+  nsim = 20,  # jitterする回数
+  seed = 1
+)
+
+jitter_res$resdat
+
+best_id <- jitter_res$resdat$ID[which.min(jitter_res$resdat$obj_value)]
+best_id
+
+if (best_id == 0) {
+    res_best <- res_rw
+  } else {
+    input <- res_rw$input
+    input$p0.list <- jitter_res$reslist[[best_id]]$obj$env$parList()
+    res_best <- do.call(sam, input)
+  }
+
+```
+
+
+### 資源尾数Nのプロセス誤差を小さい値に固定したい {#fix-SDlogN}
+
+- SAMではVPAと異なり、加入以降の個体数が、漁獲死亡(F)と自然死亡係数(M)以外の要因（プロセス誤差）によっても変化することを仮定します
+- その値を小さくすることで、VPAと同じ個体群動態になります
+- 上の診断例のように、`sigma.logN` が極端に小さい場合は、以下の設定で1歳以上のsigma.logNを小さい値で固定して、推定しないことが推奨されます
+- `varN.fix = c(NA, 0.0001)`のように引数を設定してください。NAは0歳（加入）を推定すること、1歳魚以上の過程誤差の分散を0.0001に固定することを意味しています。
+- 設定するのはSDではなく分散であることに注意してください。つまり0.0001とするとSDは0.01で固定されます
+- `varN.fix`の長さは、`unique(varN)`の長さと一致しなくてはいけません
+
+```{r fix-sigmaN, echo = TRUE}
+
+input <- res_rw$input
+input$varN #1歳魚以上が共通
+input$varN.fix <- c(NA,0.0001) #SDではなくて分散
+
+res_varNfix = do.call(sam, input)
+res_varNfix$sigma.logN #1歳魚以上はSD=0.01に固定
+
+check_fit_sam(res_varNfix, verbose = TRUE) #すべてOKになる
+```
+
+### ある固定効果パラメータをある値に固定して使いたい {#fix-SDlogC}
+
+- 上記で説明したNの過程誤差以外にも、他のパラメータを固定したい場合があるかもしれない
+- 例えば、catch at ageの観測誤差の分散が事前に分かっている場合はその値を固定することは妥当だと思われる
+- TMBでは`map`という機能を使って、固定効果パラメータを初期値に固定できる機能がある
+- `sam`では`map.add`という引数を利用することで、特定のパラメータを固定できる
+- SAMではcatch at ageの観測誤差とIndexの観測誤差（のSDのlog）が共にlogSdLogObsというパラメータで推定されているので、その場所を見つける必要がある
+
+```{r fix-logsdlogobs, echo = TRUE}
+input <- res_varNfix$input
+
+# 現在の推定値を次の初期値に使う
+input$p0.list <- res_varNfix$par_list
+
+# 有効桁数の違いで match() が NA になることがあるので、
+# 許容誤差つきで一番近い位置を探す関数を用意する
+find_pos <- function(x, target, tol = 1e-6) {
+  pos <- which(abs(x - target) < tol)
+  if (length(pos) == 0) {
+    pos <- which.min(abs(x - target))
+  }
+  pos[1]
+}
+
+# logSdLogObs は log スケールだが、確認しやすいように SD スケールで比較する
+sigma_hat <- exp(input$p0.list$logSdLogObs)
+
+# sigma.logC に対応する logSdLogObs の位置を探す
+idx_logC <- sapply(unique(res_varNfix$sigma.logC), function(z) {
+  find_pos(sigma_hat, z, tol = 1e-6)
+})
+
+idx_logC
+sigma_hat[idx_logC]
+exp(input$p0.list$logSdLogObs[idx_logC])
+
+# 例: すべてのsigma.logCを 0.2 に固定する
+fix_pos <- idx_logC[]
+
+# map は、推定するパラメータには番号、固定するパラメータには NA を入れる
+map_logSdLogObs <- seq_along(input$p0.list$logSdLogObs)
+map_logSdLogObs[fix_pos] <- NA
+
+# 固定したい値を初期値として入れる（logをとること）
+input$p0.list$logSdLogObs[fix_pos] <- log(0.2)
+input$map.add <- list(logSdLogObs = factor(map_logSdLogObs))
+
+res_sigma02 <- do.call(sam, input)
+
+# 固定したグループが 0.2 になっていることを確認する
+res_sigma02$sigma.logC
+abs(res_sigma02$sigma.logC - 0.2) < 1e-6
+
+# 固定したパラメータは opt$par には出てこない
+res_sigma02$opt$par[names(res_sigma02$opt$par) == "logSdLogObs"]
+```
+
+### VPAと同じような設定で解析したい
+
+- SAMで、VPAの仮定を同じような設定をすることによって、VPAのようなモデルを解析することができる
+- ①年齢別漁獲尾数の観測誤差を小さくする、②1歳魚以上の資源尾数の過程誤差を小さくする、③FのRandom walkにおける年齢間の相関をゼロにし、各年齢の観測誤差のSDを（なるべく）別々に推定する、ことによって、VPAの仕様に近づけることになります。
+- ①については、`varC`, `sdLogObs.init`, `map.add` を以下のようにすることで実行できます（[ある固定効果パラメータをある値に固定して使いたい](#fix-SDlogC)も参照のこと）
+- ②については、`varN`, `varN.fix` を以下のように設定してください（[資源尾数Nのプロセス誤差を小さい値に固定したい](#fix-SDlogN)も参照のこと）
+- ③については、`varF`, `rho.mode`を以下のように設定してください
+- ここではやっていませんが、上記の設定のon/offを組み合わせることで、catch at ageの観測誤差、1歳魚以上の過程誤差, Fのランダムウォークに相対的影響を評価することもできるかと思います
+
+```{r vpa-like model1, echo = TRUE}
+res_vpalike  <- sam(
+  dat_ex,
+  last.catch.zero = TRUE, #最終年のcatchがzeroかどうか
+  abund = c("N","N","N","SSB","B"),
+  min.age=c(0,0,1,0,0),
+  max.age = c(0,0,1,6,6),
+  rec.age = 0,
+  index.key=0:4,
+  b.est=FALSE,
+  SR = "RW",
+  varC = c(0,0,0,0,0,0,0), #すべての年齢で観測誤差が共通
+  sdLogObs.init = c(0.01, rep(0.5, nrow(dat_ex$index))), #catch at ageのSDの初期値0.01とし、Indexについては0.5とする
+  map.add = list(logSdLogObs = factor(c(NA,1:rep(nrow(dat_ex$index))))),　#catch at ageのSDのみmapで初期値に固定する
+  varN = c(0,1,1,1,1,1,1),
+  varN.fix = c(NA,0.0001),
+  varF = c(0,1,2,3,4,5,5), #年齢別に推定するが、最高齢とその1歳前は同じ数字にしてください（収束しない場合は共通する）
+  rho.mode=0, #Fのrandom wallk process errorの年齢間の相関なし
+  bias.correct = FALSE,
+  silent = TRUE
+)
+
+check_fit_sam(res_vpalike, verbose = FALSE)
+
+res_vpalike$sigma.logC #Catch at ageの観測誤差が小さくなっていることを確認
+# res_vpalike$sigma.logF
+
+res_vpalike$sigma.logN #N at age 1+の仮定誤差が小さくなっていることを確認
+
+plot_samvpa(list(res_rw, res_vpalike), scenario_name = c("SAM","VPA-like"))
+
+```
+
+
+- 以下のコードで、catch-at-ageへの当てはまりを比較することができます
+- VPA-like modelの方は、catch-at-ageの観測値とほぼ変わらない値が推定できることが分かります
+
+```{r compare-caa-fit-vpalike, echo = TRUE}
+caa_to_long <- function(x, value_name) {
+  out <- as.data.frame(as.table(as.matrix(x)), stringsAsFactors = FALSE)
+  names(out) <- c("Age", "Year", value_name)
+  out$Age <- as.numeric(as.character(out$Age))
+  out$Year <- as.numeric(as.character(out$Year))
+  out
+}
+
+caa_obs <- caa_to_long(res_rw$input$dat$caa, "Catch")
+if (isTRUE(res_rw$input$last.catch.zero)) {
+  caa_obs <- caa_obs[caa_obs$Year < max(caa_obs$Year), ]
+}
+
+caa_pred_sam <- caa_to_long(res_rw$caa, "Catch")
+caa_pred_sam$Model <- "SAM"
+
+caa_pred_vpalike <- caa_to_long(res_vpalike$caa, "Catch")
+caa_pred_vpalike$Model <- "VPA-like"
+
+caa_pred <- rbind(caa_pred_sam, caa_pred_vpalike)
+caa_pred <- caa_pred[
+  caa_pred$Year %in% caa_obs$Year &
+    caa_pred$Age %in% caa_obs$Age,
+]
+
+ggplot2::ggplot() +
+  ggplot2::geom_point(
+    data = caa_obs,
+    ggplot2::aes(x = Year, y = Catch),
+    colour = "black",
+    size = 1.6
+  ) +
+  ggplot2::geom_line(
+    data = caa_pred,
+    ggplot2::aes(x = Year, y = Catch, colour = Model, linetype = Model),
+    linewidth = 0.8
+  ) +
+  ggplot2::facet_wrap(ggplot2::vars(Age), scales = "free_y") +
+  ggplot2::labs(
+    x = "Year",
+    y = "Catch at age",
+    colour = "Model",
+    linetype = "Model"
+  ) +
+  # + scale_y_log10()　#縦軸をlog scaleにした方がよければコメントアウトを外してください
+  ggplot2::theme_bw() 
+```
+
+- 以下のコードで、F-at-ageや選択率を比較することができます
+- VPA-like modelのほうがFや選択率がギザギザしており、SAMは平滑化されていることが分かります
+
+```{r compare-faa-saa-vpalike, echo = TRUE}
+age_year_to_long <- function(x, model, metric) {
+  out <- as.data.frame(as.table(as.matrix(x)), stringsAsFactors = FALSE)
+  names(out) <- c("Age", "Year", "Value")
+  out$Age <- factor(out$Age, levels = rownames(x))
+  out$Year <- as.numeric(as.character(out$Year))
+  out$Model <- model
+  out$Metric <- metric
+  out
+}
+
+faa_saa_dat <- rbind(
+  age_year_to_long(res_rw$faa, "SAM", "F-at-age"),
+  age_year_to_long(res_vpalike$faa, "VPA-like", "F-at-age"),
+  age_year_to_long(res_rw$saa, "SAM", "Selectivity at age"),
+  age_year_to_long(res_vpalike$saa, "VPA-like", "Selectivity at age")
+)
+
+faa_saa_dat$Model <- factor(faa_saa_dat$Model, levels = c("SAM", "VPA-like"))
+faa_saa_dat$Metric <- factor(
+  faa_saa_dat$Metric,
+  levels = c("F-at-age", "Selectivity at age")
+)
+
+age_levels <- levels(faa_saa_dat$Age)
+linetype_values <- rep(c("solid", "dashed", "dotted", "dotdash", "longdash", "twodash"),
+                       length.out = length(age_levels))
+names(linetype_values) <- age_levels
+
+ggplot2::ggplot(
+  faa_saa_dat,
+  ggplot2::aes(x = Year, y = Value, colour = Age, linetype = Age)
+) +
+  ggplot2::geom_line(linewidth = 0.8) +
+  ggplot2::facet_grid(
+    ggplot2::vars(Metric),
+    ggplot2::vars(Model),
+    scales = "free_y"
+  ) +
+  ggplot2::scale_linetype_manual(values = linetype_values) +
+  ggplot2::labs(
+    x = "Year",
+    y = NULL,
+    colour = "Age",
+    linetype = "Age"
+  ) +
+  ggplot2::theme_bw()
+```
+
+
+### Indexの観測誤差のSD`sigma`を共通に解析したい
+
+- すべてのIndexで同じSDを使用する場合は（`frasyr::vpa()`の`est.method="ls"`に相当）、引数を`input$index.key <- rep(0, length(input$abund))`のように設定する
+- 特定のIndexにおいて共通のSDを使用する場合は`input$index.key <- c(0,0,1,2,3)`のように設定する（1番目と2番目のIndexのSDが等しい場合）
+
+```{r index-common, echo = TRUE}
+res_rw$sigma #index毎に異なる
+
+input <- res_rw$input
+input$index.key <- rep(0, length(input$abund))
+res_ls <- do.call(sam, input)
+res_ls$sigma
+
+input$index.key <- c(0,0,1,2,3)
+res_rw2 <- do.call(sam, input)
+res_rw2$sigma
+
+#AICの比較
+c(res_rw$aic, res_ls$aic, res_rw2$aic)
+```
+
+### IndexとAbundanceの間の非線形性を推定したい
+
+デフォルトでは `b.est = FALSE` として、index と資源量の関係を比例関係、つまり `b = 1` として扱います。
+一方、index が資源量に対して非線形に反応すると考えられる場合は、`b.est = TRUE` として `b` を推定できます。
+`b.fix` に `NA` を指定した index では `b` を推定し、数値を指定した index ではその値に固定します。
+例えば `b.fix = c(1, 1, 1, NA, NA)` とすると、1から3番目の index は `b = 1` に固定し、4から5番目の index だけで `b` を推定します。
+1以外の値に固定することもできます。
+
+`b` を推定するとパラメータ数が増えるため、収束状況や `b` の推定値が極端でないかを確認し、AIC などでモデルを比較します。
+
+```{r b-est, echo = TRUE}
+
+input <- res_rw$input
+input$b.est <- TRUE
+input$p0.list <- res_rw$par_list
+res_estb_full <- do.call(sam, input)
+res_estb_full$b #すべてのindexでbが推定される
+check_fit_sam(res_estb_full, verbose = FALSE)
+
+c(res_rw$aic, res_estb_full$aic)
+
+input$b.fix <- c(1,1,1,1,NA) #1-4番目のindexはb=1に固定し、5番目のindexはb推定を行う
+res_estb_45 <- do.call(sam, input)
+res_estb_45$b #
+check_fit_sam(res_estb_45, verbose = FALSE)
+
+c(res_rw$aic, res_estb_full$aic, res_estb_45$aic)
+```
+
+### 加入年齢を1歳にしたい
+
+`rec.age` を指定すると、再生産関係で対応させる親魚量と加入尾数の年をずらして解析できます。
+過程誤差の推定開始年を`rec.age`の年数分遅らせることになります。
+そのため、過程誤差の数が違うので、異なる`rec.age`の場合でAICや尤度を比較することはできません。
+以下では、`rec.age = 0` と `rec.age = 1` の再生産関係のプロットを横に並べて比較します。
+`rec.age = 1` の図では、加入尾数の点が親魚量の年に対応するように自動的にずれて表示されます。
+
+```{r rec_age1, echo = TRUE}
+input <- res_bh$input
+input$rec.age <- 1
+input$p0.list <- res_bh$par_list
+res_bh_rec1 <- do.call(sam, input)
+
+g0 <- plot_SR_simple(res_bh) +
+  ggplot2::labs(title = "Recruitment age 0")
+g1 <- plot_SR_simple(res_bh_rec1) +
+  ggplot2::labs(title = "Recruitment age 1")
+
+gridExtra::grid.arrange(g0, g1, nrow=1)
+```
+
+
+## SAMの結果の出力
+
+### `plot_samvpa()`の縦軸のスケールを換えたい
+
+- `plot_samvpa()` では、加入量、資源量、親魚量、漁獲量の表示スケールを個別に変更できます。
+デフォルトはいずれも `1000` なので、引数を指定しない場合はこれまでと同じ図になります。
+
+- 下の例では、加入量は元のスケールで表示し、資源量と親魚量は `10000` で割って表示しています。
+
+
+```{r plot-samvpa-scale-example, eval = TRUE}
+gg1 <- plot_samvpa(
+  list(res_rw, res_bh, res_ri),
+  CI = 0.8,
+  scenario_name = rev(c("RW", "BH", "RI")),
+  scale_recruitment = 1,
+  scale_biomass = 10000,
+  scale_ssb = 10000
+)
+print(gg1)
+```
+
+- 以下のやり方で、表示名を事後的に変えて、日本語表記や単位を含めることができます
+
+```{r plot-samvpa-facet-label, eval = TRUE}
+gg1 +
+    ggplot2::facet_wrap(
+      ggplot2::vars(stat_f),
+      scales = "free_y",
+      ncol = 2,
+      labeller = ggplot2::as_labeller(c(
+        "Recruitment" = "加入量（尾）",
+        "Biomass" = "資源量（万トン）",
+        "SSB" = "親魚量（万トン）",
+        "Exploitation_rate" = "漁獲割合"
+      ))
+    )
+```
+
+### 資源量や親魚量の変動要因を明らかにしたい
+
+`decompose_biomass_factors`という関数を使って、ある年から翌年の資源量および親魚量の変化量（絶対値 or パーセント）を、(1)新規個体の加入 (recruitment)、(2)漁獲による死亡 (fishing)、(3)自然死亡 (natural)、(4)前年にいた個体の成長 (growth)、(5)過程誤差 (process)、(6)前年にいた個体の成熟 (maturity, SSBのみ)に分解できます。これによって、どの要因が個体群動態を駆動しているかを、定量化・定量化できます。
+
+プロットには、`plot_biomass_factors`を用います。
+
+- Shapley分解という手法で、年齢ごとに各要因の周辺効果を求めています。そのため、各要因・各年齢ごとに要因分解することも可能です。
+- VPAでも動くようになっているので、両方で比較するのもありかも。
+- 前の年と評価が大きく変わった際の要因分析にも使えるかなと思います。
+
+```{r decompose-biomass-effects, eval = TRUE, echo = TRUE}
+
+# process errorが推定されるようなデータを作る（実際はこの手順は不要です）
+input <- res_rw$input
+
+caa2 <- input$dat$caa
+caa2[,as.character(1985:1994)] <- input$dat$caa[,as.character(1985:1994)]^1.5
+
+caa2[,as.character(2000:2014)] <- input$dat$caa[,as.character(2000:2014)]^0.75
+
+input$dat$caa <- caa2
+# input$dat$M[] <- 0.6
+input$p0.list <- NULL
+# res_rw$sigma.logN
+
+res_proc <- do.call(sam, input)
+res_proc$sigma.logN
+
+factor_b <- decompose_biomass_factors(
+    res_proc,
+    target = "biomass"
+  )
+
+# biomassの絶対量
+knitr::kable(factor_b$age_aggregated)
+# 前年のbiomass対する比率 (%)
+knitr::kable(factor_b$percent_aggregated)
+
+factor_s <- decompose_biomass_factors(
+    res_proc,
+    target = "ssb"
+  )
+
+
+g1 <- plot_biomass_factors(factor_b)
+g2 <- plot_biomass_factors(factor_s)
+
+g3 <- plot_biomass_factors(factor_b, type = "absolute", scale = 1000)
+g4 <- plot_biomass_factors(factor_s, type = "absolute", scale = 1000)
+
+patchwork::wrap_plots(
+  g1, g2, g3, g4,
+  ncol = 2,
+  guides = "collect"
+) &
+  ggplot2::theme(legend.position = "bottom")
+
+```
+
+### 過程誤差をプロットする
+
+Number at ageの過程誤差は、以下のようにプロットできる。ここでは、残差をそのまま示す方法と、Biomasssの対する影響をプロットする方法を示します。
+
+```{r plot-process-error}
+
+  samres = res_proc
+  rept = samres$obj$env$report(samres$obj$env$last.par.best)
+  logNresid = rept$logN_resid
+
+  colnames(logNresid) <- colnames(samres$naa)
+
+  logNresid_long = logNresid |> as.data.frame() |> mutate(age = 1:n()-1) |>
+    mutate(Age = ifelse(age == max(age),str_c("Age ",age,"+"),str_c("Age ", age))) |>
+    dplyr::select(-age) |>
+    pivot_longer(cols=-Age,names_to="Year",values_to="Residual") |>
+    mutate(Var = "logN") |>
+    dplyr::filter(Year>min(Year)) #最初の年は0なので除く
+
+resid_long <- logNresid_long |> 
+  mutate(Year = as.numeric(Year))
+
+(g_proc_resid = resid_long |>
+      ggplot(aes(x=Year,y=Age,col=Residual,size=abs(Residual)))+
+      # geom_hline(yintercept=0) +
+      geom_point()+
+    ylab("Process error")+
+      scale_size_continuous(range=c(0,5))+
+      scale_colour_gradient2(high="red",low="blue",mid="gray")
+  )
+
+# Biomassレベルでの影響
+logBresid = samres$baa*(exp(logNresid)-1)
+  
+  Bresid_long = logBresid |> as.data.frame() |> mutate(age = 1:n()-1) |>
+    dplyr::filter(age > 0) |>  #age 0 を入れたければ不要
+    mutate(Age = ifelse(age == max(age),str_c("Age ",age,"+"),str_c("Age ", age))) |>
+    dplyr::select(-age) |>
+    pivot_longer(cols=-Age,names_to="Year",values_to="Residual") |>
+    mutate(Var = "B_by_age") |>
+    dplyr::filter(Year>min(Year)) |> #最初の年は0なので除く
+    mutate(Value = Residual/1000) |>
+    mutate(Age = forcats::fct_rev(Age))
+
+  (g_proc_resid2 = Bresid_long |>
+      ggplot(aes(x=as.numeric(Year),y=Value,fill=Age)) +
+      geom_bar(stat="identity") +
+      ylab("Effect of process error on biomass")+
+      scale_fill_brewer(palette="Set3") +
+      theme_bw() + xlab("Year")
+  )
+```
+
+### 固定効果間の相関をプロットする 
+
+固定効果の相関は以下のようなコードでプロットできます。
+
+```{r plot-FEcorrelation, echo = TRUE}
+cor_mat = cov2cor(samres$rep$cov.fixed)
+
+tmp = data.frame(varname = colnames(cor_mat)) |>
+    group_by(varname) |>
+    mutate(id = 1:n(), n = n()) |>
+    mutate(varname2= ifelse(n==1, varname, str_c(varname,id)))
+
+varname = tmp$varname2
+colnames(cor_mat) <- rownames(cor_mat) <- varname
+
+  (g_cor = ggcorrplot::ggcorrplot(cor_mat ,lab=TRUE,type="upper",lab_size=1.5,digits=2,colors=c("lightblue","white","darkorange")) +
+      theme_bw(base_size=9) +
+      theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1),
+            legend.justification=c(0.99,0.01),
+            legend.position.inside=c(0.99,0.01),
+            legend.position = "inside")+
+      xlab("")+ylab("")
+    )
+```
+
+
+### 成分ごとの条件付き負の対数尤度を求めて、プロットしたい
+
+`get_cond_nll()`を使うと、推定されたランダム効果に条件付けた負の対数尤度（negative log-likelihood; NLL）を、資源尾数Nの過程、漁獲死亡係数Fの過程、年齢別漁獲尾数、および各資源量指標に分けて確認できます。NLLが小さいほど、その成分について観測値または状態の変化がモデルの仮定の下で生じやすいことを表します。ただし、各成分ではデータ数、次元、分散、確率分布が異なるため、成分間のNLLの絶対値や正負をそのまま当てはまりの優劣として比較することはできません。特に、分散を小さな値に固定した正規分布では確率密度が1を超え、NLLが負になることがあります。また、ここで示す値はLaplace近似後の周辺負の対数尤度ではないことにも注意してください。
+
+以下では、1歳以上のNのプロセス誤差だけを小さく固定したモデル（varN-fix）と、さらに年齢別漁獲尾数の観測誤差を小さくし、Fのランダムウォークの年齢間相関をなくしたモデル（VPA-like）を比較します。この例では、1歳魚以上のNプロセス誤差が小さいのでProcess_Nのnllが非常に小さくなっています。VPA-likeモデルでは、年齢別漁獲尾数に強く適合するよう制約されるため、catch-at-ageのNLLは小さくなります。その一方で、年齢別漁獲尾数の年変動をFの変化として説明する必要が強くなるため、F過程のNLLは大きくなります。これは、観測への適合度とF過程の滑らかさの間のトレードオフを示しています。このようにモデル間のNLLを比較することで、それぞれのモデルの特徴を把握することができます。
+
+```{r cond-nll, echo = TRUE}
+
+cond_nll1 <- get_cond_nll(res_varNfix)
+knitr::kable(cond_nll1)
+
+cond_nll2 <- get_cond_nll(res_vpalike)
+
+g1 <- plot_cond_nll(cond_nll1) + ggtitle("varN-fix")
+g2 <- plot_cond_nll(cond_nll2) + ggtitle("VPA-like")
+
+patchwork::wrap_plots(
+  g1, g2,
+  ncol = 2,
+  guides = "collect"
+) 
+
+```
