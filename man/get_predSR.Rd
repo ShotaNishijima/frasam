@@ -4,7 +4,7 @@
 \alias{get_predSR}
 \title{SAMで推定された再生産関係の予測値}
 \usage{
-get_predSR(samres, max.ssb.pred = 1.3)
+get_predSR(samres, max.ssb.pred = 1.3, length = 100)
 }
 \arguments{
 \item{samres}{samの結果オブジェクト}
