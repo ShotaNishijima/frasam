@@ -481,7 +481,8 @@ Type objective_function<Type>::operator() ()
   vector<Type> pred_log(nobs); //
   vector<Type> ans_obs(nobs);
   ans_obs.setZero();
-  Type predcaa=0;
+  vector<Type> predcaa;
+  // Type sdcaa=0.0;
 
   if (minAge != 0) {
     error("minAge must be 0. Age inputs are assumed to be indexed from age 0.");
@@ -508,22 +509,24 @@ Type objective_function<Type>::operator() ()
     if(ft==0){// residual fleet
       // caaもage aggregateに対応（2026/07/05）
       predObs=0.0;
+      predcaa.resize(amax-a+1);
+      predcaa.setZero();
       for(int j=a; j<amax+1; ++j){
         if(j<(stateDimN-1)){
           zz=exp(logF((keyLogFsta(0,j)),y))+natMor(y,j);  // total mortality
         }else{
           zz=alpha*exp(logF((keyLogFsta(0,j)),y))+natMor(y,j);  // total mortality
         }
-        predcaa=logN(j,y)-log(zz)+log(1-exp(-zz));
+        predcaa(j-a)=logN(j,y)-log(zz)+log(1-exp(-zz));
         if((keyLogFsta(f-1,j))>(-1)){
           if(j<(stateDimN-1)){
-            predcaa+=logF((keyLogFsta(0,j)),y);  // 漁獲方程式
+            predcaa(j-a)+=logF((keyLogFsta(0,j)),y);  // 漁獲方程式
           }else{
-            predcaa+=log(alpha)+logF((keyLogFsta(0,j)),y);  // 漁獲方程式
+            predcaa(j-a)+=log(alpha)+logF((keyLogFsta(0,j)),y);  // 漁獲方程式
           }
         }
-        predcaa=exp(predcaa); //log(caa) -> caaに変換
-        predObs+=predcaa; //caa scale
+        predcaa(j-a)=exp(predcaa(j-a)); //log(caa) -> caaに変換
+        predObs+=predcaa(j-a); //caa scale
       }
       predObs=log(predObs); //caa scaleで足した後にlog scaleに戻す
     }else{
@@ -631,10 +634,17 @@ Type objective_function<Type>::operator() ()
       }
     }
     var=varLogObs(CppAD::Integer(keyVarObs(f-1,a)));
-    // ans_obs(i)=-dnorm(log(obs(i,3)),predObs,sqrt(var),true);
+    if(ft==0) { //複数のcatch at ageをまとめるときの分散をデルタ法で計算する
+      if(a!=amax){
+        var=0.0;
+        for(int j=a; j<amax+1; ++j){
+          var+=predcaa(j-a)*predcaa(j-a)*varLogObs(CppAD::Integer(keyVarObs(f-1,j)));
+        }
+        var=var/(sum(predcaa)*sum(predcaa));
+      }
+    }
     ans_obs(i) -= keep(i)*dnorm(logobs(i),predObs,sqrt(var),true);
-    // ans_obs(i) -= keep.cdf_lower(i)*log(pnorm(logobs(i), predObs,sqrt(var)) );
-    // ans_obs(i) -= keep.cdf_upper(i)*log(1.0-pnorm(logobs(i), predObs,sqrt(var)) );
+
     pred_log(i) = predObs;
     SIMULATE {
       obs(i,3) = exp( rnorm(predObs, sqrt(var)) );
