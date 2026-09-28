@@ -76,7 +76,8 @@ sam(
   getJointPrecision = FALSE,
   loopnum = 2,
   obj_overwrite = NULL,
-  ignore.parm.uncertainty = FALSE
+  ignore.parm.uncertainty = FALSE,
+  change_plusgroup = FALSE
 )
 ```
 
@@ -367,6 +368,10 @@ sam(
 - loopnum:
 
   最適化を繰り返す回数．デフォルトは2
+
+- change_plusgroup:
+
+  プラスグループが途中で変わるか
 
 - varNfix:
 

@@ -55,7 +55,7 @@
       <h1>SAMを使った資源量推定</h1>
                         <h4 data-toc-skip class="author">市野川桃子・西嶋翔太</h4>
             
-            <h4 data-toc-skip class="date">2026-07-11</h4>
+            <h4 data-toc-skip class="date">2026-09-28</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/ShotaNishijima/frasam/blob/create_vignette/vignettes/sam.Rmd" class="external-link"><code>vignettes/sam.Rmd</code></a></small>
       <div class="d-none name"><code>sam.Rmd</code></div>
@@ -201,7 +201,7 @@
 <span><span class="co">#&gt;         logQ         logQ logSdLogFsta    logSdLogN  logSdLogObs  logSdLogObs </span></span>
 <span><span class="co">#&gt;     9.560474    -7.232696    -1.877590    -1.761564    -3.101510    -1.367962 </span></span>
 <span><span class="co">#&gt;  logSdLogObs     rec_loga     rec_logb </span></span>
-<span><span class="co">#&gt;    -1.082575     2.365818   -20.967589 </span></span>
+<span><span class="co">#&gt;    -1.082575     2.365818   -20.873127 </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $objective</span></span>
 <span><span class="co">#&gt; [1] -4.304594</span></span>
@@ -210,11 +210,11 @@
 <span><span class="co">#&gt; [1] 0</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $iterations</span></span>
-<span><span class="co">#&gt; [1] 87</span></span>
+<span><span class="co">#&gt; [1] 88</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $evaluations</span></span>
 <span><span class="co">#&gt; function gradient </span></span>
-<span><span class="co">#&gt;      116       88 </span></span>
+<span><span class="co">#&gt;      117       89 </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $message</span></span>
 <span><span class="co">#&gt; [1] "relative convergence (4)"</span></span>
@@ -229,12 +229,12 @@
 <span><span class="co">#&gt; logQ          -7.232696 1.118901e-01</span></span>
 <span><span class="co">#&gt; logSdLogFsta  -1.877590 1.476098e-01</span></span>
 <span><span class="co">#&gt; logSdLogN     -1.761564 2.699047e-01</span></span>
-<span><span class="co">#&gt; logSdLogObs   -3.101510 7.511999e-01</span></span>
+<span><span class="co">#&gt; logSdLogObs   -3.101510 7.512002e-01</span></span>
 <span><span class="co">#&gt; logSdLogObs   -1.367962 2.342732e-01</span></span>
 <span><span class="co">#&gt; logSdLogObs   -1.082575 2.288350e-01</span></span>
 <span><span class="co">#&gt; rec_loga       2.365818 6.530281e-02</span></span>
-<span><span class="co">#&gt; rec_logb     -20.967589 4.742059e+04</span></span>
-<span><span class="co">#&gt; Maximum gradient component: 1.00355e-05</span></span>
+<span><span class="co">#&gt; rec_logb     -20.873127 4.523290e+04</span></span>
+<span><span class="co">#&gt; Maximum gradient component: 1.565561e-05</span></span>
 <span></span>
 <span><span class="co">## 推定結果の確認: AIC（単独ではあまり意味がない。モデルを比較するときに）</span></span>
 <span><span class="va">res_sam</span><span class="op">$</span><span class="va">aic</span></span>
@@ -248,7 +248,7 @@
 <span><span class="co">#&gt; [1] 0.2546253 0.3387221</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $sigma.logC</span></span>
-<span><span class="co">#&gt; [1] 0.04498123 0.04498123 0.04498123 0.04498123 0.04498123 0.04498123 0.04498123</span></span>
+<span><span class="co">#&gt; [1] 0.04498122 0.04498122 0.04498122 0.04498122 0.04498122 0.04498122 0.04498122</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $sigma.logFsta</span></span>
 <span><span class="co">#&gt; [1] 0.1529583 0.1529583 0.1529583 0.1529583 0.1529583 0.1529583 0.1529583</span></span>
@@ -272,63 +272,63 @@
 <td align="left">logQ</td>
 <td align="right">9.560474</td>
 <td align="right">8.811780e-02</td>
-<td align="right">-5.4e-06</td>
+<td align="right">-5.00e-06</td>
 <td align="right">1.419257e+04</td>
 </tr>
 <tr class="even">
 <td align="left">logQ</td>
-<td align="right">-7.232697</td>
+<td align="right">-7.232696</td>
 <td align="right">1.118901e-01</td>
-<td align="right">1.0e-05</td>
+<td align="right">1.57e-05</td>
 <td align="right">7.226000e-04</td>
 </tr>
 <tr class="odd">
 <td align="left">logSdLogFsta</td>
 <td align="right">-1.877590</td>
 <td align="right">1.476098e-01</td>
-<td align="right">1.8e-06</td>
+<td align="right">-3.80e-06</td>
 <td align="right">1.529583e-01</td>
 </tr>
 <tr class="even">
 <td align="left">logSdLogN</td>
 <td align="right">-1.761564</td>
 <td align="right">2.699047e-01</td>
-<td align="right">2.3e-06</td>
+<td align="right">0.00e+00</td>
 <td align="right">1.717760e-01</td>
 </tr>
 <tr class="odd">
 <td align="left">logSdLogObs</td>
 <td align="right">-3.101510</td>
-<td align="right">7.511999e-01</td>
-<td align="right">-4.0e-07</td>
+<td align="right">7.512002e-01</td>
+<td align="right">-1.20e-06</td>
 <td align="right">4.498120e-02</td>
 </tr>
 <tr class="even">
 <td align="left">logSdLogObs</td>
 <td align="right">-1.367962</td>
 <td align="right">2.342732e-01</td>
-<td align="right">-7.0e-07</td>
+<td align="right">-1.70e-06</td>
 <td align="right">2.546253e-01</td>
 </tr>
 <tr class="odd">
 <td align="left">logSdLogObs</td>
 <td align="right">-1.082575</td>
 <td align="right">2.288350e-01</td>
-<td align="right">-4.5e-06</td>
+<td align="right">-2.10e-06</td>
 <td align="right">3.387221e-01</td>
 </tr>
 <tr class="even">
 <td align="left">rec_loga</td>
 <td align="right">2.365818</td>
 <td align="right">6.530280e-02</td>
-<td align="right">1.3e-06</td>
+<td align="right">-8.70e-06</td>
 <td align="right">1.065275e+01</td>
 </tr>
 <tr class="odd">
 <td align="left">rec_logb</td>
-<td align="right">-20.967589</td>
-<td align="right">4.742059e+04</td>
-<td align="right">0.0e+00</td>
+<td align="right">-20.873127</td>
+<td align="right">4.523290e+04</td>
+<td align="right">0.00e+00</td>
 <td align="right">0.000000e+00</td>
 </tr>
 </tbody>
@@ -371,9 +371,9 @@
 <span><span class="va">res_sam2</span><span class="op">$</span><span class="va">opt</span> <span class="co">#収束している</span></span>
 <span><span class="co">#&gt; $par</span></span>
 <span><span class="co">#&gt;         logQ         logQ logSdLogFsta    logSdLogN  logSdLogObs  logSdLogObs </span></span>
-<span><span class="co">#&gt;     9.512568    -7.296031    -2.061695    -1.834227    -2.377935    -1.437568 </span></span>
+<span><span class="co">#&gt;     9.512568    -7.296031    -2.061696    -1.834226    -2.377935    -1.437568 </span></span>
 <span><span class="co">#&gt;  logSdLogObs     rec_loga     rec_logb </span></span>
-<span><span class="co">#&gt;    -1.110561     2.382367   -19.094873 </span></span>
+<span><span class="co">#&gt;    -1.110561     2.382367   -18.896012 </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $objective</span></span>
 <span><span class="co">#&gt; [1] -19.7347</span></span>
@@ -382,27 +382,27 @@
 <span><span class="co">#&gt; [1] 0</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $iterations</span></span>
-<span><span class="co">#&gt; [1] 78</span></span>
+<span><span class="co">#&gt; [1] 79</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $evaluations</span></span>
 <span><span class="co">#&gt; function gradient </span></span>
-<span><span class="co">#&gt;      105       79 </span></span>
+<span><span class="co">#&gt;      104       80 </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $message</span></span>
 <span><span class="co">#&gt; [1] "relative convergence (4)"</span></span>
 <span><span class="va">res_sam2</span><span class="op">$</span><span class="va">rep</span> <span class="co">#sdreportの結果</span></span>
 <span><span class="co">#&gt; sdreport(.) result</span></span>
 <span><span class="co">#&gt;                Estimate   Std. Error</span></span>
-<span><span class="co">#&gt; logQ           9.512568 9.125255e-02</span></span>
-<span><span class="co">#&gt; logQ          -7.296031 1.177387e-01</span></span>
-<span><span class="co">#&gt; logSdLogFsta  -2.061695 2.787371e-01</span></span>
-<span><span class="co">#&gt; logSdLogN     -1.834227 2.616238e-01</span></span>
+<span><span class="co">#&gt; logQ           9.512568 9.125472e-02</span></span>
+<span><span class="co">#&gt; logQ          -7.296031 1.177411e-01</span></span>
+<span><span class="co">#&gt; logSdLogFsta  -2.061695 2.788937e-01</span></span>
+<span><span class="co">#&gt; logSdLogN     -1.834226 2.616240e-01</span></span>
 <span><span class="co">#&gt; logSdLogObs   -2.377935 1.120733e-01</span></span>
-<span><span class="co">#&gt; logSdLogObs   -1.437568 2.347150e-01</span></span>
-<span><span class="co">#&gt; logSdLogObs   -1.110561 2.293440e-01</span></span>
-<span><span class="co">#&gt; rec_loga       2.382367 5.989813e-02</span></span>
-<span><span class="co">#&gt; rec_logb     -19.094873 2.338457e+04</span></span>
-<span><span class="co">#&gt; Maximum gradient component: 4.651708e-06</span></span>
+<span><span class="co">#&gt; logSdLogObs   -1.437568 2.347159e-01</span></span>
+<span><span class="co">#&gt; logSdLogObs   -1.110561 2.293441e-01</span></span>
+<span><span class="co">#&gt; rec_loga       2.382367 5.989832e-02</span></span>
+<span><span class="co">#&gt; rec_logb     -18.976964 2.205816e+04</span></span>
+<span><span class="co">#&gt; Maximum gradient component: 1.277606e-06</span></span>
 <span><span class="va">res_sam2</span><span class="op">$</span><span class="va">rep</span><span class="op">$</span><span class="va">pdHess</span> <span class="co">#Hessianが正定値を持つかどうか（持たない場合SEが計算できない）</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span>
 <span></span>
@@ -419,36 +419,36 @@
 <span><span class="va">res_sam3</span><span class="op">$</span><span class="va">opt</span>　</span>
 <span><span class="co">#&gt; $par</span></span>
 <span><span class="co">#&gt;         logQ         logQ logSdLogFsta    logSdLogN  logSdLogObs  logSdLogObs </span></span>
-<span><span class="co">#&gt;     9.505219    -7.303391    -2.047747    -1.254582    -2.374554    -1.444442 </span></span>
+<span><span class="co">#&gt;     9.505219    -7.303394    -2.047735    -1.254589    -2.374554    -1.444450 </span></span>
 <span><span class="co">#&gt;  logSdLogObs </span></span>
-<span><span class="co">#&gt;    -1.108991 </span></span>
+<span><span class="co">#&gt;    -1.108996 </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $objective</span></span>
 <span><span class="co">#&gt; [1] -14.68522</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $convergence</span></span>
-<span><span class="co">#&gt; [1] 0</span></span>
+<span><span class="co">#&gt; [1] 1</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $iterations</span></span>
-<span><span class="co">#&gt; [1] 53</span></span>
+<span><span class="co">#&gt; [1] 75</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $evaluations</span></span>
 <span><span class="co">#&gt; function gradient </span></span>
-<span><span class="co">#&gt;       84       53 </span></span>
+<span><span class="co">#&gt;      122       75 </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $message</span></span>
-<span><span class="co">#&gt; [1] "relative convergence (4)"</span></span>
+<span><span class="co">#&gt; [1] "false convergence (8)"</span></span>
 <span><span class="va">res_sam3</span><span class="op">$</span><span class="va">rep</span></span>
 <span><span class="co">#&gt; sdreport(.) result</span></span>
 <span><span class="co">#&gt;               Estimate Std. Error</span></span>
-<span><span class="co">#&gt; logQ          9.505219 0.09135781</span></span>
-<span><span class="co">#&gt; logQ         -7.303391 0.11811402</span></span>
-<span><span class="co">#&gt; logSdLogFsta -2.047747 0.28031293</span></span>
-<span><span class="co">#&gt; logSdLogN    -1.254582 0.25257649</span></span>
-<span><span class="co">#&gt; logSdLogObs  -2.374554 0.11286891</span></span>
-<span><span class="co">#&gt; logSdLogObs  -1.444442 0.23289432</span></span>
-<span><span class="co">#&gt; logSdLogObs  -1.108991 0.22963190</span></span>
-<span><span class="co">#&gt; Maximum gradient component: 0.0001249072</span></span>
+<span><span class="co">#&gt; logQ          9.505219 0.09135735</span></span>
+<span><span class="co">#&gt; logQ         -7.303394 0.11811349</span></span>
+<span><span class="co">#&gt; logSdLogFsta -2.047735 0.28031435</span></span>
+<span><span class="co">#&gt; logSdLogN    -1.254589 0.25257552</span></span>
+<span><span class="co">#&gt; logSdLogObs  -2.374554 0.11286892</span></span>
+<span><span class="co">#&gt; logSdLogObs  -1.444450 0.23289260</span></span>
+<span><span class="co">#&gt; logSdLogObs  -1.108996 0.22963086</span></span>
+<span><span class="co">#&gt; Maximum gradient component: 0.0002997019</span></span>
 <span><span class="va">res_sam3</span><span class="op">$</span><span class="va">rep</span><span class="op">$</span><span class="va">pdHess</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span>
 <span></span>
@@ -560,29 +560,29 @@
 <tr class="odd">
 <td align="right">0</td>
 <td align="right">-15.37044</td>
-<td align="right">0</td>
+<td align="right">1</td>
 <td align="left">TRUE</td>
-<td align="right">0.2803129</td>
+<td align="right">0.2803143</td>
 <td align="left">NA</td>
 <td align="right">NA</td>
-<td align="left">selected</td>
+<td align="left">NA</td>
 </tr>
 <tr class="even">
 <td align="right">1</td>
 <td align="right">-16.17782</td>
-<td align="right">0</td>
+<td align="right">1</td>
 <td align="left">TRUE</td>
-<td align="right">0.3434833</td>
+<td align="right">0.3452781</td>
 <td align="left">varF</td>
 <td align="right">1</td>
-<td align="left">best</td>
+<td align="left">NA</td>
 </tr>
 <tr class="odd">
 <td align="right">1</td>
-<td align="right">70.30363</td>
+<td align="right">69.85547</td>
 <td align="right">1</td>
 <td align="left">FALSE</td>
-<td align="right">0.3066315</td>
+<td align="right">0.3233936</td>
 <td align="left">varC</td>
 <td align="right">1</td>
 <td align="left">NA</td>
@@ -590,9 +590,9 @@
 <tr class="even">
 <td align="right">1</td>
 <td align="right">-15.20191</td>
-<td align="right">1</td>
+<td align="right">0</td>
 <td align="left">TRUE</td>
-<td align="right">0.2926398</td>
+<td align="right">0.2925388</td>
 <td align="left">varF</td>
 <td align="right">2</td>
 <td align="left">NA</td>
@@ -600,9 +600,9 @@
 <tr class="odd">
 <td align="right">1</td>
 <td align="right">-13.64304</td>
-<td align="right">1</td>
+<td align="right">0</td>
 <td align="left">TRUE</td>
-<td align="right">0.2808002</td>
+<td align="right">0.2808000</td>
 <td align="left">varC</td>
 <td align="right">2</td>
 <td align="left">NA</td>
@@ -612,7 +612,7 @@
 <td align="right">-13.38721</td>
 <td align="right">0</td>
 <td align="left">TRUE</td>
-<td align="right">0.2896330</td>
+<td align="right">0.2889663</td>
 <td align="left">varF</td>
 <td align="right">3</td>
 <td align="left">NA</td>
@@ -620,9 +620,9 @@
 <tr class="odd">
 <td align="right">1</td>
 <td align="right">-13.37596</td>
-<td align="right">1</td>
+<td align="right">0</td>
 <td align="left">TRUE</td>
-<td align="right">0.2804344</td>
+<td align="right">0.2804337</td>
 <td align="left">varC</td>
 <td align="right">3</td>
 <td align="left">NA</td>
@@ -632,7 +632,7 @@
 <td align="right">-14.33871</td>
 <td align="right">1</td>
 <td align="left">TRUE</td>
-<td align="right">0.2845544</td>
+<td align="right">0.2840691</td>
 <td align="left">varF</td>
 <td align="right">4</td>
 <td align="left">NA</td>
@@ -642,7 +642,7 @@
 <td align="right">-13.40533</td>
 <td align="right">0</td>
 <td align="left">TRUE</td>
-<td align="right">0.2806029</td>
+<td align="right">0.2806033</td>
 <td align="left">varC</td>
 <td align="right">4</td>
 <td align="left">NA</td>
@@ -650,19 +650,19 @@
 <tr class="even">
 <td align="right">1</td>
 <td align="right">-15.81438</td>
-<td align="right">1</td>
+<td align="right">0</td>
 <td align="left">TRUE</td>
-<td align="right">0.2892509</td>
+<td align="right">0.2894105</td>
 <td align="left">varF</td>
 <td align="right">5</td>
-<td align="left">NA</td>
+<td align="left">best</td>
 </tr>
 <tr class="odd">
 <td align="right">1</td>
 <td align="right">-13.66380</td>
-<td align="right">1</td>
+<td align="right">0</td>
 <td align="left">TRUE</td>
-<td align="right">0.2789667</td>
+<td align="right">0.2789665</td>
 <td align="left">varC</td>
 <td align="right">5</td>
 <td align="left">NA</td>
@@ -672,17 +672,17 @@
 <td align="right">-13.78186</td>
 <td align="right">0</td>
 <td align="left">TRUE</td>
-<td align="right">0.4950590</td>
+<td align="right">0.4950595</td>
 <td align="left">varC</td>
 <td align="right">6</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
 <td align="right">2</td>
-<td align="right">68.47550</td>
+<td align="right">68.75309</td>
 <td align="right">1</td>
 <td align="left">FALSE</td>
-<td align="right">3.5031052</td>
+<td align="right">0.4256353</td>
 <td align="left">varC</td>
 <td align="right">1</td>
 <td align="left">NA</td>
@@ -692,7 +692,7 @@
 <td align="right">-14.57080</td>
 <td align="right">1</td>
 <td align="left">TRUE</td>
-<td align="right">0.3559270</td>
+<td align="right">0.3560643</td>
 <td align="left">varF</td>
 <td align="right">2</td>
 <td align="left">NA</td>
@@ -702,7 +702,7 @@
 <td align="right">-15.13593</td>
 <td align="right">0</td>
 <td align="left">TRUE</td>
-<td align="right">0.3199824</td>
+<td align="right">0.3207955</td>
 <td align="left">varC</td>
 <td align="right">2</td>
 <td align="left">NA</td>
@@ -710,9 +710,9 @@
 <tr class="even">
 <td align="right">2</td>
 <td align="right">-14.64335</td>
-<td align="right">0</td>
+<td align="right">1</td>
 <td align="left">TRUE</td>
-<td align="right">0.3457028</td>
+<td align="right">0.3382339</td>
 <td align="left">varF</td>
 <td align="right">3</td>
 <td align="left">NA</td>
@@ -722,7 +722,7 @@
 <td align="right">-14.25631</td>
 <td align="right">0</td>
 <td align="left">TRUE</td>
-<td align="right">0.3436794</td>
+<td align="right">0.3473887</td>
 <td align="left">varC</td>
 <td align="right">3</td>
 <td align="left">NA</td>
@@ -732,7 +732,7 @@
 <td align="right">-14.26322</td>
 <td align="right">1</td>
 <td align="left">TRUE</td>
-<td align="right">0.3400563</td>
+<td align="right">0.3367668</td>
 <td align="left">varF</td>
 <td align="right">4</td>
 <td align="left">NA</td>
@@ -740,9 +740,9 @@
 <tr class="odd">
 <td align="right">2</td>
 <td align="right">-14.25064</td>
-<td align="right">1</td>
+<td align="right">0</td>
 <td align="left">TRUE</td>
-<td align="right">0.3432627</td>
+<td align="right">0.3340897</td>
 <td align="left">varC</td>
 <td align="right">4</td>
 <td align="left">NA</td>
@@ -752,7 +752,7 @@
 <td align="right">-15.45370</td>
 <td align="right">1</td>
 <td align="left">TRUE</td>
-<td align="right">0.3382439</td>
+<td align="right">0.3262959</td>
 <td align="left">varF</td>
 <td align="right">5</td>
 <td align="left">NA</td>
@@ -762,7 +762,7 @@
 <td align="right">-14.71694</td>
 <td align="right">0</td>
 <td align="left">TRUE</td>
-<td align="right">0.3587414</td>
+<td align="right">0.3608365</td>
 <td align="left">varC</td>
 <td align="right">5</td>
 <td align="left">NA</td>
@@ -772,7 +772,7 @@
 <td align="right">-15.15816</td>
 <td align="right">0</td>
 <td align="left">TRUE</td>
-<td align="right">0.5952348</td>
+<td align="right">0.5857203</td>
 <td align="left">varC</td>
 <td align="right">6</td>
 <td align="left">selected</td>
@@ -802,43 +802,43 @@
 <tr class="odd">
 <td align="right">0</td>
 <td align="right">0.0898453</td>
-<td align="right">0.0988359</td>
-<td align="right">0.2748462</td>
+<td align="right">0.0988350</td>
+<td align="right">0.2748465</td>
 </tr>
 <tr class="even">
 <td align="right">1</td>
 <td align="right">0.0898453</td>
-<td align="right">0.1475825</td>
+<td align="right">0.1475813</td>
 <td align="right">0.0100000</td>
 </tr>
 <tr class="odd">
 <td align="right">2</td>
 <td align="right">0.0898453</td>
-<td align="right">0.1475825</td>
+<td align="right">0.1475813</td>
 <td align="right">0.0100000</td>
 </tr>
 <tr class="even">
 <td align="right">3</td>
 <td align="right">0.0898453</td>
-<td align="right">0.1475825</td>
+<td align="right">0.1475813</td>
 <td align="right">0.0100000</td>
 </tr>
 <tr class="odd">
 <td align="right">4</td>
 <td align="right">0.0898453</td>
-<td align="right">0.1475825</td>
+<td align="right">0.1475813</td>
 <td align="right">0.0100000</td>
 </tr>
 <tr class="even">
 <td align="right">5</td>
 <td align="right">0.0898453</td>
-<td align="right">0.1475825</td>
+<td align="right">0.1475813</td>
 <td align="right">0.0100000</td>
 </tr>
 <tr class="odd">
 <td align="right">6</td>
 <td align="right">0.0898453</td>
-<td align="right">0.1475825</td>
+<td align="right">0.1475813</td>
 <td align="right">0.0100000</td>
 </tr>
 </tbody>
@@ -867,8 +867,8 @@
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">refF_res</span><span class="op">$</span><span class="va">summary</span></span>
 <span><span class="co">#&gt;            Fcurrent Fmed Flow Fhigh      Fmax      F0.1 Fmean FpSPR.10.SPR</span></span>
-<span><span class="co">#&gt; max       0.4565963   NA   NA    NA 0.5620096 0.3383640    NA    0.6752882</span></span>
-<span><span class="co">#&gt; mean      0.4121442  NaN  NaN   NaN 0.5072950 0.3054225   NaN    0.6095454</span></span>
+<span><span class="co">#&gt; max       0.4565963   NA   NA    NA 0.5620096 0.3383639    NA    0.6752882</span></span>
+<span><span class="co">#&gt; mean      0.4121443  NaN  NaN   NaN 0.5072950 0.3054225   NaN    0.6095454</span></span>
 <span><span class="co">#&gt; Fref/Fcur 1.0000000   NA   NA    NA 1.2308677 0.7410572    NA    1.4789612</span></span>
 <span><span class="co">#&gt;           FpSPR.20.SPR FpSPR.30.SPR FpSPR.40.SPR FpSPR.50.SPR FpSPR.60.SPR</span></span>
 <span><span class="co">#&gt; max          0.4380875    0.3135295    0.2310909    0.1704472    0.1229955</span></span>
@@ -877,7 +877,7 @@
 <span><span class="co">#&gt;           FpSPR.70.SPR FpSPR.80.SPR FpSPR.90.SPR</span></span>
 <span><span class="co">#&gt; max         0.08434062   0.05193112   0.02417321</span></span>
 <span><span class="co">#&gt; mean        0.07612962   0.04687535   0.02181983</span></span>
-<span><span class="co">#&gt; Fref/Fcur   0.18471597   0.11373531   0.05294221</span></span></code></pre></div>
+<span><span class="co">#&gt; Fref/Fcur   0.18471596   0.11373531   0.05294220</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="モデル診断">モデル診断<a class="anchor" aria-label="anchor" href="#%E3%83%A2%E3%83%87%E3%83%AB%E8%A8%BA%E6%96%AD"></a>
@@ -1150,15 +1150,15 @@ cross validationを実行する</li>
 <td align="right">1</td>
 <td align="left">Index 1</td>
 <td align="right">324.3231275</td>
-<td align="right">212.4539428</td>
-<td align="right">0.6550687</td>
+<td align="right">212.4757645</td>
+<td align="right">0.655136</td>
 </tr>
 <tr class="even">
 <td align="right">2</td>
 <td align="left">Index 2</td>
 <td align="right">0.1126078</td>
-<td align="right">0.1329193</td>
-<td align="right">1.1803741</td>
+<td align="right">0.1329261</td>
+<td align="right">1.180434</td>
 </tr>
 </tbody>
 </table>
@@ -1319,161 +1319,161 @@ SAMのモデルを疑似データにフィットさせるというシミュレ�
 <td align="left">SSB</td>
 <td align="right">1991</td>
 <td align="right">NA</td>
-<td align="right">4.748965</td>
-<td align="right">3.472682</td>
+<td align="right">4.748967</td>
+<td align="right">3.472684</td>
 <td align="right">0.0395290</td>
 <td align="right">0.0289056</td>
-<td align="right">1.0141799</td>
-<td align="right">0.0084417</td>
-<td align="right">121.15305</td>
+<td align="right">1.0141953</td>
+<td align="right">0.0084419</td>
+<td align="right">121.15308</td>
 <td align="right">0.0383032</td>
-<td align="right">120.13887</td>
-<td align="right">114.36772</td>
-<td align="right">130.68867</td>
+<td align="right">120.13888</td>
+<td align="right">114.36776</td>
+<td align="right">130.68869</td>
 </tr>
 <tr class="even">
 <td align="left">SSB</td>
 <td align="right">1992</td>
 <td align="right">NA</td>
-<td align="right">4.418594</td>
-<td align="right">3.281835</td>
+<td align="right">4.418596</td>
+<td align="right">3.281836</td>
 <td align="right">0.0366443</td>
 <td align="right">0.0272169</td>
-<td align="right">1.0258709</td>
-<td align="right">0.0085078</td>
-<td align="right">121.60662</td>
-<td align="right">0.0358219</td>
-<td align="right">120.58075</td>
-<td align="right">115.85956</td>
-<td align="right">130.86682</td>
+<td align="right">1.0258911</td>
+<td align="right">0.0085079</td>
+<td align="right">121.60665</td>
+<td align="right">0.0358218</td>
+<td align="right">120.58076</td>
+<td align="right">115.85959</td>
+<td align="right">130.86686</td>
 </tr>
 <tr class="odd">
 <td align="left">SSB</td>
 <td align="right">1993</td>
 <td align="right">NA</td>
 <td align="right">4.350415</td>
-<td align="right">3.373667</td>
+<td align="right">3.373664</td>
 <td align="right">0.0359135</td>
 <td align="right">0.0278503</td>
-<td align="right">-0.8631408</td>
-<td align="right">-0.0071254</td>
-<td align="right">120.27265</td>
+<td align="right">-0.8631043</td>
+<td align="right">-0.0071251</td>
+<td align="right">120.27269</td>
 <td align="right">0.0368647</td>
-<td align="right">121.13579</td>
-<td align="right">114.06842</td>
-<td align="right">130.44005</td>
+<td align="right">121.13580</td>
+<td align="right">114.06847</td>
+<td align="right">130.44008</td>
 </tr>
 <tr class="even">
 <td align="left">SSB</td>
 <td align="right">1994</td>
 <td align="right">NA</td>
-<td align="right">3.536073</td>
-<td align="right">2.867511</td>
+<td align="right">3.536072</td>
+<td align="right">2.867513</td>
 <td align="right">0.0317202</td>
 <td align="right">0.0257229</td>
-<td align="right">-0.4448374</td>
+<td align="right">-0.4448401</td>
 <td align="right">-0.0039904</td>
-<td align="right">111.03228</td>
+<td align="right">111.03229</td>
 <td align="right">0.0325566</td>
-<td align="right">111.47711</td>
-<td align="right">105.73816</td>
+<td align="right">111.47713</td>
+<td align="right">105.73821</td>
 <td align="right">117.71557</td>
 </tr>
 <tr class="odd">
 <td align="left">SSB</td>
 <td align="right">1995</td>
 <td align="right">NA</td>
-<td align="right">3.691662</td>
-<td align="right">2.958111</td>
-<td align="right">0.0358542</td>
+<td align="right">3.691653</td>
+<td align="right">2.958112</td>
+<td align="right">0.0358541</td>
 <td align="right">0.0287298</td>
-<td align="right">0.0720792</td>
+<td align="right">0.0720785</td>
 <td align="right">0.0007000</td>
 <td align="right">103.03514</td>
-<td align="right">0.0368093</td>
+<td align="right">0.0368092</td>
 <td align="right">102.96306</td>
-<td align="right">96.97200</td>
-<td align="right">110.11772</td>
+<td align="right">96.97203</td>
+<td align="right">110.11770</td>
 </tr>
 <tr class="even">
 <td align="left">SSB</td>
 <td align="right">1996</td>
 <td align="right">NA</td>
-<td align="right">4.250619</td>
-<td align="right">3.570114</td>
-<td align="right">0.0479317</td>
-<td align="right">0.0402581</td>
-<td align="right">-0.2056242</td>
-<td align="right">-0.0023187</td>
-<td align="right">88.47510</td>
-<td align="right">0.0492152</td>
-<td align="right">88.68073</td>
-<td align="right">81.37054</td>
-<td align="right">96.19893</td>
+<td align="right">4.250611</td>
+<td align="right">3.570108</td>
+<td align="right">0.0479316</td>
+<td align="right">0.0402580</td>
+<td align="right">-0.2055944</td>
+<td align="right">-0.0023184</td>
+<td align="right">88.47514</td>
+<td align="right">0.0492151</td>
+<td align="right">88.68074</td>
+<td align="right">81.37056</td>
+<td align="right">96.19891</td>
 </tr>
 <tr class="odd">
 <td align="left">SSB</td>
 <td align="right">1997</td>
 <td align="right">NA</td>
-<td align="right">5.319414</td>
-<td align="right">4.260240</td>
-<td align="right">0.0725801</td>
-<td align="right">0.0581284</td>
-<td align="right">-0.4107809</td>
-<td align="right">-0.0056049</td>
-<td align="right">72.87944</td>
-<td align="right">0.0746003</td>
-<td align="right">73.29023</td>
-<td align="right">65.25896</td>
-<td align="right">83.31792</td>
+<td align="right">5.319406</td>
+<td align="right">4.260229</td>
+<td align="right">0.0725800</td>
+<td align="right">0.0581282</td>
+<td align="right">-0.4107427</td>
+<td align="right">-0.0056043</td>
+<td align="right">72.87950</td>
+<td align="right">0.0746002</td>
+<td align="right">73.29024</td>
+<td align="right">65.25898</td>
+<td align="right">83.31789</td>
 </tr>
 <tr class="even">
 <td align="left">SSB</td>
 <td align="right">1998</td>
 <td align="right">NA</td>
-<td align="right">6.021707</td>
-<td align="right">4.745437</td>
-<td align="right">0.1031374</td>
-<td align="right">0.0812779</td>
-<td align="right">-0.6461976</td>
-<td align="right">-0.0110678</td>
-<td align="right">57.73910</td>
-<td align="right">0.1053884</td>
-<td align="right">58.38530</td>
-<td align="right">51.06980</td>
-<td align="right">70.83089</td>
+<td align="right">6.021700</td>
+<td align="right">4.745422</td>
+<td align="right">0.1031372</td>
+<td align="right">0.0812777</td>
+<td align="right">-0.6461664</td>
+<td align="right">-0.0110673</td>
+<td align="right">57.73915</td>
+<td align="right">0.1053882</td>
+<td align="right">58.38532</td>
+<td align="right">51.06982</td>
+<td align="right">70.83086</td>
 </tr>
 <tr class="odd">
 <td align="left">SSB</td>
 <td align="right">1999</td>
 <td align="right">NA</td>
-<td align="right">7.587664</td>
-<td align="right">5.989982</td>
-<td align="right">0.1377491</td>
-<td align="right">0.1087443</td>
-<td align="right">-1.3693275</td>
-<td align="right">-0.0248593</td>
-<td align="right">53.71388</td>
-<td align="right">0.1420179</td>
-<td align="right">55.08320</td>
-<td align="right">45.02114</td>
-<td align="right">70.36160</td>
+<td align="right">7.587647</td>
+<td align="right">5.989958</td>
+<td align="right">0.1377488</td>
+<td align="right">0.1087438</td>
+<td align="right">-1.3692709</td>
+<td align="right">-0.0248582</td>
+<td align="right">53.71395</td>
+<td align="right">0.1420174</td>
+<td align="right">55.08322</td>
+<td align="right">45.02116</td>
+<td align="right">70.36164</td>
 </tr>
 <tr class="even">
 <td align="left">SSB</td>
 <td align="right">2000</td>
 <td align="right">NA</td>
-<td align="right">10.591320</td>
-<td align="right">8.474815</td>
-<td align="right">0.1947344</td>
-<td align="right">0.1558198</td>
-<td align="right">-3.6841892</td>
-<td align="right">-0.0677383</td>
-<td align="right">50.70436</td>
-<td align="right">0.2023717</td>
-<td align="right">54.38855</td>
-<td align="right">39.46957</td>
-<td align="right">76.36913</td>
+<td align="right">10.591288</td>
+<td align="right">8.474755</td>
+<td align="right">0.1947337</td>
+<td align="right">0.1558187</td>
+<td align="right">-3.6841019</td>
+<td align="right">-0.0677367</td>
+<td align="right">50.70447</td>
+<td align="right">0.2023709</td>
+<td align="right">54.38858</td>
+<td align="right">39.46960</td>
+<td align="right">76.36919</td>
 </tr>
 </tbody>
 </table>
@@ -1530,29 +1530,29 @@ SAMのモデルを疑似データにフィットさせるというシミュレ�
 <td align="right">5.639811</td>
 <td align="right">0.0583380</td>
 <td align="right">0.0469441</td>
-<td align="right">4.980693</td>
+<td align="right">4.980692</td>
 <td align="right">0.0414578</td>
-<td align="right">125.11956</td>
+<td align="right">125.11958</td>
 <td align="right">0.0363967</td>
-<td align="right">120.13887</td>
-<td align="right">119.12141</td>
-<td align="right">133.89929</td>
+<td align="right">120.13888</td>
+<td align="right">119.12142</td>
+<td align="right">133.89930</td>
 </tr>
 <tr class="even">
 <td align="left">SSB</td>
 <td align="right">1992</td>
 <td align="right">NA</td>
 <td align="right">6.803587</td>
-<td align="right">5.837697</td>
+<td align="right">5.837696</td>
 <td align="right">0.0564235</td>
 <td align="right">0.0484132</td>
 <td align="right">5.359513</td>
 <td align="right">0.0444475</td>
-<td align="right">125.94026</td>
+<td align="right">125.94027</td>
 <td align="right">0.0345226</td>
-<td align="right">120.58075</td>
-<td align="right">117.89615</td>
-<td align="right">133.15689</td>
+<td align="right">120.58076</td>
+<td align="right">117.89616</td>
+<td align="right">133.15690</td>
 </tr>
 <tr class="odd">
 <td align="left">SSB</td>
@@ -1562,11 +1562,11 @@ SAMのモデルを疑似データにフィットさせるというシミュレ�
 <td align="right">5.088046</td>
 <td align="right">0.0500246</td>
 <td align="right">0.0420028</td>
-<td align="right">4.342049</td>
+<td align="right">4.342047</td>
 <td align="right">0.0358445</td>
 <td align="right">125.47784</td>
 <td align="right">0.0374352</td>
-<td align="right">121.13579</td>
+<td align="right">121.13580</td>
 <td align="right">116.63157</td>
 <td align="right">134.58281</td>
 </tr>
@@ -1578,13 +1578,13 @@ SAMのモデルを疑似データにフィットさせるというシミュレ�
 <td align="right">4.462884</td>
 <td align="right">0.0503621</td>
 <td align="right">0.0400341</td>
-<td align="right">3.639329</td>
+<td align="right">3.639327</td>
 <td align="right">0.0326464</td>
-<td align="right">115.11644</td>
+<td align="right">115.11645</td>
 <td align="right">0.0384839</td>
-<td align="right">111.47711</td>
-<td align="right">107.76149</td>
-<td align="right">122.85626</td>
+<td align="right">111.47713</td>
+<td align="right">107.76150</td>
+<td align="right">122.85628</td>
 </tr>
 <tr class="odd">
 <td align="left">SSB</td>
@@ -1594,13 +1594,13 @@ SAMのモデルを疑似データにフィットさせるというシミュレ�
 <td align="right">4.135281</td>
 <td align="right">0.0528299</td>
 <td align="right">0.0401628</td>
-<td align="right">1.940047</td>
-<td align="right">0.0188422</td>
-<td align="right">104.90310</td>
+<td align="right">1.940045</td>
+<td align="right">0.0188421</td>
+<td align="right">104.90311</td>
 <td align="right">0.0395911</td>
 <td align="right">102.96306</td>
 <td align="right">100.25963</td>
-<td align="right">114.14214</td>
+<td align="right">114.14215</td>
 </tr>
 <tr class="even">
 <td align="left">SSB</td>
@@ -1610,76 +1610,76 @@ SAMのモデルを疑似データにフィットさせるというシミュレ�
 <td align="right">4.703847</td>
 <td align="right">0.0689817</td>
 <td align="right">0.0530425</td>
-<td align="right">2.256859</td>
-<td align="right">0.0254493</td>
-<td align="right">90.93758</td>
+<td align="right">2.256857</td>
+<td align="right">0.0254492</td>
+<td align="right">90.93760</td>
 <td align="right">0.0585842</td>
-<td align="right">88.68073</td>
-<td align="right">82.86073</td>
-<td align="right">100.84286</td>
+<td align="right">88.68074</td>
+<td align="right">82.86074</td>
+<td align="right">100.84288</td>
 </tr>
 <tr class="odd">
 <td align="left">SSB</td>
 <td align="right">1997</td>
 <td align="right">NA</td>
-<td align="right">7.575826</td>
+<td align="right">7.575825</td>
 <td align="right">5.668556</td>
 <td align="right">0.1033675</td>
-<td align="right">0.0773440</td>
-<td align="right">1.435129</td>
-<td align="right">0.0195815</td>
-<td align="right">74.72535</td>
+<td align="right">0.0773439</td>
+<td align="right">1.435125</td>
+<td align="right">0.0195814</td>
+<td align="right">74.72536</td>
 <td align="right">0.0950577</td>
-<td align="right">73.29023</td>
-<td align="right">65.45184</td>
+<td align="right">73.29024</td>
+<td align="right">65.45185</td>
 <td align="right">89.05097</td>
 </tr>
 <tr class="even">
 <td align="left">SSB</td>
 <td align="right">1998</td>
 <td align="right">NA</td>
-<td align="right">8.263546</td>
+<td align="right">8.263545</td>
 <td align="right">6.510862</td>
-<td align="right">0.1415347</td>
+<td align="right">0.1415346</td>
 <td align="right">0.1115154</td>
-<td align="right">2.368833</td>
-<td align="right">0.0405724</td>
-<td align="right">60.75413</td>
+<td align="right">2.368827</td>
+<td align="right">0.0405723</td>
+<td align="right">60.75415</td>
 <td align="right">0.1294029</td>
-<td align="right">58.38530</td>
-<td align="right">51.81063</td>
+<td align="right">58.38532</td>
+<td align="right">51.81064</td>
 <td align="right">77.45656</td>
 </tr>
 <tr class="odd">
 <td align="left">SSB</td>
 <td align="right">1999</td>
 <td align="right">NA</td>
-<td align="right">10.035738</td>
-<td align="right">8.013141</td>
-<td align="right">0.1821923</td>
-<td align="right">0.1454734</td>
-<td align="right">3.996335</td>
+<td align="right">10.035735</td>
+<td align="right">8.013140</td>
+<td align="right">0.1821922</td>
+<td align="right">0.1454733</td>
+<td align="right">3.996337</td>
 <td align="right">0.0725509</td>
-<td align="right">59.07954</td>
-<td align="right">0.1646626</td>
-<td align="right">55.08320</td>
-<td align="right">46.85553</td>
-<td align="right">78.38818</td>
+<td align="right">59.07956</td>
+<td align="right">0.1646625</td>
+<td align="right">55.08322</td>
+<td align="right">46.85555</td>
+<td align="right">78.38819</td>
 </tr>
 <tr class="even">
 <td align="left">SSB</td>
 <td align="right">2000</td>
 <td align="right">NA</td>
-<td align="right">12.793289</td>
-<td align="right">10.346382</td>
-<td align="right">0.2352202</td>
-<td align="right">0.1902309</td>
-<td align="right">4.315383</td>
-<td align="right">0.0793436</td>
+<td align="right">12.793283</td>
+<td align="right">10.346379</td>
+<td align="right">0.2352200</td>
+<td align="right">0.1902307</td>
+<td align="right">4.315363</td>
+<td align="right">0.0793432</td>
 <td align="right">58.70394</td>
-<td align="right">0.2138959</td>
-<td align="right">54.38855</td>
-<td align="right">41.33169</td>
+<td align="right">0.2138958</td>
+<td align="right">54.38858</td>
+<td align="right">41.33172</td>
 <td align="right">83.14742</td>
 </tr>
 </tbody>

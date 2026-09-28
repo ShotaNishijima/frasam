@@ -180,17 +180,17 @@ length(res_fixed_p0$input$abund)
 fit_check <- check_fit_sam(res_rw)
 #>                          check    ok              value       threshold
 #>          optimizer convergence  TRUE                  0               0
-#>      positive definite Hessian FALSE              FALSE            TRUE
-#>  maximum fixed-effect gradient  TRUE          6.795e-06            0.01
-#>    finite fixed effects and SE FALSE              17/18             all
-#>        maximum fixed-effect SE  TRUE             0.6787             Inf
-#>  maximum absolute fixed effect  TRUE              9.788             Inf
-#>           reported sigma range FALSE 5.612e-05 to 1.373     1e-04 to 10
+#>      positive definite Hessian  TRUE               TRUE            TRUE
+#>  maximum fixed-effect gradient  TRUE          0.0001152            0.01
+#>    finite fixed effects and SE  TRUE              18/18             all
+#>        maximum fixed-effect SE  TRUE              55.08             Inf
+#>  maximum absolute fixed effect  TRUE              10.64             Inf
+#>           reported sigma range FALSE 2.388e-05 to 1.373     1e-04 to 10
 #>             reported rho range  TRUE   0.9796 to 0.9796 1e-04 to 0.9999
 #>  parameters near finite bounds  TRUE                  0               0
 #>                                                                         message
 #>                                                   nlminb convergence code is 0.
-#>                                         sdreport does not report pdHess = TRUE.
+#>                                                 sdreport reports pdHess = TRUE.
 #>                                         Maximum absolute fixed-effect gradient.
 #>                    Fixed-effect estimates and standard errors should be finite.
 #>                         Large standard errors can indicate weak identification.
@@ -204,17 +204,17 @@ fit_check$ok
 fit_check$checks
 #>                           check    ok              value       threshold
 #> 1         optimizer convergence  TRUE                  0               0
-#> 2     positive definite Hessian FALSE              FALSE            TRUE
-#> 3 maximum fixed-effect gradient  TRUE          6.795e-06            0.01
-#> 4   finite fixed effects and SE FALSE              17/18             all
-#> 5       maximum fixed-effect SE  TRUE             0.6787             Inf
-#> 6 maximum absolute fixed effect  TRUE              9.788             Inf
-#> 7          reported sigma range FALSE 5.612e-05 to 1.373     1e-04 to 10
+#> 2     positive definite Hessian  TRUE               TRUE            TRUE
+#> 3 maximum fixed-effect gradient  TRUE          0.0001152            0.01
+#> 4   finite fixed effects and SE  TRUE              18/18             all
+#> 5       maximum fixed-effect SE  TRUE              55.08             Inf
+#> 6 maximum absolute fixed effect  TRUE              10.64             Inf
+#> 7          reported sigma range FALSE 2.388e-05 to 1.373     1e-04 to 10
 #> 8            reported rho range  TRUE   0.9796 to 0.9796 1e-04 to 0.9999
 #> 9 parameters near finite bounds  TRUE                  0               0
 #>                                                                          message
 #> 1                                                  nlminb convergence code is 0.
-#> 2                                        sdreport does not report pdHess = TRUE.
+#> 2                                                sdreport reports pdHess = TRUE.
 #> 3                                        Maximum absolute fixed-effect gradient.
 #> 4                   Fixed-effect estimates and standard errors should be finite.
 #> 5                        Large standard errors can indicate weak identification.
@@ -254,11 +254,11 @@ fit_check$checks[
   ),
 ]
 #>                           check    ok              value   threshold
-#> 2     positive definite Hessian FALSE              FALSE        TRUE
-#> 3 maximum fixed-effect gradient  TRUE          6.795e-06        0.01
-#> 7          reported sigma range FALSE 5.612e-05 to 1.373 1e-04 to 10
+#> 2     positive definite Hessian  TRUE               TRUE        TRUE
+#> 3 maximum fixed-effect gradient  TRUE          0.0001152        0.01
+#> 7          reported sigma range FALSE 2.388e-05 to 1.373 1e-04 to 10
 #>                                                                          message
-#> 2                                        sdreport does not report pdHess = TRUE.
+#> 2                                                sdreport reports pdHess = TRUE.
 #> 3                                        Maximum absolute fixed-effect gradient.
 #> 7 Reported standard deviations should be finite and within the diagnostic range.
 ```
@@ -271,22 +271,22 @@ fit_check$checks[
 
 head(fit_check$fixed)
 #>           name   estimate         se      gradient
-#> 1         logQ -5.3393468 0.17712387 -9.534776e-07
-#> 2         logQ -4.7404500 0.21984587  7.940808e-07
-#> 3         logQ -5.5526326 0.08309909 -4.086623e-06
-#> 4         logQ  0.3089114 0.06075810  3.044420e-06
-#> 5         logQ -4.0119936 0.11963056 -2.135708e-06
-#> 6 logSdLogFsta -0.4669702 0.16208347 -1.079564e-06
+#> 1         logQ -5.3393484 0.17713132 -5.160339e-05
+#> 2         logQ -4.7404517 0.21984731 -3.679972e-05
+#> 3         logQ -5.5526325 0.08309938  8.663253e-06
+#> 4         logQ  0.3089114 0.06075828  2.215296e-08
+#> 5         logQ -4.0119935 0.11963119  6.903226e-06
+#> 6 logSdLogFsta -0.4669707 0.16208903 -4.387291e-06
 
 fit_check$fixed[
   order(abs(fit_check$fixed$gradient), decreasing = TRUE),
 ][1:5, ]
-#>            name    estimate         se      gradient
-#> 13  logSdLogObs  0.09393634 0.11460027 -6.795203e-06
-#> 14  logSdLogObs  0.31697774 0.11343008  6.336297e-06
-#> 3          logQ -5.55263262 0.08309909 -4.086623e-06
-#> 7  logSdLogFsta -1.16227806 0.15671268  3.722154e-06
-#> 4          logQ  0.30891139 0.06075810  3.044420e-06
+#>            name   estimate        se      gradient
+#> 7  logSdLogFsta -1.1622797 0.1567145 -1.151927e-04
+#> 11  logSdLogObs -1.3083824 0.1096391 -1.085972e-04
+#> 15  logSdLogObs -0.7159731 0.1236300  1.011676e-04
+#> 10  logSdLogObs -0.5883400 0.1054278 -8.352417e-05
+#> 1          logQ -5.3393484 0.1771313 -5.160339e-05
 ```
 
 診断のしきい値は引数で変更できます。 例えば、勾配をより厳しく見る場合は
@@ -297,17 +297,17 @@ fit_check$fixed[
 check_fit_sam(res_rw, gradient_tol = 1e-4, verbose = FALSE)$checks
 #>                           check    ok              value       threshold
 #> 1         optimizer convergence  TRUE                  0               0
-#> 2     positive definite Hessian FALSE              FALSE            TRUE
-#> 3 maximum fixed-effect gradient  TRUE          6.795e-06           1e-04
-#> 4   finite fixed effects and SE FALSE              17/18             all
-#> 5       maximum fixed-effect SE  TRUE             0.6787             Inf
-#> 6 maximum absolute fixed effect  TRUE              9.788             Inf
-#> 7          reported sigma range FALSE 5.612e-05 to 1.373     1e-04 to 10
+#> 2     positive definite Hessian  TRUE               TRUE            TRUE
+#> 3 maximum fixed-effect gradient FALSE          0.0001152           1e-04
+#> 4   finite fixed effects and SE  TRUE              18/18             all
+#> 5       maximum fixed-effect SE  TRUE              55.08             Inf
+#> 6 maximum absolute fixed effect  TRUE              10.64             Inf
+#> 7          reported sigma range FALSE 2.388e-05 to 1.373     1e-04 to 10
 #> 8            reported rho range  TRUE   0.9796 to 0.9796 1e-04 to 0.9999
 #> 9 parameters near finite bounds  TRUE                  0               0
 #>                                                                          message
 #> 1                                                  nlminb convergence code is 0.
-#> 2                                        sdreport does not report pdHess = TRUE.
+#> 2                                                sdreport reports pdHess = TRUE.
 #> 3                                        Maximum absolute fixed-effect gradient.
 #> 4                   Fixed-effect estimates and standard errors should be finite.
 #> 5                        Large standard errors can indicate weak identification.
@@ -325,41 +325,41 @@ check_fit_sam(res_rw, gradient_tol = 1e-4, verbose = FALSE)$checks
 
 fit_check$sigma
 #>             type index        value    ok   problem
-#> 1          sigma     1 1.0984898146  TRUE          
-#> 2          sigma     2 1.3729720116  TRUE          
-#> 3          sigma     3 0.4887155303  TRUE          
-#> 4          sigma     4 0.3385309609  TRUE          
-#> 5          sigma     5 0.7328951790  TRUE          
-#> 6     sigma.logC     1 0.5552486816  TRUE          
-#> 7     sigma.logC     2 0.5552486816  TRUE          
-#> 8     sigma.logC     3 0.2702569865  TRUE          
-#> 9     sigma.logC     4 0.2702569865  TRUE          
-#> 10    sigma.logC     5 0.2702569865  TRUE          
-#> 11    sigma.logC     6 0.4575531134  TRUE          
-#> 12    sigma.logC     7 0.4575531134  TRUE          
-#> 13 sigma.logFsta     1 0.6268987810  TRUE          
-#> 14 sigma.logFsta     2 0.6268987810  TRUE          
-#> 15 sigma.logFsta     3 0.3127728525  TRUE          
-#> 16 sigma.logFsta     4 0.3127728525  TRUE          
-#> 17 sigma.logFsta     5 0.3127728525  TRUE          
-#> 18 sigma.logFsta     6 0.3127728525  TRUE          
-#> 19 sigma.logFsta     7 0.3127728525  TRUE          
-#> 20    sigma.logN     1 0.6279343136  TRUE          
-#> 21    sigma.logN     2 0.0000561208 FALSE too small
-#> 22    sigma.logN     3 0.0000561208 FALSE too small
-#> 23    sigma.logN     4 0.0000561208 FALSE too small
-#> 24    sigma.logN     5 0.0000561208 FALSE too small
-#> 25    sigma.logN     6 0.0000561208 FALSE too small
-#> 26    sigma.logN     7 0.0000561208 FALSE too small
+#> 1          sigma     1 1.098490e+00  TRUE          
+#> 2          sigma     2 1.372971e+00  TRUE          
+#> 3          sigma     3 4.887163e-01  TRUE          
+#> 4          sigma     4 3.385311e-01  TRUE          
+#> 5          sigma     5 7.328954e-01  TRUE          
+#> 6     sigma.logC     1 5.552483e-01  TRUE          
+#> 7     sigma.logC     2 5.552483e-01  TRUE          
+#> 8     sigma.logC     3 2.702569e-01  TRUE          
+#> 9     sigma.logC     4 2.702569e-01  TRUE          
+#> 10    sigma.logC     5 2.702569e-01  TRUE          
+#> 11    sigma.logC     6 4.575532e-01  TRUE          
+#> 12    sigma.logC     7 4.575532e-01  TRUE          
+#> 13 sigma.logFsta     1 6.268985e-01  TRUE          
+#> 14 sigma.logFsta     2 6.268985e-01  TRUE          
+#> 15 sigma.logFsta     3 3.127723e-01  TRUE          
+#> 16 sigma.logFsta     4 3.127723e-01  TRUE          
+#> 17 sigma.logFsta     5 3.127723e-01  TRUE          
+#> 18 sigma.logFsta     6 3.127723e-01  TRUE          
+#> 19 sigma.logFsta     7 3.127723e-01  TRUE          
+#> 20    sigma.logN     1 6.279345e-01  TRUE          
+#> 21    sigma.logN     2 2.388496e-05 FALSE too small
+#> 22    sigma.logN     3 2.388496e-05 FALSE too small
+#> 23    sigma.logN     4 2.388496e-05 FALSE too small
+#> 24    sigma.logN     5 2.388496e-05 FALSE too small
+#> 25    sigma.logN     6 2.388496e-05 FALSE too small
+#> 26    sigma.logN     7 2.388496e-05 FALSE too small
 
 fit_check$sigma[!fit_check$sigma$ok, ]
-#>          type index       value    ok   problem
-#> 21 sigma.logN     2 5.61208e-05 FALSE too small
-#> 22 sigma.logN     3 5.61208e-05 FALSE too small
-#> 23 sigma.logN     4 5.61208e-05 FALSE too small
-#> 24 sigma.logN     5 5.61208e-05 FALSE too small
-#> 25 sigma.logN     6 5.61208e-05 FALSE too small
-#> 26 sigma.logN     7 5.61208e-05 FALSE too small
+#>          type index        value    ok   problem
+#> 21 sigma.logN     2 2.388496e-05 FALSE too small
+#> 22 sigma.logN     3 2.388496e-05 FALSE too small
+#> 23 sigma.logN     4 2.388496e-05 FALSE too small
+#> 24 sigma.logN     5 2.388496e-05 FALSE too small
+#> 25 sigma.logN     6 2.388496e-05 FALSE too small
+#> 26 sigma.logN     7 2.388496e-05 FALSE too small
 ```
 
 しきい値を変えて確認したい場合は、`sigma_range` を指定します。
@@ -377,32 +377,32 @@ fit_check_strict_sigma$checks[
   fit_check_strict_sigma$checks$check == "reported sigma range",
 ]
 #>                  check    ok              value threshold
-#> 7 reported sigma range FALSE 5.612e-05 to 1.373  0.5 to 1
+#> 7 reported sigma range FALSE 2.388e-05 to 1.373  0.5 to 1
 #>                                                                          message
 #> 7 Reported standard deviations should be finite and within the diagnostic range.
 
 fit_check_strict_sigma$sigma[!fit_check_strict_sigma$sigma$ok, ]
 #>             type index        value    ok   problem
-#> 1          sigma     1 1.0984898146 FALSE too large
-#> 2          sigma     2 1.3729720116 FALSE too large
-#> 3          sigma     3 0.4887155303 FALSE too small
-#> 4          sigma     4 0.3385309609 FALSE too small
-#> 8     sigma.logC     3 0.2702569865 FALSE too small
-#> 9     sigma.logC     4 0.2702569865 FALSE too small
-#> 10    sigma.logC     5 0.2702569865 FALSE too small
-#> 11    sigma.logC     6 0.4575531134 FALSE too small
-#> 12    sigma.logC     7 0.4575531134 FALSE too small
-#> 15 sigma.logFsta     3 0.3127728525 FALSE too small
-#> 16 sigma.logFsta     4 0.3127728525 FALSE too small
-#> 17 sigma.logFsta     5 0.3127728525 FALSE too small
-#> 18 sigma.logFsta     6 0.3127728525 FALSE too small
-#> 19 sigma.logFsta     7 0.3127728525 FALSE too small
-#> 21    sigma.logN     2 0.0000561208 FALSE too small
-#> 22    sigma.logN     3 0.0000561208 FALSE too small
-#> 23    sigma.logN     4 0.0000561208 FALSE too small
-#> 24    sigma.logN     5 0.0000561208 FALSE too small
-#> 25    sigma.logN     6 0.0000561208 FALSE too small
-#> 26    sigma.logN     7 0.0000561208 FALSE too small
+#> 1          sigma     1 1.098490e+00 FALSE too large
+#> 2          sigma     2 1.372971e+00 FALSE too large
+#> 3          sigma     3 4.887163e-01 FALSE too small
+#> 4          sigma     4 3.385311e-01 FALSE too small
+#> 8     sigma.logC     3 2.702569e-01 FALSE too small
+#> 9     sigma.logC     4 2.702569e-01 FALSE too small
+#> 10    sigma.logC     5 2.702569e-01 FALSE too small
+#> 11    sigma.logC     6 4.575532e-01 FALSE too small
+#> 12    sigma.logC     7 4.575532e-01 FALSE too small
+#> 15 sigma.logFsta     3 3.127723e-01 FALSE too small
+#> 16 sigma.logFsta     4 3.127723e-01 FALSE too small
+#> 17 sigma.logFsta     5 3.127723e-01 FALSE too small
+#> 18 sigma.logFsta     6 3.127723e-01 FALSE too small
+#> 19 sigma.logFsta     7 3.127723e-01 FALSE too small
+#> 21    sigma.logN     2 2.388496e-05 FALSE too small
+#> 22    sigma.logN     3 2.388496e-05 FALSE too small
+#> 23    sigma.logN     4 2.388496e-05 FALSE too small
+#> 24    sigma.logN     5 2.388496e-05 FALSE too small
+#> 25    sigma.logN     6 2.388496e-05 FALSE too small
+#> 26    sigma.logN     7 2.388496e-05 FALSE too small
 ```
 
 #### 以前の解析結果の初期値を利用したい
@@ -544,7 +544,7 @@ check_fit_sam(res_varNfix, verbose = TRUE) #すべてOKになる
 #>                          check   ok            value       threshold
 #>          optimizer convergence TRUE                0               0
 #>      positive definite Hessian TRUE             TRUE            TRUE
-#>  maximum fixed-effect gradient TRUE        0.0003751            0.01
+#>  maximum fixed-effect gradient TRUE        0.0004075            0.01
 #>    finite fixed effects and SE TRUE            17/17             all
 #>        maximum fixed-effect SE TRUE           0.6788             Inf
 #>  maximum absolute fixed effect TRUE            5.553             Inf
@@ -601,9 +601,9 @@ idx_logC <- sapply(unique(res_varNfix$sigma.logC), function(z) {
 idx_logC
 #> [1] 1 2 3
 sigma_hat[idx_logC]
-#> [1] 0.5552559 0.2700808 0.4574299
+#> [1] 0.5552559 0.2700807 0.4574298
 exp(input$p0.list$logSdLogObs[idx_logC])
-#> [1] 0.5552559 0.2700808 0.4574299
+#> [1] 0.5552559 0.2700807 0.4574298
 
 # 例: すべてのsigma.logCを 0.2 に固定する
 fix_pos <- idx_logC[]
@@ -627,7 +627,7 @@ abs(res_sigma02$sigma.logC - 0.2) < 1e-6
 # 固定したパラメータは opt$par には出てこない
 res_sigma02$opt$par[names(res_sigma02$opt$par) == "logSdLogObs"]
 #> logSdLogObs logSdLogObs logSdLogObs logSdLogObs logSdLogObs 
-#>   0.1326099   0.3298195  -0.6822912  -1.0575798  -0.2981344
+#>   0.1326106   0.3298184  -0.6822933  -1.0575786  -0.2981355
 ```
 
 #### VPAと同じような設定で解析したい
@@ -801,7 +801,7 @@ ggplot2::ggplot(
 ``` r
 
 res_rw$sigma #index毎に異なる
-#> [1] 1.0984898 1.3729720 0.4887155 0.3385310 0.7328952
+#> [1] 1.0984901 1.3729710 0.4887163 0.3385311 0.7328954
 
 input <- res_rw$input
 input$index.key <- rep(0, length(input$abund))
@@ -812,11 +812,11 @@ res_ls$sigma
 input$index.key <- c(0,0,1,2,3)
 res_rw2 <- do.call(sam, input)
 res_rw2$sigma
-#> [1] 1.2438612 1.2438612 0.4909690 0.3384183 0.7341527
+#> [1] 1.2438601 1.2438601 0.4909688 0.3384182 0.7341535
 
 #AICの比較
 c(res_rw$aic, res_ls$aic, res_rw2$aic)
-#> [1]  976.4474 1053.1456  976.3553
+#> [1]  976.4474 1053.1456  976.3630
 ```
 
 #### IndexとAbundanceの間の非線形性を推定したい
@@ -841,7 +841,7 @@ input$b.est <- TRUE
 input$p0.list <- res_rw$par_list
 res_estb_full <- do.call(sam, input)
 res_estb_full$b #すべてのindexでbが推定される
-#> [1] 0.9775703 0.9484969 1.0082841 0.9249488 0.8870791
+#> [1] 0.9775696 0.9484946 1.0082822 0.9249474 0.8870780
 check_fit_sam(res_estb_full, verbose = FALSE)
 
 c(res_rw$aic, res_estb_full$aic)
@@ -850,11 +850,11 @@ c(res_rw$aic, res_estb_full$aic)
 input$b.fix <- c(1,1,1,1,NA) #1-4番目のindexはb=1に固定し、5番目のindexはb推定を行う
 res_estb_45 <- do.call(sam, input)
 res_estb_45$b #
-#> [1] 1.0000000 1.0000000 1.0000000 1.0000000 0.8962082
+#> [1] 1.0000000 1.0000000 1.0000000 1.0000000 0.9973021
 check_fit_sam(res_estb_45, verbose = FALSE)
 
 c(res_rw$aic, res_estb_full$aic, res_estb_45$aic)
-#> [1] 976.4474 982.5655 977.3648
+#> [1] 976.4474 982.5655 976.0210
 ```
 
 #### 加入年齢を1歳にしたい
@@ -1132,8 +1132,8 @@ knitr::kable(cond_nll1)
 | type         |        nll |
 |:-------------|-----------:|
 | Process_N    | -827.21626 |
-| Process_F    | -290.70451 |
-| Catch_at_age |   82.62484 |
+| Process_F    | -290.70462 |
+| Catch_at_age |   82.62482 |
 | Index_1      |   60.06802 |
 | Index_2      |   69.16650 |
 | Index_3      |   26.34139 |
