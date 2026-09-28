@@ -1,0 +1,1119 @@
+---
+title: "SAMを使ったマサバ大平洋系群の資源量推定"
+subtitle: "Catch at age修正版"
+author: "西嶋翔太"
+date: "`r format(Sys.Date())`"
+output:
+  html_document:
+    toc: true         # 目次を表示
+    toc_float: true   # 目次を画面横に固定
+    fig_width: 10
+    fig_height: 6
+    df_print: paged   # データフレームをスクロール可能テーブルで表示
+  md_document:
+    variant: gfm
+---
+
+```{r setup, include = FALSE}
+# options(rmarkdown.html_vignette.check_title = FALSE)
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 10,     # in (好みで調整)
+  fig.height = 6,
+  dpi = 150,
+  out.width = "100%", # コンテナ幅いっぱいに
+  fig.align = "center",
+  message = FALSE, 
+  warning = FALSE,
+  echo = FALSE,
+  cache = TRUE          # 既定でキャッシュ有効
+  # cache.path = "cache/", # すべてのキャッシュをこの下にまとめる
+  # fig.path   = "figs/"
+)
+```
+
+
+
+```{r read library, fig.show='hold',cache=FALSE}
+
+## インストール (最新ブランチはcmsa11→vignetteとかが追加されたcreate_vignette)
+# devtools::install_github("ShotaNishijima/frasam@create_vignette") # frasam
+## frasyrも使うのでfrasyrもインストールしてください
+# devtools::install_github("ichimomo/frasyr@dev")
+
+# ライブラリの呼び出し
+library(frasyr)
+library(frasam)
+# devtools::load_all()
+library(tidyverse)
+library(patchwork)
+# install.packages("lemon")
+library(lemon)
+library(readxl)
+library(TMB)
+library(knitr)
+library(magrittr)
+library(ggcorrplot)
+```
+
+# データセットの読み込みおよび図の作成
+
+```{r load_data, fig.show='hold'}
+dirname <- "~/git/masaba2025/sam_rev"
+dir.create(dirname)
+setwd(dirname)
+caa   <- read.csv("../Data/caa1_2025_fix.csv",  row.names=1)
+waa   <- read.csv("../Data/waa2_2025.csv",  row.names=1)
+# 2025漁期年を2022-2024年平均に変更
+maa   <- read.csv("../Data/maa1_2025.csv",  row.names=1)
+index <- read.csv("../Data/cpue1_2025.csv",  row.names=1)
+M <- read.csv("../Data/M_2025.csv",  row.names=1)
+
+dat <- data.handler(caa=caa, waa=waa, maa=maa, M=M, index=index)
+```
+
+## Catch-at-age
+
+- 2024漁期年の漁獲尾数は前年よりもさらに減少
+
+```{r plot_caa, fig.show='hold'}
+caa_orig = read.csv("../Data/final_caa_annual_1970to2024_fix.csv",
+                    header=T,check.names = FALSE)
+caa_long = caa_orig %>%
+  pivot_longer(cols=c(-Fyear,-Member),names_to="Age") %>%
+  group_by(Fyear,Age) %>%
+  summarise(total = sum(value)/1.0e+6) %>% # unit = million
+  mutate(type = "Catch number (billion)") %>%
+  ungroup()
+caa_long = caa_long %>%
+  mutate(Age = factor(Age,levels = rev(unique(caa_long$Age))))
+
+theme_set(theme_bw(base_size=14))
+g_caa = caa_long %>% ggplot(aes(x=Fyear,y=total,fill=Age)) +
+    geom_col()+
+    scale_fill_brewer(palette="Set2") +
+    xlab("Fishing year")+
+    ylab("Catch number (million)") +
+    ggtitle("(a) Catch number")
+
+(g_caa2 = caa_long %>% ggplot(aes(x=Fyear,y=total,fill=Age)) +
+    geom_col()+
+    scale_fill_brewer(palette="Set2") +
+    xlab("Fishing year")+
+    ylab("Catch number (million)")
+)
+ggsave(filename = "CatchAtAge.png",dpi=600,unit="cm",height=10,width=15)
+
+```
+
+## Catch-at-age by members
+
+-　0-1歳の、日本と中国での減少が大きい
+
+```{r plot_caa2, fig.show='hold'}
+caa_fleet = caa_orig %>%
+  pivot_longer(cols=c(-Fyear,-Member)) %>%
+  mutate(Value = value/1.0e+6) %>% # unit = million
+  mutate(Age = as.numeric(name))
+caa_fleet = caa_fleet %>%
+  mutate(Age = factor(Age,levels = unique(caa_fleet$Age))) %>%
+  filter(Fyear > 2013)
+
+theme_set(theme_bw(base_size=11))
+(g_caa_f = caa_fleet %>% ggplot(aes(x=Age,y=Value,fill=Member)) +
+    geom_col()+
+    facet_wrap(vars(Fyear))+
+    xlab("Age")+ylab("Catch number (million)")
+)
+ggsave(g_caa_f,filename="caa_fleet_figure.png",dpi=600,unit="cm",height=12,width=18)
+
+
+fleet_name <- c("China","Japan","Russia")
+for(i in 1:3) {
+  caa_f = caa_fleet %>% dplyr::select(-value) %>%
+    filter(Member == fleet_name[i]) %>%
+    pivot_wider(id_cols =Fyear,names_from = name,values_from = Value)
+  write.csv(caa_f,file=paste0("caa_million_since2014_",fleet_name[i],".csv"),row.names=FALSE)
+}
+
+```
+
+## Weight-at-age
+
+- 2024年漁期は6+歳以外は体重増加
+- 2025年漁期は2016漁期年以降の平均としているため、減少する
+- この仮定が妥当かどうかは微妙だが、NPFCで実施した感度分析の結果から、この仮定に対して結果は頑健であると考えられる
+
+```{r plot_waa, fig.show='hold'}
+waa_long = dat$waa %>%
+  rownames_to_column(var="age") %>%
+  pivot_longer(cols=-age,names_to="Year") %>%
+  mutate(type = "Stock weight (g)")
+waa_long = waa_long %>%
+  mutate(Age = factor(age,levels = rev(unique(waa_long$age)))) %>%
+  mutate(Fyear = as.numeric(Year))
+g_waa = waa_long %>% ggplot(aes(x=Fyear,y=value,colour=Age,linetype=Age,shape=Age)) +
+    geom_path(linewidth=0.5)+
+    geom_point()+
+    scale_colour_brewer(palette="Set2") +
+    scale_shape_manual(values=0:6)+
+    xlab("Fishing year")+
+    ylab("Stock weight (g)") +
+    ggtitle("(b) Stock weight")
+
+(g_waa2 = waa_long %>% ggplot(aes(x=Fyear,y=value,colour=Age,linetype=Age,shape=Age)) +
+    geom_path(linewidth=1)+
+    geom_point()+
+    scale_colour_brewer(palette="Set2") +
+    scale_shape_manual(values=0:6)+
+    xlab("Fishing year")+
+    ylab("Stock weight (g)")
+)
+ggsave(filename = "WeightAtAge.png",dpi=600,unit="cm",height=10,width=15)
+```
+
+## Maturity-at-age
+
+- 2024, 2025は引き続き低水準を仮定
+
+```{r plot_maa, fig.show='hold'}
+maa_long = dat$maa %>%
+  rownames_to_column(var="age") %>%
+  pivot_longer(cols=-age,names_to="Year") %>%
+  mutate(type = "Maturity")
+maa_long = maa_long %>%
+  mutate(Age = factor(age,levels = rev(unique(maa_long$age)))) %>%
+  mutate(Fyear = as.numeric(Year))
+
+g_maa = maa_long %>% ggplot(aes(x=Fyear,y=value,colour=Age,linetype=Age,shape=Age)) +
+    geom_path(linewidth=0.5)+
+    geom_point()+
+    scale_colour_brewer(palette="Set2") +
+    scale_shape_manual(values=0:6)+
+    xlab("Fishing year")+
+    ylab("Maturity") +
+    ggtitle("(c) Maturity")
+
+(g_maa2 = maa_long %>% ggplot(aes(x=Fyear,y=value,colour=Age,linetype=Age,shape=Age)) +
+    geom_path(linewidth=1)+
+    geom_point()+
+    scale_colour_brewer(palette="Set2") +
+    scale_shape_manual(values=0:6)+
+    xlab("Fishing year")+
+    ylab("Maturity")
+)
+ggsave(filename = "MaturityAtAge.png",dpi=600,unit="cm",height=10,width=15)
+```
+
+
+## Index
+
+- 夏季調査加入量指数以外は減少傾向
+
+```{r plot_index}
+index_name = c("Summer_age0","Autumn_age0","Autumn_age1","Egg_ssb","Dipnet_ssb","PS_china", "TR_russia")
+index_long = dat$index %>% 
+  rownames_to_column() %>%
+  pivot_longer(-rowname, names_to="Fyear") %>%
+  mutate(index = index_name[as.numeric(rowname)]) %>%
+  group_by(index) %>%
+  na.omit() %>%
+  mutate(scaled_value = value/mean(value)) %>%
+  ungroup()
+index_long =index_long %>%
+  mutate(Fleet = factor(index,levels=unique(index_long$index))) %>%
+  mutate(Fyear = as.numeric(Fyear))
+
+g_index = index_long %>%
+    ggplot(aes(x=Fyear,y=scaled_value,colour=Fleet,linetype=Fleet,shape=Fleet))+
+    geom_path(linewidth=0.5)+
+    geom_point()+
+    scale_colour_brewer(palette="Set1")+
+    scale_shape_manual(values=0:6)+
+    xlab("Fishing year")+
+    ylab("Scaled index") +
+    ggtitle("(d) Abundance index") + 
+  theme(legend.position=c(0.01,0.99),legend.justification=c(0.01,0.99))
+
+(g_index2 = index_long %>%
+    ggplot(aes(x=Fyear,y=scaled_value,colour=Fleet,linetype=Fleet,shape=Fleet))+
+    geom_path(linewidth=0.5)+
+    geom_point()+
+    scale_colour_brewer(palette="Set1")+
+    scale_shape_manual(values=0:6)+
+    xlab("Fishing year")+
+    ylab("Scaled index")
+  +theme(legend.position=c(0.01,0.99),legend.justification=c(0.01,0.99))
+)
+ggsave(filename = "AbundIndex.png",dpi=600,unit="cm",height=10,width=15)
+
+```
+
+
+```{r wrap_plot_data, include =FALSE}
+g_data = gridExtra::grid.arrange(g_caa,g_waa,g_maa,g_index,ncol=2)
+ggsave(g_data,filename="data_figure.png",dpi=600,unit="cm",height=16,width=24)
+
+```
+
+## Age-specific M
+
+- 引き続き、年齢別Mを使用
+
+```{r caa_prop}
+Mdat = data.frame(age = 0:6,value=0.5,type="Common") %>%
+  full_join(data.frame(age=0:6,value=c(0.80,0.60,0.51,0.46,0.43,0.41,0.4),type="Age-specific")) %>%
+  mutate(Type = factor(type,levels=c("Common","Age-specific")),
+         Age = ifelse(age==6,"6+",as.character(age)))
+(g_M = Mdat %>%
+    filter(type == "Age-specific") %>%
+    ggplot(aes(x=Age,y=value,group=Type))+
+    geom_path(linewidth=1.0)+
+    geom_point(size=2)+
+    ylab("M value")
+)
+ggsave(g_M,filename="M_figure.png",dpi=600,unit="cm",height=8,width=12)
+```
+
+```{r caa_prop2, include = FALSE}
+caa_china = caa_orig %>% filter(Member=="China") %>%
+  dplyr::select(-Member) %>%
+  pivot_longer(cols=c(-Fyear),names_to="Age",values_to="China") %>%
+  mutate(China = China/1.0e+6) %>%
+  right_join(caa_long) %>%
+  arrange(Fyear,Age) %>%
+  mutate(catch_prop = ifelse(is.na(China),0,China/total))
+
+catch_prop_wide = caa_china %>% dplyr::select(-China,-total) %>%
+  pivot_wider(names_from=Fyear,id_cols=Age,values_from=catch_prop)
+catch_prop_china = as.matrix(catch_prop_wide[,-1])
+rownames(catch_prop_china) <- 0:6
+
+caa_russia = caa_orig %>% filter(Member=="Russia") %>%
+  dplyr::select(-Member) %>%
+  pivot_longer(cols=c(-Fyear),names_to="Age",values_to="Russia") %>%
+  mutate(Russia = Russia/1.0e+6) %>%
+  right_join(caa_long) %>%
+  arrange(Fyear,Age) %>%
+  mutate(catch_prop = ifelse(is.na(Russia),0,Russia/total))
+
+catch_prop_wide = caa_russia %>% dplyr::select(-Russia,-total) %>%
+  pivot_wider(names_from=Fyear,id_cols=Age,values_from=catch_prop)
+catch_prop_russia = as.matrix(catch_prop_wide[,-1])
+rownames(catch_prop_russia) <- 0:6
+
+catch_prop = array(1,dim=c(dim(caa),nrow(index)+1)) # caaの分を足す
+catch_prop[,1:ncol(catch_prop_china),7] <- catch_prop_china
+catch_prop[,1:ncol(catch_prop_russia),8] <- catch_prop_russia #8番目のfleetにロシアを追加
+
+```
+
+# SAMの解析ーベースケースの決定、重要なモデル診断
+
+- 加入をAR(1)とする
+- 観測誤差、過程誤差の設定はNPFC TWG-CMSA11時のものを使用
+- 念のため、昨年評価の場合も解析するが、AICはほぼ変わらす
+- b推定も同様の設定とし、北上期0歳と秋季0, 1歳魚指標のみb推定
+- R0 (rec_loga)に関するSEが非常に大きくなる
+
+```{r compile, cache=FALSE,include=FALSE,results="hide"}
+use_sam_tmb(TmbFile="sam2",overwrite=FALSE) #compile and activate
+```
+
+```{r initial analysis}
+
+# 昨年の結果の読み込み
+res_prev = get(load("../sam/sam_masaba_P2024.rda"))
+res_npfc = get(load("../sam/reslist_scenario_rev.rda"))
+res_npfc = res_npfc$`S02-Index24_1`
+
+# NPFCの設定をベースにする
+input_base = res_npfc$input
+# データは入れ替える
+input_base$dat <- dat
+input_base$catch_prop <- catch_prop
+# 再生産関係はAR(1)
+input_base$SR <- "Const"
+input_base$AR <- 1
+input_base$p0.list <- NULL
+input_base$scale <- 1
+input_base$scale_number <- 1
+
+res_base1 = do.call(sam,input_base)
+
+
+# NPFCの設定をベースにする
+input_base = res_npfc$input
+# データは入れ替える
+input_base$dat <- dat
+input_base$catch_prop <- catch_prop
+# 再生産関係はAR(1)
+input_base$SR <- "Const"
+input_base$AR <- 1
+input_base$p0.list <- NULL
+input_base$scale <- 1
+input_base$scale_number <- 1
+
+res_base1 = do.call(sam,input_base)
+
+
+# 昨年の設定をベースにする
+input_base2 = res_prev$input
+# まずはRWで
+res0_rw <- sam(
+  dat,
+  last.catch.zero = TRUE,
+  catch_prop = catch_prop,
+  # abund = c("N","N","N","SSB","SSB","Bf","Bf"),
+  abund = c("N","N","N","SSB","SSB","Bf","Bf"),
+  sel.def=c("max","mean")[2], #sel.def = "max"だと収束しない（中国のCPUEに対して）ので、"mean"に変更
+  min.age=c(0,0,1,0,0,0,0),
+  max.age = c(0,0,1,6,6,6,6),
+  rec.age = 0,
+  index.key=0:6,
+  b.est=c(FALSE,TRUE)[2],
+  index.b.key = c(0,1,2,3,3,3,3),
+  b.fix=c(NA,NA,NA,1),
+  SR = "RW",
+  varC = input_base2$varC,
+  varF = input_base2$varF,
+  varN = input_base2$varN,
+  # varN.fix=c(NA,1e-4), #New!
+  rho.mode=3,
+  bias.correct = FALSE, #IMPORTANT
+  get.random.vcov = FALSE,
+  scale=1,
+  scale_number=1,
+  no_est=FALSE,
+  # q.init = q_init,
+  silent=TRUE,
+  loopnum = 3
+)
+
+input = res0_rw$input
+input$p0.list <- res0_rw$par_list
+input$SR <- "Const"
+input$AR <- 1
+
+res_base2 = do.call(sam,input)
+
+c("AIC_SA2024setting" = res_base2$aic,"AIC_TWGCMSA11setting"=res_base1$aic)
+# AICはほぼ変わらず
+
+## 固定効果の確認・出力
+fixef = out_par(res_base1,filename="FEpar_base1")
+knitr::kable(fixef)
+
+## 結果のプロット
+# デルタ法にかかる信頼区間が描かれる
+plot_samvpa(list(res_base1,res_npfc,res_prev), CI=0.,
+            scenario_name=rev(c("SA2024","TWG-CMSA11","SA2025")))
+
+plot_samvpa(list(res_base1,res_npfc,res_prev), CI=0.,
+            scenario_name=rev(c("SA2024","TWG-CMSA11","SA2025")),years = 2011:2025)
+
+
+## 結果の出力
+out_sam(res_base1, filename="sam_base")
+
+save(res_base1,file="res_base1.rda")
+```
+
+## 再生産関係のパラメータをFixした場合
+
+- 管理基準値との整合性をとるため、R0を昨年の値でfixした場合を解析
+- 対数尤度はほぼ変わらない
+
+```{r R0_fix}
+
+c("R0_prev" = res_prev$rec.par["a"],"R0_est" = res_base1$rec.par["a"])
+# ほぼ変わらないが、少しR0が高くなる
+
+input_base3 <- res_base1$input
+input_base3$p0.list <- res_base1$par_list
+input_base3$p0.list$rec_loga <- res_prev$par_list$rec_loga
+input_base3$map.add <- list(rec_loga = factor(NA))
+res_base3 = do.call(sam, input_base3)
+
+c("loglik_R0_est" = res_base1$loglik,
+  "loglik_R0_fix" = res_base3$loglik) #ほぼ変わらない→固定してよい？
+# -582.1239 -582.1251
+
+# plotの結果はほぼ変わらない
+plot_samvpa(list(res_base1,res_base3), CI=0.,
+            scenario_name=rev(c("R0_est","R0_fix")),years = 2011:2025)
+
+# 結果の出力
+out_sam(res_base3, filename="sam_base3")
+save(res_base3,file="res_base3.rda")
+save(res_base3,file="sam_masaba_P2025.rda")
+```
+
+## レトロスペクティブ解析
+
+- Mohn's rhoもR0を固定した場合と推定した場合でほぼ変わらないので、Fixの場合を採用
+
+```{r retro_analysis}
+retro_base1 = retro_sam(res_base1)
+retro_base3 = retro_sam(res_base3)
+
+save(retro_base1,file="retro_base1.rda")
+save(retro_base3,file="retro_base3.rda")
+# mohn
+cbind(
+  "R0_est" = retro_base1$mohn,
+  "R0_fix" = retro_base3$mohn) %>% kable()
+
+# mohn in forecasting
+cbind(
+  "R0_est" = retro_base1$mohn_forecast,
+  "R0_fix" = retro_base3$mohn_forecast) %>% kable()
+```
+
+# レトロスペクティブ解析のプロット
+- 加入量や資源量でレトロスペクティブパターンが見られるが、親魚量では見られない
+
+```{r retro_plot}
+(g_retro = retro_plot(res_base3,retro_base3,
+                      start_year=2012,mohn_position="upperleft"))
+ggsave(g_retro,filename="retro_base3.png",dpi=600,unit="cm",height=16,width=24)
+```
+
+# レトロスペクティブ・フォアキャスト解析のプロット
+
+- 親魚量でもやや大きなレトロスペクティブパターンが見られる
+
+```{r retro_plot2}
+(g_retro2 = retro_plot(res_base3,retro_base3,
+                      start_year=2012,mohn_position="upperleft",forecast = TRUE))
+ggsave(g_retro2,filename="retro_forecast_base3.png",dpi=600,unit="cm",height=16,width=24)
+```
+
+## jitter analysis
+
+- 初期値を変えて再推定し、目的関数（負の対数尤度）の値が変わらないかをチェックする
+- 尤度は変わらないので、そのままでOK
+
+```{r jitter,results='hide',cache=FALSE,include=FALSE}
+update_jitter <- FALSE
+if(isTRUE(update_jitter)) {
+jitterres = do_jitter(res_base3,SD=0.1,nsim=100)
+#SDは初期値を乱数発生させる際のSD
+save(jitterres,file="jitterres.rda")
+} else {
+  load("jitterres.rda")
+}
+```
+
+```{r jitter2}
+knitr::kable(jitterres$resdat) #変わらない
+```
+
+# 結果の出力
+
+## 推定値のプロット
+
+- 親魚量のピークは2017年となり、そこから急激に減少
+
+```{r plot_est}
+(g_est1 = plot_samvpa(res_base3,legend_name = "",CI=0.95,alpha=0.4, what = c("biomass","SSB","Recruitment","catch","fishing_mortality","U"),
+                                  ncol=2)+
+    xlab("Fishing year")+
+   scale_color_manual(values = "black") +
+  scale_fill_manual(values = "black") +
+  guides(color = "none", fill = "none",linetype="none")) 
+ggsave(filename="base_estimates_long.png",dpi=600,unit="cm",height=18,width=24)
+g_est2 = plot_samvpa(res_base3,legend_name = "",CI=0.95,alpha=0.4,
+                                  ncol=2)+
+    xlab("Fishing year")+
+   scale_color_manual(values = "black") +
+  scale_fill_manual(values = "black") +
+  guides(color = "none", fill = "none",linetype="none")
+ggsave(filename="base_estimates_short.png",dpi=600,unit="cm",height=12,width=24)
+```
+
+## 昨年評価との比較
+
+- 近年の加入量は下方修正
+- 図で見るとあまり差なはいが、2022年以降の親魚量は下方修正であり
+- 2022年漁期以降、SBlimit (14.2万トン)を下回ったことになり
+- 2024年漁期の親魚量は`r round(as.numeric(colSums(res_base3$ssb)["2024"])/10000,2)`万トンで、
+`r round(as.numeric(colSums(res_base3$ssb)["2025"])/10000,2)`万トン
+
+```{r comparison1}
+(g_comp1=plot_samvpa(list(res_base3,res_prev), CI=0.,
+            scenario_name=rev(c("SA2024","SA2025")))
+)
+ggsave(filename="compare_estimates.png",dpi=600,unit="cm",height=12,width=24)
+
+(g_comp2=plot_samvpa(list(res_base3,res_prev), CI=0.,
+            scenario_name=rev(c("SA2024","SA2025")),years=2012:2025)
+)
+ggsave(filename="compare_estimates_recent.png",dpi=600,unit="cm",height=12,width=24)
+
+g_wide <- g_comp2$data %>%
+  arrange(Year) %>%                                # Yearの昇順に並べる
+  unite(col = stat_model, stat_f, Model, sep = "_") %>%   # 列名として使う文字列を作成
+  select(Year, stat_model, value) %>%              # 必要な列だけ
+  pivot_wider(names_from = stat_model,
+              values_from = value)
+
+
+g_wide2 <- g_wide %>%
+  # 列名を分解して並べ替え
+  relocate(Year) %>% 
+  rename_with(~ .x %>% str_replace("_", "___"), -Year) %>%  # 一時的に "_" を避ける
+  pivot_longer(-Year, names_to = "var", values_to = "value") %>%
+  separate(var, into = c("stat", "model"), sep = "___") %>%
+  mutate(model_year = as.numeric(str_extract(model, "\\d+"))) %>%  # SA2024 → 2024 を抽出
+  arrange(stat, model_year) %>%
+  unite(var, stat, model, sep = "_") %>%
+  dplyr::select(-model_year) %>% 
+  pivot_wider(names_from = var, values_from = value)
+
+kable(g_wide2)
+```
+
+## NPFCの結果 (TWG CMSA11) も含めた比較
+
+```{r comparison2}
+(g_comp3=plot_samvpa(list(res_base3,res_npfc,res_prev), CI=0.,
+            scenario_name=rev(c("SA2024","TWG-CMSA11","SA2025")))
+)
+ggsave(filename="compare_estimates_npfc.png",dpi=600,unit="cm",height=12,width=24)
+
+(g_comp4=plot_samvpa(list(res_base3,res_npfc,res_prev), CI=0.,
+            scenario_name=rev(c("SA2024","TWG-CMSA11","SA2025")),years=2012:2025)
+)
+ggsave(filename="compare_estimates_npfc_recent.png",dpi=600,unit="cm",height=12,width=24)
+```
+
+## 固定効果の出力
+
+- SEもGradientも十分に小さい
+
+```{r output_FE}
+
+## 固定効果の確認・出力
+fixef = out_par(res_base3,filename="FEpar_base3")
+knitr::kable(fixef)
+
+## 結果の出力
+out_sam(res_base3, filename="base3")
+```
+
+
+## F-at-age 
+
+```{r F-at-age}
+
+  res = res_base3
+  faa = res$faa
+  saa = res$saa
+
+  saa_tbl = sweep(res$faa,2,apply(res$faa,2,sum),FUN="/") %>%
+    as_tibble() %>%
+    mutate(Age = 0:(nrow(res$faa)-1)) %>%
+    pivot_longer(cols=-Age,names_to="year",values_to="value") %>%
+    mutate(Year = as.numeric(year)) %>%
+    arrange(Year,Age)
+  saa_tbl %<>%
+    # mutate(Scenario = scnname) %>%
+    rename(age = Age) %>%
+    # mutate(Age = as.character(age)) %>%
+    mutate(Age = ifelse(age==max(age),paste0(age,"+"),as.character(age)))
+  saa_tbl %<>%
+    mutate(Age = factor(Age,levels=rev(unique(saa_tbl$Age))))
+
+  saa_tbl2 = res$saa %>%
+    as_tibble() %>%
+    mutate(Age = 0:(nrow(res$faa)-1)) %>%
+    pivot_longer(cols=-Age,names_to="year",values_to="value") %>%
+    mutate(Year = as.numeric(year)) %>%
+    arrange(Year,Age)
+  saa_tbl2 %<>%
+    # mutate(Scenario = scnname) %>%
+    rename(age = Age) %>%
+    mutate(Age = ifelse(age==max(age),paste0(age,"+"),as.character(age)))
+
+  faa_tbl = faa %>%
+    as_tibble() %>%
+    mutate(Age = 0:(nrow(res$faa)-1)) %>%
+    pivot_longer(cols=-Age,names_to="year",values_to="value") %>%
+    mutate(Year = as.numeric(year)) %>%
+    arrange(Year,Age)
+  faa_tbl %<>%
+    # mutate(Scenario = scnname) %>%
+    rename(age = Age) %>%
+    mutate(Age = ifelse(age==max(age),paste0(age,"+"),as.character(age)))
+  
+  g_saa_bar = ggplot(data=saa_tbl,aes(x=Year,y=value,fill=Age) )+
+    geom_bar(stat = "identity")+
+    # facet_grid(Scenario~Model)+
+    scale_fill_brewer(palette="Set2")+
+    theme_bw(base_size=12)+
+    theme(legend.position="right")+
+    # theme(legend.position="top",legend.justification = c(0.5,0))+
+    xlab("Fishing year")+ylab("Selectivity at age")
+  # g_saa_bar
+
+  ggsave(g_saa_bar,filename=paste0("saa_bar.png"),dpi=600,unit="cm",
+         height=12,width=18)
+
+  g_saa_path = ggplot(data=saa_tbl2,aes(x=Year,y=value,colour=Age,linetype=Age ))+
+    geom_path(linewidth=1)+
+    # facet_grid(Scenario~Model)+
+    scale_colour_brewer(palette="Set2")+
+    theme_bw(base_size=12)+
+    theme(legend.position="right")+
+    # theme(legend.position="top",legend.justification = c(0.5,0))+
+    xlab("Fishing year")+ylab("Selectivity at age")
+  # g_saa_path
+
+  ggsave(g_saa_path,filename=paste0("saa_path.png"),dpi=600,unit="cm",
+         height=12,width=18)
+
+  g_faa_path = ggplot(data=faa_tbl,aes(x=Year,y=value,colour=Age,linetype=Age ))+
+    geom_path(linewidth=1)+
+    # facet_grid(Scenario~Model)+
+    scale_colour_brewer(palette="Set3")+
+    theme_bw(base_size=12)+
+    theme(legend.position="right")+
+    # theme(legend.position="top",legend.justification = c(0.5,0))+
+    xlab("Fishing year")+ylab("F at age")
+  g_faa_path
+
+  ggsave(g_faa_path,filename=paste0("faa_path.png"),dpi=600,unit="cm",
+         height=12,width=18)
+```
+
+## 選択率
+
+- 平均をゼロとしている
+
+```{r plot_saa}
+g_saa_path
+```
+
+# 再生産関係に依存しない管理基準値
+
+- Fcurrentを2022-2024年漁期の3年平均とする
+
+```{r refF}
+
+Fcurrent <- rowMeans(res_base3$faa[,as.character(2022:2024)])
+refF_res <- ref.F(res_base3,Fcurrent=Fcurrent,Pope=FALSE)
+refF_res$summary %>% kable()
+```
+
+# モデル診断
+
+## 残差プロット
+
+### 資源量指標値
+
+- たもすくいへの当てはまりが悪く、残差の自己相関もあるように見える
+
+```{r index_residual,results='hide'}
+
+## 資源量指数 (frasyrのplot_residual_vpaと統合してもよい？）
+## - これは通常のresidual
+g_index <- index_plot2(res_base3,index_name=index_name,
+                       base_size=11,nrow=4); wrap_plots(g_index,nrow=2)
+
+
+i<-3  
+savename1=paste0("index_pred_B",i,"_rev.png")
+savename2=paste0("index_resid_B",i,"_rev.png")
+savename3=paste0("index_abund_B",i,"_rev.png")
+ggsave(g_index$index+xlab("Fishing year"),filename=savename1,dpi=600,unit="cm",height=18,width=18)
+ggsave(g_index$resid+xlab("Fishing year"),filename=savename2,dpi=600,unit="cm",height=18,width=18)
+ggsave(g_index$abund,filename=savename3,dpi=600,unit="cm",height=18,width=18)
+```
+
+### 年齢別漁獲尾数
+
+- 若齢と高齢で残差大きい
+
+```{r caa_resid}
+g_caa = caa_plot(res_base3,base_size=11)
+wrap_plots(g_caa)
+  savename1=paste0("caa_pred_B",i,".png")
+  savename2=paste0("caa_resid_B",i,".png")
+  ggsave(g_caa$caa+xlab("Fishing year"),filename=savename1,dpi=600,unit="cm",height=12,width=24)
+  ggsave(g_caa$resid+xlab("Fishing year"),filename=savename2,dpi=600,unit="cm",height=12,width=24)
+```
+
+
+### One-Step-Ahead (OSA) residuals
+
+-たもすくいで自己相関あり？
+- QQプロットはまぁまぁ良さげ
+
+```{r OSA residual,results = 'hide',include=FALSE}
+osa.simple <- do_osa_resid(res_base3)
+```
+
+```{r plot_OSA,results = 'hide'}
+
+# 関数がうまく行っていなかったので再定義
+plot_osa_resid <- function(osares) {
+
+  ## caa
+  osa_resid_caa = osares %>%
+    filter(fleet==1) %>% #Fleet=1がCatch at age, それ以外がIndexを表す
+    filter(!is.nan(residual))
+
+  g_caa = osa_resid_caa %>%
+    ggplot(aes(x=year,y=age,colour=residual,size=abs(residual))) +
+    geom_point() +
+    scale_colour_gradient2(high="red",low="blue",mid="gray")+
+    xlab("Year")+
+    ylab("Age")+
+    scale_y_continuous(breaks=0:100)+
+    theme_bw()
+
+  ## index
+  osa_resid_index = osares %>%
+    filter(fleet>1) %>%
+    filter(!is.nan(residual))
+
+  g_index = osa_resid_index %>%
+    ggplot(aes(x=year,y=fleet-1,colour=residual,size=abs(residual))) +
+    geom_point() +
+    scale_colour_gradient2(high="red",low="blue",mid="gray")+
+    xlab("Fishing year")+
+    ylab("Index ID")+
+    scale_y_continuous(breaks=1:100)+
+    theme_bw()
+
+  ## qq plot
+  p <- osares %>%
+    filter(!is.nan(residual)) %>%
+    ggplot(aes(sample = residual)) +
+    stat_qq(distribution = qnorm) +  # 標準正規分布の分位数を使用
+    stat_qq_line(distribution = qnorm) +  # 標準正規分布に基づく直線
+    labs(x = "Theoretical Quantiles",
+         y = "Sample Quantiles") +
+    theme_SH()
+
+  return(list(caa = g_caa, index = g_index, qq = p))
+}
+
+gg_osa = plot_osa_resid(filter(osa.simple,year>1971)); wrap_plots(gg_osa,ncol=2)
+
+ggsave(gg_osa$caa, filename=paste0("osa_resid_caa_rev.png"),
+           dpi=600,unit="cm",height=12,width=18)
+ggsave(gg_osa$index, filename=paste0("osa_resid_index.png"),
+           dpi=600,unit="cm",height=12,width=18)
+ggsave(gg_osa$qq, filename=paste0("osa_resid_qq.png"),
+           dpi=600,unit="cm",height=12,width=18)
+```
+
+
+## Hindcast cross validation
+
+- レトロスペクティブ解析で最新のデータを順番に除いていき、除いたIndexを予測するHindcast cross validationを実行する
+- Mean absolute scaled error (MASE) で予測精度を評価する
+- 全体的にあまり良くない
+- 産卵量の減少を予測できておらず、たもすくいの予測はさらに悪い
+
+```{r hindcasting, cache=TRUE}
+
+# frasamからコピペ
+plot_hindcastCV = function(samres,
+                           retrores,
+                           h=1,
+                           log = FALSE,
+                           index_name = NULL,
+                           show_mase = TRUE,
+                           mase_position = "upperright",
+                           use_index = NULL,
+                           years = NULL
+) {
+  res_mase = calc_mase(samres = samres,
+                       retrores = retrores,
+                       h = h,
+                       log = log,
+                       index_name = index_name)
+
+  if(is.null(use_index)) {
+    use_index = 1:nrow(samres$input$dat$index)
+  }
+
+  dat_removed = res_mase$removed %>%
+    filter(idx %in% use_index)
+  dat_full = res_mase$full %>% filter(idx %in% use_index)
+
+  if(!is.null(years)) {
+    dat_removed = filter(dat_removed, year %in% years)
+    dat_full = filter(dat_full, year %in% years)
+  }
+  dat_mase = res_mase$mase %>% filter(idx %in% use_index)
+  dat_cv = res_mase$cv %>% filter(idx %in% use_index)
+
+  dat_both = bind_rows(dat_full,dat_removed) %>%
+    group_by(idx, index) %>%
+    summarise(ymax = max(obs, pred_full, pred_cond, na.rm=T)) %>%
+    ungroup()
+
+  if (!mase_position %in% c("upperright", "upperleft", "bottomright", "bottomleft")) {
+    stop("Invalid value for 'mase_position'. Must be one of 'upperright', 'upperleft', 'bottomright', or 'bottomleft'.")
+  }
+
+  dat_mase2 = left_join(dat_mase,dat_both) %>%
+    mutate(year = max(dat_full$year), #upperright
+           y = ymax,
+           label = sprintf("MASE == %.2f",MASE)) %>%
+    mutate(hjust=1,vjust=1)
+
+  if(mase_position == "upperleft") {
+    dat_mase2 = dat_mase2 %>%
+      mutate(year = min(dat_full$year),
+             hjust = 0)
+  }
+  if(str_detect(mase_position,"bottom")) {
+    dat_mase2 = dat_mase2 %>%
+      mutate(y = 0, vjust = 0)
+    if(str_detect(mase_position,"left")) {
+      dat_mase2 = dat_mase2 %>%
+        mutate(vjust = 0, hjust = 0,
+               year = min(dat_full$year))
+    }
+  }
+
+  gg <- ggplot(data = dat_removed, aes(x=year)) +
+    geom_path(linewidth=0.8,aes(y=pred_cond,colour=as.factor(retro_id)))+
+    geom_point(data = dat_cv, size=2,
+               aes(x = year_target, y=pred_cond,colour=as.factor(retro_id)))+
+    geom_path(data=dat_full,aes(y=pred_full),colour="black",linewidth=0.8)+
+    geom_point(data=dat_full,aes(y=obs),colour="black",size=2)+
+    frasyr::theme_SH()+
+    scale_x_continuous(breaks=scales::pretty_breaks()) +
+    ylab("Value") + xlab("Year") +
+    ylim(0,NA)
+
+  if (length(use_index) > 1) {
+    gg <- gg + facet_wrap(vars(index), scales="free_y")
+  }
+
+  if (isTRUE(show_mase)) {
+    gg <- gg +
+      geom_text(data=dat_mase2,parse=TRUE,size=4,
+                aes(y=y,label=label,hjust=hjust,vjust=vjust))
+
+  }
+  gg
+}
+(g_hindcast <- plot_hindcastCV(res_base3, retro_base3, show_mase = TRUE, 
+                               mase_position = "upperright", use_index = 1:7, 
+                               log = FALSE,index_name=index_name,
+                               years=2015:2025) +
+    xlab("Fishing year") + ylab("Index value"))
+
+ggsave(g_hindcast,file="hindcast_CV.png",dpi=600,unit="cm",height=15,width=24)
+```
+
+## Leave-one-out index analysis
+
+- Indexを一つずつの除いて、推定値の頑健性、影響力のあるIndexを明らかにする（ジャックナイフ解析？）
+- かなり頑健
+ 
+```{r loo-index}
+loo_res <- do_loo_index(res_base3)
+reslist <- list()
+for ( j in 0:length(loo_res)) {
+    if(j==0) {
+      reslist[[j+1]] <- res_base3
+    } else {
+      reslist[[j+1]] <- loo_res[[j]]
+    }
+}
+(g_loo <- plot_samvpa(reslist,CI=0,
+                    scenario_name = c("full",as.character(-1:-7)),years = 2012:2025)
+  )
+savename1 = paste0("loo_base_B",i,".png")
+ggsave(g_loo,filename=savename1,dpi=600,unit="cm",height=16,width=24)
+```
+
+## 固定効果間の相関係数
+
+- logQ (漁具能率)と非線形係数(logB)の間の負の相関が強い
+- FやNのプロセス誤差の年齢間の相関がやや強い
+
+```{r correlation_matrix}
+cor_mat = res_base3$rep$cov.fixed %>% cov2cor()
+
+tmp = data.frame(varname = colnames(cor_mat)) %>%
+    group_by(varname) %>%
+    mutate(id = 1:n(), n = n()) %>%
+    mutate(varname2= ifelse(n==1, varname, str_c(varname,id)))
+
+varname = tmp$varname2
+colnames(cor_mat) <- rownames(cor_mat) <- varname
+
+(g_cor = cor_mat %>% ggcorrplot(.,lab=TRUE,type="upper",lab_size=1.5,digits=2,colors=c("lightblue3","white","darkorange")) +
+      theme_bw(base_size=9) +
+      theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1),
+            legend.justification=c(0.99,0.01),legend.position=c(0.99,0.01))+
+      xlab("")+ylab("")
+  )
+  # g_cor
+  
+  ggsave(g_cor,filename="correlation_plot.png",dpi=600,unit="cm",
+       height=12,width=12)
+```
+
+## プロセス誤差
+
+
+```{r process_error}
+res = res_base3
+  rept = res$obj$env$report(res$obj$env$last.par.best)
+  logNresid = rept$logN_resid
+  # matplot(t(logNresid))
+  logFresid = rept$logF_resid
+  # matplot(t(logFresid))
+
+  colnames(logNresid) <- colnames(logFresid) <- colnames(res$naa)
+
+  logNresid_long = logNresid %>% as.data.frame() %>% mutate(age = 1:n()-1) %>%
+    mutate(Age = ifelse(age == max(age),str_c("Age ",age,"+"),str_c("Age ", age))) %>%
+    dplyr::select(-age) %>%
+    pivot_longer(cols=-Age,names_to="Year",values_to="Residual") %>%
+    mutate(Var = "logN") %>%
+    dplyr::filter(Year>min(Year)) #最初の年は0なので除く
+
+  logFresid_long = logFresid %>% as.data.frame() %>% mutate(age = 1:n()-1) %>%
+    mutate(Age = str_c("Age ", age)) %>%
+    dplyr::select(-age) %>%
+    pivot_longer(cols=-Age,names_to="Year",values_to="Residual") %>%
+    mutate(Var = "logF") %>%
+    dplyr::filter(Year>min(Year)) #最初の年は0なので除く
+
+  resid_long = bind_rows(logNresid_long,logFresid_long) %>%
+    mutate(Var = factor(Var,levels=c("logN","logF")),
+           Year = as.numeric(Year))
+  g_proc_resid = resid_long %>%
+      ggplot(aes(x=Year,y=Residual,col=Age)) +
+      geom_hline(yintercept=0) +
+      facet_wrap(~Var,scales="free_y",nrow=1)+
+      geom_point()+xlab("Fishing year")+ylab("Process error")
+  ggsave(g_proc_resid,
+         filename=paste0("procErr1.png"),dpi=600,
+         unit="cm",height=8,width=20)
+
+  (g_proc_resid2 = resid_long %>%
+      ggplot(aes(x=Year,y=Age,col=Residual,size=abs(Residual))) +
+      # geom_hline(yintercept=0) +
+      facet_wrap(~Var,nrow=1)+
+      geom_point()+xlab("Fishing year")+ylab("Process error")+
+      scale_size_continuous(range=c(0,5))+
+      scale_colour_gradient2(high="red",low="blue",mid="gray")
+  )
+  ggsave(g_proc_resid2,
+         filename=paste0("procErr2.png"),dpi=600,
+         unit="cm",height=8,width=20)
+```
+
+## ブートストラップ
+
+- 'boo_sam()'で実行できる
+- ノンパラメトリックブートストラップ（'method="n"'）は厳密ではないので、パラメトリックブートストラップを推奨（'method="p"'）
+- delta法で求めたCIも図に加える場合は'draw_deltaCI=TRUE'
+
+```{r bootstrap, results = 'hide'}
+update_boot <- FALSE
+if (isTRUE(update_boot)) {
+res_boot <- boo_sam(res_base3, n=100,method="p",seed=123) 
+save(res_boot,file="res_boot.rda")
+} else {
+load("res_boot.rda")
+}
+(g1 = plot_boosam(res_base3,res_boot, CI=0.95, draw_deltaCI = TRUE))
+ggsave(g1,filename="bootstrap.png",dpi=600,unit="cm",height=16,width=24)
+```
+
+
+## プロファイル尤度
+
+- Cachability qなどを変化させたときの対数尤度を調べて、収束しているか、どの程度尤度が変わるか（不確実性の程度、信頼区間）を調べる
+- 収束はしているが、たもすくいCPUE・中国CPUE・ロシアCPUEについてのQの不確実性は大きい → これらのデータの影響は小さい
+
+```{r profile_likelihood}
+# Catchabilityに対するプロファイル尤度
+# 同じ名前のパラメータが複数ある場合は引数'which_param'で位置を指定できる
+update_proflik <- FALSE
+if(isTRUE(update_proflik)) {
+samres = res_base3
+input = samres$input
+input$p0.list <- samres$par_list
+input$b.fix <- samres$b[1:4]
+res_bfix = do.call(sam, input)
+
+profres_q = lapply(1:7, function(i) samprofile(res_bfix,param_name="logQ",which_param=i,length=50))
+save(profres_q,file="profres_q.rda")
+} else {
+  load("profres_q.rda")
+}
+
+profdat = map_dfr(1:7, function(j) {
+    profres_q[[j]]$obj_tbl %>%
+      mutate(parameter=paste0("logQ",j))
+  })
+
+
+(g_wide = ggplot(filter(profdat,likelihood=="profile"),aes(x=par,y=obj_value)) +
+    geom_path(linewidth=1)+
+    geom_point(data=filter(profdat,likelihood!="profile"),colour="red",size=2)+
+    facet_wrap(vars(parameter),scales="free") +
+    # facet_grid(scenario~parameter,scales="free") +
+    xlab("Parameter value") + ylab("Negative log-likelihood")
+)
+
+ggsave(g_wide,filename="prof_lik_q_bfix.png",dpi=600,unit="cm",height=16,width=24)
+```
+
+
+## Mのプロファイル尤度
+
+- Mに対して負の対数尤度は単調増加のパターンを示す
+
+```{r M_prof}
+# Mのプロファイル尤度 => 関数がないからこんな感じで手動で
+add_M = seq(-0.3,0.5,by=0.05)
+# proflik_Mlist = list()
+
+res = res_base3
+p0_list = res$par_list
+orig_tmbdata = res$data
+orig_natMor <- orig_tmbdata$natMor
+upd_tmbdata = orig_tmbdata
+
+proflik_Mlist = map_dfr(1:length(add_M), function(j) {
+    upd_tmbdata$natMor <- orig_natMor[] + add_M[j]
+    tmp = est_mixed(upd_tmbdata,par_init=p0_list,map=res$map,random="U",cpp.file.name = "sam2",bias_correct = TRUE)
+    cat(paste0("add_M=", add_M[j], ", obj_value=",round(tmp$opt$objective,3),"\n"))
+    data.frame(added_M = add_M[j],obj_value = tmp$opt$objective, rep = summary(tmp$rep))
+  })
+
+save(proflik_Mlist,file="prof_Mlist.rda")
+# load("prof_M.rda")
+
+objdat = proflik_Mlist %>% dplyr::select(added_M,obj_value) %>% distinct()
+(g_profM = objdat %>%
+    ggplot(aes(x=added_M,y=obj_value))+
+    geom_path(linewidth=1)+
+    geom_point(size=2)+
+    geom_point(data=filter(objdat,round(added_M,2)==0),size=3,colour="red")+
+    # facet_wrap(vars(scenario)) +
+    xlab("Added M value")+ylab("Negative log-likelihood")+
+    theme_bw(base_size=12)
+)
+
+
+ggsave(g_profM,filename="prof_lik_M.png",dpi=600,unit="cm",height=8,width=12)
+
+```
+

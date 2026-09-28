@@ -1,0 +1,12 @@
+url: https://shotanishijima.github.io/frasam/
+template:
+  bootstrap: 5
+  bootswatch: flatly
+
+navbar:
+  structure:
+    left: [home, reference, articles, news]
+    right: [github]
+  components:
+    github:
+

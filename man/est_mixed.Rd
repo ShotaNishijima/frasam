@@ -10,7 +10,7 @@ est_mixed(
   par_init,
   map,
   random = "U",
-  cpp.file.name = "sam",
+  cpp.file.name = "sam2",
   silent = TRUE,
   bias_correct = TRUE
 )

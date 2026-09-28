@@ -2,7 +2,9 @@
 ##### Parametric bootstrap of SAM #####
 #######################################
 
-
+#'
+#' @export
+#' 
 
 boo_sam <- function(Res,n=100,seed=1,est=TRUE,method="p",use_p0=TRUE){
 
@@ -19,7 +21,7 @@ boo_sam <- function(Res,n=100,seed=1,est=TRUE,method="p",use_p0=TRUE){
     boot.list <- list()
     pred.index <- Res$pred.index
     pred.caa <- Res$caa
-    if (Res$input$est.method == "ml") sigma.index <- Res$sigma else sigma.index <- rep(Res$sigma,nrow(pred.index))
+    sigma.index <- Res$sigma
     sigma.caa <- Res$sigma.logC
     resid.index <- log(as.matrix(Res$input$dat$index))-log(as.matrix(Res$pred.index))
     resid.caa <- log(Res$input$dat$caa)-log(Res$caa)
@@ -64,7 +66,6 @@ boo_sam <- function(Res,n=100,seed=1,est=TRUE,method="p",use_p0=TRUE){
     }
     boot.list
   } else {
-    require(MASS)
     # if (!isTRUE(Res$input$get.random.vcov)) {
     #   Res$input$get.random.vcov <- TRUE
     #   Res <- do.call(sam, Res$input)
@@ -80,7 +81,7 @@ boo_sam <- function(Res,n=100,seed=1,est=TRUE,method="p",use_p0=TRUE){
     waa <- Res$input$dat$waa
     maa <- Res$input$dat$maa
     lapply(1:n, function(i){
-      boot <- mvrnorm(n=1,mu,vcov)
+      boot <- MASS::mvrnorm(n=1,mu,vcov)
       naa <- exp(matrix(boot[names(boot)=="logN"],ncol=nc))
       faa <- exp(matrix(boot[names(boot)=="logF"],ncol=nc))
       faa <- rbind(faa,Res$input$alpha*faa[nrow(faa),])

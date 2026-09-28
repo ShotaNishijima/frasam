@@ -1,0 +1,2 @@
+body { max-width: 1000px; }   /* 好みの幅に */
+img, .figure img { max-width: 100%; height: auto; }

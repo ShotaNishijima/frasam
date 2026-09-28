@@ -1,9 +1,5 @@
 
-###################################################
-### Converrting a SAM result into a tibble form ###
-###################################################
-
-convert_vector <- function(vector,name){
+convert_sam_vector <- function(vector,name){
   vector %>%
     as_tibble %>%
     mutate(year = as.integer(names(vector))) %>%
@@ -11,10 +7,15 @@ convert_vector <- function(vector,name){
 }
 
 # VPAや将来予測の結果をtidyに ----
-convert_df <- function(df,name){
+convert_sam_df <- function(df,name){
+  age <- suppressWarnings(as.numeric(rownames(df)))
+  if (length(age) != nrow(df) || any(is.na(age))) {
+    age <- seq_len(nrow(df)) - 1
+  }
+
   df %>%
     as_tibble %>%
-    mutate(age = as.numeric(rownames(df))) %>%
+    mutate(age = age) %>%
     gather(key=year, value=value, -age, convert=TRUE) %>%
     group_by(year) %>%
     #        summarise(value=sum(value)) %>%
@@ -23,7 +24,7 @@ convert_df <- function(df,name){
 
 #' SAMの結果オブジェクトをtibble形式に変換する関数
 #'
-#' @param vpares vpaの結果のオブジェクト
+#' @param samres samまたはvpaの結果オブジェクト
 #' @encoding UTF-8
 #'
 #'
@@ -31,38 +32,55 @@ convert_df <- function(df,name){
 #'
 convert_sam_tibble <- function(samres) {
 
-  if (class(samres) == "vpa") {
+  if (class(samres)[1] == "vpa") {
     total.catch <- colSums(samres$input$dat$caa*samres$input$dat$waa,na.rm=T)
   } else{
     total.catch <- colSums(samres$caa*samres$input$dat$waa,na.rm=T)
   }
   U <- total.catch/colSums(samres$baa, na.rm=T)
 
-  SSB <- convert_vector(colSums(samres$ssb,na.rm=T),"SSB") %>%
+  SSB <- convert_sam_vector(colSums(samres$ssb,na.rm=T),"SSB") %>%
     dplyr::filter(value>0&!is.na(value))
-  Biomass <- convert_vector(colSums(samres$baa,na.rm=T),"biomass") %>%
+  Biomass <- convert_sam_vector(colSums(samres$baa,na.rm=T),"biomass") %>%
     dplyr::filter(value>0&!is.na(value))
-  FAA <- convert_df(samres$faa,"fishing_mortality") %>%
+  FAA <- convert_sam_df(samres$faa,"fishing_mortality") %>%
     dplyr::filter(value>0&!is.na(value))
-  Recruitment <- convert_vector(colSums(samres$naa[1,,drop=F]),"Recruitment") %>%
+  Recruitment <- convert_sam_vector(colSums(samres$naa[1,,drop=F]),"Recruitment") %>%
     dplyr::filter(value>0&!is.na(value))
 
   Fratio <- NULL
 
-  all_table <- bind_rows(SSB,
-                         Biomass,
-                         convert_vector(U[U>0],"U"),
-                         convert_vector(total.catch[total.catch>0],"catch"),
-                         convert_df(samres$naa,"fish_number"),
-                         FAA,
-                         convert_df(samres$input$dat$waa,"weight"),
-                         convert_df(samres$input$dat$maa,"maturity"),
-                         # convert_df(samres$input$dat$caa,"catch_number"),
-                         convert_df(samres$caa,"catch_number"),
-                         convert_df(samres$input$dat$M,  "natural_mortality"),
-                         Recruitment,
-                         Fratio) %>%
-    mutate(type = "SAM")
+  if (class(samres)[1] == "vpa") {
+    all_table <- bind_rows(SSB,
+                           Biomass,
+                           convert_sam_vector(U[U>0],"U"),
+                           convert_sam_vector(total.catch[total.catch>0],"catch"),
+                           convert_sam_df(samres$naa,"fish_number"),
+                           FAA,
+                           convert_sam_df(samres$input$dat$waa,"weight"),
+                           convert_sam_df(samres$input$dat$maa,"maturity"),
+                           convert_sam_df(samres$input$dat$caa,"catch_number"),
+                           # convert_sam_df(samres$caa,"catch_number"),
+                           convert_sam_df(samres$input$dat$M,  "natural_mortality"),
+                           Recruitment,
+                           Fratio) %>%
+      mutate(type = "VPA")
+  } else {
+    all_table <- bind_rows(SSB,
+                           Biomass,
+                           convert_sam_vector(U[U>0],"U"),
+                           convert_sam_vector(total.catch[total.catch>0],"catch"),
+                           convert_sam_df(samres$naa,"fish_number"),
+                           FAA,
+                           convert_sam_df(samres$input$dat$waa,"weight"),
+                           convert_sam_df(samres$input$dat$maa,"maturity"),
+                           # convert_sam_df(samres$input$dat$caa,"catch_number"),
+                           convert_sam_df(samres$caa,"catch_number"),
+                           convert_sam_df(samres$input$dat$M,  "natural_mortality"),
+                           Recruitment,
+                           Fratio) %>%
+      mutate(type = "SAM")
+  }
 }
 
 #
