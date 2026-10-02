@@ -42,7 +42,9 @@ decompose_biomass_effects(
 
 - plus_group:
 
-  Logical. If TRUE, the last row is treated as a plus group.
+  Logical. If TRUE, the last row is treated as a plus group. If higher
+  age rows are missing for some years, ages above the common plus-group
+  row are collapsed before decomposition.
 
 - recruitment_age_row:
 
@@ -54,4 +56,6 @@ decompose_biomass_effects(
 
 ## Value
 
-A list of matrices with the same dimensions as naa.
+A list of matrices with the same age-year dimensions used for
+decomposition. When the plus group is harmonized, the matrices have the
+collapsed common plus-group age rows.

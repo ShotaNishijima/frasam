@@ -17,6 +17,7 @@
 <url><loc>https://shotanishijima.github.io/frasam/reference/Calcu_SPR_X.html</loc></url>
 <url><loc>https://shotanishijima.github.io/frasam/reference/Calcu_YPR.html</loc></url>
 <url><loc>https://shotanishijima.github.io/frasam/reference/Est_SR.html</loc></url>
+<url><loc>https://shotanishijima.github.io/frasam/reference/FAQ-results.html</loc></url>
 <url><loc>https://shotanishijima.github.io/frasam/reference/caa_plot.html</loc></url>
 <url><loc>https://shotanishijima.github.io/frasam/reference/calc_mase.html</loc></url>
 <url><loc>https://shotanishijima.github.io/frasam/reference/calc_metrics.html</loc></url>
@@ -31,9 +32,12 @@
 <url><loc>https://shotanishijima.github.io/frasam/reference/dot-add_decomposition_summaries.html</loc></url>
 <url><loc>https://shotanishijima.github.io/frasam/reference/dot-as_age_year_matrix.html</loc></url>
 <url><loc>https://shotanishijima.github.io/frasam/reference/dot-as_numeric_matrix.html</loc></url>
+<url><loc>https://shotanishijima.github.io/frasam/reference/dot-harmonize_changed_plus_group.html</loc></url>
 <url><loc>https://shotanishijima.github.io/frasam/reference/dot-permutations.html</loc></url>
 <url><loc>https://shotanishijima.github.io/frasam/reference/dot-safe_ratio.html</loc></url>
 <url><loc>https://shotanishijima.github.io/frasam/reference/dot-shapley_transition.html</loc></url>
+<url><loc>https://shotanishijima.github.io/frasam/reference/dot-weighted_mean_or_mean.html</loc></url>
+<url><loc>https://shotanishijima.github.io/frasam/reference/dot-weighted_mortality.html</loc></url>
 <url><loc>https://shotanishijima.github.io/frasam/reference/est_fixed.html</loc></url>
 <url><loc>https://shotanishijima.github.io/frasam/reference/est_mixed.html</loc></url>
 <url><loc>https://shotanishijima.github.io/frasam/reference/fit2PSdata.html</loc></url>

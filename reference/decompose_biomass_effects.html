@@ -31,7 +31,7 @@
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Decompose biomass or spawning-stock-biomass changes by age</h1>
-      <small class="dont-index">Source: <a href="https://github.com/ShotaNishijima/frasam/blob/dev/R/decompose_factors.R" class="external-link"><code>R/decompose_factors.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/ShotaNishijima/frasam/blob/create_vignette/R/decompose_factors.R" class="external-link"><code>R/decompose_factors.R</code></a></small>
       <div class="d-none name"><code>decompose_biomass_effects.Rd</code></div>
     </div>
 
@@ -79,7 +79,9 @@ If supplied, spawning-stock biomass is decomposed.</p></dd>
 
 
 <dt id="arg-plus-group">plus_group<a class="anchor" aria-label="anchor" href="#arg-plus-group"></a></dt>
-<dd><p>Logical. If TRUE, the last row is treated as a plus group.</p></dd>
+<dd><p>Logical. If TRUE, the last row is treated as a plus group.
+If higher age rows are missing for some years, ages above the common
+plus-group row are collapsed before decomposition.</p></dd>
 
 
 <dt id="arg-recruitment-age-row">recruitment_age_row<a class="anchor" aria-label="anchor" href="#arg-recruitment-age-row"></a></dt>
@@ -92,7 +94,9 @@ If supplied, spawning-stock biomass is decomposed.</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A list of matrices with the same dimensions as naa.</p>
+    <p>A list of matrices with the same age-year dimensions used for
+  decomposition. When the plus group is harmonized, the matrices have the
+  collapsed common plus-group age rows.</p>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
