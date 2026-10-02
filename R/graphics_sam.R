@@ -293,93 +293,100 @@ plot_samvpa <- function(vpa_sam_list,CI=0.95,scenario_name=NULL,
     data2 = data2 %>% mutate(model = scenario_name[sapply(1:nrow(data2), function(i) which(data2$id[i]==unique(data2$id)))])
   }
 
-  CVdata_all = tibble()
-  stat_order = case_when(what.plot=="biomass" ~ "Biomass",
-                          what.plot=="fishing_mortality"~"F",
-                          what.plot=="U"~"Exploitation_rate",
-                         what.plot=="catch"~"Catch",
-                          TRUE ~ what.plot)
-  for(i in 1:length(vpa_sam_list)) {
-    res = vpa_sam_list[[i]]
-    if(class(res)=="vpa") {
-      # browser()
-      if (is.null(res$rep)) {
-        stop("Rerun vpa() with TMB=TRUE & sdreport=TRUE!")
-      }
-      cvdata = tibble(stat0 = names(res$rep$value),CV=res$rep$sd/res$rep$value,model=scenario_name[i]) %>%
-        filter(stat0 != "U")
-      if (!("U" %in% what.plot)) cvdata = cvdata %>% filter(stat0 != "scale_U")
-      if (!("fishing_mortality" %in% what.plot)) cvdata = cvdata %>% filter(stat0 != "F_mean")
-      cvdata = cvdata %>%
-        mutate(Year = rep(as.numeric(colnames(res$naa)),nrow(cvdata)/ncol(res$naa)))
-
-      cvdata_R = cvdata %>% filter(stat0=="N") %>%
-        arrange(Year) %>%
-        mutate(Age = rep(as.numeric(rownames(res$naa)),ncol(res$naa))) %>%
-        filter(Age == min(Age)) %>%
-        select(-Age) %>%
-        mutate(stat = "Recruitment")
-
-      # cvdata$stat0 %>% unique()
-      cvdata = cvdata %>% filter(stat0 %in% c("SSB","B_total","F_mean","scale_U","catch")) %>%
-        mutate(stat = case_when(stat0=="SSB" ~ "SSB",
-                                stat0=="F_mean" ~ "F",
-                                stat0=="scale_U" ~ "Exploitation_rate",
-                                stat0 =="catch" ~ "Catch",
-                                TRUE ~ "Biomass")) %>%
-        full_join(cvdata_R) %>%
-        mutate(stat_f = factor(stat,levels=stat_order)) %>%
-        select(-stat0,stat)
-      CVdata_all = bind_rows(CVdata_all,cvdata)
-    }
-
-    if (class(res)=="sam") {
-      # exploitation_rateのCVを(U*(1-U))に変更（2024/09/10）
-      if (is.null(res$rep$unbiased)){
-        cvdata2 = tibble(stat0 = names(res$rep$value),CV=res$rep$sd/res$rep$value,model=scenario_name[i]) %>%
-          filter(stat0 %in% c("exp_logN","ssb","B_total","F_mean","scale_U","Catch_biomass"))
-      }else{
-        cvdata2 = tibble(stat0 = names(res$rep$value),CV=res$rep$sd/res$rep$unbiased$value,model=scenario_name[i]) %>%
-          filter(stat0 %in% c("exp_logN","ssb","B_total","F_mean","scale_U","Catch_biomass"))
-      }
-      cvdata2 = cvdata2 %>% mutate(stat0 = ifelse(stat0 == "scale_U","Exploitation_rate",stat0))
-
-      cvdata2_R = cvdata2 %>% filter(stat0=="exp_logN") %>%
-        mutate(Age = as.numeric(rep(rownames(res$naa),ncol(res$naa)))) %>%
-        filter(Age == 0) %>%
-        mutate(Year = as.numeric(colnames(res$naa))) %>%
-        select(-Age) %>% mutate(stat = "Recruitment")
-
-      cvdata2 = cvdata2 %>% filter(stat0 %in% c("ssb","B_total","F_mean","Exploitation_rate","Catch_biomass")) %>%
-        # mutate(Year = rep(as.numeric(colnames(res$naa)),length(unique(.$stat0)))) %>%
-        mutate(Year = rep(as.numeric(colnames(res$naa)),length(unique(.$stat0)))) %>%
-        mutate(stat = case_when(stat0=="ssb" ~ "SSB",
-                                stat0=="F_mean" ~ "F",
-                                stat0=="B_total" ~ "Biomass",
-                                stat0=="Catch_biomass" ~ "Catch",
-                                TRUE~stat0)) %>%
-        full_join(cvdata2_R)
-      cvdata2 = cvdata2 %>% filter(stat %in% stat_order) %>%
-        mutate(stat_f = factor(stat,levels=stat_order)) %>%
-        select(-stat0,stat)
-      # cvdata2$stat %>% unique
-      CVdata_all = bind_rows(CVdata_all,cvdata2)
-    }
-  }
-
   data2 = data2 %>% rename(Year = year) %>%
     dplyr::select(-stat)
 
-  CVdata_all = CVdata_all %>% dplyr::select(-stat)
-  # CVdata_all
+  if (CI > 0) {
+    CVdata_all = tibble()
+    stat_order = case_when(what.plot=="biomass" ~ "Biomass",
+                            what.plot=="fishing_mortality"~"F",
+                            what.plot=="U"~"Exploitation_rate",
+                           what.plot=="catch"~"Catch",
+                            TRUE ~ what.plot)
+    for(i in 1:length(vpa_sam_list)) {
+      res = vpa_sam_list[[i]]
+      if(class(res)=="vpa") {
+        # browser()
+        if (is.null(res$rep)) {
+          stop("Rerun vpa() with TMB=TRUE & sdreport=TRUE!")
+        }
+        cvdata = tibble(stat0 = names(res$rep$value),CV=res$rep$sd/res$rep$value,model=scenario_name[i]) %>%
+          filter(stat0 != "U")
+        if (!("U" %in% what.plot)) cvdata = cvdata %>% filter(stat0 != "scale_U")
+        if (!("fishing_mortality" %in% what.plot)) cvdata = cvdata %>% filter(stat0 != "F_mean")
+        cvdata = cvdata %>%
+          mutate(Year = rep(as.numeric(colnames(res$naa)),nrow(cvdata)/ncol(res$naa)))
 
-  # Exploitation rateについてはU/1-UのCVから計算に変更（2024/09/10）
-  data3 = full_join(data2,CVdata_all) %>%
-    mutate(stat_f = factor(stat_f,levels=stat_order)) %>%
-    mutate(Cz = ifelse(stat_f != "Exploitation_rate",exp(qnorm(CI+(1-CI)/2)*sqrt(log(1+CV^2))),exp(qnorm(CI+(1-CI)/2)*CV))) %>%
-    mutate(lower = ifelse(stat_f != "Exploitation_rate", value/Cz, value/(value+(1-value)*Cz)),
-           upper = ifelse(stat_f != "Exploitation_rate", value*Cz, value/(value+(1-value)/Cz))) %>%
-    arrange(model,stat_f,Year) %>%
+        cvdata_R = cvdata %>% filter(stat0=="N") %>%
+          arrange(Year) %>%
+          mutate(Age = rep(as.numeric(rownames(res$naa)),ncol(res$naa))) %>%
+          filter(Age == min(Age)) %>%
+          select(-Age) %>%
+          mutate(stat = "Recruitment")
+
+        # cvdata$stat0 %>% unique()
+        cvdata = cvdata %>% filter(stat0 %in% c("SSB","B_total","F_mean","scale_U","catch")) %>%
+          mutate(stat = case_when(stat0=="SSB" ~ "SSB",
+                                  stat0=="F_mean" ~ "F",
+                                  stat0=="scale_U" ~ "Exploitation_rate",
+                                  stat0 =="catch" ~ "Catch",
+                                  TRUE ~ "Biomass")) %>%
+          full_join(cvdata_R) %>%
+          mutate(stat_f = factor(stat,levels=stat_order)) %>%
+          select(-stat0,stat)
+        CVdata_all = bind_rows(CVdata_all,cvdata)
+      }
+
+      if (class(res)=="sam") {
+        # exploitation_rateのCVを(U*(1-U))に変更（2024/09/10）
+        if (is.null(res$rep$unbiased)){
+          cvdata2 = tibble(stat0 = names(res$rep$value),CV=res$rep$sd/res$rep$value,model=scenario_name[i]) %>%
+            filter(stat0 %in% c("exp_logN","ssb","B_total","F_mean","scale_U","Catch_biomass"))
+        }else{
+          cvdata2 = tibble(stat0 = names(res$rep$value),CV=res$rep$sd/res$rep$unbiased$value,model=scenario_name[i]) %>%
+            filter(stat0 %in% c("exp_logN","ssb","B_total","F_mean","scale_U","Catch_biomass"))
+        }
+        cvdata2 = cvdata2 %>% mutate(stat0 = ifelse(stat0 == "scale_U","Exploitation_rate",stat0))
+
+        cvdata2_R = cvdata2 %>% filter(stat0=="exp_logN") %>%
+          mutate(Age = as.numeric(rep(rownames(res$naa),ncol(res$naa)))) %>%
+          filter(Age == 0) %>%
+          mutate(Year = as.numeric(colnames(res$naa))) %>%
+          select(-Age) %>% mutate(stat = "Recruitment")
+
+        cvdata2 = cvdata2 %>% filter(stat0 %in% c("ssb","B_total","F_mean","Exploitation_rate","Catch_biomass")) %>%
+          # mutate(Year = rep(as.numeric(colnames(res$naa)),length(unique(.$stat0)))) %>%
+          mutate(Year = rep(as.numeric(colnames(res$naa)),length(unique(.$stat0)))) %>%
+          mutate(stat = case_when(stat0=="ssb" ~ "SSB",
+                                  stat0=="F_mean" ~ "F",
+                                  stat0=="B_total" ~ "Biomass",
+                                  stat0=="Catch_biomass" ~ "Catch",
+                                  TRUE~stat0)) %>%
+          full_join(cvdata2_R)
+        cvdata2 = cvdata2 %>% filter(stat %in% stat_order) %>%
+          mutate(stat_f = factor(stat,levels=stat_order)) %>%
+          select(-stat0,stat)
+        # cvdata2$stat %>% unique
+        CVdata_all = bind_rows(CVdata_all,cvdata2)
+      }
+    }
+
+
+    CVdata_all = CVdata_all %>% dplyr::select(-stat)
+    # CVdata_all
+
+    # Exploitation rateについてはU/1-UのCVから計算に変更（2024/09/10）
+    data3 = full_join(data2,CVdata_all) %>%
+      mutate(stat_f = factor(stat_f,levels=stat_order)) %>%
+      mutate(Cz = ifelse(stat_f != "Exploitation_rate",exp(qnorm(CI+(1-CI)/2)*sqrt(log(1+CV^2))),exp(qnorm(CI+(1-CI)/2)*CV))) %>%
+      mutate(lower = ifelse(stat_f != "Exploitation_rate", value/Cz, value/(value+(1-value)*Cz)),
+             upper = ifelse(stat_f != "Exploitation_rate", value*Cz, value/(value+(1-value)/Cz))) %>%
+      arrange(model,stat_f,Year)
+  } else {
+    data3 <- data2
+  }
+
+  data3 <- data3 %>%
     mutate(Model = factor(model,levels=scenario_name))
 
   if (!is.null(years)) data3 = data3 %>% dplyr::filter(Year %in% years)
@@ -771,7 +778,7 @@ plot_boosam = function(samres,
                        ncol=2
                        ) {
 
-  est_res = plot_samvpa(samres,CI=CI, what.plot = what.plot)
+  est_res = plot_samvpa(samres,CI=0, what.plot = what.plot)
 
   est_data = est_res$data %>%
     mutate(scenario = scenario_name[1])

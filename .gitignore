@@ -34,6 +34,8 @@ tools/**/*.rds
 tools/**/*.RData
 tools/**/*.rda
 tools/**/*.cpp
+tools/tfg/*
+
 
 res_sam.Rmd
 Rplots.pdf
