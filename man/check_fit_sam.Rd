@@ -12,7 +12,8 @@ check_fit_sam(
   rho_range = c(1e-04, 1 - 1e-04),
   par_abs_max = Inf,
   boundary_tol = 1e-04,
-  verbose = TRUE
+  verbose = TRUE,
+  require_optimizer_convergence = FALSE
 )
 }
 \arguments{
@@ -34,6 +35,10 @@ internal scale. Set \code{Inf} to skip this check.}
 lower or upper bounds.}
 
 \item{verbose}{If \code{TRUE}, print the diagnostic table.}
+
+\item{require_optimizer_convergence}{If \code{TRUE}, require optimizer
+convergence code 0 for the overall result. By default, the code and
+stopping message are reported but do not determine \code{ok}.}
 }
 \value{
 A list with \code{ok}, \code{checks}, \code{fixed}, \code{sigma},
@@ -42,4 +47,11 @@ A list with \code{ok}, \code{checks}, \code{fixed}, \code{sigma},
 \description{
 \code{check_fit_sam} summarizes basic convergence diagnostics for a
 \code{sam()} result object. The function does not change the fitted object.
+}
+\details{
+The \code{required} column in \code{checks} identifies diagnostics
+  used in the overall result. A nonzero optimizer code warrants inspection
+  of the stopping message and stability after restarting, even if the
+  remaining diagnostics pass. Passing diagnostics does not guarantee a
+  global optimum.
 }
