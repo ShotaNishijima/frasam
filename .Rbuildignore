@@ -9,3 +9,4 @@
 ^\.positai$
 ^\.claude$
 ^tools$
+^data-raw$

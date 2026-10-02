@@ -62,3 +62,84 @@ test_that("plot_biomass_factors scales absolute values", {
 
   expect_equal(scaled$data$value, unscaled$data$value / 1000)
 })
+
+test_that("decompose_biomass_effects harmonizes changed plus groups", {
+  naa <- matrix(
+    c(
+      100, 110, 120,
+      50, 55, 60,
+      20, 25, 30,
+      10, 12, NA
+    ),
+    nrow = 4,
+    byrow = TRUE,
+    dimnames = list(0:3, 2000:2002)
+  )
+  waa <- matrix(
+    c(
+      1, 1, 1,
+      2, 2, 2,
+      3, 4, 5,
+      6, 8, NA
+    ),
+    nrow = 4,
+    byrow = TRUE,
+    dimnames = dimnames(naa)
+  )
+  maa <- matrix(
+    c(
+      0, 0, 0,
+      0.5, 0.5, 0.5,
+      0.8, 0.9, 1,
+      1, 1, NA
+    ),
+    nrow = 4,
+    byrow = TRUE,
+    dimnames = dimnames(naa)
+  )
+  faa <- matrix(
+    c(
+      0.1, 0.1, 0.1,
+      0.2, 0.2, 0.2,
+      0.3, 0.4, 0.5,
+      0.7, 0.8, NA
+    ),
+    nrow = 4,
+    byrow = TRUE,
+    dimnames = dimnames(naa)
+  )
+  M <- matrix(
+    c(
+      0.4, 0.4, 0.4,
+      0.4, 0.4, 0.4,
+      0.5, 0.6, 0.7,
+      0.8, 0.9, NA
+    ),
+    nrow = 4,
+    byrow = TRUE,
+    dimnames = dimnames(naa)
+  )
+
+  out <- suppressWarnings(decompose_biomass_effects(
+    naa = naa, waa = waa, faa = faa, M = M, maa = maa, plus_group = TRUE
+  ))
+
+  expected_baa <- colSums(naa[3:4, ] * waa[3:4, ], na.rm = TRUE)
+  expected_ssb <- colSums(naa[3:4, ] * waa[3:4, ] * maa[3:4, ], na.rm = TRUE)
+  expected_faa_2000 <- -log(sum(naa[3:4, 1] * exp(-faa[3:4, 1])) / sum(naa[3:4, 1]))
+  expected_M_2000 <- -log(sum(naa[3:4, 1] * exp(-M[3:4, 1])) / sum(naa[3:4, 1]))
+
+  expect_equal(nrow(out$target_quantity), 3)
+  expect_equal(rownames(out$target_quantity), c("0", "1", "2"))
+  expect_true(out$plus_group_adjustment$changed)
+  expect_equal(out$target_quantity[3, ], expected_ssb)
+
+  collapsed <- suppressWarnings(.harmonize_changed_plus_group(
+    naa = naa, waa = waa, faa = faa, M = M, maa = maa
+  ))
+  expect_equal(collapsed$naa[3, ], colSums(naa[3:4, ], na.rm = TRUE))
+  expect_equal(collapsed$naa[3, ] * collapsed$waa[3, ], expected_baa)
+  expect_equal(collapsed$naa[3, ] * collapsed$waa[3, ] * collapsed$maa[3, ], expected_ssb)
+  expect_equal(collapsed$faa[3, 1], expected_faa_2000)
+  expect_equal(collapsed$M[3, 1], expected_M_2000)
+})

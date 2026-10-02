@@ -70,6 +70,115 @@
   num / den
 }
 
+#' Weighted mean with a finite fallback for zero total weight
+#'
+#' @keywords internal
+.weighted_mean_or_mean <- function(x, w) {
+  ok <- !is.na(x) & !is.na(w)
+  if (!any(ok)) {
+    return(NA_real_)
+  }
+
+  w_sum <- sum(w[ok])
+  if (w_sum > 0) {
+    return(sum(x[ok] * w[ok]) / w_sum)
+  }
+
+  mean(x[ok])
+}
+
+#' Average mortality through survival, weighted by numbers at age
+#'
+#' @keywords internal
+.weighted_mortality <- function(x, w) {
+  ok <- !is.na(x) & !is.na(w)
+  if (!any(ok)) {
+    return(NA_real_)
+  }
+
+  w_sum <- sum(w[ok])
+  if (w_sum > 0) {
+    survival <- sum(exp(-x[ok]) * w[ok]) / w_sum
+  } else {
+    survival <- mean(exp(-x[ok]))
+  }
+
+  -log(survival)
+}
+
+#' Collapse ages above the common plus group when the plus group changes by year
+#'
+#' @keywords internal
+.harmonize_changed_plus_group <- function(naa, waa, faa, M, maa = NULL) {
+  last_age_by_year <- apply(!is.na(naa), 2L, function(z) {
+    if (!any(z)) {
+      return(NA_integer_)
+    }
+
+    max(which(z))
+  })
+
+  if (anyNA(last_age_by_year)) {
+    stop("Each year in naa must contain at least one non-NA age.", call. = FALSE)
+  }
+
+  common_plus_row <- min(last_age_by_year)
+  if (common_plus_row == nrow(naa)) {
+    return(list(
+      naa = naa, waa = waa, faa = faa, M = M, maa = maa,
+      plus_group_changed = FALSE,
+      original_n_age = nrow(naa),
+      common_plus_row = common_plus_row
+    ))
+  }
+
+  collapse_rows <- common_plus_row:nrow(naa)
+  keep_rows <- seq_len(common_plus_row)
+  out_naa <- naa[keep_rows, , drop = FALSE]
+  out_waa <- waa[keep_rows, , drop = FALSE]
+  out_faa <- faa[keep_rows, , drop = FALSE]
+  out_M <- M[keep_rows, , drop = FALSE]
+  out_maa <- if (!is.null(maa)) maa[keep_rows, , drop = FALSE] else NULL
+
+  for (y in seq_len(ncol(naa))) {
+    N <- naa[collapse_rows, y]
+    W <- waa[collapse_rows, y]
+    F <- faa[collapse_rows, y]
+    M_y <- M[collapse_rows, y]
+
+    if (all(is.na(N))) {
+      out_naa[common_plus_row, y] <- NA_real_
+      out_waa[common_plus_row, y] <- NA_real_
+      out_faa[common_plus_row, y] <- NA_real_
+      out_M[common_plus_row, y] <- NA_real_
+      if (!is.null(out_maa)) {
+        out_maa[common_plus_row, y] <- NA_real_
+      }
+      next
+    }
+
+    out_naa[common_plus_row, y] <- sum(N, na.rm = TRUE)
+    out_waa[common_plus_row, y] <- .weighted_mean_or_mean(W, N)
+    out_faa[common_plus_row, y] <- .weighted_mortality(F, N)
+    out_M[common_plus_row, y] <- .weighted_mortality(M_y, N)
+
+    if (!is.null(out_maa)) {
+      # Weight maturity by biomass so the collapsed plus-group SSB is preserved.
+      out_maa[common_plus_row, y] <- .weighted_mean_or_mean(
+        maa[collapse_rows, y],
+        N * W
+      )
+    }
+  }
+
+  list(
+    naa = out_naa, waa = out_waa, faa = out_faa, M = out_M, maa = out_maa,
+    plus_group_changed = TRUE,
+    original_n_age = nrow(naa),
+    common_plus_row = common_plus_row
+  )
+}
+
 
 #' Shapley decomposition for one transition
 #'
@@ -155,10 +264,14 @@
 #' @param maa Optional matrix of maturity at age. If NULL, biomass is decomposed.
 #'   If supplied, spawning-stock biomass is decomposed.
 #' @param plus_group Logical. If TRUE, the last row is treated as a plus group.
+#'   If higher age rows are missing for some years, ages above the common
+#'   plus-group row are collapsed before decomposition.
 #' @param recruitment_age_row Row index for recruitment. Default is 1, assumed to be age 0.
 #' @param zero_tol Tolerance for zero denominators.
 #'
-#' @return A list of matrices with the same dimensions as naa.
+#' @return A list of matrices with the same age-year dimensions used for
+#'   decomposition. When the plus group is harmonized, the matrices have the
+#'   collapsed common plus-group age rows.
 #'
 #' @export
 decompose_biomass_effects <- function(naa,
@@ -211,8 +324,32 @@ decompose_biomass_effects <- function(naa,
     }
   }
 
-  if (!identical(dim(naa), dim(waa)) || !identical(dim(naa), dim(faa))) {
-    stop("naa, waa, and faa must have the same dimensions.", call. = FALSE)
+  plus_group_adjustment <- NULL
+  if (isTRUE(plus_group)) {
+    harmonized <- .harmonize_changed_plus_group(
+      naa = naa, waa = waa, faa = faa, M = M, maa = maa
+    )
+    naa <- harmonized$naa
+    waa <- harmonized$waa
+    faa <- harmonized$faa
+    M <- harmonized$M
+    maa <- harmonized$maa
+    plus_group_adjustment <- list(
+      changed = harmonized$plus_group_changed,
+      original_n_age = harmonized$original_n_age,
+      common_plus_row = harmonized$common_plus_row,
+      common_plus_age = rownames(naa)[harmonized$common_plus_row]
+    )
+  }
+
+  n_age <- nrow(naa)
+  n_year <- ncol(naa)
+
+  if (recruitment_age_row > n_age) {
+    stop(
+      "recruitment_age_row is out of range after plus-group harmonization.",
+      call. = FALSE
+    )
   }
 
   make_mat <- function(value = 0) {
@@ -384,6 +521,7 @@ decompose_biomass_effects <- function(naa,
     annual_change = annual_change,
     residual = annual_effect_sum - annual_change,
     residual_with_terminal = annual_effect_sum_with_terminal - annual_change,
+    plus_group_adjustment = plus_group_adjustment,
     target = if (use_maturity) "ssb" else "biomass"
   )
 

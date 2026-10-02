@@ -27,14 +27,18 @@ decompose_biomass_effects(
 \item{maa}{Optional matrix of maturity at age. If NULL, biomass is decomposed.
 If supplied, spawning-stock biomass is decomposed.}
 
-\item{plus_group}{Logical. If TRUE, the last row is treated as a plus group.}
+\item{plus_group}{Logical. If TRUE, the last row is treated as a plus group.
+If higher age rows are missing for some years, ages above the common
+plus-group row are collapsed before decomposition.}
 
 \item{recruitment_age_row}{Row index for recruitment. Default is 1, assumed to be age 0.}
 
 \item{zero_tol}{Tolerance for zero denominators.}
 }
 \value{
-A list of matrices with the same dimensions as naa.
+A list of matrices with the same age-year dimensions used for
+  decomposition. When the plus group is harmonized, the matrices have the
+  collapsed common plus-group age rows.
 }
 \description{
 Decompose biomass or spawning-stock-biomass changes by age
