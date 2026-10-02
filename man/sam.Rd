@@ -86,7 +86,7 @@ sam(
 
 \item{cpp.file.name}{推定に用いるcppファイル。デフォルトは最新版の"sam2"}
 
-\item{abund}{Indexの種類。用いるIndexの長さのベクトル。"B": 資源量、"SSB"：親魚資源量、"N"：尾数、"Bs"：資源量×fleetごとの選択率、"Bf"：資源量×選択率．合計する年齢の幅については\code{min.age}と\code{max.age}}
+\item{abund}{Indexの種類。用いるIndexの長さのベクトル。"B": 資源量、"SSB"：親魚資源量、"N"：尾数、"Bs"：資源量×全体のFから計算した選択率、"Bf"：資源量×指標ごとの選択率（Fを\code{catch_prop}で調整）。合計する年齢の幅については\code{min.age}と\code{max.age}。オメガ法との対応はDetailsを参照。}
 
 \item{rec.age}{加入年齢 (default: 0)。1以上の場合でも、min.ageやmax.ageは0歳始まりとしての年齢を入れること。}
 
@@ -152,7 +152,7 @@ sam(
 
 \item{gamma}{Gamma parameter setting.}
 
-\item{sel.def}{選択率の定義。"max"（デフォルト）の場合、最大年齢を１とする。}
+\item{sel.def}{選択率の定義。"max"（デフォルト）は最大値で、"mean"は全年齢の平均値で、"maxage"は最高年齢の値でFを割る。"Bf"では\code{F * catch_prop}を同様に正規化する。}
 
 \item{use.index}{この仕様は設定ミスを引き起こしやすいので廃止しました。\code{sam()}を使用するまえに、Indexのデータを使用するもののみにsubsetするようにしてください}
 
@@ -206,7 +206,11 @@ sam(
 
 \item{growth_regime}{Growth regime setting.}
 
-\item{catch_prop}{abund="Bs"のとき、対象とするfleetのcatch at ageの全体に対する比率.}
+\item{catch_prop}{\code{abund = "Bf"}のときにFに掛ける年齢・年・指標別の重み。
+通常は対象fleetのcatch at ageの全体に対する比率。オメガ法ではomegaを指定できる。
+次元は\code{c(nrow(dat$waa), ncol(dat$waa), nrow(dat$index) + 1)}で、
+第3次元の1番目は漁獲データ、\code{i + 1}番目は\code{i}番目のIndexに対応する。
+\code{NULL}の場合はすべて1。}
 
 \item{no_est}{推定しない(TRUE)、パラメータ推定する（FALSE, デフォルト）}
 
@@ -220,4 +224,24 @@ sam(
 }
 \description{
 SAMによる資源計算を実施する
+}
+\details{
+\code{abund = "Bf"}は、\code{catch_prop}の対象Indexのスライスにomegaを指定し、
+\code{sel.def = "mean"}とすることで、\code{frasyr::vpa(abund = "Bo")}
+と実質的に同じ指標への当てはめ方に対応する。
+VPAの"Bo"は\code{F * omega}を年ごとに合計が1となるよう正規化する。
+SAMの"Bf"で平均値による正規化を使うと、その重みはVPAの年齢区分数倍となる。
+年齢区分数が一定でqを推定する場合、この定数倍はqに吸収される
+（資源量のスケーリングもqに影響する）。VPAとSAMの推定結果自体が一致するという意味ではない。
+同じN、F、体重、omega、対象年齢を用いた場合、SAMとVPAのscaleをそれぞれ
+\code{scale_sam}、\code{scale_vpa}、全年齢区分数を\code{K}とすると、
+\code{A_Bf = (K * scale_vpa / scale_sam) * A_Bo}となる。
+指標の関係が\code{I = q * A^b}の場合、Boの尺度への換算は
+\code{q_on_Bo_scale = q_Bf * (K * scale_vpa / scale_sam)^b}。
+同じscaleで\code{b = 1}なら\code{q_on_Bo_scale = K * q_Bf}となる。
+omega全体の定数倍は選択率の正規化で打ち消されるため、omegaを割るだけではqの尺度は揃わない。
+この換算は正規化・単位の違いを補正するもので、別々に推定したVPAとSAMのqの一致を保証しない。
+\code{sel.def = "max"}では正規化の比率が年ごとに変わり得るため、
+一定のqで吸収できるとは限らない。\code{sel.def}は他の"Bs"・"Bf"にも共通して適用される。
+詳細は\href{https://shotanishijima.github.io/frasam/articles/FAQ.html#omega-method}{FAQのオメガ法の項目}を参照。
 }

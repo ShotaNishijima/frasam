@@ -15,6 +15,17 @@ test_that("test input",{
   input$no_est <- TRUE
   testres <- safe_do_call(sam,input)
 
+  # Catch ages are internal row positions, independent of their labels.
+  input_age1 <- input
+  rownames(input_age1$dat$caa) <- as.character(seq_len(nrow(input_age1$dat$caa)))
+  testres_age1 <- safe_do_call(sam, input_age1)
+  expect_equal(testres_age1$data$obs, testres$data$obs)
+  catch_obs <- testres_age1$data$obs[testres_age1$data$obs[, "fleet"] == 1, ]
+  expect_equal(sort(unique(catch_obs[, "age"])),
+               seq_len(nrow(input_age1$dat$caa)) - 1L)
+  expect_equal(catch_obs[, "maxage"], catch_obs[, "age"])
+  expect_equal(rownames(testres_age1$input$dat$caa), rownames(input_age1$dat$caa))
+
   bad_input <- input
   bad_input$q.init <- rep(1, length(bad_input$abund) + 1)
   expect_error(safe_do_call(sam,bad_input), "'q.init' must have length")
@@ -50,6 +61,15 @@ test_that("test output",{
   args_def = formals(sam)
   input$cpp.file.name <- args_def$cpp.file.name
   testres = safe_do_call(sam,input)
+
+  input_age1 <- input
+  rownames(input_age1$dat$caa) <- as.character(seq_len(nrow(input_age1$dat$caa)))
+  testres_age1 <- safe_do_call(sam, input_age1)
+  expect_equal(testres_age1$opt$convergence, testres$opt$convergence)
+  expect_equal(testres_age1$opt$objective, testres$opt$objective, tolerance = 1e-8)
+  expect_equal(testres_age1$opt$par, testres$opt$par, tolerance = 1e-8)
+  expect_equal(testres_age1$naa, testres$naa, tolerance = 1e-8)
+  expect_equal(testres_age1$faa, testres$faa, tolerance = 1e-8)
 
   expect_equal(rownames(testres$naa), as.character(testres$data$minAge:testres$data$maxAge))
   expect_equal(rownames(testres$faa), as.character(testres$data$minAge:testres$data$maxAge))

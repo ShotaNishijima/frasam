@@ -14,6 +14,14 @@
 #' @param boundary_tol Tolerance for detecting parameters close to finite
 #'   lower or upper bounds.
 #' @param verbose If \code{TRUE}, print the diagnostic table.
+#' @param require_optimizer_convergence If \code{TRUE}, require optimizer
+#'   convergence code 0 for the overall result. By default, the code and
+#'   stopping message are reported but do not determine \code{ok}.
+#' @details The \code{required} column in \code{checks} identifies diagnostics
+#'   used in the overall result. A nonzero optimizer code warrants inspection
+#'   of the stopping message and stability after restarting, even if the
+#'   remaining diagnostics pass. Passing diagnostics does not guarantee a
+#'   global optimum.
 #'
 #' @return A list with \code{ok}, \code{checks}, \code{fixed}, \code{sigma},
 #'   and \code{boundary} elements.
@@ -25,7 +33,8 @@ check_fit_sam <- function(res,
                           rho_range = c(1e-4, 1 - 1e-4),
                           par_abs_max = Inf,
                           boundary_tol = 1e-4,
-                          verbose = TRUE) {
+                          verbose = TRUE,
+                          require_optimizer_convergence = FALSE) {
   add_check <- function(checks, check, ok, value = NA, threshold = NA, message = "") {
     rbind(
       checks,
@@ -53,6 +62,12 @@ check_fit_sam <- function(res,
     stop("'res' must be a sam result object.", call. = FALSE)
   }
 
+  if (!is.logical(require_optimizer_convergence) ||
+      length(require_optimizer_convergence) != 1L ||
+      is.na(require_optimizer_convergence)) {
+    stop("'require_optimizer_convergence' must be TRUE or FALSE.", call. = FALSE)
+  }
+
   opt <- res$opt
   rep <- res$rep
 
@@ -63,7 +78,11 @@ check_fit_sam <- function(res,
     isTRUE(convergence == 0),
     convergence,
     "0",
-    if (isTRUE(convergence == 0)) "nlminb convergence code is 0." else "nlminb convergence code is not 0."
+    if (!is.null(opt$message)) {
+      paste(opt$message, collapse = "; ")
+    } else {
+      "Optimizer message unavailable."
+    }
   )
 
   pdHess <- if (!is.null(rep$pdHess)) rep$pdHess else NA
@@ -227,7 +246,10 @@ check_fit_sam <- function(res,
     "Only checked when finite lower or upper bounds were supplied."
   )
 
-  ok <- all(checks$ok)
+  checks$required <- TRUE
+  checks$required[checks$check == "optimizer convergence"] <-
+    require_optimizer_convergence
+  ok <- all(checks$ok[checks$required])
   out <- list(
     ok = ok,
     checks = checks,
@@ -239,6 +261,12 @@ check_fit_sam <- function(res,
 
   if (isTRUE(verbose)) {
     print(checks, row.names = FALSE)
+    if (!isTRUE(convergence == 0) && !require_optimizer_convergence) {
+      message(
+        "Optimizer convergence code is not 0; ",
+        "inspect the stopping message and check stability after restarting."
+      )
+    }
     if (!isTRUE(ok)) warning("Some convergence diagnostics failed.", call. = FALSE)
   }
 

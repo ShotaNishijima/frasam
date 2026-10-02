@@ -620,6 +620,40 @@ res_rw2$sigma
 c(res_rw$aic, res_ls$aic, res_rw2$aic)
 ```
 
+### オメガ法でCPUEに当てはめたい {#omega-method}
+
+`abund = "Bs"`は全体のFから計算した選択率を、`abund = "Bf"`はFに`catch_prop`を掛けて計算した指標ごとの選択率を、資源重量に掛けてIndexに当てはめます。
+
+`frasyr::vpa(abund = "Bo")`に対応させるには、`"Bf"`の対象Indexの`catch_prop`にomegaを指定し、`sel.def = "mean"`を使います。
+VPAの`"Bo"`は`F * omega`の合計を1にしますが、SAMでは平均を1にするため、重みは年齢区分数倍になります。
+年齢区分数が一定でqを推定する場合、この定数倍はqに吸収できます。これは指標への当てはめ方の対応であり、VPAとSAMの推定結果自体が一致するという意味ではありません。
+
+`catch_prop`は年齢 × 年 × (Index数 + 1)の配列で、Indexの`i`番目に対応するスライスは`catch_prop[, , i + 1]`です。
+`sel.def = "max"`では正規化の違いが年ごとに変わり得るため、同じ対応になるとは限りません。
+また、`sel.def`は他の`"Bs"`・`"Bf"`にも適用されます。
+
+#### VPAのオメガ法とSAMのBfでqは同じになりますか？
+
+正規化が異なるため、同じ`scale`で`b = 1`の場合、同じN・F・体重・omegaから計算するなら、Bfの資源量指標はBoの全年齢区分数倍、対応するqはその逆数倍になります。
+ここでの年齢区分数は`min.age:max.age`の長さではなく、選択率の正規化に使う全年齢の行数です。
+
+`sel.def = "mean"`の場合、SAMのqをBoの尺度に換算できます。指標が`I = q * A^b`に従うとき、換算式は次のとおりです。
+
+```{r omega-q-scale, eval = FALSE}
+i <- 1L # Bfに設定したIndexの番号
+K <- nrow(res_bf$naa)
+scale_vpa <- 1000 # 比較するVPAで指定したscale
+scale_sam <- res_bf$input$scale
+q_on_Bo_scale <- res_bf$q[i] * (K * scale_vpa / scale_sam)^res_bf$b[i]
+```
+
+同じ`scale`で`b = 1`なら、`q_on_Bo_scale = K * res_bf$q[i]`です。
+omegaを定数倍しても正規化で打ち消されるため、omegaを`K`で割るだけではqの尺度は揃いません。
+SAMの`scale`を`K * scale_vpa`にする方法でも指標の尺度は揃いますが、他の資源量指標にも影響するため、比較用にqを換算する方法が扱いやすいです。
+
+この換算は正規化と単位の違いを補正するもので、VPAとSAMで別々に推定したqが同じになることを保証しません。
+`sel.def = "max"`の場合は比率が年によって変わり得るため、この定数による換算は使えません。
+
 ### IndexとAbundanceの間の非線形性を推定したい
 
 デフォルトでは `b.est = FALSE` として、index と資源量の関係を比例関係、つまり `b = 1` として扱います。
