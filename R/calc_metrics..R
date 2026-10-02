@@ -112,10 +112,12 @@ calc_metrics <- function(y,
     RMSRE <- NA_real_
     MARE  <- NA_real_
     MedRelBias <- NA_real_
+    MedAbsRelBias <- NA_real_
   } else {
     RMSRE <- sqrt(mean(rel_err^2))
     MARE  <- mean(abs(rel_err))
     MedRelBias <- stats::median(rel_err)
+    MedAbsRelBias <- stats::median(abs(rel_err))
   }
 
   # --- MedBias (signed) ---
@@ -133,6 +135,7 @@ calc_metrics <- function(y,
     RMSE       = RMSE,
     MAE        = MAE,
     RMSRE      = RMSRE,
+    MedAbsRelBias = MedAbsRelBias,
     MARE       = MARE,
     MedBias    = MedBias,
     MedRelBias = MedRelBias,
