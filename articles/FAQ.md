@@ -41,13 +41,31 @@ library(frasyr)
 
 - [`sam()`](https://shotanishijima.github.io/frasam/reference/sam.md)
   を実行する前に、TMBで使う実行ファイルを準備するために実行します。
-- 通常のテストや例では、上書きしない設定にします。
+- 同じバージョンで解析を続ける場合は、上書きしない設定にできます。パッケージ更新後は、次の項目の手順で実行ファイルも更新してください。
 
 ``` r
 
  use_sam_tmb(overwrite = FALSE, compile = "auto")
 #> [1] TRUE
 ```
+
+#### パッケージ更新後に `sam()` が動かなくなった
+
+`frasam`を更新しても、作業ディレクトリにある古い`sam2.cpp`や`sam2.dll`は自動では更新されません。
+`use_sam_tmb(overwrite = FALSE)`では既存の`sam2.cpp`を残すため、パッケージのRコードと古い実行ファイルの組み合わせでエラーが起きることがあります。
+
+パッケージ更新後はRセッションを再起動し、以下を実行してから[`sam()`](https://shotanishijima.github.io/frasam/reference/sam.md)を使ってください。
+`overwrite = TRUE`でインストール済みパッケージの`sam2.cpp`に置き換え、`compile = "always"`でDLLを再コンパイルします。
+
+``` r
+
+library(frasam)
+use_sam_tmb(overwrite = TRUE, compile = "always")
+```
+
+`compile = "auto"`は作業ディレクトリのCPPとDLLの更新日時を比較するため、更新後の再作成を確実に行うには`"always"`を指定してください。
+`RunDir`を指定している場合は、上の呼び出しでも同じディレクトリを指定します。
+作業ディレクトリの`sam2.cpp`を独自に変更している場合は、上書き前に別名で保存してください。
 
 #### 一部の引数のみを変更して解析したい
 

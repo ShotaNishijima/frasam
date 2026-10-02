@@ -96,16 +96,22 @@ y_pred <- c(11, 11, 8, 14, 0.2, 9)
 
 # Default: percent = TRUE, rel_zero = "omit"
 calc_metrics(y, y_pred)
-#>        RMSE       MAE     RMSRE       MARE MedBias  MedRelBias Median        CV
-#> 1 0.9165151 0.8666667 0.0993575 0.09722222    -0.4 -0.06666667     10 0.5321906
+#>        RMSE       MAE     RMSRE MedAbsRelBias       MARE MedBias  MedRelBias
+#> 1 0.9165151 0.8666667 0.0993575           0.1 0.09722222    -0.4 -0.06666667
+#>   Median        CV
+#> 1     10 0.5321906
 
 # Use proportions (not %) and guard zeros with epsilon
 calc_metrics(y, y_pred, percent = FALSE, rel_zero = "epsilon", epsilon = 1e-6)
-#>        RMSE       MAE    RMSRE     MARE MedBias MedRelBias Median        CV
-#> 1 0.9165151 0.8666667 81649.66 33333.41    -0.4 0.01666666     10 0.5321906
+#>        RMSE       MAE    RMSRE MedAbsRelBias     MARE MedBias MedRelBias Median
+#> 1 0.9165151 0.8666667 81649.66     0.1055555 33333.41    -0.4 0.01666666     10
+#>          CV
+#> 1 0.5321906
 
 # No guarding (may produce Inf/NaN if y contains zeros)
 calc_metrics(y, y_pred, rel_zero = "none")
-#>        RMSE       MAE     RMSRE       MARE MedBias  MedRelBias Median        CV
-#> 1 0.9165151 0.8666667 0.0993575 0.09722222    -0.4 -0.06666667     10 0.5321906
+#>        RMSE       MAE     RMSRE MedAbsRelBias       MARE MedBias  MedRelBias
+#> 1 0.9165151 0.8666667 0.0993575           0.1 0.09722222    -0.4 -0.06666667
+#>   Median        CV
+#> 1     10 0.5321906
 ```

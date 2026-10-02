@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">frasam</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.5.999</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -1281,20 +1281,21 @@ SAMのモデルを疑似データにフィットさせるというシミュレ�
 <span><span class="va">metric_sam2sam</span> <span class="op">=</span> <span class="fu"><a href="../reference/sumup_popsim.html">sumup_popsim</a></span><span class="op">(</span><span class="va">res_best</span>,<span class="va">fit_sam2sam</span><span class="op">)</span> <span class="co">#真のモデルの結果を使うこと</span></span>
 <span><span class="co"># SSBの要約統計量を出力</span></span>
 <span><span class="va">metric_sam2sam</span><span class="op">$</span><span class="va">summary</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">stat</span><span class="op">==</span><span class="st">"SSB"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
+<table style="width:100%;" class="table">
 <colgroup>
 <col width="3%">
 <col width="3%">
-<col width="3%">
+<col width="2%">
+<col width="7%">
+<col width="6%">
+<col width="7%">
+<col width="10%">
 <col width="7%">
 <col width="7%">
 <col width="7%">
 <col width="7%">
-<col width="8%">
-<col width="8%">
 <col width="7%">
 <col width="7%">
-<col width="8%">
 <col width="7%">
 <col width="7%">
 </colgroup>
@@ -1305,6 +1306,7 @@ SAMのモデルを疑似データにフィットさせるというシミュレ�
 <th align="right">RMSE</th>
 <th align="right">MAE</th>
 <th align="right">RMSRE</th>
+<th align="right">MedAbsRelBias</th>
 <th align="right">MARE</th>
 <th align="right">MedBias</th>
 <th align="right">MedRelBias</th>
@@ -1322,6 +1324,7 @@ SAMのモデルを疑似データにフィットさせるというシミュレ�
 <td align="right">4.748967</td>
 <td align="right">3.472684</td>
 <td align="right">0.0395290</td>
+<td align="right">0.0239094</td>
 <td align="right">0.0289056</td>
 <td align="right">1.0141953</td>
 <td align="right">0.0084419</td>
@@ -1338,6 +1341,7 @@ SAMのモデルを疑似データにフィットさせるというシミュレ�
 <td align="right">4.418596</td>
 <td align="right">3.281836</td>
 <td align="right">0.0366443</td>
+<td align="right">0.0230325</td>
 <td align="right">0.0272169</td>
 <td align="right">1.0258911</td>
 <td align="right">0.0085079</td>
@@ -1354,6 +1358,7 @@ SAMのモデルを疑似データにフィットさせるというシミュレ�
 <td align="right">4.350415</td>
 <td align="right">3.373664</td>
 <td align="right">0.0359135</td>
+<td align="right">0.0178766</td>
 <td align="right">0.0278503</td>
 <td align="right">-0.8631043</td>
 <td align="right">-0.0071251</td>
@@ -1370,6 +1375,7 @@ SAMのモデルを疑似データにフィットさせるというシミュレ�
 <td align="right">3.536072</td>
 <td align="right">2.867513</td>
 <td align="right">0.0317202</td>
+<td align="right">0.0200754</td>
 <td align="right">0.0257229</td>
 <td align="right">-0.4448401</td>
 <td align="right">-0.0039904</td>
@@ -1386,6 +1392,7 @@ SAMのモデルを疑似データにフィットさせるというシミュレ�
 <td align="right">3.691653</td>
 <td align="right">2.958112</td>
 <td align="right">0.0358541</td>
+<td align="right">0.0206177</td>
 <td align="right">0.0287298</td>
 <td align="right">0.0720785</td>
 <td align="right">0.0007000</td>
@@ -1402,6 +1409,7 @@ SAMのモデルを疑似データにフィットさせるというシミュレ�
 <td align="right">4.250611</td>
 <td align="right">3.570108</td>
 <td align="right">0.0479316</td>
+<td align="right">0.0345034</td>
 <td align="right">0.0402580</td>
 <td align="right">-0.2055944</td>
 <td align="right">-0.0023184</td>
@@ -1418,6 +1426,7 @@ SAMのモデルを疑似データにフィットさせるというシミュレ�
 <td align="right">5.319406</td>
 <td align="right">4.260229</td>
 <td align="right">0.0725800</td>
+<td align="right">0.0522110</td>
 <td align="right">0.0581282</td>
 <td align="right">-0.4107427</td>
 <td align="right">-0.0056043</td>
@@ -1434,6 +1443,7 @@ SAMのモデルを疑似データにフィットさせるというシミュレ�
 <td align="right">6.021700</td>
 <td align="right">4.745422</td>
 <td align="right">0.1031372</td>
+<td align="right">0.0832738</td>
 <td align="right">0.0812777</td>
 <td align="right">-0.6461664</td>
 <td align="right">-0.0110673</td>
@@ -1450,6 +1460,7 @@ SAMのモデルを疑似データにフィットさせるというシミュレ�
 <td align="right">7.587647</td>
 <td align="right">5.989958</td>
 <td align="right">0.1377488</td>
+<td align="right">0.1028682</td>
 <td align="right">0.1087438</td>
 <td align="right">-1.3692709</td>
 <td align="right">-0.0248582</td>
@@ -1466,6 +1477,7 @@ SAMのモデルを疑似データにフィットさせるというシミュレ�
 <td align="right">10.591288</td>
 <td align="right">8.474755</td>
 <td align="right">0.1947337</td>
+<td align="right">0.1330371</td>
 <td align="right">0.1558187</td>
 <td align="right">-3.6841019</td>
 <td align="right">-0.0677367</td>
@@ -1490,20 +1502,21 @@ SAMのモデルを疑似データにフィットさせるというシミュレ�
 <span><span class="va">metric_vpa2sam</span><span class="op">$</span><span class="va">summary</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">stat</span><span class="op">==</span><span class="st">"SSB"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <table style="width:100%;" class="table">
 <colgroup>
-<col width="4%">
-<col width="4%">
 <col width="3%">
-<col width="8%">
-<col width="8%">
-<col width="8%">
-<col width="8%">
+<col width="3%">
+<col width="2%">
 <col width="7%">
-<col width="8%">
-<col width="8%">
-<col width="8%">
-<col width="8%">
-<col width="8%">
-<col width="8%">
+<col width="7%">
+<col width="7%">
+<col width="10%">
+<col width="7%">
+<col width="6%">
+<col width="7%">
+<col width="7%">
+<col width="7%">
+<col width="7%">
+<col width="7%">
+<col width="7%">
 </colgroup>
 <thead><tr class="header">
 <th align="left">stat</th>
@@ -1512,6 +1525,7 @@ SAMのモデルを疑似データにフィットさせるというシミュレ�
 <th align="right">RMSE</th>
 <th align="right">MAE</th>
 <th align="right">RMSRE</th>
+<th align="right">MedAbsRelBias</th>
 <th align="right">MARE</th>
 <th align="right">MedBias</th>
 <th align="right">MedRelBias</th>
@@ -1529,6 +1543,7 @@ SAMのモデルを疑似データにフィットさせるというシミュレ�
 <td align="right">7.008667</td>
 <td align="right">5.639811</td>
 <td align="right">0.0583380</td>
+<td align="right">0.0414578</td>
 <td align="right">0.0469441</td>
 <td align="right">4.980692</td>
 <td align="right">0.0414578</td>
@@ -1545,6 +1560,7 @@ SAMのモデルを疑似データにフィットさせるというシミュレ�
 <td align="right">6.803587</td>
 <td align="right">5.837696</td>
 <td align="right">0.0564235</td>
+<td align="right">0.0456549</td>
 <td align="right">0.0484132</td>
 <td align="right">5.359513</td>
 <td align="right">0.0444475</td>
@@ -1561,6 +1577,7 @@ SAMのモデルを疑似データにフィットさせるというシミュレ�
 <td align="right">6.059764</td>
 <td align="right">5.088046</td>
 <td align="right">0.0500246</td>
+<td align="right">0.0362895</td>
 <td align="right">0.0420028</td>
 <td align="right">4.342047</td>
 <td align="right">0.0358445</td>
@@ -1577,6 +1594,7 @@ SAMのモデルを疑似データにフィットさせるというシミュレ�
 <td align="right">5.614226</td>
 <td align="right">4.462884</td>
 <td align="right">0.0503621</td>
+<td align="right">0.0375366</td>
 <td align="right">0.0400341</td>
 <td align="right">3.639327</td>
 <td align="right">0.0326464</td>
@@ -1593,6 +1611,7 @@ SAMのモデルを疑似データにフィットさせるというシミュレ�
 <td align="right">5.439524</td>
 <td align="right">4.135281</td>
 <td align="right">0.0528299</td>
+<td align="right">0.0311823</td>
 <td align="right">0.0401628</td>
 <td align="right">1.940045</td>
 <td align="right">0.0188421</td>
@@ -1609,6 +1628,7 @@ SAMのモデルを疑似データにフィットさせるというシミュレ�
 <td align="right">6.117344</td>
 <td align="right">4.703847</td>
 <td align="right">0.0689817</td>
+<td align="right">0.0470056</td>
 <td align="right">0.0530425</td>
 <td align="right">2.256857</td>
 <td align="right">0.0254492</td>
@@ -1625,6 +1645,7 @@ SAMのモデルを疑似データにフィットさせるというシミュレ�
 <td align="right">7.575825</td>
 <td align="right">5.668556</td>
 <td align="right">0.1033675</td>
+<td align="right">0.0422183</td>
 <td align="right">0.0773439</td>
 <td align="right">1.435125</td>
 <td align="right">0.0195814</td>
@@ -1641,6 +1662,7 @@ SAMのモデルを疑似データにフィットさせるというシミュレ�
 <td align="right">8.263545</td>
 <td align="right">6.510862</td>
 <td align="right">0.1415346</td>
+<td align="right">0.0850895</td>
 <td align="right">0.1115154</td>
 <td align="right">2.368827</td>
 <td align="right">0.0405723</td>
@@ -1657,6 +1679,7 @@ SAMのモデルを疑似データにフィットさせるというシミュレ�
 <td align="right">10.035735</td>
 <td align="right">8.013140</td>
 <td align="right">0.1821922</td>
+<td align="right">0.1148381</td>
 <td align="right">0.1454733</td>
 <td align="right">3.996337</td>
 <td align="right">0.0725509</td>
@@ -1673,6 +1696,7 @@ SAMのモデルを疑似データにフィットさせるというシミュレ�
 <td align="right">12.793283</td>
 <td align="right">10.346379</td>
 <td align="right">0.2352200</td>
+<td align="right">0.1693258</td>
 <td align="right">0.1902307</td>
 <td align="right">4.315363</td>
 <td align="right">0.0793432</td>

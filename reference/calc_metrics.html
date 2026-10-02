@@ -41,7 +41,7 @@ If zeros occur in y, control the behavior via rel_zero:
 
     <a class="navbar-brand me-2" href="../index.html">frasam</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.5.999</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -150,18 +150,24 @@ Default <code>1e-8</code>.</p></dd>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Default: percent = TRUE, rel_zero = "omit"</span></span></span>
 <span class="r-in"><span><span class="fu">calc_metrics</span><span class="op">(</span><span class="va">y</span>, <span class="va">y_pred</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        RMSE       MAE     RMSRE       MARE MedBias  MedRelBias Median        CV</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.9165151 0.8666667 0.0993575 0.09722222    -0.4 -0.06666667     10 0.5321906</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        RMSE       MAE     RMSRE MedAbsRelBias       MARE MedBias  MedRelBias</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.9165151 0.8666667 0.0993575           0.1 0.09722222    -0.4 -0.06666667</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Median        CV</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1     10 0.5321906</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Use proportions (not %) and guard zeros with epsilon</span></span></span>
 <span class="r-in"><span><span class="fu">calc_metrics</span><span class="op">(</span><span class="va">y</span>, <span class="va">y_pred</span>, percent <span class="op">=</span> <span class="cn">FALSE</span>, rel_zero <span class="op">=</span> <span class="st">"epsilon"</span>, epsilon <span class="op">=</span> <span class="fl">1e-6</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        RMSE       MAE    RMSRE     MARE MedBias MedRelBias Median        CV</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.9165151 0.8666667 81649.66 33333.41    -0.4 0.01666666     10 0.5321906</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        RMSE       MAE    RMSRE MedAbsRelBias     MARE MedBias MedRelBias Median</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.9165151 0.8666667 81649.66     0.1055555 33333.41    -0.4 0.01666666     10</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>          CV</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.5321906</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># No guarding (may produce Inf/NaN if y contains zeros)</span></span></span>
 <span class="r-in"><span><span class="fu">calc_metrics</span><span class="op">(</span><span class="va">y</span>, <span class="va">y_pred</span>, rel_zero <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        RMSE       MAE     RMSRE       MARE MedBias  MedRelBias Median        CV</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.9165151 0.8666667 0.0993575 0.09722222    -0.4 -0.06666667     10 0.5321906</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        RMSE       MAE     RMSRE MedAbsRelBias       MARE MedBias  MedRelBias</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.9165151 0.8666667 0.0993575           0.1 0.09722222    -0.4 -0.06666667</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Median        CV</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1     10 0.5321906</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
