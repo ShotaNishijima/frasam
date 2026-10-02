@@ -248,9 +248,22 @@ sam <- function(dat,
       }
     }
 
+    # obs <- suppressWarnings(
+    #   cbind(expand.grid(as.numeric(rownames(caa)),as.numeric(colnames(caa))),1,unlist(caa))[,c(2,3,1,4)]
+    # )
+
+    # rownames(caa)が1歳始まりの時に動かなくなるので修正
     obs <- suppressWarnings(
-      cbind(expand.grid(as.numeric(rownames(caa)),as.numeric(colnames(caa))),1,unlist(caa))[,c(2,3,1,4)]
+      cbind(
+        expand.grid(
+          seq_len(nrow(caa)) - 1L,
+          as.numeric(colnames(caa))
+        ),
+        1,
+        unlist(caa)
+      )[, c(2, 3, 1, 4)]
     )
+
     obs <- cbind(obs,obs[,3])
 
     nindex <- nrow(index)
