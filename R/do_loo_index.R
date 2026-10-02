@@ -13,8 +13,12 @@ do_loo_index = function(samres) {
 
   RES = lapply(1:nindex,function(j) {
     input$dat$index <- res$input$dat$index[-j,]
-    input$a.init <- as.numeric(res$rec.par["a"])
+    if(!is.null(res$rec.par["a"])) {
+      input$a.init <- as.numeric(res$rec.par["a"])
+    }
+    if(!is.null(res$rec.par["b"]) && !is.na(res$rec.par["b"])) {
     input$b.init <- as.numeric(res$rec.par["b"])
+    }
     input$q.init <- res$q[-j]
     input$abund <- res$input$abund[-j]
     input$min.age <- res$input$min.age[-j]
@@ -25,7 +29,8 @@ do_loo_index = function(samres) {
     if(!is.null(res$input$catch_prop)) input$catch_prop <- res$input$catch_prop[,,-j]
 
     input$no_est <- TRUE
-    tmp = do.call(sam,input)
+    tmp = try(do.call(sam,input), silent = TRUE)
+    if (inherits(tmp, "try-error")) return(tmp)
 
     p0_list <- tmp$obj$env$parList()
     p0_list$U <- res$obj$env$parList()[["U"]]
@@ -35,7 +40,7 @@ do_loo_index = function(samres) {
     input$no_est <- FALSE
     input$p0.list <- p0_list
 
-    res.c = do.call(sam,input)
+    res.c = try(do.call(sam,input), silent = TRUE)
     return( res.c )
   })
   return( RES )

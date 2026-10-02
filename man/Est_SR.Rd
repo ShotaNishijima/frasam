@@ -47,7 +47,7 @@ Est_SR(
 \item{Fish_mort}{Fishing mortality to calculate SBR. Should be provided with a numeric value.}
 }
 \value{
-Values of alpha and beta coefficients for the BH relationships or a value of SB0 for the HS relationships. 
+Values of alpha and beta coefficients for the BH relationships or a value of SB0 for the HS relationships.
 As for the BH, when h is not fixed (i.e. h_fix = T), the output from the optim() function is shown.
 }
 \description{

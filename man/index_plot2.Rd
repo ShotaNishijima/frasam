@@ -7,6 +7,7 @@
 index_plot2(
   samres,
   index_name = NULL,
+  nrow = 2,
   scales = c("free", "free_x", "free"),
   base_size = 14
 )

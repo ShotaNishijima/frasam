@@ -1,0 +1,8 @@
+body { max-width: 1000px; }   /* 好みの幅に */
+img, .figure img { max-width: 100%; height: auto; }
+
+/* Keep all TOC levels visible, including when the pointer is outside the TOC. */
+#TOC ul,
+#TOC ul ul {
+  display: block !important;
+}
