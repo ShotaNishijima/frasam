@@ -98,7 +98,7 @@ sam(
 - abund:
 
   Indexの種類。用いるIndexの長さのベクトル。"B":
-  資源量、"SSB"：親魚資源量、"N"：尾数、"Bs"：資源量×fleetごとの選択率、"Bf"：資源量×選択率．合計する年齢の幅については`min.age`と`max.age`
+  資源量、"SSB"：親魚資源量、"N"：尾数、"Bs"：資源量×全体のFから計算した選択率、"Bf"：資源量×指標ごとの選択率（Fを`catch_prop`で調整）。合計する年齢の幅については`min.age`と`max.age`。オメガ法との対応はDetailsを参照。
 
 - rec.age:
 
@@ -244,7 +244,7 @@ sam(
 
 - sel.def:
 
-  選択率の定義。"max"（デフォルト）の場合、最大年齢を１とする。
+  選択率の定義。"max"（デフォルト）は最大値で、"mean"は全年齢の平均値で、"maxage"は最高年齢の値でFを割る。"Bf"では`F * catch_prop`を同様に正規化する。
 
 - use.index:
 
@@ -354,7 +354,12 @@ sam(
 
 - catch_prop:
 
-  abund="Bs"のとき、対象とするfleetのcatch at ageの全体に対する比率.
+  `abund = "Bf"`のときにFに掛ける年齢・年・指標別の重み。
+  通常は対象fleetのcatch at
+  ageの全体に対する比率。オメガ法ではomegaを指定できる。
+  次元は`c(nrow(dat$waa), ncol(dat$waa), nrow(dat$index) + 1)`で、
+  第3次元の1番目は漁獲データ、`i + 1`番目は`i`番目のIndexに対応する。
+  `NULL`の場合はすべて1。
 
 - no_est:
 
@@ -376,3 +381,24 @@ sam(
 - varNfix:
 
   ??
+
+## Details
+
+`abund = "Bf"`は、`catch_prop`の対象Indexのスライスにomegaを指定し、
+`sel.def = "mean"`とすることで、`frasyr::vpa(abund = "Bo")`
+と実質的に同じ指標への当てはめ方に対応する。
+VPAの"Bo"は`F * omega`を年ごとに合計が1となるよう正規化する。
+SAMの"Bf"で平均値による正規化を使うと、その重みはVPAの年齢区分数倍となる。
+年齢区分数が一定でqを推定する場合、この定数倍はqに吸収される
+（資源量のスケーリングもqに影響する）。VPAとSAMの推定結果自体が一致するという意味ではない。
+同じN、F、体重、omega、対象年齢を用いた場合、SAMとVPAのscaleをそれぞれ
+`scale_sam`、`scale_vpa`、全年齢区分数を`K`とすると、
+`A_Bf = (K * scale_vpa / scale_sam) * A_Bo`となる。
+指標の関係が`I = q * A^b`の場合、Boの尺度への換算は
+`q_on_Bo_scale = q_Bf * (K * scale_vpa / scale_sam)^b`。
+同じscaleで`b = 1`なら`q_on_Bo_scale = K * q_Bf`となる。
+omega全体の定数倍は選択率の正規化で打ち消されるため、omegaを割るだけではqの尺度は揃わない。
+この換算は正規化・単位の違いを補正するもので、別々に推定したVPAとSAMのqの一致を保証しない。
+`sel.def = "max"`では正規化の比率が年ごとに変わり得るため、
+一定のqで吸収できるとは限らない。`sel.def`は他の"Bs"・"Bf"にも共通して適用される。
+詳細は[FAQのオメガ法の項目](https://shotanishijima.github.io/frasam/articles/FAQ.html#omega-method)を参照。

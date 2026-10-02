@@ -15,7 +15,8 @@ check_fit_sam(
   rho_range = c(1e-04, 1 - 1e-04),
   par_abs_max = Inf,
   boundary_tol = 1e-04,
-  verbose = TRUE
+  verbose = TRUE,
+  require_optimizer_convergence = FALSE
 )
 ```
 
@@ -56,6 +57,20 @@ check_fit_sam(
 
   If `TRUE`, print the diagnostic table.
 
+- require_optimizer_convergence:
+
+  If `TRUE`, require optimizer convergence code 0 for the overall
+  result. By default, the code and stopping message are reported but do
+  not determine `ok`.
+
 ## Value
 
 A list with `ok`, `checks`, `fixed`, `sigma`, and `boundary` elements.
+
+## Details
+
+The `required` column in `checks` identifies diagnostics used in the
+overall result. A nonzero optimizer code warrants inspection of the
+stopping message and stability after restarting, even if the remaining
+diagnostics pass. Passing diagnostics does not guarantee a global
+optimum.

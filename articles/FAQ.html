@@ -246,18 +246,18 @@
 なら、基本的な診断項目はすべて通っています。</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fit_check</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/check_fit_sam.html">check_fit_sam</a></span><span class="op">(</span><span class="va">res_rw</span><span class="op">)</span></span>
-<span><span class="co">#&gt;                          check    ok              value       threshold</span></span>
-<span><span class="co">#&gt;          optimizer convergence  TRUE                  0               0</span></span>
-<span><span class="co">#&gt;      positive definite Hessian  TRUE               TRUE            TRUE</span></span>
-<span><span class="co">#&gt;  maximum fixed-effect gradient  TRUE          0.0001152            0.01</span></span>
-<span><span class="co">#&gt;    finite fixed effects and SE  TRUE              18/18             all</span></span>
-<span><span class="co">#&gt;        maximum fixed-effect SE  TRUE              55.08             Inf</span></span>
-<span><span class="co">#&gt;  maximum absolute fixed effect  TRUE              10.64             Inf</span></span>
-<span><span class="co">#&gt;           reported sigma range FALSE 2.388e-05 to 1.373     1e-04 to 10</span></span>
-<span><span class="co">#&gt;             reported rho range  TRUE   0.9796 to 0.9796 1e-04 to 0.9999</span></span>
-<span><span class="co">#&gt;  parameters near finite bounds  TRUE                  0               0</span></span>
+<span><span class="co">#&gt;                          check    ok             value       threshold</span></span>
+<span><span class="co">#&gt;          optimizer convergence FALSE                 1               0</span></span>
+<span><span class="co">#&gt;      positive definite Hessian  TRUE              TRUE            TRUE</span></span>
+<span><span class="co">#&gt;  maximum fixed-effect gradient  TRUE         0.0002187            0.01</span></span>
+<span><span class="co">#&gt;    finite fixed effects and SE  TRUE             18/18             all</span></span>
+<span><span class="co">#&gt;        maximum fixed-effect SE  TRUE             22.54             Inf</span></span>
+<span><span class="co">#&gt;  maximum absolute fixed effect  TRUE             11.26             Inf</span></span>
+<span><span class="co">#&gt;           reported sigma range FALSE 1.29e-05 to 1.373     1e-04 to 10</span></span>
+<span><span class="co">#&gt;             reported rho range  TRUE  0.9796 to 0.9796 1e-04 to 0.9999</span></span>
+<span><span class="co">#&gt;  parameters near finite bounds  TRUE                 0               0</span></span>
 <span><span class="co">#&gt;                                                                         message</span></span>
-<span><span class="co">#&gt;                                                   nlminb convergence code is 0.</span></span>
+<span><span class="co">#&gt;                                                           false convergence (8)</span></span>
 <span><span class="co">#&gt;                                                 sdreport reports pdHess = TRUE.</span></span>
 <span><span class="co">#&gt;                                         Maximum absolute fixed-effect gradient.</span></span>
 <span><span class="co">#&gt;                    Fixed-effect estimates and standard errors should be finite.</span></span>
@@ -266,22 +266,32 @@
 <span><span class="co">#&gt;  Reported standard deviations should be finite and within the diagnostic range.</span></span>
 <span><span class="co">#&gt;                 Rho values very close to 0 or 1 can indicate boundary behavior.</span></span>
 <span><span class="co">#&gt;                   Only checked when finite lower or upper bounds were supplied.</span></span>
+<span><span class="co">#&gt;  required</span></span>
+<span><span class="co">#&gt;     FALSE</span></span>
+<span><span class="co">#&gt;      TRUE</span></span>
+<span><span class="co">#&gt;      TRUE</span></span>
+<span><span class="co">#&gt;      TRUE</span></span>
+<span><span class="co">#&gt;      TRUE</span></span>
+<span><span class="co">#&gt;      TRUE</span></span>
+<span><span class="co">#&gt;      TRUE</span></span>
+<span><span class="co">#&gt;      TRUE</span></span>
+<span><span class="co">#&gt;      TRUE</span></span>
 <span></span>
 <span><span class="va">fit_check</span><span class="op">$</span><span class="va">ok</span></span>
 <span><span class="co">#&gt; [1] FALSE</span></span>
 <span><span class="va">fit_check</span><span class="op">$</span><span class="va">checks</span></span>
-<span><span class="co">#&gt;                           check    ok              value       threshold</span></span>
-<span><span class="co">#&gt; 1         optimizer convergence  TRUE                  0               0</span></span>
-<span><span class="co">#&gt; 2     positive definite Hessian  TRUE               TRUE            TRUE</span></span>
-<span><span class="co">#&gt; 3 maximum fixed-effect gradient  TRUE          0.0001152            0.01</span></span>
-<span><span class="co">#&gt; 4   finite fixed effects and SE  TRUE              18/18             all</span></span>
-<span><span class="co">#&gt; 5       maximum fixed-effect SE  TRUE              55.08             Inf</span></span>
-<span><span class="co">#&gt; 6 maximum absolute fixed effect  TRUE              10.64             Inf</span></span>
-<span><span class="co">#&gt; 7          reported sigma range FALSE 2.388e-05 to 1.373     1e-04 to 10</span></span>
-<span><span class="co">#&gt; 8            reported rho range  TRUE   0.9796 to 0.9796 1e-04 to 0.9999</span></span>
-<span><span class="co">#&gt; 9 parameters near finite bounds  TRUE                  0               0</span></span>
+<span><span class="co">#&gt;                           check    ok             value       threshold</span></span>
+<span><span class="co">#&gt; 1         optimizer convergence FALSE                 1               0</span></span>
+<span><span class="co">#&gt; 2     positive definite Hessian  TRUE              TRUE            TRUE</span></span>
+<span><span class="co">#&gt; 3 maximum fixed-effect gradient  TRUE         0.0002187            0.01</span></span>
+<span><span class="co">#&gt; 4   finite fixed effects and SE  TRUE             18/18             all</span></span>
+<span><span class="co">#&gt; 5       maximum fixed-effect SE  TRUE             22.54             Inf</span></span>
+<span><span class="co">#&gt; 6 maximum absolute fixed effect  TRUE             11.26             Inf</span></span>
+<span><span class="co">#&gt; 7          reported sigma range FALSE 1.29e-05 to 1.373     1e-04 to 10</span></span>
+<span><span class="co">#&gt; 8            reported rho range  TRUE  0.9796 to 0.9796 1e-04 to 0.9999</span></span>
+<span><span class="co">#&gt; 9 parameters near finite bounds  TRUE                 0               0</span></span>
 <span><span class="co">#&gt;                                                                          message</span></span>
-<span><span class="co">#&gt; 1                                                  nlminb convergence code is 0.</span></span>
+<span><span class="co">#&gt; 1                                                          false convergence (8)</span></span>
 <span><span class="co">#&gt; 2                                                sdreport reports pdHess = TRUE.</span></span>
 <span><span class="co">#&gt; 3                                        Maximum absolute fixed-effect gradient.</span></span>
 <span><span class="co">#&gt; 4                   Fixed-effect estimates and standard errors should be finite.</span></span>
@@ -289,7 +299,17 @@
 <span><span class="co">#&gt; 6     Extremely large internal-scale estimates can indicate weak identification.</span></span>
 <span><span class="co">#&gt; 7 Reported standard deviations should be finite and within the diagnostic range.</span></span>
 <span><span class="co">#&gt; 8                Rho values very close to 0 or 1 can indicate boundary behavior.</span></span>
-<span><span class="co">#&gt; 9                  Only checked when finite lower or upper bounds were supplied.</span></span></code></pre></div>
+<span><span class="co">#&gt; 9                  Only checked when finite lower or upper bounds were supplied.</span></span>
+<span><span class="co">#&gt;   required</span></span>
+<span><span class="co">#&gt; 1    FALSE</span></span>
+<span><span class="co">#&gt; 2     TRUE</span></span>
+<span><span class="co">#&gt; 3     TRUE</span></span>
+<span><span class="co">#&gt; 4     TRUE</span></span>
+<span><span class="co">#&gt; 5     TRUE</span></span>
+<span><span class="co">#&gt; 6     TRUE</span></span>
+<span><span class="co">#&gt; 7     TRUE</span></span>
+<span><span class="co">#&gt; 8     TRUE</span></span>
+<span><span class="co">#&gt; 9     TRUE</span></span></code></pre></div>
 <p><code>verbose = FALSE</code>
 を指定すると、実行時に表を表示せず、結果だけをオブジェクトとして保存できます。
 複数のモデルを比較するときは、<code>ok</code> や <code>checks</code>
@@ -315,53 +335,57 @@
 <span>    <span class="st">"reported sigma range"</span></span>
 <span>  <span class="op">)</span>,</span>
 <span><span class="op">]</span></span>
-<span><span class="co">#&gt;                           check    ok              value   threshold</span></span>
-<span><span class="co">#&gt; 2     positive definite Hessian  TRUE               TRUE        TRUE</span></span>
-<span><span class="co">#&gt; 3 maximum fixed-effect gradient  TRUE          0.0001152        0.01</span></span>
-<span><span class="co">#&gt; 7          reported sigma range FALSE 2.388e-05 to 1.373 1e-04 to 10</span></span>
+<span><span class="co">#&gt;                           check    ok             value   threshold</span></span>
+<span><span class="co">#&gt; 2     positive definite Hessian  TRUE              TRUE        TRUE</span></span>
+<span><span class="co">#&gt; 3 maximum fixed-effect gradient  TRUE         0.0002187        0.01</span></span>
+<span><span class="co">#&gt; 7          reported sigma range FALSE 1.29e-05 to 1.373 1e-04 to 10</span></span>
 <span><span class="co">#&gt;                                                                          message</span></span>
 <span><span class="co">#&gt; 2                                                sdreport reports pdHess = TRUE.</span></span>
 <span><span class="co">#&gt; 3                                        Maximum absolute fixed-effect gradient.</span></span>
-<span><span class="co">#&gt; 7 Reported standard deviations should be finite and within the diagnostic range.</span></span></code></pre></div>
+<span><span class="co">#&gt; 7 Reported standard deviations should be finite and within the diagnostic range.</span></span>
+<span><span class="co">#&gt;   required</span></span>
+<span><span class="co">#&gt; 2     TRUE</span></span>
+<span><span class="co">#&gt; 3     TRUE</span></span>
+<span><span class="co">#&gt; 7     TRUE</span></span></code></pre></div>
 <p><code>fixed</code>
 には固定効果パラメータごとの推定値、標準誤差、勾配が入っています。
 標準誤差が大きいパラメータや、勾配が大きいパラメータを確認したいときに使います。</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">fit_check</span><span class="op">$</span><span class="va">fixed</span><span class="op">)</span></span>
 <span><span class="co">#&gt;           name   estimate         se      gradient</span></span>
-<span><span class="co">#&gt; 1         logQ -5.3393484 0.17713132 -5.160339e-05</span></span>
-<span><span class="co">#&gt; 2         logQ -4.7404517 0.21984731 -3.679972e-05</span></span>
-<span><span class="co">#&gt; 3         logQ -5.5526325 0.08309938  8.663253e-06</span></span>
-<span><span class="co">#&gt; 4         logQ  0.3089114 0.06075828  2.215296e-08</span></span>
-<span><span class="co">#&gt; 5         logQ -4.0119935 0.11963119  6.903226e-06</span></span>
-<span><span class="co">#&gt; 6 logSdLogFsta -0.4669707 0.16208903 -4.387291e-06</span></span>
+<span><span class="co">#&gt; 1         logQ -5.3393491 0.17720032 -8.328050e-05</span></span>
+<span><span class="co">#&gt; 2         logQ -4.7404460 0.21985575  8.031707e-05</span></span>
+<span><span class="co">#&gt; 3         logQ -5.5526334 0.08310066 -1.600140e-04</span></span>
+<span><span class="co">#&gt; 4         logQ  0.3089121 0.06075912  1.730827e-04</span></span>
+<span><span class="co">#&gt; 5         logQ -4.0119932 0.11963210  9.267032e-06</span></span>
+<span><span class="co">#&gt; 6 logSdLogFsta -0.4669744 0.16208696 -1.857439e-04</span></span>
 <span></span>
 <span><span class="va">fit_check</span><span class="op">$</span><span class="va">fixed</span><span class="op">[</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/order.html" class="external-link">order</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">fit_check</span><span class="op">$</span><span class="va">fixed</span><span class="op">$</span><span class="va">gradient</span><span class="op">)</span>, decreasing <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
 <span><span class="op">]</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>, <span class="op">]</span></span>
-<span><span class="co">#&gt;            name   estimate        se      gradient</span></span>
-<span><span class="co">#&gt; 7  logSdLogFsta -1.1622797 0.1567145 -1.151927e-04</span></span>
-<span><span class="co">#&gt; 11  logSdLogObs -1.3083824 0.1096391 -1.085972e-04</span></span>
-<span><span class="co">#&gt; 15  logSdLogObs -0.7159731 0.1236300  1.011676e-04</span></span>
-<span><span class="co">#&gt; 10  logSdLogObs -0.5883400 0.1054278 -8.352417e-05</span></span>
-<span><span class="co">#&gt; 1          logQ -5.3393484 0.1771313 -5.160339e-05</span></span></code></pre></div>
+<span><span class="co">#&gt;            name    estimate         se      gradient</span></span>
+<span><span class="co">#&gt; 10  logSdLogObs -0.58834092 0.10542818 -0.0002187308</span></span>
+<span><span class="co">#&gt; 6  logSdLogFsta -0.46697441 0.16208696 -0.0001857439</span></span>
+<span><span class="co">#&gt; 4          logQ  0.30891205 0.06075912  0.0001730827</span></span>
+<span><span class="co">#&gt; 13  logSdLogObs  0.09393416 0.11460023 -0.0001727920</span></span>
+<span><span class="co">#&gt; 3          logQ -5.55263339 0.08310066 -0.0001600140</span></span></code></pre></div>
 <p>診断のしきい値は引数で変更できます。
 例えば、勾配をより厳しく見る場合は <code>gradient_tol</code>
 を小さくします。</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/check_fit_sam.html">check_fit_sam</a></span><span class="op">(</span><span class="va">res_rw</span>, gradient_tol <span class="op">=</span> <span class="fl">1e-4</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">$</span><span class="va">checks</span></span>
-<span><span class="co">#&gt;                           check    ok              value       threshold</span></span>
-<span><span class="co">#&gt; 1         optimizer convergence  TRUE                  0               0</span></span>
-<span><span class="co">#&gt; 2     positive definite Hessian  TRUE               TRUE            TRUE</span></span>
-<span><span class="co">#&gt; 3 maximum fixed-effect gradient FALSE          0.0001152           1e-04</span></span>
-<span><span class="co">#&gt; 4   finite fixed effects and SE  TRUE              18/18             all</span></span>
-<span><span class="co">#&gt; 5       maximum fixed-effect SE  TRUE              55.08             Inf</span></span>
-<span><span class="co">#&gt; 6 maximum absolute fixed effect  TRUE              10.64             Inf</span></span>
-<span><span class="co">#&gt; 7          reported sigma range FALSE 2.388e-05 to 1.373     1e-04 to 10</span></span>
-<span><span class="co">#&gt; 8            reported rho range  TRUE   0.9796 to 0.9796 1e-04 to 0.9999</span></span>
-<span><span class="co">#&gt; 9 parameters near finite bounds  TRUE                  0               0</span></span>
+<span><span class="co">#&gt;                           check    ok             value       threshold</span></span>
+<span><span class="co">#&gt; 1         optimizer convergence FALSE                 1               0</span></span>
+<span><span class="co">#&gt; 2     positive definite Hessian  TRUE              TRUE            TRUE</span></span>
+<span><span class="co">#&gt; 3 maximum fixed-effect gradient FALSE         0.0002187           1e-04</span></span>
+<span><span class="co">#&gt; 4   finite fixed effects and SE  TRUE             18/18             all</span></span>
+<span><span class="co">#&gt; 5       maximum fixed-effect SE  TRUE             22.54             Inf</span></span>
+<span><span class="co">#&gt; 6 maximum absolute fixed effect  TRUE             11.26             Inf</span></span>
+<span><span class="co">#&gt; 7          reported sigma range FALSE 1.29e-05 to 1.373     1e-04 to 10</span></span>
+<span><span class="co">#&gt; 8            reported rho range  TRUE  0.9796 to 0.9796 1e-04 to 0.9999</span></span>
+<span><span class="co">#&gt; 9 parameters near finite bounds  TRUE                 0               0</span></span>
 <span><span class="co">#&gt;                                                                          message</span></span>
-<span><span class="co">#&gt; 1                                                  nlminb convergence code is 0.</span></span>
+<span><span class="co">#&gt; 1                                                          false convergence (8)</span></span>
 <span><span class="co">#&gt; 2                                                sdreport reports pdHess = TRUE.</span></span>
 <span><span class="co">#&gt; 3                                        Maximum absolute fixed-effect gradient.</span></span>
 <span><span class="co">#&gt; 4                   Fixed-effect estimates and standard errors should be finite.</span></span>
@@ -369,48 +393,58 @@
 <span><span class="co">#&gt; 6     Extremely large internal-scale estimates can indicate weak identification.</span></span>
 <span><span class="co">#&gt; 7 Reported standard deviations should be finite and within the diagnostic range.</span></span>
 <span><span class="co">#&gt; 8                Rho values very close to 0 or 1 can indicate boundary behavior.</span></span>
-<span><span class="co">#&gt; 9                  Only checked when finite lower or upper bounds were supplied.</span></span></code></pre></div>
+<span><span class="co">#&gt; 9                  Only checked when finite lower or upper bounds were supplied.</span></span>
+<span><span class="co">#&gt;   required</span></span>
+<span><span class="co">#&gt; 1    FALSE</span></span>
+<span><span class="co">#&gt; 2     TRUE</span></span>
+<span><span class="co">#&gt; 3     TRUE</span></span>
+<span><span class="co">#&gt; 4     TRUE</span></span>
+<span><span class="co">#&gt; 5     TRUE</span></span>
+<span><span class="co">#&gt; 6     TRUE</span></span>
+<span><span class="co">#&gt; 7     TRUE</span></span>
+<span><span class="co">#&gt; 8     TRUE</span></span>
+<span><span class="co">#&gt; 9     TRUE</span></span></code></pre></div>
 <p><code>reported sigma range</code> が <code>FALSE</code>
 になった場合は、<code>sigma</code> テーブルを見ると、どの種類・何番目の
 sigma がしきい値の外にあるかを確認できます。</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fit_check</span><span class="op">$</span><span class="va">sigma</span></span>
 <span><span class="co">#&gt;             type index        value    ok   problem</span></span>
-<span><span class="co">#&gt; 1          sigma     1 1.098490e+00  TRUE          </span></span>
-<span><span class="co">#&gt; 2          sigma     2 1.372971e+00  TRUE          </span></span>
-<span><span class="co">#&gt; 3          sigma     3 4.887163e-01  TRUE          </span></span>
-<span><span class="co">#&gt; 4          sigma     4 3.385311e-01  TRUE          </span></span>
-<span><span class="co">#&gt; 5          sigma     5 7.328954e-01  TRUE          </span></span>
-<span><span class="co">#&gt; 6     sigma.logC     1 5.552483e-01  TRUE          </span></span>
-<span><span class="co">#&gt; 7     sigma.logC     2 5.552483e-01  TRUE          </span></span>
-<span><span class="co">#&gt; 8     sigma.logC     3 2.702569e-01  TRUE          </span></span>
-<span><span class="co">#&gt; 9     sigma.logC     4 2.702569e-01  TRUE          </span></span>
-<span><span class="co">#&gt; 10    sigma.logC     5 2.702569e-01  TRUE          </span></span>
-<span><span class="co">#&gt; 11    sigma.logC     6 4.575532e-01  TRUE          </span></span>
-<span><span class="co">#&gt; 12    sigma.logC     7 4.575532e-01  TRUE          </span></span>
-<span><span class="co">#&gt; 13 sigma.logFsta     1 6.268985e-01  TRUE          </span></span>
-<span><span class="co">#&gt; 14 sigma.logFsta     2 6.268985e-01  TRUE          </span></span>
-<span><span class="co">#&gt; 15 sigma.logFsta     3 3.127723e-01  TRUE          </span></span>
-<span><span class="co">#&gt; 16 sigma.logFsta     4 3.127723e-01  TRUE          </span></span>
-<span><span class="co">#&gt; 17 sigma.logFsta     5 3.127723e-01  TRUE          </span></span>
-<span><span class="co">#&gt; 18 sigma.logFsta     6 3.127723e-01  TRUE          </span></span>
-<span><span class="co">#&gt; 19 sigma.logFsta     7 3.127723e-01  TRUE          </span></span>
-<span><span class="co">#&gt; 20    sigma.logN     1 6.279345e-01  TRUE          </span></span>
-<span><span class="co">#&gt; 21    sigma.logN     2 2.388496e-05 FALSE too small</span></span>
-<span><span class="co">#&gt; 22    sigma.logN     3 2.388496e-05 FALSE too small</span></span>
-<span><span class="co">#&gt; 23    sigma.logN     4 2.388496e-05 FALSE too small</span></span>
-<span><span class="co">#&gt; 24    sigma.logN     5 2.388496e-05 FALSE too small</span></span>
-<span><span class="co">#&gt; 25    sigma.logN     6 2.388496e-05 FALSE too small</span></span>
-<span><span class="co">#&gt; 26    sigma.logN     7 2.388496e-05 FALSE too small</span></span>
+<span><span class="co">#&gt; 1          sigma     1 1.098487e+00  TRUE          </span></span>
+<span><span class="co">#&gt; 2          sigma     2 1.372972e+00  TRUE          </span></span>
+<span><span class="co">#&gt; 3          sigma     3 4.887162e-01  TRUE          </span></span>
+<span><span class="co">#&gt; 4          sigma     4 3.385304e-01  TRUE          </span></span>
+<span><span class="co">#&gt; 5          sigma     5 7.328961e-01  TRUE          </span></span>
+<span><span class="co">#&gt; 6     sigma.logC     1 5.552477e-01  TRUE          </span></span>
+<span><span class="co">#&gt; 7     sigma.logC     2 5.552477e-01  TRUE          </span></span>
+<span><span class="co">#&gt; 8     sigma.logC     3 2.702573e-01  TRUE          </span></span>
+<span><span class="co">#&gt; 9     sigma.logC     4 2.702573e-01  TRUE          </span></span>
+<span><span class="co">#&gt; 10    sigma.logC     5 2.702573e-01  TRUE          </span></span>
+<span><span class="co">#&gt; 11    sigma.logC     6 4.575533e-01  TRUE          </span></span>
+<span><span class="co">#&gt; 12    sigma.logC     7 4.575533e-01  TRUE          </span></span>
+<span><span class="co">#&gt; 13 sigma.logFsta     1 6.268961e-01  TRUE          </span></span>
+<span><span class="co">#&gt; 14 sigma.logFsta     2 6.268961e-01  TRUE          </span></span>
+<span><span class="co">#&gt; 15 sigma.logFsta     3 3.127718e-01  TRUE          </span></span>
+<span><span class="co">#&gt; 16 sigma.logFsta     4 3.127718e-01  TRUE          </span></span>
+<span><span class="co">#&gt; 17 sigma.logFsta     5 3.127718e-01  TRUE          </span></span>
+<span><span class="co">#&gt; 18 sigma.logFsta     6 3.127718e-01  TRUE          </span></span>
+<span><span class="co">#&gt; 19 sigma.logFsta     7 3.127718e-01  TRUE          </span></span>
+<span><span class="co">#&gt; 20    sigma.logN     1 6.279338e-01  TRUE          </span></span>
+<span><span class="co">#&gt; 21    sigma.logN     2 1.289816e-05 FALSE too small</span></span>
+<span><span class="co">#&gt; 22    sigma.logN     3 1.289816e-05 FALSE too small</span></span>
+<span><span class="co">#&gt; 23    sigma.logN     4 1.289816e-05 FALSE too small</span></span>
+<span><span class="co">#&gt; 24    sigma.logN     5 1.289816e-05 FALSE too small</span></span>
+<span><span class="co">#&gt; 25    sigma.logN     6 1.289816e-05 FALSE too small</span></span>
+<span><span class="co">#&gt; 26    sigma.logN     7 1.289816e-05 FALSE too small</span></span>
 <span></span>
 <span><span class="va">fit_check</span><span class="op">$</span><span class="va">sigma</span><span class="op">[</span><span class="op">!</span><span class="va">fit_check</span><span class="op">$</span><span class="va">sigma</span><span class="op">$</span><span class="va">ok</span>, <span class="op">]</span></span>
 <span><span class="co">#&gt;          type index        value    ok   problem</span></span>
-<span><span class="co">#&gt; 21 sigma.logN     2 2.388496e-05 FALSE too small</span></span>
-<span><span class="co">#&gt; 22 sigma.logN     3 2.388496e-05 FALSE too small</span></span>
-<span><span class="co">#&gt; 23 sigma.logN     4 2.388496e-05 FALSE too small</span></span>
-<span><span class="co">#&gt; 24 sigma.logN     5 2.388496e-05 FALSE too small</span></span>
-<span><span class="co">#&gt; 25 sigma.logN     6 2.388496e-05 FALSE too small</span></span>
-<span><span class="co">#&gt; 26 sigma.logN     7 2.388496e-05 FALSE too small</span></span></code></pre></div>
+<span><span class="co">#&gt; 21 sigma.logN     2 1.289816e-05 FALSE too small</span></span>
+<span><span class="co">#&gt; 22 sigma.logN     3 1.289816e-05 FALSE too small</span></span>
+<span><span class="co">#&gt; 23 sigma.logN     4 1.289816e-05 FALSE too small</span></span>
+<span><span class="co">#&gt; 24 sigma.logN     5 1.289816e-05 FALSE too small</span></span>
+<span><span class="co">#&gt; 25 sigma.logN     6 1.289816e-05 FALSE too small</span></span>
+<span><span class="co">#&gt; 26 sigma.logN     7 1.289816e-05 FALSE too small</span></span></code></pre></div>
 <p>しきい値を変えて確認したい場合は、<code>sigma_range</code>
 を指定します。
 例えば、以下では説明用にかなり狭い範囲を指定しています。</p>
@@ -424,33 +458,35 @@ sigma がしきい値の外にあるかを確認できます。</p>
 <span><span class="va">fit_check_strict_sigma</span><span class="op">$</span><span class="va">checks</span><span class="op">[</span></span>
 <span>  <span class="va">fit_check_strict_sigma</span><span class="op">$</span><span class="va">checks</span><span class="op">$</span><span class="va">check</span> <span class="op">==</span> <span class="st">"reported sigma range"</span>,</span>
 <span><span class="op">]</span></span>
-<span><span class="co">#&gt;                  check    ok              value threshold</span></span>
-<span><span class="co">#&gt; 7 reported sigma range FALSE 2.388e-05 to 1.373  0.5 to 1</span></span>
+<span><span class="co">#&gt;                  check    ok             value threshold</span></span>
+<span><span class="co">#&gt; 7 reported sigma range FALSE 1.29e-05 to 1.373  0.5 to 1</span></span>
 <span><span class="co">#&gt;                                                                          message</span></span>
 <span><span class="co">#&gt; 7 Reported standard deviations should be finite and within the diagnostic range.</span></span>
+<span><span class="co">#&gt;   required</span></span>
+<span><span class="co">#&gt; 7     TRUE</span></span>
 <span></span>
 <span><span class="va">fit_check_strict_sigma</span><span class="op">$</span><span class="va">sigma</span><span class="op">[</span><span class="op">!</span><span class="va">fit_check_strict_sigma</span><span class="op">$</span><span class="va">sigma</span><span class="op">$</span><span class="va">ok</span>, <span class="op">]</span></span>
 <span><span class="co">#&gt;             type index        value    ok   problem</span></span>
-<span><span class="co">#&gt; 1          sigma     1 1.098490e+00 FALSE too large</span></span>
-<span><span class="co">#&gt; 2          sigma     2 1.372971e+00 FALSE too large</span></span>
-<span><span class="co">#&gt; 3          sigma     3 4.887163e-01 FALSE too small</span></span>
-<span><span class="co">#&gt; 4          sigma     4 3.385311e-01 FALSE too small</span></span>
-<span><span class="co">#&gt; 8     sigma.logC     3 2.702569e-01 FALSE too small</span></span>
-<span><span class="co">#&gt; 9     sigma.logC     4 2.702569e-01 FALSE too small</span></span>
-<span><span class="co">#&gt; 10    sigma.logC     5 2.702569e-01 FALSE too small</span></span>
-<span><span class="co">#&gt; 11    sigma.logC     6 4.575532e-01 FALSE too small</span></span>
-<span><span class="co">#&gt; 12    sigma.logC     7 4.575532e-01 FALSE too small</span></span>
-<span><span class="co">#&gt; 15 sigma.logFsta     3 3.127723e-01 FALSE too small</span></span>
-<span><span class="co">#&gt; 16 sigma.logFsta     4 3.127723e-01 FALSE too small</span></span>
-<span><span class="co">#&gt; 17 sigma.logFsta     5 3.127723e-01 FALSE too small</span></span>
-<span><span class="co">#&gt; 18 sigma.logFsta     6 3.127723e-01 FALSE too small</span></span>
-<span><span class="co">#&gt; 19 sigma.logFsta     7 3.127723e-01 FALSE too small</span></span>
-<span><span class="co">#&gt; 21    sigma.logN     2 2.388496e-05 FALSE too small</span></span>
-<span><span class="co">#&gt; 22    sigma.logN     3 2.388496e-05 FALSE too small</span></span>
-<span><span class="co">#&gt; 23    sigma.logN     4 2.388496e-05 FALSE too small</span></span>
-<span><span class="co">#&gt; 24    sigma.logN     5 2.388496e-05 FALSE too small</span></span>
-<span><span class="co">#&gt; 25    sigma.logN     6 2.388496e-05 FALSE too small</span></span>
-<span><span class="co">#&gt; 26    sigma.logN     7 2.388496e-05 FALSE too small</span></span></code></pre></div>
+<span><span class="co">#&gt; 1          sigma     1 1.098487e+00 FALSE too large</span></span>
+<span><span class="co">#&gt; 2          sigma     2 1.372972e+00 FALSE too large</span></span>
+<span><span class="co">#&gt; 3          sigma     3 4.887162e-01 FALSE too small</span></span>
+<span><span class="co">#&gt; 4          sigma     4 3.385304e-01 FALSE too small</span></span>
+<span><span class="co">#&gt; 8     sigma.logC     3 2.702573e-01 FALSE too small</span></span>
+<span><span class="co">#&gt; 9     sigma.logC     4 2.702573e-01 FALSE too small</span></span>
+<span><span class="co">#&gt; 10    sigma.logC     5 2.702573e-01 FALSE too small</span></span>
+<span><span class="co">#&gt; 11    sigma.logC     6 4.575533e-01 FALSE too small</span></span>
+<span><span class="co">#&gt; 12    sigma.logC     7 4.575533e-01 FALSE too small</span></span>
+<span><span class="co">#&gt; 15 sigma.logFsta     3 3.127718e-01 FALSE too small</span></span>
+<span><span class="co">#&gt; 16 sigma.logFsta     4 3.127718e-01 FALSE too small</span></span>
+<span><span class="co">#&gt; 17 sigma.logFsta     5 3.127718e-01 FALSE too small</span></span>
+<span><span class="co">#&gt; 18 sigma.logFsta     6 3.127718e-01 FALSE too small</span></span>
+<span><span class="co">#&gt; 19 sigma.logFsta     7 3.127718e-01 FALSE too small</span></span>
+<span><span class="co">#&gt; 21    sigma.logN     2 1.289816e-05 FALSE too small</span></span>
+<span><span class="co">#&gt; 22    sigma.logN     3 1.289816e-05 FALSE too small</span></span>
+<span><span class="co">#&gt; 23    sigma.logN     4 1.289816e-05 FALSE too small</span></span>
+<span><span class="co">#&gt; 24    sigma.logN     5 1.289816e-05 FALSE too small</span></span>
+<span><span class="co">#&gt; 25    sigma.logN     6 1.289816e-05 FALSE too small</span></span>
+<span><span class="co">#&gt; 26    sigma.logN     7 1.289816e-05 FALSE too small</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="以前の解析結果の初期値を利用したい">以前の解析結果の初期値を利用したい<a class="anchor" aria-label="anchor" href="#%E4%BB%A5%E5%89%8D%E3%81%AE%E8%A7%A3%E6%9E%90%E7%B5%90%E6%9E%9C%E3%81%AE%E5%88%9D%E6%9C%9F%E5%80%A4%E3%82%92%E5%88%A9%E7%94%A8%E3%81%97%E3%81%9F%E3%81%84"></a>
@@ -588,13 +624,13 @@ jitter する前の元の結果を表します。 <code>ID &gt; 0</code>
 <span></span>
 <span><span class="va">res_varNfix</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">sam</span>, <span class="va">input</span><span class="op">)</span></span>
 <span><span class="va">res_varNfix</span><span class="op">$</span><span class="va">sigma.logN</span> <span class="co">#1歳魚以上はSD=0.01に固定</span></span>
-<span><span class="co">#&gt; [1] 0.6276352 0.0100000 0.0100000 0.0100000 0.0100000 0.0100000 0.0100000</span></span>
+<span><span class="co">#&gt; [1] 0.6276344 0.0100000 0.0100000 0.0100000 0.0100000 0.0100000 0.0100000</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/check_fit_sam.html">check_fit_sam</a></span><span class="op">(</span><span class="va">res_varNfix</span>, verbose <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="co">#すべてOKになる</span></span>
 <span><span class="co">#&gt;                          check   ok            value       threshold</span></span>
 <span><span class="co">#&gt;          optimizer convergence TRUE                0               0</span></span>
 <span><span class="co">#&gt;      positive definite Hessian TRUE             TRUE            TRUE</span></span>
-<span><span class="co">#&gt;  maximum fixed-effect gradient TRUE        0.0004075            0.01</span></span>
+<span><span class="co">#&gt;  maximum fixed-effect gradient TRUE        0.0004307            0.01</span></span>
 <span><span class="co">#&gt;    finite fixed effects and SE TRUE            17/17             all</span></span>
 <span><span class="co">#&gt;        maximum fixed-effect SE TRUE           0.6788             Inf</span></span>
 <span><span class="co">#&gt;  maximum absolute fixed effect TRUE            5.553             Inf</span></span>
@@ -602,7 +638,7 @@ jitter する前の元の結果を表します。 <code>ID &gt; 0</code>
 <span><span class="co">#&gt;             reported rho range TRUE 0.9796 to 0.9796 1e-04 to 0.9999</span></span>
 <span><span class="co">#&gt;  parameters near finite bounds TRUE                0               0</span></span>
 <span><span class="co">#&gt;                                                                         message</span></span>
-<span><span class="co">#&gt;                                                   nlminb convergence code is 0.</span></span>
+<span><span class="co">#&gt;                                                        relative convergence (4)</span></span>
 <span><span class="co">#&gt;                                                 sdreport reports pdHess = TRUE.</span></span>
 <span><span class="co">#&gt;                                         Maximum absolute fixed-effect gradient.</span></span>
 <span><span class="co">#&gt;                    Fixed-effect estimates and standard errors should be finite.</span></span>
@@ -610,7 +646,17 @@ jitter する前の元の結果を表します。 <code>ID &gt; 0</code>
 <span><span class="co">#&gt;      Extremely large internal-scale estimates can indicate weak identification.</span></span>
 <span><span class="co">#&gt;  Reported standard deviations should be finite and within the diagnostic range.</span></span>
 <span><span class="co">#&gt;                 Rho values very close to 0 or 1 can indicate boundary behavior.</span></span>
-<span><span class="co">#&gt;                   Only checked when finite lower or upper bounds were supplied.</span></span></code></pre></div>
+<span><span class="co">#&gt;                   Only checked when finite lower or upper bounds were supplied.</span></span>
+<span><span class="co">#&gt;  required</span></span>
+<span><span class="co">#&gt;     FALSE</span></span>
+<span><span class="co">#&gt;      TRUE</span></span>
+<span><span class="co">#&gt;      TRUE</span></span>
+<span><span class="co">#&gt;      TRUE</span></span>
+<span><span class="co">#&gt;      TRUE</span></span>
+<span><span class="co">#&gt;      TRUE</span></span>
+<span><span class="co">#&gt;      TRUE</span></span>
+<span><span class="co">#&gt;      TRUE</span></span>
+<span><span class="co">#&gt;      TRUE</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="fix-SDlogC">ある固定効果パラメータをある値に固定して使いたい<a class="anchor" aria-label="anchor" href="#fix-SDlogC"></a>
@@ -652,9 +698,9 @@ ageの観測誤差とIndexの観測誤差（のSDのlog）が共にlogSdLogObs�
 <span><span class="va">idx_logC</span></span>
 <span><span class="co">#&gt; [1] 1 2 3</span></span>
 <span><span class="va">sigma_hat</span><span class="op">[</span><span class="va">idx_logC</span><span class="op">]</span></span>
-<span><span class="co">#&gt; [1] 0.5552559 0.2700807 0.4574298</span></span>
+<span><span class="co">#&gt; [1] 0.5552562 0.2700810 0.4574318</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">input</span><span class="op">$</span><span class="va">p0.list</span><span class="op">$</span><span class="va">logSdLogObs</span><span class="op">[</span><span class="va">idx_logC</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 0.5552559 0.2700807 0.4574298</span></span>
+<span><span class="co">#&gt; [1] 0.5552562 0.2700810 0.4574318</span></span>
 <span></span>
 <span><span class="co"># 例: すべてのsigma.logCを 0.2 に固定する</span></span>
 <span><span class="va">fix_pos</span> <span class="op">&lt;-</span> <span class="va">idx_logC</span><span class="op">[</span><span class="op">]</span></span>
@@ -678,7 +724,7 @@ ageの観測誤差とIndexの観測誤差（のSDのlog）が共にlogSdLogObs�
 <span><span class="co"># 固定したパラメータは opt$par には出てこない</span></span>
 <span><span class="va">res_sigma02</span><span class="op">$</span><span class="va">opt</span><span class="op">$</span><span class="va">par</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">res_sigma02</span><span class="op">$</span><span class="va">opt</span><span class="op">$</span><span class="va">par</span><span class="op">)</span> <span class="op">==</span> <span class="st">"logSdLogObs"</span><span class="op">]</span></span>
 <span><span class="co">#&gt; logSdLogObs logSdLogObs logSdLogObs logSdLogObs logSdLogObs </span></span>
-<span><span class="co">#&gt;   0.1326106   0.3298184  -0.6822933  -1.0575786  -0.2981355</span></span></code></pre></div>
+<span><span class="co">#&gt;   0.1326097   0.3298171  -0.6822938  -1.0575780  -0.2981353</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="vpaと同じような設定で解析したい">VPAと同じような設定で解析したい<a class="anchor" aria-label="anchor" href="#vpa%E3%81%A8%E5%90%8C%E3%81%98%E3%82%88%E3%81%86%E3%81%AA%E8%A8%AD%E5%AE%9A%E3%81%A7%E8%A7%A3%E6%9E%90%E3%81%97%E3%81%9F%E3%81%84"></a>
@@ -846,7 +892,7 @@ modelのほうがFや選択率がギザギザしており、SAMは平滑化さ�
 </ul>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">res_rw</span><span class="op">$</span><span class="va">sigma</span> <span class="co">#index毎に異なる</span></span>
-<span><span class="co">#&gt; [1] 1.0984901 1.3729710 0.4887163 0.3385311 0.7328954</span></span>
+<span><span class="co">#&gt; [1] 1.0984874 1.3729718 0.4887162 0.3385304 0.7328961</span></span>
 <span></span>
 <span><span class="va">input</span> <span class="op">&lt;-</span> <span class="va">res_rw</span><span class="op">$</span><span class="va">input</span></span>
 <span><span class="va">input</span><span class="op">$</span><span class="va">index.key</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">input</span><span class="op">$</span><span class="va">abund</span><span class="op">)</span><span class="op">)</span></span>
@@ -857,11 +903,41 @@ modelのほうがFや選択率がギザギザしており、SAMは平滑化さ�
 <span><span class="va">input</span><span class="op">$</span><span class="va">index.key</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">0</span>,<span class="fl">1</span>,<span class="fl">2</span>,<span class="fl">3</span><span class="op">)</span></span>
 <span><span class="va">res_rw2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">sam</span>, <span class="va">input</span><span class="op">)</span></span>
 <span><span class="va">res_rw2</span><span class="op">$</span><span class="va">sigma</span></span>
-<span><span class="co">#&gt; [1] 1.2438601 1.2438601 0.4909688 0.3384182 0.7341535</span></span>
+<span><span class="co">#&gt; [1] 1.2438602 1.2438602 0.4909691 0.3384182 0.7341528</span></span>
 <span></span>
 <span><span class="co">#AICの比較</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">res_rw</span><span class="op">$</span><span class="va">aic</span>, <span class="va">res_ls</span><span class="op">$</span><span class="va">aic</span>, <span class="va">res_rw2</span><span class="op">$</span><span class="va">aic</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1]  976.4474 1053.1456  976.3630</span></span></code></pre></div>
+</div>
+<div class="section level4">
+<h4 id="omega-method">オメガ法でCPUEに当てはめたい<a class="anchor" aria-label="anchor" href="#omega-method"></a>
+</h4>
+<p><code>abund = "Bs"</code>は全体のFから計算した選択率を、<code>abund = "Bf"</code>はFに<code>catch_prop</code>を掛けて計算した指標ごとの選択率を、資源重量に掛けてIndexに当てはめます。</p>
+<p><code>frasyr::vpa(abund = "Bo")</code>に対応させるには、<code>"Bf"</code>の対象Indexの<code>catch_prop</code>にomegaを指定し、<code>sel.def = "mean"</code>を使います。
+VPAの<code>"Bo"</code>は<code>F * omega</code>の合計を1にしますが、SAMでは平均を1にするため、重みは年齢区分数倍になります。
+年齢区分数が一定でqを推定する場合、この定数倍はqに吸収できます。これは指標への当てはめ方の対応であり、VPAとSAMの推定結果自体が一致するという意味ではありません。</p>
+<p><code>catch_prop</code>は年齢 × 年 × (Index数 +
+1)の配列で、Indexの<code>i</code>番目に対応するスライスは<code>catch_prop[, , i + 1]</code>です。
+<code>sel.def = "max"</code>では正規化の違いが年ごとに変わり得るため、同じ対応になるとは限りません。
+また、<code>sel.def</code>は他の<code>"Bs"</code>・<code>"Bf"</code>にも適用されます。</p>
+<div class="section level5">
+<h5 id="vpaのオメガ法とsamのbfでqは同じになりますか">VPAのオメガ法とSAMのBfでqは同じになりますか？<a class="anchor" aria-label="anchor" href="#vpa%E3%81%AE%E3%82%AA%E3%83%A1%E3%82%AC%E6%B3%95%E3%81%A8sam%E3%81%AEbf%E3%81%A7q%E3%81%AF%E5%90%8C%E3%81%98%E3%81%AB%E3%81%AA%E3%82%8A%E3%81%BE%E3%81%99%E3%81%8B"></a>
+</h5>
+<p>正規化が異なるため、同じ<code>scale</code>で<code>b = 1</code>の場合、同じN・F・体重・omegaから計算するなら、Bfの資源量指標はBoの全年齢区分数倍、対応するqはその逆数倍になります。
+ここでの年齢区分数は<code>min.age:max.age</code>の長さではなく、選択率の正規化に使う全年齢の行数です。</p>
+<p><code>sel.def = "mean"</code>の場合、SAMのqをBoの尺度に換算できます。指標が<code>I = q * A^b</code>に従うとき、換算式は次のとおりです。</p>
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">i</span> <span class="op">&lt;-</span> <span class="fl">1L</span> <span class="co"># Bfに設定したIndexの番号</span></span>
+<span><span class="va">K</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">res_bf</span><span class="op">$</span><span class="va">naa</span><span class="op">)</span></span>
+<span><span class="va">scale_vpa</span> <span class="op">&lt;-</span> <span class="fl">1000</span> <span class="co"># 比較するVPAで指定したscale</span></span>
+<span><span class="va">scale_sam</span> <span class="op">&lt;-</span> <span class="va">res_bf</span><span class="op">$</span><span class="va">input</span><span class="op">$</span><span class="va">scale</span></span>
+<span><span class="va">q_on_Bo_scale</span> <span class="op">&lt;-</span> <span class="va">res_bf</span><span class="op">$</span><span class="va">q</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">*</span> <span class="op">(</span><span class="va">K</span> <span class="op">*</span> <span class="va">scale_vpa</span> <span class="op">/</span> <span class="va">scale_sam</span><span class="op">)</span><span class="op">^</span><span class="va">res_bf</span><span class="op">$</span><span class="va">b</span><span class="op">[</span><span class="va">i</span><span class="op">]</span></span></code></pre></div>
+<p>同じ<code>scale</code>で<code>b = 1</code>なら、<code>q_on_Bo_scale = K * res_bf$q[i]</code>です。
+omegaを定数倍しても正規化で打ち消されるため、omegaを<code>K</code>で割るだけではqの尺度は揃いません。
+SAMの<code>scale</code>を<code>K * scale_vpa</code>にする方法でも指標の尺度は揃いますが、他の資源量指標にも影響するため、比較用にqを換算する方法が扱いやすいです。</p>
+<p>この換算は正規化と単位の違いを補正するもので、VPAとSAMで別々に推定したqが同じになることを保証しません。
+<code>sel.def = "max"</code>の場合は比率が年によって変わり得るため、この定数による換算は使えません。</p>
+</div>
 </div>
 <div class="section level4">
 <h4 id="indexとabundanceの間の非線形性を推定したい">IndexとAbundanceの間の非線形性を推定したい<a class="anchor" aria-label="anchor" href="#index%E3%81%A8abundance%E3%81%AE%E9%96%93%E3%81%AE%E9%9D%9E%E7%B7%9A%E5%BD%A2%E6%80%A7%E3%82%92%E6%8E%A8%E5%AE%9A%E3%81%97%E3%81%9F%E3%81%84"></a>
@@ -879,27 +955,27 @@ modelのほうがFや選択率がギザギザしており、SAMは平滑化さ�
 <p><code>b</code> を推定するとパラメータ数が増えるため、収束状況や
 <code>b</code> の推定値が極端でないかを確認し、AIC
 などでモデルを比較します。</p>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">input</span> <span class="op">&lt;-</span> <span class="va">res_rw</span><span class="op">$</span><span class="va">input</span></span>
 <span><span class="va">input</span><span class="op">$</span><span class="va">b.est</span> <span class="op">&lt;-</span> <span class="cn">TRUE</span></span>
 <span><span class="va">input</span><span class="op">$</span><span class="va">p0.list</span> <span class="op">&lt;-</span> <span class="va">res_rw</span><span class="op">$</span><span class="va">par_list</span></span>
 <span><span class="va">res_estb_full</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">sam</span>, <span class="va">input</span><span class="op">)</span></span>
 <span><span class="va">res_estb_full</span><span class="op">$</span><span class="va">b</span> <span class="co">#すべてのindexでbが推定される</span></span>
-<span><span class="co">#&gt; [1] 0.9775696 0.9484946 1.0082822 0.9249474 0.8870780</span></span>
+<span><span class="co">#&gt; [1] 0.9998667 0.9997609 1.0003231 0.9962767 0.9983365</span></span>
 <span><span class="fu"><a href="../reference/check_fit_sam.html">check_fit_sam</a></span><span class="op">(</span><span class="va">res_estb_full</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">res_rw</span><span class="op">$</span><span class="va">aic</span>, <span class="va">res_estb_full</span><span class="op">$</span><span class="va">aic</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 976.4474 982.5655</span></span>
+<span><span class="co">#&gt; [1] 976.4474 985.4785</span></span>
 <span></span>
 <span><span class="va">input</span><span class="op">$</span><span class="va">b.fix</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="cn">NA</span><span class="op">)</span> <span class="co">#1-4番目のindexはb=1に固定し、5番目のindexはb推定を行う</span></span>
 <span><span class="va">res_estb_45</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">sam</span>, <span class="va">input</span><span class="op">)</span></span>
 <span><span class="va">res_estb_45</span><span class="op">$</span><span class="va">b</span> <span class="co">#</span></span>
-<span><span class="co">#&gt; [1] 1.0000000 1.0000000 1.0000000 1.0000000 0.9973021</span></span>
+<span><span class="co">#&gt; [1] 1.0000000 1.0000000 1.0000000 1.0000000 0.8962075</span></span>
 <span><span class="fu"><a href="../reference/check_fit_sam.html">check_fit_sam</a></span><span class="op">(</span><span class="va">res_estb_45</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">res_rw</span><span class="op">$</span><span class="va">aic</span>, <span class="va">res_estb_full</span><span class="op">$</span><span class="va">aic</span>, <span class="va">res_estb_45</span><span class="op">$</span><span class="va">aic</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 976.4474 982.5655 976.0210</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] 976.4474 985.4785 977.3648</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="加入年齢を1歳にしたい">加入年齢を1歳にしたい<a class="anchor" aria-label="anchor" href="#%E5%8A%A0%E5%85%A5%E5%B9%B4%E9%BD%A2%E3%82%921%E6%AD%B3%E3%81%AB%E3%81%97%E3%81%9F%E3%81%84"></a>
@@ -911,7 +987,7 @@ modelのほうがFや選択率がギザギザしており、SAMは平滑化さ�
 以下では、<code>rec.age = 0</code> と <code>rec.age = 1</code>
 の再生産関係のプロットを横に並べて比較します。 <code>rec.age = 1</code>
 の図では、加入尾数の点が親魚量の年に対応するように自動的にずれて表示されます。</p>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">input</span> <span class="op">&lt;-</span> <span class="va">res_bh</span><span class="op">$</span><span class="va">input</span></span>
 <span><span class="va">input</span><span class="op">$</span><span class="va">rec.age</span> <span class="op">&lt;-</span> <span class="fl">1</span></span>
 <span><span class="va">input</span><span class="op">$</span><span class="va">p0.list</span> <span class="op">&lt;-</span> <span class="va">res_bh</span><span class="op">$</span><span class="va">par_list</span></span>
@@ -941,7 +1017,7 @@ modelのほうがFや選択率がギザギザしており、SAMは平滑化さ�
 <li><p>下の例では、加入量は元のスケールで表示し、資源量と親魚量は
 <code>10000</code> で割って表示しています。</p></li>
 </ul>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">gg1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_samvpa.html">plot_samvpa</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">res_rw</span>, <span class="va">res_bh</span>, <span class="va">res_ri</span><span class="op">)</span>,</span>
 <span>  CI <span class="op">=</span> <span class="fl">0.8</span>,</span>
@@ -955,7 +1031,7 @@ modelのほうがFや選択率がギザギザしており、SAMは平滑化さ�
 <ul>
 <li>以下のやり方で、表示名を事後的に変えて、日本語表記や単位を含めることができます</li>
 </ul>
-<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">gg1</span> <span class="op">+</span></span>
 <span>    <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span></span>
 <span>      <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/vars.html" class="external-link">vars</a></span><span class="op">(</span><span class="va">stat_f</span><span class="op">)</span>,</span>
@@ -984,7 +1060,7 @@ SSBのみ)に分解できます。これによって、どの要因が個体群�
 <li>VPAでも動くようになっているので、両方で比較するのもありかも。</li>
 <li>前の年と評価が大きく変わった際の要因分析にも使えるかなと思います。</li>
 </ul>
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co"># process errorが推定されるようなデータを作る（実際はこの手順は不要です）</span></span>
 <span><span class="va">input</span> <span class="op">&lt;-</span> <span class="va">res_rw</span><span class="op">$</span><span class="va">input</span></span>
@@ -1001,7 +1077,7 @@ SSBのみ)に分解できます。これによって、どの要因が個体群�
 <span></span>
 <span><span class="va">res_proc</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">sam</span>, <span class="va">input</span><span class="op">)</span></span>
 <span><span class="va">res_proc</span><span class="op">$</span><span class="va">sigma.logN</span></span>
-<span><span class="co">#&gt; [1] 0.5975384 0.1640797 0.1640797 0.1640797 0.1640797 0.1640797 0.1640797</span></span>
+<span><span class="co">#&gt; [1] 0.5975378 0.1640789 0.1640789 0.1640789 0.1640789 0.1640789 0.1640789</span></span>
 <span></span>
 <span><span class="va">factor_b</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/decompose_biomass_factors.html">decompose_biomass_factors</a></span><span class="op">(</span></span>
 <span>    <span class="va">res_proc</span>,</span>
@@ -1035,7 +1111,7 @@ SSBのみ)に分解できます。これによって、どの要因が個体群�
 <col width="2%">
 <col width="2%">
 <col width="2%">
-<col width="3%">
+<col width="2%">
 <col width="2%">
 <col width="2%">
 <col width="2%">
@@ -1100,218 +1176,218 @@ SSBのみ)に分解できます。これによって、どの要因が個体群�
 <tbody>
 <tr class="odd">
 <td align="left">recruitment</td>
-<td align="right">1899019</td>
-<td align="right">2746780.4</td>
-<td align="right">2319582.4</td>
-<td align="right">1218777.9</td>
-<td align="right">974175.4</td>
-<td align="right">1300263.6</td>
-<td align="right">1766566.8</td>
-<td align="right">2380311.1</td>
-<td align="right">2563593.434</td>
-<td align="right">3946424.2</td>
-<td align="right">6591958.5</td>
-<td align="right">3144129</td>
-<td align="right">1720912</td>
-<td align="right">524070.9</td>
-<td align="right">229790.377</td>
-<td align="right">209013.08</td>
-<td align="right">374794.116</td>
-<td align="right">568537.1</td>
-<td align="right">265439.99</td>
-<td align="right">138938.39</td>
-<td align="right">199712.24</td>
-<td align="right">292528.020</td>
-<td align="right">205740.29790</td>
-<td align="right">99983.29</td>
-<td align="right">111997.46</td>
-<td align="right">101084.82</td>
-<td align="right">135625.35</td>
-<td align="right">154296.473</td>
-<td align="right">176933.23</td>
-<td align="right">396695.613</td>
-<td align="right">286203.65</td>
-<td align="right">193079.114</td>
-<td align="right">312309.66</td>
-<td align="right">345684.149</td>
-<td align="right">534585.20</td>
-<td align="right">454419.70</td>
-<td align="right">492904.26</td>
-<td align="right">994496.32</td>
-<td align="right">2377627.043</td>
-<td align="right">5744316.9</td>
+<td align="right">1899014</td>
+<td align="right">2746767.5</td>
+<td align="right">2319572.1</td>
+<td align="right">1218772.6</td>
+<td align="right">974170.0</td>
+<td align="right">1300255.5</td>
+<td align="right">1766563.4</td>
+<td align="right">2380309.2</td>
+<td align="right">2563590.87</td>
+<td align="right">3946421.7</td>
+<td align="right">6591955.4</td>
+<td align="right">3144128</td>
+<td align="right">1720908</td>
+<td align="right">524068.6</td>
+<td align="right">229790.486</td>
+<td align="right">209013.02</td>
+<td align="right">374793.77</td>
+<td align="right">568535.50</td>
+<td align="right">265439.7</td>
+<td align="right">138938.18</td>
+<td align="right">199711.04</td>
+<td align="right">292524.987</td>
+<td align="right">205737.6661</td>
+<td align="right">99982.040</td>
+<td align="right">111996.28</td>
+<td align="right">101083.98</td>
+<td align="right">135624.18</td>
+<td align="right">154295.325</td>
+<td align="right">176931.993</td>
+<td align="right">396692.745</td>
+<td align="right">286201.80</td>
+<td align="right">193078.11</td>
+<td align="right">312307.67</td>
+<td align="right">345682.394</td>
+<td align="right">534583.09</td>
+<td align="right">454417.64</td>
+<td align="right">492902.79</td>
+<td align="right">994489.90</td>
+<td align="right">2377608.540</td>
+<td align="right">5744266.66</td>
 </tr>
 <tr class="even">
 <td align="left">growth</td>
 <td align="right">0</td>
-<td align="right">2312905.4</td>
-<td align="right">2865695.4</td>
-<td align="right">2794485.5</td>
-<td align="right">1769580.4</td>
-<td align="right">1236487.0</td>
-<td align="right">1382513.0</td>
-<td align="right">1857532.9</td>
-<td align="right">2555485.321</td>
-<td align="right">3037354.9</td>
-<td align="right">4388192.3</td>
-<td align="right">6694213</td>
-<td align="right">4273701</td>
-<td align="right">2245679.3</td>
-<td align="right">693893.336</td>
-<td align="right">221811.63</td>
-<td align="right">204113.782</td>
-<td align="right">358990.1</td>
-<td align="right">573122.14</td>
-<td align="right">397857.72</td>
-<td align="right">167574.36</td>
-<td align="right">164068.619</td>
-<td align="right">261995.52851</td>
-<td align="right">243686.89</td>
-<td align="right">161689.25</td>
-<td align="right">140263.24</td>
-<td align="right">128624.34</td>
-<td align="right">156197.775</td>
-<td align="right">183240.44</td>
-<td align="right">212915.867</td>
-<td align="right">402082.97</td>
-<td align="right">396331.096</td>
-<td align="right">315131.98</td>
-<td align="right">366283.156</td>
-<td align="right">407130.90</td>
-<td align="right">584189.25</td>
-<td align="right">595144.11</td>
-<td align="right">621900.63</td>
-<td align="right">1014430.168</td>
-<td align="right">2310369.5</td>
+<td align="right">2312898.2</td>
+<td align="right">2865683.5</td>
+<td align="right">2794474.1</td>
+<td align="right">1769573.3</td>
+<td align="right">1236480.7</td>
+<td align="right">1382504.5</td>
+<td align="right">1857527.0</td>
+<td align="right">2555481.76</td>
+<td align="right">3037351.1</td>
+<td align="right">4388187.7</td>
+<td align="right">6694207</td>
+<td align="right">4273697</td>
+<td align="right">2245674.0</td>
+<td align="right">693891.179</td>
+<td align="right">221811.56</td>
+<td align="right">204113.74</td>
+<td align="right">358989.75</td>
+<td align="right">573120.6</td>
+<td align="right">397856.60</td>
+<td align="right">167573.76</td>
+<td align="right">164067.401</td>
+<td align="right">261992.4907</td>
+<td align="right">243683.396</td>
+<td align="right">161686.87</td>
+<td align="right">140261.49</td>
+<td align="right">128623.06</td>
+<td align="right">156196.334</td>
+<td align="right">183238.928</td>
+<td align="right">212914.230</td>
+<td align="right">402079.85</td>
+<td align="right">396328.14</td>
+<td align="right">315129.89</td>
+<td align="right">366280.712</td>
+<td align="right">407128.66</td>
+<td align="right">584186.70</td>
+<td align="right">595141.45</td>
+<td align="right">621898.46</td>
+<td align="right">1014424.281</td>
+<td align="right">2310351.24</td>
 </tr>
 <tr class="odd">
 <td align="left">fishing</td>
 <td align="right">0</td>
-<td align="right">-729670.6</td>
-<td align="right">-1069622.0</td>
-<td align="right">-850315.5</td>
-<td align="right">-2196682.1</td>
-<td align="right">-778364.9</td>
-<td align="right">-554552.3</td>
-<td align="right">-426636.3</td>
-<td align="right">-493359.793</td>
+<td align="right">-729670.7</td>
+<td align="right">-1069622.2</td>
+<td align="right">-850316.4</td>
+<td align="right">-2196677.0</td>
+<td align="right">-778365.3</td>
+<td align="right">-554552.4</td>
+<td align="right">-426636.9</td>
+<td align="right">-493360.02</td>
 <td align="right">-385085.0</td>
-<td align="right">-363057.8</td>
-<td align="right">-3971854</td>
-<td align="right">-6751163</td>
-<td align="right">-3867284.9</td>
-<td align="right">-3074848.507</td>
-<td align="right">-363959.63</td>
-<td align="right">-138750.176</td>
-<td align="right">-95910.7</td>
-<td align="right">-191356.03</td>
-<td align="right">-395304.59</td>
-<td align="right">-586780.22</td>
-<td align="right">-84041.135</td>
-<td align="right">-123693.06567</td>
-<td align="right">-90354.19</td>
-<td align="right">-52479.41</td>
-<td align="right">-32235.51</td>
-<td align="right">-12470.20</td>
-<td align="right">-11537.329</td>
-<td align="right">-11350.80</td>
-<td align="right">-12832.191</td>
-<td align="right">-17670.35</td>
-<td align="right">-23296.504</td>
+<td align="right">-363058.6</td>
+<td align="right">-3971840</td>
+<td align="right">-6751157</td>
+<td align="right">-3867275.2</td>
+<td align="right">-3074836.892</td>
+<td align="right">-363959.20</td>
+<td align="right">-138750.23</td>
+<td align="right">-95910.73</td>
+<td align="right">-191355.6</td>
+<td align="right">-395303.83</td>
+<td align="right">-586778.97</td>
+<td align="right">-84041.516</td>
+<td align="right">-123693.4799</td>
+<td align="right">-90354.420</td>
+<td align="right">-52479.45</td>
+<td align="right">-32235.53</td>
+<td align="right">-12470.21</td>
+<td align="right">-11537.323</td>
+<td align="right">-11350.785</td>
+<td align="right">-12832.184</td>
+<td align="right">-17670.34</td>
+<td align="right">-23296.49</td>
 <td align="right">-25556.76</td>
-<td align="right">-30845.711</td>
-<td align="right">-32446.58</td>
-<td align="right">-22354.54</td>
+<td align="right">-30845.685</td>
+<td align="right">-32446.57</td>
+<td align="right">-22354.56</td>
 <td align="right">-37638.40</td>
-<td align="right">-32050.03</td>
-<td align="right">-49341.907</td>
-<td align="right">-64073.3</td>
+<td align="right">-32050.02</td>
+<td align="right">-49341.831</td>
+<td align="right">-64073.21</td>
 </tr>
 <tr class="even">
 <td align="left">process</td>
 <td align="right">0</td>
-<td align="right">-233691.8</td>
-<td align="right">-191289.3</td>
-<td align="right">-218531.4</td>
-<td align="right">-196027.9</td>
-<td align="right">-158757.3</td>
-<td align="right">-131201.5</td>
-<td align="right">-116311.1</td>
-<td align="right">7237.033</td>
-<td align="right">163078.1</td>
-<td align="right">583321.3</td>
-<td align="right">1217119</td>
-<td align="right">1000081</td>
-<td align="right">519831.3</td>
-<td align="right">5053.001</td>
-<td align="right">-10011.75</td>
-<td align="right">1724.913</td>
-<td align="right">34971.1</td>
-<td align="right">84441.86</td>
-<td align="right">75483.31</td>
-<td align="right">-16910.41</td>
-<td align="right">-4386.091</td>
-<td align="right">-67.71783</td>
-<td align="right">-8384.98</td>
-<td align="right">-26009.42</td>
-<td align="right">-21719.90</td>
-<td align="right">-14892.05</td>
-<td align="right">-4667.845</td>
-<td align="right">-1527.12</td>
-<td align="right">-2235.776</td>
-<td align="right">21256.40</td>
-<td align="right">1991.771</td>
-<td align="right">-23484.44</td>
-<td align="right">3406.324</td>
-<td align="right">-34782.40</td>
-<td align="right">10996.26</td>
-<td align="right">14851.04</td>
-<td align="right">-27954.94</td>
-<td align="right">3192.676</td>
-<td align="right">137423.3</td>
+<td align="right">-233686.5</td>
+<td align="right">-191284.6</td>
+<td align="right">-218523.0</td>
+<td align="right">-196023.4</td>
+<td align="right">-158754.4</td>
+<td align="right">-131199.6</td>
+<td align="right">-116307.8</td>
+<td align="right">7239.15</td>
+<td align="right">163074.7</td>
+<td align="right">583315.3</td>
+<td align="right">1217107</td>
+<td align="right">1000069</td>
+<td align="right">519824.1</td>
+<td align="right">5052.653</td>
+<td align="right">-10011.57</td>
+<td align="right">1724.87</td>
+<td align="right">34970.80</td>
+<td align="right">84440.8</td>
+<td align="right">75481.98</td>
+<td align="right">-16910.22</td>
+<td align="right">-4386.015</td>
+<td align="right">-67.7688</td>
+<td align="right">-8384.765</td>
+<td align="right">-26008.78</td>
+<td align="right">-21719.40</td>
+<td align="right">-14891.79</td>
+<td align="right">-4667.915</td>
+<td align="right">-1527.244</td>
+<td align="right">-2235.944</td>
+<td align="right">21255.69</td>
+<td align="right">1991.43</td>
+<td align="right">-23484.34</td>
+<td align="right">3405.952</td>
+<td align="right">-34781.91</td>
+<td align="right">10996.08</td>
+<td align="right">14850.59</td>
+<td align="right">-27954.86</td>
+<td align="right">3191.899</td>
+<td align="right">137419.08</td>
 </tr>
 <tr class="odd">
 <td align="left">natural</td>
 <td align="right">0</td>
-<td align="right">-3257001.4</td>
-<td align="right">-3719538.9</td>
-<td align="right">-3843868.6</td>
-<td align="right">-2771281.4</td>
-<td align="right">-1924596.0</td>
-<td align="right">-1887351.2</td>
-<td align="right">-2326650.6</td>
-<td align="right">-3163725.142</td>
-<td align="right">-4040065.9</td>
-<td align="right">-5782200.9</td>
-<td align="right">-8104156</td>
-<td align="right">-6181397</td>
-<td align="right">-3522347.7</td>
-<td align="right">-1265381.530</td>
-<td align="right">-322648.74</td>
-<td align="right">-262040.469</td>
-<td align="right">-409006.3</td>
-<td align="right">-666362.09</td>
-<td align="right">-588924.28</td>
-<td align="right">-272912.48</td>
-<td align="right">-183300.858</td>
-<td align="right">-286412.08324</td>
-<td align="right">-312811.27</td>
-<td align="right">-263518.20</td>
-<td align="right">-232714.79</td>
-<td align="right">-216192.34</td>
-<td align="right">-236536.415</td>
-<td align="right">-271415.05</td>
-<td align="right">-313779.235</td>
-<td align="right">-499899.18</td>
-<td align="right">-578518.007</td>
-<td align="right">-543004.48</td>
-<td align="right">-579127.517</td>
-<td align="right">-628878.03</td>
-<td align="right">-805327.76</td>
-<td align="right">-906565.98</td>
-<td align="right">-976457.84</td>
-<td align="right">-1354852.066</td>
-<td align="right">-2659648.0</td>
+<td align="right">-3256991.3</td>
+<td align="right">-3719525.1</td>
+<td align="right">-3843854.0</td>
+<td align="right">-2771271.2</td>
+<td align="right">-1924587.2</td>
+<td align="right">-1887340.3</td>
+<td align="right">-2326641.1</td>
+<td align="right">-3163718.06</td>
+<td align="right">-4040058.6</td>
+<td align="right">-5782191.2</td>
+<td align="right">-8104147</td>
+<td align="right">-6181387</td>
+<td align="right">-3522338.1</td>
+<td align="right">-1265377.545</td>
+<td align="right">-322648.46</td>
+<td align="right">-262040.35</td>
+<td align="right">-409005.90</td>
+<td align="right">-666360.4</td>
+<td align="right">-588922.31</td>
+<td align="right">-272911.29</td>
+<td align="right">-183299.363</td>
+<td align="right">-286408.6363</td>
+<td align="right">-312806.598</td>
+<td align="right">-263513.97</td>
+<td align="right">-232711.28</td>
+<td align="right">-216189.53</td>
+<td align="right">-236533.754</td>
+<td align="right">-271412.356</td>
+<td align="right">-313776.415</td>
+<td align="right">-499894.96</td>
+<td align="right">-578513.28</td>
+<td align="right">-543000.31</td>
+<td align="right">-579123.216</td>
+<td align="right">-628873.89</td>
+<td align="right">-805323.49</td>
+<td align="right">-906561.35</td>
+<td align="right">-976453.52</td>
+<td align="right">-1354844.592</td>
+<td align="right">-2659628.17</td>
 </tr>
 <tr class="even">
 <td align="left">maturity</td>
@@ -1323,7 +1399,7 @@ SSBのみ)に分解できます。これによって、どの要因が個体群�
 <td align="right">0.0</td>
 <td align="right">0.0</td>
 <td align="right">0.0</td>
-<td align="right">0.000</td>
+<td align="right">0.00</td>
 <td align="right">0.0</td>
 <td align="right">0.0</td>
 <td align="right">0</td>
@@ -1331,34 +1407,34 @@ SSBのみ)に分解できます。これによって、どの要因が個体群�
 <td align="right">0.0</td>
 <td align="right">0.000</td>
 <td align="right">0.00</td>
-<td align="right">0.000</td>
+<td align="right">0.00</td>
+<td align="right">0.00</td>
 <td align="right">0.0</td>
 <td align="right">0.00</td>
 <td align="right">0.00</td>
-<td align="right">0.00</td>
 <td align="right">0.000</td>
-<td align="right">0.00000</td>
-<td align="right">0.00</td>
-<td align="right">0.00</td>
-<td align="right">0.00</td>
-<td align="right">0.00</td>
-<td align="right">0.000</td>
-<td align="right">0.00</td>
-<td align="right">0.000</td>
-<td align="right">0.00</td>
-<td align="right">0.000</td>
-<td align="right">0.00</td>
+<td align="right">0.0000</td>
 <td align="right">0.000</td>
 <td align="right">0.00</td>
 <td align="right">0.00</td>
 <td align="right">0.00</td>
+<td align="right">0.000</td>
+<td align="right">0.000</td>
+<td align="right">0.000</td>
+<td align="right">0.00</td>
+<td align="right">0.00</td>
 <td align="right">0.00</td>
 <td align="right">0.000</td>
-<td align="right">0.0</td>
+<td align="right">0.00</td>
+<td align="right">0.00</td>
+<td align="right">0.00</td>
+<td align="right">0.00</td>
+<td align="right">0.000</td>
+<td align="right">0.00</td>
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># 前年のbiomass対する比率 (%)</span></span>
 <span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">factor_b</span><span class="op">$</span><span class="va">percent_aggregated</span><span class="op">)</span></span></code></pre></div>
 <table class="table">
@@ -1452,223 +1528,237 @@ SSBのみ)に分解できます。これによって、どの要因が個体群�
 <tr class="odd">
 <td align="left">recruitment</td>
 <td align="right">NA</td>
-<td align="right">43.508489</td>
-<td align="right">32.43025</td>
-<td align="right">16.565434</td>
-<td align="right">15.085012</td>
-<td align="right">32.203333</td>
-<td align="right">47.581725</td>
-<td align="right">55.502252</td>
-<td align="right">45.3178252</td>
-<td align="right">55.379460</td>
-<td align="right">66.937993</td>
-<td align="right">20.595532</td>
-<td align="right">12.08037</td>
-<td align="right">6.308289</td>
-<td align="right">5.4613110</td>
-<td align="right">26.254250</td>
-<td align="right">70.6737373</td>
-<td align="right">80.05782</td>
-<td align="right">22.731098</td>
-<td align="right">11.268089</td>
-<td align="right">23.19334</td>
-<td align="right">83.161405</td>
-<td align="right">38.3394702</td>
-<td align="right">16.826797</td>
-<td align="right">21.279727</td>
-<td align="right">22.071389</td>
-<td align="right">32.865474</td>
-<td align="right">35.604420</td>
-<td align="right">36.0267751</td>
-<td align="right">69.9643694</td>
-<td align="right">33.759949</td>
-<td align="right">18.5700420</td>
-<td align="right">30.341302</td>
-<td align="right">32.4672077</td>
-<td align="right">45.686426</td>
-<td align="right">32.0979680</td>
-<td align="right">30.0982619</td>
-<td align="right">55.362203</td>
-<td align="right">100.0567124</td>
-<td align="right">131.529101</td>
+<td align="right">43.508429</td>
+<td align="right">32.430220</td>
+<td align="right">16.565429</td>
+<td align="right">15.084983</td>
+<td align="right">32.20327</td>
+<td align="right">47.581890</td>
+<td align="right">55.502455</td>
+<td align="right">45.3178965</td>
+<td align="right">55.379515</td>
+<td align="right">66.938059</td>
+<td align="right">20.595554</td>
+<td align="right">12.080354</td>
+<td align="right">6.308275</td>
+<td align="right">5.4613319</td>
+<td align="right">26.254275</td>
+<td align="right">70.6736971</td>
+<td align="right">80.057654</td>
+<td align="right">22.731116</td>
+<td align="right">11.268102</td>
+<td align="right">23.193284</td>
+<td align="right">83.161100</td>
+<td align="right">38.3393669</td>
+<td align="right">16.826816</td>
+<td align="right">21.279834</td>
+<td align="right">22.07154</td>
+<td align="right">32.865632</td>
+<td align="right">35.604560</td>
+<td align="right">36.0268852</td>
+<td align="right">69.9644923</td>
+<td align="right">33.760008</td>
+<td align="right">18.5700956</td>
+<td align="right">30.341344</td>
+<td align="right">32.4672795</td>
+<td align="right">45.686558</td>
+<td align="right">32.0979973</td>
+<td align="right">30.0983237</td>
+<td align="right">55.362099</td>
+<td align="right">100.0564542</td>
+<td align="right">131.528854</td>
 </tr>
 <tr class="even">
 <td align="left">growth</td>
 <td align="right">NA</td>
-<td align="right">36.635990</td>
-<td align="right">40.06549</td>
-<td align="right">37.982201</td>
-<td align="right">27.401780</td>
-<td align="right">30.623793</td>
-<td align="right">37.237401</td>
-<td align="right">43.312515</td>
-<td align="right">45.1744944</td>
-<td align="right">42.622654</td>
-<td align="right">44.559865</td>
-<td align="right">43.850268</td>
-<td align="right">30.00032</td>
-<td align="right">27.031443</td>
-<td align="right">16.4914098</td>
-<td align="right">27.861884</td>
-<td align="right">38.4890883</td>
-<td align="right">50.55073</td>
-<td align="right">49.079625</td>
-<td align="right">32.266793</td>
-<td align="right">19.46105</td>
-<td align="right">46.642290</td>
-<td align="right">48.8225684</td>
-<td align="right">41.011550</td>
-<td align="right">30.721260</td>
-<td align="right">30.625811</td>
-<td align="right">31.168951</td>
-<td align="right">36.043151</td>
-<td align="right">37.3110372</td>
-<td align="right">37.5515229</td>
-<td align="right">47.428818</td>
-<td align="right">38.1184943</td>
-<td align="right">30.615495</td>
-<td align="right">34.4018994</td>
-<td align="right">34.793997</td>
-<td align="right">41.2642496</td>
-<td align="right">36.3413443</td>
-<td align="right">34.620328</td>
-<td align="right">42.6898524</td>
-<td align="right">52.901124</td>
+<td align="right">36.635998</td>
+<td align="right">40.065469</td>
+<td align="right">37.982199</td>
+<td align="right">27.401772</td>
+<td align="right">30.62377</td>
+<td align="right">37.237372</td>
+<td align="right">43.312570</td>
+<td align="right">45.1745477</td>
+<td align="right">42.622670</td>
+<td align="right">44.559884</td>
+<td align="right">43.850284</td>
+<td align="right">30.000313</td>
+<td align="right">27.031441</td>
+<td align="right">16.4914140</td>
+<td align="right">27.861908</td>
+<td align="right">38.4890947</td>
+<td align="right">50.550717</td>
+<td align="right">49.079591</td>
+<td align="right">32.266787</td>
+<td align="right">19.461047</td>
+<td align="right">46.642257</td>
+<td align="right">48.8224952</td>
+<td align="right">41.011522</td>
+<td align="right">30.721285</td>
+<td align="right">30.62589</td>
+<td align="right">31.169059</td>
+<td align="right">36.043229</td>
+<td align="right">37.3111030</td>
+<td align="right">37.5515715</td>
+<td align="right">47.428838</td>
+<td align="right">38.1185173</td>
+<td align="right">30.615528</td>
+<td align="right">34.4019205</td>
+<td align="right">34.794044</td>
+<td align="right">41.2642940</td>
+<td align="right">36.3413646</td>
+<td align="right">34.620366</td>
+<td align="right">42.6898267</td>
+<td align="right">52.901070</td>
 </tr>
 <tr class="odd">
 <td align="left">fishing</td>
 <td align="right">NA</td>
-<td align="right">-11.557846</td>
-<td align="right">-14.95446</td>
-<td align="right">-11.557352</td>
-<td align="right">-34.015408</td>
-<td align="right">-19.277588</td>
-<td align="right">-14.936632</td>
-<td align="right">-9.947975</td>
-<td align="right">-8.7213489</td>
-<td align="right">-5.403828</td>
-<td align="right">-3.686668</td>
-<td align="right">-26.017528</td>
-<td align="right">-47.39148</td>
-<td align="right">-46.550857</td>
-<td align="right">-73.0783597</td>
-<td align="right">-45.717175</td>
-<td align="right">-26.1636804</td>
-<td align="right">-13.50554</td>
-<td align="right">-16.386878</td>
-<td align="right">-32.059730</td>
-<td align="right">-68.14501</td>
-<td align="right">-23.891656</td>
-<td align="right">-23.0500619</td>
-<td align="right">-15.206257</td>
-<td align="right">-9.971186</td>
-<td align="right">-7.038469</td>
-<td align="right">-3.021847</td>
-<td align="right">-2.662277</td>
-<td align="right">-2.3112255</td>
-<td align="right">-2.2631864</td>
-<td align="right">-2.084355</td>
-<td align="right">-2.2406207</td>
-<td align="right">-2.482874</td>
-<td align="right">-2.8970785</td>
-<td align="right">-2.772932</td>
-<td align="right">-1.5790146</td>
-<td align="right">-2.2983175</td>
-<td align="right">-1.784180</td>
-<td align="right">-2.0764354</td>
-<td align="right">-1.467103</td>
+<td align="right">-11.557885</td>
+<td align="right">-14.954518</td>
+<td align="right">-11.557411</td>
+<td align="right">-34.015456</td>
+<td align="right">-19.27768</td>
+<td align="right">-14.936713</td>
+<td align="right">-9.948033</td>
+<td align="right">-8.7213754</td>
+<td align="right">-5.403837</td>
+<td align="right">-3.686681</td>
+<td align="right">-26.017468</td>
+<td align="right">-47.391482</td>
+<td align="right">-46.550843</td>
+<td align="right">-73.0783295</td>
+<td align="right">-45.717174</td>
+<td align="right">-26.1636994</td>
+<td align="right">-13.505556</td>
+<td align="right">-16.386875</td>
+<td align="right">-32.059753</td>
+<td align="right">-68.145115</td>
+<td align="right">-23.891924</td>
+<td align="right">-23.0503718</td>
+<td align="right">-15.206503</td>
+<td align="right">-9.971349</td>
+<td align="right">-7.03858</td>
+<td align="right">-3.021890</td>
+<td align="right">-2.662306</td>
+<td align="right">-2.3112464</td>
+<td align="right">-2.2632056</td>
+<td align="right">-2.084372</td>
+<td align="right">-2.2406373</td>
+<td align="right">-2.482893</td>
+<td align="right">-2.8970971</td>
+<td align="right">-2.772950</td>
+<td align="right">-1.5790244</td>
+<td align="right">-2.2983291</td>
+<td align="right">-1.784187</td>
+<td align="right">-2.0764430</td>
+<td align="right">-1.467111</td>
 </tr>
 <tr class="even">
 <td align="left">process</td>
 <td align="right">NA</td>
-<td align="right">-3.701635</td>
-<td align="right">-2.67443</td>
-<td align="right">-2.970243</td>
-<td align="right">-3.035473</td>
-<td align="right">-3.931905</td>
-<td align="right">-3.533858</td>
-<td align="right">-2.712053</td>
-<td align="right">0.1279324</td>
-<td align="right">2.288446</td>
-<td align="right">5.923331</td>
-<td align="right">7.972706</td>
-<td align="right">7.02032</td>
-<td align="right">6.257256</td>
-<td align="right">0.1200921</td>
-<td align="right">-1.257582</td>
-<td align="right">0.3252614</td>
-<td align="right">4.92441</td>
-<td align="right">7.231225</td>
-<td align="right">6.121797</td>
-<td align="right">-1.96387</td>
-<td align="right">-1.246901</td>
-<td align="right">-0.0126191</td>
-<td align="right">-1.411159</td>
-<td align="right">-4.941839</td>
-<td align="right">-4.742436</td>
-<td align="right">-3.608723</td>
-<td align="right">-1.077121</td>
-<td align="right">-0.3109489</td>
-<td align="right">-0.3943191</td>
-<td align="right">2.507358</td>
-<td align="right">0.1915654</td>
-<td align="right">-2.281545</td>
-<td align="right">0.3199274</td>
-<td align="right">-2.972555</td>
-<td align="right">0.7767219</td>
-<td align="right">0.9068508</td>
-<td align="right">-1.556212</td>
-<td align="right">0.1343561</td>
-<td align="right">3.146616</td>
+<td align="right">-3.701562</td>
+<td align="right">-2.674373</td>
+<td align="right">-2.970141</td>
+<td align="right">-3.035414</td>
+<td align="right">-3.93185</td>
+<td align="right">-3.533825</td>
+<td align="right">-2.711988</td>
+<td align="right">0.1279701</td>
+<td align="right">2.288402</td>
+<td align="right">5.923280</td>
+<td align="right">7.972636</td>
+<td align="right">7.020242</td>
+<td align="right">6.257183</td>
+<td align="right">0.1200842</td>
+<td align="right">-1.257561</td>
+<td align="right">0.3252533</td>
+<td align="right">4.924372</td>
+<td align="right">7.231149</td>
+<td align="right">6.121706</td>
+<td align="right">-1.963855</td>
+<td align="right">-1.246888</td>
+<td align="right">-0.0126288</td>
+<td align="right">-1.411142</td>
+<td align="right">-4.941794</td>
+<td align="right">-4.74240</td>
+<td align="right">-3.608709</td>
+<td align="right">-1.077149</td>
+<td align="right">-0.3109774</td>
+<td align="right">-0.3943523</td>
+<td align="right">2.507295</td>
+<td align="right">0.1915341</td>
+<td align="right">-2.281553</td>
+<td align="right">0.3198947</td>
+<td align="right">-2.972533</td>
+<td align="right">0.7767134</td>
+<td align="right">0.9068277</td>
+<td align="right">-1.556214</td>
+<td align="right">0.1343241</td>
+<td align="right">3.146542</td>
 </tr>
 <tr class="odd">
 <td align="left">natural</td>
 <td align="right">NA</td>
-<td align="right">-51.590294</td>
-<td align="right">-52.00314</td>
-<td align="right">-52.245249</td>
-<td align="right">-42.913021</td>
-<td align="right">-47.666032</td>
-<td align="right">-50.835004</td>
-<td align="right">-54.251039</td>
-<td align="right">-55.9266306</td>
-<td align="right">-56.693516</td>
-<td align="right">-58.715315</td>
-<td align="right">-53.086064</td>
-<td align="right">-43.39186</td>
-<td align="right">-42.398816</td>
-<td align="right">-30.0736789</td>
-<td align="right">-40.528090</td>
-<td align="right">-49.4121398</td>
-<td align="right">-57.59370</td>
-<td align="right">-57.064279</td>
-<td align="right">-47.762546</td>
-<td align="right">-31.69436</td>
-<td align="right">-52.109732</td>
-<td align="right">-53.3725655</td>
-<td align="right">-52.644913</td>
-<td align="right">-50.068951</td>
-<td align="right">-50.812166</td>
-<td align="right">-52.388906</td>
-<td align="right">-54.581557</td>
-<td align="right">-55.2649668</td>
+<td align="right">-51.590305</td>
+<td align="right">-52.003132</td>
+<td align="right">-52.245261</td>
+<td align="right">-42.913024</td>
+<td align="right">-47.66601</td>
+<td align="right">-50.834983</td>
+<td align="right">-54.251057</td>
+<td align="right">-55.9266495</td>
+<td align="right">-56.693507</td>
+<td align="right">-58.715303</td>
+<td align="right">-53.086067</td>
+<td align="right">-43.391835</td>
+<td align="right">-42.398796</td>
+<td align="right">-30.0736854</td>
+<td align="right">-40.528104</td>
+<td align="right">-49.4121350</td>
+<td align="right">-57.593681</td>
+<td align="right">-57.064249</td>
+<td align="right">-47.762512</td>
+<td align="right">-31.694338</td>
+<td align="right">-52.109656</td>
+<td align="right">-53.3724621</td>
+<td align="right">-52.644846</td>
+<td align="right">-50.068926</td>
+<td align="right">-50.81217</td>
+<td align="right">-52.388930</td>
+<td align="right">-54.581564</td>
+<td align="right">-55.2649726</td>
 <td align="right">-55.3405825</td>
-<td align="right">-58.967000</td>
-<td align="right">-55.6409415</td>
-<td align="right">-52.753613</td>
-<td align="right">-54.3925819</td>
-<td align="right">-53.744828</td>
-<td align="right">-56.8843837</td>
-<td align="right">-55.3577289</td>
-<td align="right">-54.358027</td>
-<td align="right">-57.0156888</td>
-<td align="right">-60.898644</td>
+<td align="right">-58.966986</td>
+<td align="right">-55.6409357</td>
+<td align="right">-52.753616</td>
+<td align="right">-54.3925742</td>
+<td align="right">-53.744842</td>
+<td align="right">-56.8843917</td>
+<td align="right">-55.3577249</td>
+<td align="right">-54.358034</td>
+<td align="right">-57.0156708</td>
+<td align="right">-60.898608</td>
 </tr>
 <tr class="even">
 <td align="left">maturity</td>
 <td align="right">NA</td>
 <td align="right">0.000000</td>
+<td align="right">0.000000</td>
+<td align="right">0.000000</td>
+<td align="right">0.000000</td>
 <td align="right">0.00000</td>
+<td align="right">0.000000</td>
+<td align="right">0.000000</td>
+<td align="right">0.0000000</td>
+<td align="right">0.000000</td>
+<td align="right">0.000000</td>
+<td align="right">0.000000</td>
+<td align="right">0.000000</td>
+<td align="right">0.000000</td>
+<td align="right">0.0000000</td>
+<td align="right">0.000000</td>
+<td align="right">0.0000000</td>
 <td align="right">0.000000</td>
 <td align="right">0.000000</td>
 <td align="right">0.000000</td>
@@ -1677,21 +1767,7 @@ SSBのみ)に分解できます。これによって、どの要因が個体群�
 <td align="right">0.0000000</td>
 <td align="right">0.000000</td>
 <td align="right">0.000000</td>
-<td align="right">0.000000</td>
 <td align="right">0.00000</td>
-<td align="right">0.000000</td>
-<td align="right">0.0000000</td>
-<td align="right">0.000000</td>
-<td align="right">0.0000000</td>
-<td align="right">0.00000</td>
-<td align="right">0.000000</td>
-<td align="right">0.000000</td>
-<td align="right">0.00000</td>
-<td align="right">0.000000</td>
-<td align="right">0.0000000</td>
-<td align="right">0.000000</td>
-<td align="right">0.000000</td>
-<td align="right">0.000000</td>
 <td align="right">0.000000</td>
 <td align="right">0.000000</td>
 <td align="right">0.0000000</td>
@@ -1709,7 +1785,7 @@ SSBのみ)に分解できます。これによって、どの要因が個体群�
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">factor_s</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/decompose_biomass_factors.html">decompose_biomass_factors</a></span><span class="op">(</span></span>
 <span>    <span class="va">res_proc</span>,</span>
@@ -1736,7 +1812,7 @@ SSBのみ)に分解できます。これによって、どの要因が個体群�
 </h4>
 <p>Number at
 ageの過程誤差は、以下のようにプロットできる。ここでは、残差をそのまま示す方法と、Biomasssの対する影響をプロットする方法を示します。</p>
-<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span>  <span class="va">samres</span> <span class="op">=</span> <span class="va">res_proc</span></span>
 <span>  <span class="va">rept</span> <span class="op">=</span> <span class="va">samres</span><span class="op">$</span><span class="va">obj</span><span class="op">$</span><span class="va">env</span><span class="op">$</span><span class="fu">report</span><span class="op">(</span><span class="va">samres</span><span class="op">$</span><span class="va">obj</span><span class="op">$</span><span class="va">env</span><span class="op">$</span><span class="va">last.par.best</span><span class="op">)</span></span>
@@ -1763,7 +1839,7 @@ ageの過程誤差は、以下のようにプロットできる。ここでは�
 <span>      <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_gradient.html" class="external-link">scale_colour_gradient2</a></span><span class="op">(</span>high<span class="op">=</span><span class="st">"red"</span>,low<span class="op">=</span><span class="st">"blue"</span>,mid<span class="op">=</span><span class="st">"gray"</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span></code></pre></div>
 <p><img src="FAQ_files/figure-html/plot-process-error-1.png" class="r-plt" alt="" width="100%"></p>
-<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co"># Biomassレベルでの影響</span></span>
 <span><span class="va">logBresid</span> <span class="op">=</span> <span class="va">samres</span><span class="op">$</span><span class="va">baa</span><span class="op">*</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">logNresid</span><span class="op">)</span><span class="op">-</span><span class="fl">1</span><span class="op">)</span></span>
@@ -1791,7 +1867,7 @@ ageの過程誤差は、以下のようにプロットできる。ここでは�
 <h4 id="固定効果間の相関をプロットする">固定効果間の相関をプロットする<a class="anchor" aria-label="anchor" href="#%E5%9B%BA%E5%AE%9A%E5%8A%B9%E6%9E%9C%E9%96%93%E3%81%AE%E7%9B%B8%E9%96%A2%E3%82%92%E3%83%97%E3%83%AD%E3%83%83%E3%83%88%E3%81%99%E3%82%8B"></a>
 </h4>
 <p>固定効果の相関は以下のようなコードでプロットできます。</p>
-<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cor_mat</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/cor.html" class="external-link">cov2cor</a></span><span class="op">(</span><span class="va">samres</span><span class="op">$</span><span class="va">rep</span><span class="op">$</span><span class="va">cov.fixed</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">tmp</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>varname <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">cor_mat</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -1819,7 +1895,7 @@ ageの過程誤差は、以下のようにプロットできる。ここでは�
 log-likelihood;
 NLL）を、資源尾数Nの過程、漁獲死亡係数Fの過程、年齢別漁獲尾数、および各資源量指標に分けて確認できます。NLLが小さいほど、その成分について観測値または状態の変化がモデルの仮定の下で生じやすいことを表します。ただし、各成分ではデータ数、次元、分散、確率分布が異なるため、成分間のNLLの絶対値や正負をそのまま当てはまりの優劣として比較することはできません。特に、分散を小さな値に固定した正規分布では確率密度が1を超え、NLLが負になることがあります。また、ここで示す値はLaplace近似後の周辺負の対数尤度ではないことにも注意してください。</p>
 <p>以下では、1歳以上のNのプロセス誤差だけを小さく固定したモデル（varN-fix）と、さらに年齢別漁獲尾数の観測誤差を小さくし、Fのランダムウォークの年齢間相関をなくしたモデル（VPA-like）を比較します。この例では、1歳魚以上のNプロセス誤差が小さいのでProcess_Nのnllが非常に小さくなっています。VPA-likeモデルでは、年齢別漁獲尾数に強く適合するよう制約されるため、catch-at-ageのNLLは小さくなります。その一方で、年齢別漁獲尾数の年変動をFの変化として説明する必要が強くなるため、F過程のNLLは大きくなります。これは、観測への適合度とF過程の滑らかさの間のトレードオフを示しています。このようにモデル間のNLLを比較することで、それぞれのモデルの特徴を把握することができます。</p>
-<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">cond_nll1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_cond_nll.html">get_cond_nll</a></span><span class="op">(</span><span class="va">res_varNfix</span><span class="op">)</span></span>
 <span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">cond_nll1</span><span class="op">)</span></span></code></pre></div>
@@ -1831,15 +1907,15 @@ NLL）を、資源尾数Nの過程、漁獲死亡係数Fの過程、年齢別漁
 <tbody>
 <tr class="odd">
 <td align="left">Process_N</td>
-<td align="right">-827.21626</td>
+<td align="right">-827.21629</td>
 </tr>
 <tr class="even">
 <td align="left">Process_F</td>
-<td align="right">-290.70462</td>
+<td align="right">-290.70767</td>
 </tr>
 <tr class="odd">
 <td align="left">Catch_at_age</td>
-<td align="right">82.62482</td>
+<td align="right">82.62537</td>
 </tr>
 <tr class="even">
 <td align="left">Index_1</td>
@@ -1851,7 +1927,7 @@ NLL）を、資源尾数Nの過程、漁獲死亡係数Fの過程、年齢別漁
 </tr>
 <tr class="even">
 <td align="left">Index_3</td>
-<td align="right">26.34139</td>
+<td align="right">26.34141</td>
 </tr>
 <tr class="odd">
 <td align="left">Index_4</td>
@@ -1863,7 +1939,7 @@ NLL）を、資源尾数Nの過程、漁獲死亡係数Fの過程、年齢別漁
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">cond_nll2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_cond_nll.html">get_cond_nll</a></span><span class="op">(</span><span class="va">res_vpalike</span><span class="op">)</span></span>
 <span></span>

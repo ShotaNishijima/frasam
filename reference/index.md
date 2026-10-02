@@ -30,8 +30,7 @@
   : Estimate the Beverton-Holt and hockey-stick stock recruitment
   relationships from data of spawning stock biomass (SBy) and recruits
   (Ry) with a give steepness (h) value.
-- [`FAQ-results`](https://shotanishijima.github.io/frasam/reference/FAQ-results.md)
-  [`res_vpa`](https://shotanishijima.github.io/frasam/reference/FAQ-results.md)
+- [`res_vpa`](https://shotanishijima.github.io/frasam/reference/FAQ-results.md)
   [`res_bh`](https://shotanishijima.github.io/frasam/reference/FAQ-results.md)
   : Example assessment results from the FAQ
 - [`caa_plot()`](https://shotanishijima.github.io/frasam/reference/caa_plot.md)

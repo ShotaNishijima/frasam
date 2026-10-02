@@ -196,18 +196,18 @@ length(res_fixed_p0$input$abund)
 ``` r
 
 fit_check <- check_fit_sam(res_rw)
-#>                          check    ok              value       threshold
-#>          optimizer convergence  TRUE                  0               0
-#>      positive definite Hessian  TRUE               TRUE            TRUE
-#>  maximum fixed-effect gradient  TRUE          0.0001152            0.01
-#>    finite fixed effects and SE  TRUE              18/18             all
-#>        maximum fixed-effect SE  TRUE              55.08             Inf
-#>  maximum absolute fixed effect  TRUE              10.64             Inf
-#>           reported sigma range FALSE 2.388e-05 to 1.373     1e-04 to 10
-#>             reported rho range  TRUE   0.9796 to 0.9796 1e-04 to 0.9999
-#>  parameters near finite bounds  TRUE                  0               0
+#>                          check    ok             value       threshold
+#>          optimizer convergence FALSE                 1               0
+#>      positive definite Hessian  TRUE              TRUE            TRUE
+#>  maximum fixed-effect gradient  TRUE         0.0002187            0.01
+#>    finite fixed effects and SE  TRUE             18/18             all
+#>        maximum fixed-effect SE  TRUE             22.54             Inf
+#>  maximum absolute fixed effect  TRUE             11.26             Inf
+#>           reported sigma range FALSE 1.29e-05 to 1.373     1e-04 to 10
+#>             reported rho range  TRUE  0.9796 to 0.9796 1e-04 to 0.9999
+#>  parameters near finite bounds  TRUE                 0               0
 #>                                                                         message
-#>                                                   nlminb convergence code is 0.
+#>                                                           false convergence (8)
 #>                                                 sdreport reports pdHess = TRUE.
 #>                                         Maximum absolute fixed-effect gradient.
 #>                    Fixed-effect estimates and standard errors should be finite.
@@ -216,22 +216,32 @@ fit_check <- check_fit_sam(res_rw)
 #>  Reported standard deviations should be finite and within the diagnostic range.
 #>                 Rho values very close to 0 or 1 can indicate boundary behavior.
 #>                   Only checked when finite lower or upper bounds were supplied.
+#>  required
+#>     FALSE
+#>      TRUE
+#>      TRUE
+#>      TRUE
+#>      TRUE
+#>      TRUE
+#>      TRUE
+#>      TRUE
+#>      TRUE
 
 fit_check$ok
 #> [1] FALSE
 fit_check$checks
-#>                           check    ok              value       threshold
-#> 1         optimizer convergence  TRUE                  0               0
-#> 2     positive definite Hessian  TRUE               TRUE            TRUE
-#> 3 maximum fixed-effect gradient  TRUE          0.0001152            0.01
-#> 4   finite fixed effects and SE  TRUE              18/18             all
-#> 5       maximum fixed-effect SE  TRUE              55.08             Inf
-#> 6 maximum absolute fixed effect  TRUE              10.64             Inf
-#> 7          reported sigma range FALSE 2.388e-05 to 1.373     1e-04 to 10
-#> 8            reported rho range  TRUE   0.9796 to 0.9796 1e-04 to 0.9999
-#> 9 parameters near finite bounds  TRUE                  0               0
+#>                           check    ok             value       threshold
+#> 1         optimizer convergence FALSE                 1               0
+#> 2     positive definite Hessian  TRUE              TRUE            TRUE
+#> 3 maximum fixed-effect gradient  TRUE         0.0002187            0.01
+#> 4   finite fixed effects and SE  TRUE             18/18             all
+#> 5       maximum fixed-effect SE  TRUE             22.54             Inf
+#> 6 maximum absolute fixed effect  TRUE             11.26             Inf
+#> 7          reported sigma range FALSE 1.29e-05 to 1.373     1e-04 to 10
+#> 8            reported rho range  TRUE  0.9796 to 0.9796 1e-04 to 0.9999
+#> 9 parameters near finite bounds  TRUE                 0               0
 #>                                                                          message
-#> 1                                                  nlminb convergence code is 0.
+#> 1                                                          false convergence (8)
 #> 2                                                sdreport reports pdHess = TRUE.
 #> 3                                        Maximum absolute fixed-effect gradient.
 #> 4                   Fixed-effect estimates and standard errors should be finite.
@@ -240,6 +250,16 @@ fit_check$checks
 #> 7 Reported standard deviations should be finite and within the diagnostic range.
 #> 8                Rho values very close to 0 or 1 can indicate boundary behavior.
 #> 9                  Only checked when finite lower or upper bounds were supplied.
+#>   required
+#> 1    FALSE
+#> 2     TRUE
+#> 3     TRUE
+#> 4     TRUE
+#> 5     TRUE
+#> 6     TRUE
+#> 7     TRUE
+#> 8     TRUE
+#> 9     TRUE
 ```
 
 `verbose = FALSE`
@@ -271,14 +291,18 @@ fit_check$checks[
     "reported sigma range"
   ),
 ]
-#>                           check    ok              value   threshold
-#> 2     positive definite Hessian  TRUE               TRUE        TRUE
-#> 3 maximum fixed-effect gradient  TRUE          0.0001152        0.01
-#> 7          reported sigma range FALSE 2.388e-05 to 1.373 1e-04 to 10
+#>                           check    ok             value   threshold
+#> 2     positive definite Hessian  TRUE              TRUE        TRUE
+#> 3 maximum fixed-effect gradient  TRUE         0.0002187        0.01
+#> 7          reported sigma range FALSE 1.29e-05 to 1.373 1e-04 to 10
 #>                                                                          message
 #> 2                                                sdreport reports pdHess = TRUE.
 #> 3                                        Maximum absolute fixed-effect gradient.
 #> 7 Reported standard deviations should be finite and within the diagnostic range.
+#>   required
+#> 2     TRUE
+#> 3     TRUE
+#> 7     TRUE
 ```
 
 `fixed`
@@ -289,22 +313,22 @@ fit_check$checks[
 
 head(fit_check$fixed)
 #>           name   estimate         se      gradient
-#> 1         logQ -5.3393484 0.17713132 -5.160339e-05
-#> 2         logQ -4.7404517 0.21984731 -3.679972e-05
-#> 3         logQ -5.5526325 0.08309938  8.663253e-06
-#> 4         logQ  0.3089114 0.06075828  2.215296e-08
-#> 5         logQ -4.0119935 0.11963119  6.903226e-06
-#> 6 logSdLogFsta -0.4669707 0.16208903 -4.387291e-06
+#> 1         logQ -5.3393491 0.17720032 -8.328050e-05
+#> 2         logQ -4.7404460 0.21985575  8.031707e-05
+#> 3         logQ -5.5526334 0.08310066 -1.600140e-04
+#> 4         logQ  0.3089121 0.06075912  1.730827e-04
+#> 5         logQ -4.0119932 0.11963210  9.267032e-06
+#> 6 logSdLogFsta -0.4669744 0.16208696 -1.857439e-04
 
 fit_check$fixed[
   order(abs(fit_check$fixed$gradient), decreasing = TRUE),
 ][1:5, ]
-#>            name   estimate        se      gradient
-#> 7  logSdLogFsta -1.1622797 0.1567145 -1.151927e-04
-#> 11  logSdLogObs -1.3083824 0.1096391 -1.085972e-04
-#> 15  logSdLogObs -0.7159731 0.1236300  1.011676e-04
-#> 10  logSdLogObs -0.5883400 0.1054278 -8.352417e-05
-#> 1          logQ -5.3393484 0.1771313 -5.160339e-05
+#>            name    estimate         se      gradient
+#> 10  logSdLogObs -0.58834092 0.10542818 -0.0002187308
+#> 6  logSdLogFsta -0.46697441 0.16208696 -0.0001857439
+#> 4          logQ  0.30891205 0.06075912  0.0001730827
+#> 13  logSdLogObs  0.09393416 0.11460023 -0.0001727920
+#> 3          logQ -5.55263339 0.08310066 -0.0001600140
 ```
 
 診断のしきい値は引数で変更できます。 例えば、勾配をより厳しく見る場合は
@@ -313,18 +337,18 @@ fit_check$fixed[
 ``` r
 
 check_fit_sam(res_rw, gradient_tol = 1e-4, verbose = FALSE)$checks
-#>                           check    ok              value       threshold
-#> 1         optimizer convergence  TRUE                  0               0
-#> 2     positive definite Hessian  TRUE               TRUE            TRUE
-#> 3 maximum fixed-effect gradient FALSE          0.0001152           1e-04
-#> 4   finite fixed effects and SE  TRUE              18/18             all
-#> 5       maximum fixed-effect SE  TRUE              55.08             Inf
-#> 6 maximum absolute fixed effect  TRUE              10.64             Inf
-#> 7          reported sigma range FALSE 2.388e-05 to 1.373     1e-04 to 10
-#> 8            reported rho range  TRUE   0.9796 to 0.9796 1e-04 to 0.9999
-#> 9 parameters near finite bounds  TRUE                  0               0
+#>                           check    ok             value       threshold
+#> 1         optimizer convergence FALSE                 1               0
+#> 2     positive definite Hessian  TRUE              TRUE            TRUE
+#> 3 maximum fixed-effect gradient FALSE         0.0002187           1e-04
+#> 4   finite fixed effects and SE  TRUE             18/18             all
+#> 5       maximum fixed-effect SE  TRUE             22.54             Inf
+#> 6 maximum absolute fixed effect  TRUE             11.26             Inf
+#> 7          reported sigma range FALSE 1.29e-05 to 1.373     1e-04 to 10
+#> 8            reported rho range  TRUE  0.9796 to 0.9796 1e-04 to 0.9999
+#> 9 parameters near finite bounds  TRUE                 0               0
 #>                                                                          message
-#> 1                                                  nlminb convergence code is 0.
+#> 1                                                          false convergence (8)
 #> 2                                                sdreport reports pdHess = TRUE.
 #> 3                                        Maximum absolute fixed-effect gradient.
 #> 4                   Fixed-effect estimates and standard errors should be finite.
@@ -333,6 +357,16 @@ check_fit_sam(res_rw, gradient_tol = 1e-4, verbose = FALSE)$checks
 #> 7 Reported standard deviations should be finite and within the diagnostic range.
 #> 8                Rho values very close to 0 or 1 can indicate boundary behavior.
 #> 9                  Only checked when finite lower or upper bounds were supplied.
+#>   required
+#> 1    FALSE
+#> 2     TRUE
+#> 3     TRUE
+#> 4     TRUE
+#> 5     TRUE
+#> 6     TRUE
+#> 7     TRUE
+#> 8     TRUE
+#> 9     TRUE
 ```
 
 `reported sigma range` が `FALSE` になった場合は、`sigma`
@@ -343,41 +377,41 @@ check_fit_sam(res_rw, gradient_tol = 1e-4, verbose = FALSE)$checks
 
 fit_check$sigma
 #>             type index        value    ok   problem
-#> 1          sigma     1 1.098490e+00  TRUE          
-#> 2          sigma     2 1.372971e+00  TRUE          
-#> 3          sigma     3 4.887163e-01  TRUE          
-#> 4          sigma     4 3.385311e-01  TRUE          
-#> 5          sigma     5 7.328954e-01  TRUE          
-#> 6     sigma.logC     1 5.552483e-01  TRUE          
-#> 7     sigma.logC     2 5.552483e-01  TRUE          
-#> 8     sigma.logC     3 2.702569e-01  TRUE          
-#> 9     sigma.logC     4 2.702569e-01  TRUE          
-#> 10    sigma.logC     5 2.702569e-01  TRUE          
-#> 11    sigma.logC     6 4.575532e-01  TRUE          
-#> 12    sigma.logC     7 4.575532e-01  TRUE          
-#> 13 sigma.logFsta     1 6.268985e-01  TRUE          
-#> 14 sigma.logFsta     2 6.268985e-01  TRUE          
-#> 15 sigma.logFsta     3 3.127723e-01  TRUE          
-#> 16 sigma.logFsta     4 3.127723e-01  TRUE          
-#> 17 sigma.logFsta     5 3.127723e-01  TRUE          
-#> 18 sigma.logFsta     6 3.127723e-01  TRUE          
-#> 19 sigma.logFsta     7 3.127723e-01  TRUE          
-#> 20    sigma.logN     1 6.279345e-01  TRUE          
-#> 21    sigma.logN     2 2.388496e-05 FALSE too small
-#> 22    sigma.logN     3 2.388496e-05 FALSE too small
-#> 23    sigma.logN     4 2.388496e-05 FALSE too small
-#> 24    sigma.logN     5 2.388496e-05 FALSE too small
-#> 25    sigma.logN     6 2.388496e-05 FALSE too small
-#> 26    sigma.logN     7 2.388496e-05 FALSE too small
+#> 1          sigma     1 1.098487e+00  TRUE          
+#> 2          sigma     2 1.372972e+00  TRUE          
+#> 3          sigma     3 4.887162e-01  TRUE          
+#> 4          sigma     4 3.385304e-01  TRUE          
+#> 5          sigma     5 7.328961e-01  TRUE          
+#> 6     sigma.logC     1 5.552477e-01  TRUE          
+#> 7     sigma.logC     2 5.552477e-01  TRUE          
+#> 8     sigma.logC     3 2.702573e-01  TRUE          
+#> 9     sigma.logC     4 2.702573e-01  TRUE          
+#> 10    sigma.logC     5 2.702573e-01  TRUE          
+#> 11    sigma.logC     6 4.575533e-01  TRUE          
+#> 12    sigma.logC     7 4.575533e-01  TRUE          
+#> 13 sigma.logFsta     1 6.268961e-01  TRUE          
+#> 14 sigma.logFsta     2 6.268961e-01  TRUE          
+#> 15 sigma.logFsta     3 3.127718e-01  TRUE          
+#> 16 sigma.logFsta     4 3.127718e-01  TRUE          
+#> 17 sigma.logFsta     5 3.127718e-01  TRUE          
+#> 18 sigma.logFsta     6 3.127718e-01  TRUE          
+#> 19 sigma.logFsta     7 3.127718e-01  TRUE          
+#> 20    sigma.logN     1 6.279338e-01  TRUE          
+#> 21    sigma.logN     2 1.289816e-05 FALSE too small
+#> 22    sigma.logN     3 1.289816e-05 FALSE too small
+#> 23    sigma.logN     4 1.289816e-05 FALSE too small
+#> 24    sigma.logN     5 1.289816e-05 FALSE too small
+#> 25    sigma.logN     6 1.289816e-05 FALSE too small
+#> 26    sigma.logN     7 1.289816e-05 FALSE too small
 
 fit_check$sigma[!fit_check$sigma$ok, ]
 #>          type index        value    ok   problem
-#> 21 sigma.logN     2 2.388496e-05 FALSE too small
-#> 22 sigma.logN     3 2.388496e-05 FALSE too small
-#> 23 sigma.logN     4 2.388496e-05 FALSE too small
-#> 24 sigma.logN     5 2.388496e-05 FALSE too small
-#> 25 sigma.logN     6 2.388496e-05 FALSE too small
-#> 26 sigma.logN     7 2.388496e-05 FALSE too small
+#> 21 sigma.logN     2 1.289816e-05 FALSE too small
+#> 22 sigma.logN     3 1.289816e-05 FALSE too small
+#> 23 sigma.logN     4 1.289816e-05 FALSE too small
+#> 24 sigma.logN     5 1.289816e-05 FALSE too small
+#> 25 sigma.logN     6 1.289816e-05 FALSE too small
+#> 26 sigma.logN     7 1.289816e-05 FALSE too small
 ```
 
 しきい値を変えて確認したい場合は、`sigma_range` を指定します。
@@ -394,33 +428,35 @@ fit_check_strict_sigma <- check_fit_sam(
 fit_check_strict_sigma$checks[
   fit_check_strict_sigma$checks$check == "reported sigma range",
 ]
-#>                  check    ok              value threshold
-#> 7 reported sigma range FALSE 2.388e-05 to 1.373  0.5 to 1
+#>                  check    ok             value threshold
+#> 7 reported sigma range FALSE 1.29e-05 to 1.373  0.5 to 1
 #>                                                                          message
 #> 7 Reported standard deviations should be finite and within the diagnostic range.
+#>   required
+#> 7     TRUE
 
 fit_check_strict_sigma$sigma[!fit_check_strict_sigma$sigma$ok, ]
 #>             type index        value    ok   problem
-#> 1          sigma     1 1.098490e+00 FALSE too large
-#> 2          sigma     2 1.372971e+00 FALSE too large
-#> 3          sigma     3 4.887163e-01 FALSE too small
-#> 4          sigma     4 3.385311e-01 FALSE too small
-#> 8     sigma.logC     3 2.702569e-01 FALSE too small
-#> 9     sigma.logC     4 2.702569e-01 FALSE too small
-#> 10    sigma.logC     5 2.702569e-01 FALSE too small
-#> 11    sigma.logC     6 4.575532e-01 FALSE too small
-#> 12    sigma.logC     7 4.575532e-01 FALSE too small
-#> 15 sigma.logFsta     3 3.127723e-01 FALSE too small
-#> 16 sigma.logFsta     4 3.127723e-01 FALSE too small
-#> 17 sigma.logFsta     5 3.127723e-01 FALSE too small
-#> 18 sigma.logFsta     6 3.127723e-01 FALSE too small
-#> 19 sigma.logFsta     7 3.127723e-01 FALSE too small
-#> 21    sigma.logN     2 2.388496e-05 FALSE too small
-#> 22    sigma.logN     3 2.388496e-05 FALSE too small
-#> 23    sigma.logN     4 2.388496e-05 FALSE too small
-#> 24    sigma.logN     5 2.388496e-05 FALSE too small
-#> 25    sigma.logN     6 2.388496e-05 FALSE too small
-#> 26    sigma.logN     7 2.388496e-05 FALSE too small
+#> 1          sigma     1 1.098487e+00 FALSE too large
+#> 2          sigma     2 1.372972e+00 FALSE too large
+#> 3          sigma     3 4.887162e-01 FALSE too small
+#> 4          sigma     4 3.385304e-01 FALSE too small
+#> 8     sigma.logC     3 2.702573e-01 FALSE too small
+#> 9     sigma.logC     4 2.702573e-01 FALSE too small
+#> 10    sigma.logC     5 2.702573e-01 FALSE too small
+#> 11    sigma.logC     6 4.575533e-01 FALSE too small
+#> 12    sigma.logC     7 4.575533e-01 FALSE too small
+#> 15 sigma.logFsta     3 3.127718e-01 FALSE too small
+#> 16 sigma.logFsta     4 3.127718e-01 FALSE too small
+#> 17 sigma.logFsta     5 3.127718e-01 FALSE too small
+#> 18 sigma.logFsta     6 3.127718e-01 FALSE too small
+#> 19 sigma.logFsta     7 3.127718e-01 FALSE too small
+#> 21    sigma.logN     2 1.289816e-05 FALSE too small
+#> 22    sigma.logN     3 1.289816e-05 FALSE too small
+#> 23    sigma.logN     4 1.289816e-05 FALSE too small
+#> 24    sigma.logN     5 1.289816e-05 FALSE too small
+#> 25    sigma.logN     6 1.289816e-05 FALSE too small
+#> 26    sigma.logN     7 1.289816e-05 FALSE too small
 ```
 
 #### 以前の解析結果の初期値を利用したい
@@ -556,13 +592,13 @@ input$varN.fix <- c(NA,0.0001) #SDではなくて分散
 
 res_varNfix = do.call(sam, input)
 res_varNfix$sigma.logN #1歳魚以上はSD=0.01に固定
-#> [1] 0.6276352 0.0100000 0.0100000 0.0100000 0.0100000 0.0100000 0.0100000
+#> [1] 0.6276344 0.0100000 0.0100000 0.0100000 0.0100000 0.0100000 0.0100000
 
 check_fit_sam(res_varNfix, verbose = TRUE) #すべてOKになる
 #>                          check   ok            value       threshold
 #>          optimizer convergence TRUE                0               0
 #>      positive definite Hessian TRUE             TRUE            TRUE
-#>  maximum fixed-effect gradient TRUE        0.0004075            0.01
+#>  maximum fixed-effect gradient TRUE        0.0004307            0.01
 #>    finite fixed effects and SE TRUE            17/17             all
 #>        maximum fixed-effect SE TRUE           0.6788             Inf
 #>  maximum absolute fixed effect TRUE            5.553             Inf
@@ -570,7 +606,7 @@ check_fit_sam(res_varNfix, verbose = TRUE) #すべてOKになる
 #>             reported rho range TRUE 0.9796 to 0.9796 1e-04 to 0.9999
 #>  parameters near finite bounds TRUE                0               0
 #>                                                                         message
-#>                                                   nlminb convergence code is 0.
+#>                                                        relative convergence (4)
 #>                                                 sdreport reports pdHess = TRUE.
 #>                                         Maximum absolute fixed-effect gradient.
 #>                    Fixed-effect estimates and standard errors should be finite.
@@ -579,6 +615,16 @@ check_fit_sam(res_varNfix, verbose = TRUE) #すべてOKになる
 #>  Reported standard deviations should be finite and within the diagnostic range.
 #>                 Rho values very close to 0 or 1 can indicate boundary behavior.
 #>                   Only checked when finite lower or upper bounds were supplied.
+#>  required
+#>     FALSE
+#>      TRUE
+#>      TRUE
+#>      TRUE
+#>      TRUE
+#>      TRUE
+#>      TRUE
+#>      TRUE
+#>      TRUE
 ```
 
 #### ある固定効果パラメータをある値に固定して使いたい
@@ -619,9 +665,9 @@ idx_logC <- sapply(unique(res_varNfix$sigma.logC), function(z) {
 idx_logC
 #> [1] 1 2 3
 sigma_hat[idx_logC]
-#> [1] 0.5552559 0.2700807 0.4574298
+#> [1] 0.5552562 0.2700810 0.4574318
 exp(input$p0.list$logSdLogObs[idx_logC])
-#> [1] 0.5552559 0.2700807 0.4574298
+#> [1] 0.5552562 0.2700810 0.4574318
 
 # 例: すべてのsigma.logCを 0.2 に固定する
 fix_pos <- idx_logC[]
@@ -645,7 +691,7 @@ abs(res_sigma02$sigma.logC - 0.2) < 1e-6
 # 固定したパラメータは opt$par には出てこない
 res_sigma02$opt$par[names(res_sigma02$opt$par) == "logSdLogObs"]
 #> logSdLogObs logSdLogObs logSdLogObs logSdLogObs logSdLogObs 
-#>   0.1326106   0.3298184  -0.6822933  -1.0575786  -0.2981355
+#>   0.1326097   0.3298171  -0.6822938  -1.0575780  -0.2981353
 ```
 
 #### VPAと同じような設定で解析したい
@@ -819,7 +865,7 @@ ggplot2::ggplot(
 ``` r
 
 res_rw$sigma #index毎に異なる
-#> [1] 1.0984901 1.3729710 0.4887163 0.3385311 0.7328954
+#> [1] 1.0984874 1.3729718 0.4887162 0.3385304 0.7328961
 
 input <- res_rw$input
 input$index.key <- rep(0, length(input$abund))
@@ -830,12 +876,48 @@ res_ls$sigma
 input$index.key <- c(0,0,1,2,3)
 res_rw2 <- do.call(sam, input)
 res_rw2$sigma
-#> [1] 1.2438601 1.2438601 0.4909688 0.3384182 0.7341535
+#> [1] 1.2438602 1.2438602 0.4909691 0.3384182 0.7341528
 
 #AICの比較
 c(res_rw$aic, res_ls$aic, res_rw2$aic)
 #> [1]  976.4474 1053.1456  976.3630
 ```
+
+#### オメガ法でCPUEに当てはめたい
+
+`abund = "Bs"`は全体のFから計算した選択率を、`abund = "Bf"`はFに`catch_prop`を掛けて計算した指標ごとの選択率を、資源重量に掛けてIndexに当てはめます。
+
+`frasyr::vpa(abund = "Bo")`に対応させるには、`"Bf"`の対象Indexの`catch_prop`にomegaを指定し、`sel.def = "mean"`を使います。
+VPAの`"Bo"`は`F * omega`の合計を1にしますが、SAMでは平均を1にするため、重みは年齢区分数倍になります。
+年齢区分数が一定でqを推定する場合、この定数倍はqに吸収できます。これは指標への当てはめ方の対応であり、VPAとSAMの推定結果自体が一致するという意味ではありません。
+
+`catch_prop`は年齢 × 年 × (Index数 +
+1)の配列で、Indexの`i`番目に対応するスライスは`catch_prop[, , i + 1]`です。
+`sel.def = "max"`では正規化の違いが年ごとに変わり得るため、同じ対応になるとは限りません。
+また、`sel.def`は他の`"Bs"`・`"Bf"`にも適用されます。
+
+##### VPAのオメガ法とSAMのBfでqは同じになりますか？
+
+正規化が異なるため、同じ`scale`で`b = 1`の場合、同じN・F・体重・omegaから計算するなら、Bfの資源量指標はBoの全年齢区分数倍、対応するqはその逆数倍になります。
+ここでの年齢区分数は`min.age:max.age`の長さではなく、選択率の正規化に使う全年齢の行数です。
+
+`sel.def = "mean"`の場合、SAMのqをBoの尺度に換算できます。指標が`I = q * A^b`に従うとき、換算式は次のとおりです。
+
+``` r
+
+i <- 1L # Bfに設定したIndexの番号
+K <- nrow(res_bf$naa)
+scale_vpa <- 1000 # 比較するVPAで指定したscale
+scale_sam <- res_bf$input$scale
+q_on_Bo_scale <- res_bf$q[i] * (K * scale_vpa / scale_sam)^res_bf$b[i]
+```
+
+同じ`scale`で`b = 1`なら、`q_on_Bo_scale = K * res_bf$q[i]`です。
+omegaを定数倍しても正規化で打ち消されるため、omegaを`K`で割るだけではqの尺度は揃いません。
+SAMの`scale`を`K * scale_vpa`にする方法でも指標の尺度は揃いますが、他の資源量指標にも影響するため、比較用にqを換算する方法が扱いやすいです。
+
+この換算は正規化と単位の違いを補正するもので、VPAとSAMで別々に推定したqが同じになることを保証しません。
+`sel.def = "max"`の場合は比率が年によって変わり得るため、この定数による換算は使えません。
 
 #### IndexとAbundanceの間の非線形性を推定したい
 
@@ -859,20 +941,20 @@ input$b.est <- TRUE
 input$p0.list <- res_rw$par_list
 res_estb_full <- do.call(sam, input)
 res_estb_full$b #すべてのindexでbが推定される
-#> [1] 0.9775696 0.9484946 1.0082822 0.9249474 0.8870780
+#> [1] 0.9998667 0.9997609 1.0003231 0.9962767 0.9983365
 check_fit_sam(res_estb_full, verbose = FALSE)
 
 c(res_rw$aic, res_estb_full$aic)
-#> [1] 976.4474 982.5655
+#> [1] 976.4474 985.4785
 
 input$b.fix <- c(1,1,1,1,NA) #1-4番目のindexはb=1に固定し、5番目のindexはb推定を行う
 res_estb_45 <- do.call(sam, input)
 res_estb_45$b #
-#> [1] 1.0000000 1.0000000 1.0000000 1.0000000 0.9973021
+#> [1] 1.0000000 1.0000000 1.0000000 1.0000000 0.8962075
 check_fit_sam(res_estb_45, verbose = FALSE)
 
 c(res_rw$aic, res_estb_full$aic, res_estb_45$aic)
-#> [1] 976.4474 982.5655 976.0210
+#> [1] 976.4474 985.4785 977.3648
 ```
 
 #### 加入年齢を1歳にしたい
@@ -981,7 +1063,7 @@ input$p0.list <- NULL
 
 res_proc <- do.call(sam, input)
 res_proc$sigma.logN
-#> [1] 0.5975384 0.1640797 0.1640797 0.1640797 0.1640797 0.1640797 0.1640797
+#> [1] 0.5975378 0.1640789 0.1640789 0.1640789 0.1640789 0.1640789 0.1640789
 
 factor_b <- decompose_biomass_factors(
     res_proc,
@@ -994,12 +1076,12 @@ knitr::kable(factor_b$age_aggregated)
 
 |  | 1975 | 1976 | 1977 | 1978 | 1979 | 1980 | 1981 | 1982 | 1983 | 1984 | 1985 | 1986 | 1987 | 1988 | 1989 | 1990 | 1991 | 1992 | 1993 | 1994 | 1995 | 1996 | 1997 | 1998 | 1999 | 2000 | 2001 | 2002 | 2003 | 2004 | 2005 | 2006 | 2007 | 2008 | 2009 | 2010 | 2011 | 2012 | 2013 | 2014 |
 |:---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| recruitment | 1899019 | 2746780.4 | 2319582.4 | 1218777.9 | 974175.4 | 1300263.6 | 1766566.8 | 2380311.1 | 2563593.434 | 3946424.2 | 6591958.5 | 3144129 | 1720912 | 524070.9 | 229790.377 | 209013.08 | 374794.116 | 568537.1 | 265439.99 | 138938.39 | 199712.24 | 292528.020 | 205740.29790 | 99983.29 | 111997.46 | 101084.82 | 135625.35 | 154296.473 | 176933.23 | 396695.613 | 286203.65 | 193079.114 | 312309.66 | 345684.149 | 534585.20 | 454419.70 | 492904.26 | 994496.32 | 2377627.043 | 5744316.9 |
-| growth | 0 | 2312905.4 | 2865695.4 | 2794485.5 | 1769580.4 | 1236487.0 | 1382513.0 | 1857532.9 | 2555485.321 | 3037354.9 | 4388192.3 | 6694213 | 4273701 | 2245679.3 | 693893.336 | 221811.63 | 204113.782 | 358990.1 | 573122.14 | 397857.72 | 167574.36 | 164068.619 | 261995.52851 | 243686.89 | 161689.25 | 140263.24 | 128624.34 | 156197.775 | 183240.44 | 212915.867 | 402082.97 | 396331.096 | 315131.98 | 366283.156 | 407130.90 | 584189.25 | 595144.11 | 621900.63 | 1014430.168 | 2310369.5 |
-| fishing | 0 | -729670.6 | -1069622.0 | -850315.5 | -2196682.1 | -778364.9 | -554552.3 | -426636.3 | -493359.793 | -385085.0 | -363057.8 | -3971854 | -6751163 | -3867284.9 | -3074848.507 | -363959.63 | -138750.176 | -95910.7 | -191356.03 | -395304.59 | -586780.22 | -84041.135 | -123693.06567 | -90354.19 | -52479.41 | -32235.51 | -12470.20 | -11537.329 | -11350.80 | -12832.191 | -17670.35 | -23296.504 | -25556.76 | -30845.711 | -32446.58 | -22354.54 | -37638.40 | -32050.03 | -49341.907 | -64073.3 |
-| process | 0 | -233691.8 | -191289.3 | -218531.4 | -196027.9 | -158757.3 | -131201.5 | -116311.1 | 7237.033 | 163078.1 | 583321.3 | 1217119 | 1000081 | 519831.3 | 5053.001 | -10011.75 | 1724.913 | 34971.1 | 84441.86 | 75483.31 | -16910.41 | -4386.091 | -67.71783 | -8384.98 | -26009.42 | -21719.90 | -14892.05 | -4667.845 | -1527.12 | -2235.776 | 21256.40 | 1991.771 | -23484.44 | 3406.324 | -34782.40 | 10996.26 | 14851.04 | -27954.94 | 3192.676 | 137423.3 |
-| natural | 0 | -3257001.4 | -3719538.9 | -3843868.6 | -2771281.4 | -1924596.0 | -1887351.2 | -2326650.6 | -3163725.142 | -4040065.9 | -5782200.9 | -8104156 | -6181397 | -3522347.7 | -1265381.530 | -322648.74 | -262040.469 | -409006.3 | -666362.09 | -588924.28 | -272912.48 | -183300.858 | -286412.08324 | -312811.27 | -263518.20 | -232714.79 | -216192.34 | -236536.415 | -271415.05 | -313779.235 | -499899.18 | -578518.007 | -543004.48 | -579127.517 | -628878.03 | -805327.76 | -906565.98 | -976457.84 | -1354852.066 | -2659648.0 |
-| maturity | 0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.000 | 0.0 | 0.0 | 0 | 0 | 0.0 | 0.000 | 0.00 | 0.000 | 0.0 | 0.00 | 0.00 | 0.00 | 0.000 | 0.00000 | 0.00 | 0.00 | 0.00 | 0.00 | 0.000 | 0.00 | 0.000 | 0.00 | 0.000 | 0.00 | 0.000 | 0.00 | 0.00 | 0.00 | 0.00 | 0.000 | 0.0 |
+| recruitment | 1899014 | 2746767.5 | 2319572.1 | 1218772.6 | 974170.0 | 1300255.5 | 1766563.4 | 2380309.2 | 2563590.87 | 3946421.7 | 6591955.4 | 3144128 | 1720908 | 524068.6 | 229790.486 | 209013.02 | 374793.77 | 568535.50 | 265439.7 | 138938.18 | 199711.04 | 292524.987 | 205737.6661 | 99982.040 | 111996.28 | 101083.98 | 135624.18 | 154295.325 | 176931.993 | 396692.745 | 286201.80 | 193078.11 | 312307.67 | 345682.394 | 534583.09 | 454417.64 | 492902.79 | 994489.90 | 2377608.540 | 5744266.66 |
+| growth | 0 | 2312898.2 | 2865683.5 | 2794474.1 | 1769573.3 | 1236480.7 | 1382504.5 | 1857527.0 | 2555481.76 | 3037351.1 | 4388187.7 | 6694207 | 4273697 | 2245674.0 | 693891.179 | 221811.56 | 204113.74 | 358989.75 | 573120.6 | 397856.60 | 167573.76 | 164067.401 | 261992.4907 | 243683.396 | 161686.87 | 140261.49 | 128623.06 | 156196.334 | 183238.928 | 212914.230 | 402079.85 | 396328.14 | 315129.89 | 366280.712 | 407128.66 | 584186.70 | 595141.45 | 621898.46 | 1014424.281 | 2310351.24 |
+| fishing | 0 | -729670.7 | -1069622.2 | -850316.4 | -2196677.0 | -778365.3 | -554552.4 | -426636.9 | -493360.02 | -385085.0 | -363058.6 | -3971840 | -6751157 | -3867275.2 | -3074836.892 | -363959.20 | -138750.23 | -95910.73 | -191355.6 | -395303.83 | -586778.97 | -84041.516 | -123693.4799 | -90354.420 | -52479.45 | -32235.53 | -12470.21 | -11537.323 | -11350.785 | -12832.184 | -17670.34 | -23296.49 | -25556.76 | -30845.685 | -32446.57 | -22354.56 | -37638.40 | -32050.02 | -49341.831 | -64073.21 |
+| process | 0 | -233686.5 | -191284.6 | -218523.0 | -196023.4 | -158754.4 | -131199.6 | -116307.8 | 7239.15 | 163074.7 | 583315.3 | 1217107 | 1000069 | 519824.1 | 5052.653 | -10011.57 | 1724.87 | 34970.80 | 84440.8 | 75481.98 | -16910.22 | -4386.015 | -67.7688 | -8384.765 | -26008.78 | -21719.40 | -14891.79 | -4667.915 | -1527.244 | -2235.944 | 21255.69 | 1991.43 | -23484.34 | 3405.952 | -34781.91 | 10996.08 | 14850.59 | -27954.86 | 3191.899 | 137419.08 |
+| natural | 0 | -3256991.3 | -3719525.1 | -3843854.0 | -2771271.2 | -1924587.2 | -1887340.3 | -2326641.1 | -3163718.06 | -4040058.6 | -5782191.2 | -8104147 | -6181387 | -3522338.1 | -1265377.545 | -322648.46 | -262040.35 | -409005.90 | -666360.4 | -588922.31 | -272911.29 | -183299.363 | -286408.6363 | -312806.598 | -263513.97 | -232711.28 | -216189.53 | -236533.754 | -271412.356 | -313776.415 | -499894.96 | -578513.28 | -543000.31 | -579123.216 | -628873.89 | -805323.49 | -906561.35 | -976453.52 | -1354844.592 | -2659628.17 |
+| maturity | 0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.00 | 0.0 | 0.0 | 0 | 0 | 0.0 | 0.000 | 0.00 | 0.00 | 0.00 | 0.0 | 0.00 | 0.00 | 0.000 | 0.0000 | 0.000 | 0.00 | 0.00 | 0.00 | 0.000 | 0.000 | 0.000 | 0.00 | 0.00 | 0.00 | 0.000 | 0.00 | 0.00 | 0.00 | 0.00 | 0.000 | 0.00 |
 
 ``` r
 
@@ -1009,12 +1091,12 @@ knitr::kable(factor_b$percent_aggregated)
 
 |  | 1975 | 1976 | 1977 | 1978 | 1979 | 1980 | 1981 | 1982 | 1983 | 1984 | 1985 | 1986 | 1987 | 1988 | 1989 | 1990 | 1991 | 1992 | 1993 | 1994 | 1995 | 1996 | 1997 | 1998 | 1999 | 2000 | 2001 | 2002 | 2003 | 2004 | 2005 | 2006 | 2007 | 2008 | 2009 | 2010 | 2011 | 2012 | 2013 | 2014 |
 |:---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| recruitment | NA | 43.508489 | 32.43025 | 16.565434 | 15.085012 | 32.203333 | 47.581725 | 55.502252 | 45.3178252 | 55.379460 | 66.937993 | 20.595532 | 12.08037 | 6.308289 | 5.4613110 | 26.254250 | 70.6737373 | 80.05782 | 22.731098 | 11.268089 | 23.19334 | 83.161405 | 38.3394702 | 16.826797 | 21.279727 | 22.071389 | 32.865474 | 35.604420 | 36.0267751 | 69.9643694 | 33.759949 | 18.5700420 | 30.341302 | 32.4672077 | 45.686426 | 32.0979680 | 30.0982619 | 55.362203 | 100.0567124 | 131.529101 |
-| growth | NA | 36.635990 | 40.06549 | 37.982201 | 27.401780 | 30.623793 | 37.237401 | 43.312515 | 45.1744944 | 42.622654 | 44.559865 | 43.850268 | 30.00032 | 27.031443 | 16.4914098 | 27.861884 | 38.4890883 | 50.55073 | 49.079625 | 32.266793 | 19.46105 | 46.642290 | 48.8225684 | 41.011550 | 30.721260 | 30.625811 | 31.168951 | 36.043151 | 37.3110372 | 37.5515229 | 47.428818 | 38.1184943 | 30.615495 | 34.4018994 | 34.793997 | 41.2642496 | 36.3413443 | 34.620328 | 42.6898524 | 52.901124 |
-| fishing | NA | -11.557846 | -14.95446 | -11.557352 | -34.015408 | -19.277588 | -14.936632 | -9.947975 | -8.7213489 | -5.403828 | -3.686668 | -26.017528 | -47.39148 | -46.550857 | -73.0783597 | -45.717175 | -26.1636804 | -13.50554 | -16.386878 | -32.059730 | -68.14501 | -23.891656 | -23.0500619 | -15.206257 | -9.971186 | -7.038469 | -3.021847 | -2.662277 | -2.3112255 | -2.2631864 | -2.084355 | -2.2406207 | -2.482874 | -2.8970785 | -2.772932 | -1.5790146 | -2.2983175 | -1.784180 | -2.0764354 | -1.467103 |
-| process | NA | -3.701635 | -2.67443 | -2.970243 | -3.035473 | -3.931905 | -3.533858 | -2.712053 | 0.1279324 | 2.288446 | 5.923331 | 7.972706 | 7.02032 | 6.257256 | 0.1200921 | -1.257582 | 0.3252614 | 4.92441 | 7.231225 | 6.121797 | -1.96387 | -1.246901 | -0.0126191 | -1.411159 | -4.941839 | -4.742436 | -3.608723 | -1.077121 | -0.3109489 | -0.3943191 | 2.507358 | 0.1915654 | -2.281545 | 0.3199274 | -2.972555 | 0.7767219 | 0.9068508 | -1.556212 | 0.1343561 | 3.146616 |
-| natural | NA | -51.590294 | -52.00314 | -52.245249 | -42.913021 | -47.666032 | -50.835004 | -54.251039 | -55.9266306 | -56.693516 | -58.715315 | -53.086064 | -43.39186 | -42.398816 | -30.0736789 | -40.528090 | -49.4121398 | -57.59370 | -57.064279 | -47.762546 | -31.69436 | -52.109732 | -53.3725655 | -52.644913 | -50.068951 | -50.812166 | -52.388906 | -54.581557 | -55.2649668 | -55.3405825 | -58.967000 | -55.6409415 | -52.753613 | -54.3925819 | -53.744828 | -56.8843837 | -55.3577289 | -54.358027 | -57.0156888 | -60.898644 |
-| maturity | NA | 0.000000 | 0.00000 | 0.000000 | 0.000000 | 0.000000 | 0.000000 | 0.000000 | 0.0000000 | 0.000000 | 0.000000 | 0.000000 | 0.00000 | 0.000000 | 0.0000000 | 0.000000 | 0.0000000 | 0.00000 | 0.000000 | 0.000000 | 0.00000 | 0.000000 | 0.0000000 | 0.000000 | 0.000000 | 0.000000 | 0.000000 | 0.000000 | 0.0000000 | 0.0000000 | 0.000000 | 0.0000000 | 0.000000 | 0.0000000 | 0.000000 | 0.0000000 | 0.0000000 | 0.000000 | 0.0000000 | 0.000000 |
+| recruitment | NA | 43.508429 | 32.430220 | 16.565429 | 15.084983 | 32.20327 | 47.581890 | 55.502455 | 45.3178965 | 55.379515 | 66.938059 | 20.595554 | 12.080354 | 6.308275 | 5.4613319 | 26.254275 | 70.6736971 | 80.057654 | 22.731116 | 11.268102 | 23.193284 | 83.161100 | 38.3393669 | 16.826816 | 21.279834 | 22.07154 | 32.865632 | 35.604560 | 36.0268852 | 69.9644923 | 33.760008 | 18.5700956 | 30.341344 | 32.4672795 | 45.686558 | 32.0979973 | 30.0983237 | 55.362099 | 100.0564542 | 131.528854 |
+| growth | NA | 36.635998 | 40.065469 | 37.982199 | 27.401772 | 30.62377 | 37.237372 | 43.312570 | 45.1745477 | 42.622670 | 44.559884 | 43.850284 | 30.000313 | 27.031441 | 16.4914140 | 27.861908 | 38.4890947 | 50.550717 | 49.079591 | 32.266787 | 19.461047 | 46.642257 | 48.8224952 | 41.011522 | 30.721285 | 30.62589 | 31.169059 | 36.043229 | 37.3111030 | 37.5515715 | 47.428838 | 38.1185173 | 30.615528 | 34.4019205 | 34.794044 | 41.2642940 | 36.3413646 | 34.620366 | 42.6898267 | 52.901070 |
+| fishing | NA | -11.557885 | -14.954518 | -11.557411 | -34.015456 | -19.27768 | -14.936713 | -9.948033 | -8.7213754 | -5.403837 | -3.686681 | -26.017468 | -47.391482 | -46.550843 | -73.0783295 | -45.717174 | -26.1636994 | -13.505556 | -16.386875 | -32.059753 | -68.145115 | -23.891924 | -23.0503718 | -15.206503 | -9.971349 | -7.03858 | -3.021890 | -2.662306 | -2.3112464 | -2.2632056 | -2.084372 | -2.2406373 | -2.482893 | -2.8970971 | -2.772950 | -1.5790244 | -2.2983291 | -1.784187 | -2.0764430 | -1.467111 |
+| process | NA | -3.701562 | -2.674373 | -2.970141 | -3.035414 | -3.93185 | -3.533825 | -2.711988 | 0.1279701 | 2.288402 | 5.923280 | 7.972636 | 7.020242 | 6.257183 | 0.1200842 | -1.257561 | 0.3252533 | 4.924372 | 7.231149 | 6.121706 | -1.963855 | -1.246888 | -0.0126288 | -1.411142 | -4.941794 | -4.74240 | -3.608709 | -1.077149 | -0.3109774 | -0.3943523 | 2.507295 | 0.1915341 | -2.281553 | 0.3198947 | -2.972533 | 0.7767134 | 0.9068277 | -1.556214 | 0.1343241 | 3.146542 |
+| natural | NA | -51.590305 | -52.003132 | -52.245261 | -42.913024 | -47.66601 | -50.834983 | -54.251057 | -55.9266495 | -56.693507 | -58.715303 | -53.086067 | -43.391835 | -42.398796 | -30.0736854 | -40.528104 | -49.4121350 | -57.593681 | -57.064249 | -47.762512 | -31.694338 | -52.109656 | -53.3724621 | -52.644846 | -50.068926 | -50.81217 | -52.388930 | -54.581564 | -55.2649726 | -55.3405825 | -58.966986 | -55.6409357 | -52.753616 | -54.3925742 | -53.744842 | -56.8843917 | -55.3577249 | -54.358034 | -57.0156708 | -60.898608 |
+| maturity | NA | 0.000000 | 0.000000 | 0.000000 | 0.000000 | 0.00000 | 0.000000 | 0.000000 | 0.0000000 | 0.000000 | 0.000000 | 0.000000 | 0.000000 | 0.000000 | 0.0000000 | 0.000000 | 0.0000000 | 0.000000 | 0.000000 | 0.000000 | 0.000000 | 0.000000 | 0.0000000 | 0.000000 | 0.000000 | 0.00000 | 0.000000 | 0.000000 | 0.0000000 | 0.0000000 | 0.000000 | 0.0000000 | 0.000000 | 0.0000000 | 0.000000 | 0.0000000 | 0.0000000 | 0.000000 | 0.0000000 | 0.000000 |
 
 ``` r
 
@@ -1149,12 +1231,12 @@ knitr::kable(cond_nll1)
 
 | type         |        nll |
 |:-------------|-----------:|
-| Process_N    | -827.21626 |
-| Process_F    | -290.70462 |
-| Catch_at_age |   82.62482 |
+| Process_N    | -827.21629 |
+| Process_F    | -290.70767 |
+| Catch_at_age |   82.62537 |
 | Index_1      |   60.06802 |
 | Index_2      |   69.16650 |
-| Index_3      |   26.34139 |
+| Index_3      |   26.34141 |
 | Index_4      |   12.16784 |
 | Index_5      |   43.96092 |
 

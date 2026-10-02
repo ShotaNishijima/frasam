@@ -33,7 +33,7 @@ and the packaged dat_ex data."></head><body>
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Example assessment results from the FAQ</h1>
-
+      <small class="dont-index">Source: <a href="https://github.com/ShotaNishijima/frasam/blob/create_vignette/R/FAQ-data.R" class="external-link"><code>R/FAQ-data.R</code></a></small>
       <div class="d-none name"><code>FAQ-results.Rd</code></div>
     </div>
 
@@ -42,20 +42,28 @@ and the packaged dat_ex data."></head><body>
 and the packaged <code>dat_ex</code> data.</p>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="va">res_vpa</span></span>
+<span></span>
+<span><span class="va">res_bh</span></span></code></pre></div>
+    </div>
 
     <div class="section level2">
     <h2 id="format">Format<a class="anchor" aria-label="anchor" href="#format"></a></h2>
     <p>Lists containing assessment inputs, estimated population numbers,
-fishing mortality, biomass, spawning biomass, and model diagnostics.</p>
+  fishing mortality, biomass, spawning biomass, and model diagnostics.</p>
+<p>An object of class <code>vpa</code> of length 28.</p>
+<p>An object of class <code>sam</code> of length 34.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p><code>res_vpa</code> is the tuned VPA result from the <code>set-qinit</code> example,
-with the final-year recruitment indices set to missing.
-<code>res_bh</code> is the SAM result with Beverton-Holt recruitment from the
-<code>use-do.call</code> example. Saved TMB external pointers cannot be used in
-a new R session; refit with <code>do.call(sam, res_bh$input)</code> when a live
-TMB objective is required, after running <code><a href="use_sam_tmb.html">use_sam_tmb()</a></code>.</p>
+    <p><code>res_vpa</code> is the tuned VPA result from the <code>set-qinit</code>
+  example, with the final-year recruitment indices set to missing.
+  <code>res_bh</code> is the SAM result with Beverton-Holt recruitment from the
+  <code>use-do.call</code> example. Saved TMB external pointers cannot be used in
+  a new R session; refit with <code>do.call(sam, res_bh$input)</code> when a live
+  TMB objective is required, after running <code><a href="use_sam_tmb.html">use_sam_tmb()</a></code>.</p>
     </div>
 
     <div class="section level2">

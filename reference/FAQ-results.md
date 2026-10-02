@@ -3,10 +3,22 @@
 Assessment results generated using the examples in `vignettes/FAQ.Rmd`
 and the packaged `dat_ex` data.
 
+## Usage
+
+``` r
+res_vpa
+
+res_bh
+```
+
 ## Format
 
 Lists containing assessment inputs, estimated population numbers,
 fishing mortality, biomass, spawning biomass, and model diagnostics.
+
+An object of class `vpa` of length 28.
+
+An object of class `sam` of length 34.
 
 ## Details
 

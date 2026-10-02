@@ -52,7 +52,8 @@ sam() result object. The function does not change the fitted object."></head><bo
 <span>  rho_range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1e-04</span>, <span class="fl">1</span> <span class="op">-</span> <span class="fl">1e-04</span><span class="op">)</span>,</span>
 <span>  par_abs_max <span class="op">=</span> <span class="cn">Inf</span>,</span>
 <span>  boundary_tol <span class="op">=</span> <span class="fl">1e-04</span>,</span>
-<span>  verbose <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  verbose <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  require_optimizer_convergence <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -94,11 +95,25 @@ lower or upper bounds.</p></dd>
 <dt id="arg-verbose">verbose<a class="anchor" aria-label="anchor" href="#arg-verbose"></a></dt>
 <dd><p>If <code>TRUE</code>, print the diagnostic table.</p></dd>
 
+
+<dt id="arg-require-optimizer-convergence">require_optimizer_convergence<a class="anchor" aria-label="anchor" href="#arg-require-optimizer-convergence"></a></dt>
+<dd><p>If <code>TRUE</code>, require optimizer
+convergence code 0 for the overall result. By default, the code and
+stopping message are reported but do not determine <code>ok</code>.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A list with <code>ok</code>, <code>checks</code>, <code>fixed</code>, <code>sigma</code>,
   and <code>boundary</code> elements.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>The <code>required</code> column in <code>checks</code> identifies diagnostics
+  used in the overall result. A nonzero optimizer code warrants inspection
+  of the stopping message and stability after restarting, even if the
+  remaining diagnostics pass. Passing diagnostics does not guarantee a
+  global optimum.</p>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
