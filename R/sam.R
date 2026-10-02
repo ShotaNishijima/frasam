@@ -873,7 +873,7 @@ sam <- function(dat,
       # Re-run to further decrease final gradient (https://github.com/kaskr/TMB_contrib_R/blob/master/TMBhelper/R/fit_tmb.R)
       for( i in seq(2,loopnum,length=max(0,loopnum-1)) ){
         # Temp = parameter_estimates[c('iterations','evaluations')]
-        opt2 = nlminb( start=obj$par, objective=obj$fn, gradient=obj$gr, control=nlminb.control, lower=lower, upper=upper )
+        opt2 = nlminb( start=opt$par, objective=obj$fn, gradient=obj$gr, control=nlminb.control, lower=lower, upper=upper )
         if(opt2$objective<=opt$objective) {
           opt <- opt2
         } else {
