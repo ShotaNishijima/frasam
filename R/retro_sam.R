@@ -5,16 +5,23 @@
 #'
 #' @param res SAM object
 #' @param n the number of peels
+#' @param dat_overwrite ピールごとにdatを置き換える場合に使用する
 #'
 #' @export
 
-retro_sam <- function(res, n=5, stat="mean", b.fix=TRUE,remove_short_index=-1, map_add = NULL, p0_retro_list = NULL){
+retro_sam <- function(res, n=5, stat="mean", b.fix=TRUE,remove_short_index=-1, map_add = NULL, p0_retro_list = NULL, dat_overwrite = NULL){
   res.c <- res
   res.c$input$bias.correct.sd = FALSE
   Res <- list()
   obj.n <- obj.b <- obj.s <- obj.r <- obj.f <- NULL
   obj.n2 <- obj.b2 <- obj.s2 <- obj.r2 <- obj.f2 <- NULL
   max.a <- nrow(res$naa)
+
+  if (!is.null(dat_overwrite)) {
+    if (!is.list(dat_overwrite) || length(dat_overwrite) < n) {
+      stop("'dat_overwrite' must be a list with at least 'n' elements.", call. = FALSE)
+    }
+  }
 
   if ("rec_logb" %in% names(map_add)) {
     res.c$input$b.init <- as.numeric(res$rec.par["b"])
@@ -72,6 +79,16 @@ retro_sam <- function(res, n=5, stat="mean", b.fix=TRUE,remove_short_index=-1, m
       res.c$input$p0.list$logSdLogObs <- c(res.c$input$p0.list$logSdLogObs[unique(res.c$input$varC)+1],
                                            res.c$input$p0.list$logSdLogObs[max(unique(res.c$input$varC))+1+unique(res.c$input$index.key)])
 
+    }
+
+    if(!is.null(dat_overwrite)) {
+      if (!isTRUE(all(dim(dat_overwrite[[i]]$caa) == dim(res.c$input$dat$caa)))) {
+        stop("'dat_overwrite[[", i, "]]$caa' must have the same dimensions as the peeled data.", call. = FALSE)
+      }
+      if (!isTRUE(all(dim(dat_overwrite[[i]]$index) == dim(res.c$input$dat$index)))) {
+        stop("'dat_overwrite[[", i, "]]$index' must have the same dimensions as the peeled data.", call. = FALSE)
+      }
+      res.c$input$dat <- dat_overwrite[[i]]
     }
 
     if (!is.null(map_add)) res.c$input$map.add <- map_add
