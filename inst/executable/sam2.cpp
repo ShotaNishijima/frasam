@@ -210,6 +210,7 @@ Type objective_function<Type>::operator() ()
 
   DATA_VECTOR(logobs);
   DATA_VECTOR_INDICATOR(keep, logobs);
+  DATA_IMATRIX(fix_zero_f);
 
   array<Type> logF(nlogF,U.cols()); // logF (6 x 50 matrix)
   array<Type> logN(nlogN,U.cols()); // logN (7 x 50 matrix)
@@ -253,6 +254,19 @@ Type objective_function<Type>::operator() ()
   vector<Type> Catch_biomass(timeSteps);
   vector<Type> Exploitation_rate(timeSteps);
   vector<Type> scale_U(timeSteps);
+
+  array<Type> faa_eff(stateDimN,U.cols());
+
+  // create effective F (for fishing ban)
+  for(int y=0;y<U.cols();y++){
+    for(int a=0;a<stateDimN;a++){
+      if(a < stateDimN-1){
+        faa_eff(a,y)=exp_logF((keyLogFsta(0,a)),y)*(Type(1.0)-Type(fix_zero_f(a,y)));
+      }else{
+        faa_eff(a,y)=alpha*exp_logF((keyLogFsta(0,a)),y)*(Type(1.0)-Type(fix_zero_f(a,y)));
+      }
+    }
+  }
 
   //First take care of F
   matrix<Type> fvar(stateDimF,stateDimF);  // Fの???散??????
@@ -305,9 +319,8 @@ Type objective_function<Type>::operator() ()
     ssb(i)=0.0;
     ssn(i)=0.0;
     for(int j=0; j<stateDimN; ++j){
-      ssb(i)+=exp(logN(j,i))*exp(-exp(logF((keyLogFsta(0,j)),i))*propF(i,j)-natMor(i,j)*propM(i,j))*propMat(i,j)*stockMeanWeight_true(i,j);  // ssbを
-      ssn(i)+=exp(logN(j,i))*exp(-exp(logF((keyLogFsta(0,j)),i))*propF(i,j)-natMor(i,j)*propM(i,j))*propMat(i,j);
-      // ssb(i)+=exp(logN(j,i))*propMat(i,j)*stockMeanWeight(i,j);  // ssbを??????
+      ssb(i)+=exp(logN(j,i))*exp(-faa_eff(j,i)*propF(i,j)-natMor(i,j)*propM(i,j))*propMat(i,j)*stockMeanWeight_true(i,j);  // ssbを
+      ssn(i)+=exp(logN(j,i))*exp(-faa_eff(j,i)*propF(i,j)-natMor(i,j)*propM(i,j))*propMat(i,j);
     }
     logssb(i)=log(ssb(i));  // log(ssb)
   }
@@ -317,11 +330,7 @@ Type objective_function<Type>::operator() ()
   vector<Type> FY(stateDimN);
   for (int y=0;y<timeSteps;y++){
     for (int i=0;i<stateDimN;i++) {
-      if(i<stateDimN-1){
-        FY(i)=exp_logF(i,y);
-      }else{
-        FY(i)=alpha*exp_logF(i-1,y);
-        }
+      FY(i)=faa_eff(i,y);
     }
     if (sel_def==0) { //max
       Sel1(y)=max(FY);
@@ -333,7 +342,11 @@ Type objective_function<Type>::operator() ()
       }
     }
     for (int i=0;i<stateDimN;i++){
-      saa(i,y)=FY(i)/Sel1(y);
+      if(Sel1(y)==0.0) {
+        saa(i,y)=Type(0.0);
+      } else {
+        saa(i,y)=FY(i)/Sel1(y);
+      }
     }
   }
 
@@ -343,13 +356,7 @@ Type objective_function<Type>::operator() ()
   for(int j=0;j<catch_prop4index.dim[2];j++){
     for (int y=0;y<timeSteps;y++){
       for (int i=0;i<stateDimN;i++) {
-        if(i<stateDimN-1){
-          FY_f(i)=exp_logF(i,y)*catch_prop4index(i,y,j);
-          // FY_f(i)=exp_logF(i,y);
-        }else{
-          FY_f(i)=alpha*exp_logF(i-1,y)*catch_prop4index(i,y,j);
-          // FY_f(i)=alpha*exp_logF(i-1,y);
-        }
+          FY_f(i)=faa_eff(i,y)*catch_prop4index(i,y,j);
       }
       if (sel_def==0) { //max
         Sel1_f(y)=max(FY_f);
@@ -361,7 +368,11 @@ Type objective_function<Type>::operator() ()
         }
       }
       for (int i=0;i<stateDimN;i++){
-        saa_f(i,y,j)=FY_f(i)/Sel1_f(y);
+        if(Sel1_f(y)==0.0) {
+          saa_f(i,y,j)=Type(0.0);
+        } else {
+          saa_f(i,y,j)=FY_f(i)/Sel1_f(y);
+        }
       }
     }
   }
@@ -385,16 +396,6 @@ Type objective_function<Type>::operator() ()
   }
   MVNORM_t<Type> neg_log_densityN(nvar);
 
-  // //For initial step
-  // matrix<Type> nvar0(stateDimN,stateDimN);  // logNのvcov
-  // for(int k=0; k<stateDimN; ++k){
-  //   for(int j=0; j<stateDimN; ++j){
-  //     if(k!=j){nvar0(k,j)=0.0;}else{
-  //       nvar0(k,j)=varLogN(CppAD::Integer(keyVarLogN(0,k)))/(1-pow(phi1,Type(2.0)));
-  //       } // logNには相関なし varは加入とそれより上で異なる
-  //   }
-  // }
-  // MVNORM_t<Type> neg_log_densityN0(nvar0);
   Type phi1 = (exp(trans_phi1)-Type(1.0))/(exp(trans_phi1)+Type(1.0));
   Type ans_n=0.0;
 
@@ -456,15 +457,11 @@ Type objective_function<Type>::operator() ()
     }
 
     for(int j=1; j<stateDimN; ++j){
-      if (j<(stateDimN-1)) {
-        predN(j)=logN(j-1,i-1)-exp(logF((keyLogFsta(0,j-1)),i-1))-natMor(i-1,j-1);  // population dynamics model
-      }else{
-        predN(j)=logN(j-1,i-1)-exp(logF((keyLogFsta(0,j-1)),i-1))-natMor(i-1,j-1);  // population dynamics model
-      }
+        predN(j)=logN(j-1,i-1)-faa_eff(j-1,i-1)-natMor(i-1,j-1);  // population dynamics model
     }
     if(maxAgePlusGroup==1){
-      predN(stateDimN-1)=log(exp(logN(stateDimN-2,i-1)-exp(logF((keyLogFsta(0,stateDimN-2)),i-1))-natMor(i-1,stateDimN-2))+
-                             exp(logN(stateDimN-1,i-1)-alpha*exp(logF((keyLogFsta(0,stateDimN-1)),i-1))-natMor(i-1,stateDimN-1))); // plus group
+      predN(stateDimN-1)=log(exp(logN(stateDimN-2,i-1)-faa_eff(stateDimN-2,i-1)-natMor(i-1,stateDimN-2))+
+                             exp(logN(stateDimN-1,i-1)-faa_eff(stateDimN-1,i-1)-natMor(i-1,stateDimN-1))); // plus group
     }
     ans_n+=neg_log_densityN(logN.col(i)-predN); // N-Process likelihood
     SIMULATE {
@@ -501,11 +498,7 @@ Type objective_function<Type>::operator() ()
       error("Invalid age range in obs.");
     }
 
-    if(a<(stateDimN-1)){
-      zz=exp(logF((keyLogFsta(0,a)),y))+natMor(y,a);  // total mortality
-    }else{
-      zz=alpha*exp(logF((keyLogFsta(0,a)),y))+natMor(y,a);  // total mortality
-    }
+    zz=faa_eff(a,y)+natMor(y,a);  // total mortality
 
     if(ft==0){// residual fleet
       // caaもage aggregateに対応（2026/07/05）
@@ -513,23 +506,15 @@ Type objective_function<Type>::operator() ()
       predcaa.resize(amax-a+1);
       predcaa.setZero();
       for(int j=a; j<amax+1; ++j){
-        if(j<(stateDimN-1)){
-          zz=exp(logF((keyLogFsta(0,j)),y))+natMor(y,j);  // total mortality
-        }else{
-          zz=alpha*exp(logF((keyLogFsta(0,j)),y))+natMor(y,j);  // total mortality
-        }
+        zz=faa_eff(j,y)+natMor(y,j);
         predcaa(j-a)=logN(j,y)-log(zz)+log(1-exp(-zz));
         if((keyLogFsta(f-1,j))>(-1)){
-          if(j<(stateDimN-1)){
-            predcaa(j-a)+=logF((keyLogFsta(0,j)),y);  // 漁獲方程式
-          }else{
-            predcaa(j-a)+=log(alpha)+logF((keyLogFsta(0,j)),y);  // 漁獲方程式
-          }
+          predcaa(j-a)=exp(predcaa(j-a))*faa_eff(j,y);
         }
-        predcaa(j-a)=exp(predcaa(j-a)); //log(caa) -> caaに変換
         predObs+=predcaa(j-a); //caa scale
       }
-      predObs=log(predObs); //caa scaleで足した後にlog scaleに戻す
+      predObs = CppAD::CondExpLt(predObs, Type(1e-6), Type(1e-6), predObs);
+      predObs = log(predObs);
     }else{
       if(ft==1){//Not used (same as ft==4)
          predObs=logN(a,y)-zz*sampleTimes(f-1);
@@ -597,7 +582,7 @@ Type objective_function<Type>::operator() ()
             }else{
               if (ft==5){ //Not used
                 for(int j=0; j<stateDimN; ++j){
-                  predObs+=exp(logN(a+j,y))*exp(-exp(logF((keyLogFsta(0,j)),iy(i)))-natMor(iy(i),j))*propMat2(iy(i),j)*stockMeanWeight_true(iy(i),j);
+                  predObs+=exp(logN(a+j,y))*exp(-faa_eff(j,iy(i))-natMor(iy(i),j))*propMat2(iy(i),j)*stockMeanWeight_true(iy(i),j);
                 }
                 predObs=log(predObs);
                 if(CppAD::Integer(keyLogB(f-1,a))>(-1)){
@@ -686,16 +671,10 @@ Type objective_function<Type>::operator() ()
     Catch_biomass(i)=0.0;
     for(int j=0; j<stateDimN; j++){
       B_total(i)+=exp(logN(j,i))*stockMeanWeight_true(i,j);
-      F_mean(i)+=exp(logF((keyLogFsta(0,j)),i));
-      if (j<(stateDimN-1)) {
-        zz=exp(logF((keyLogFsta(0,j)),i))+natMor(i,j);
-        Catch_biomass(i)+=exp(logN(j,i))*stockMeanWeight_true(i,j)*exp(logF((keyLogFsta(0,j)),i))*(1-exp(-zz))/zz;
-        caa_est(j,i)=exp(logN(j,i))*exp(logF((keyLogFsta(0,j)),i))*(1-exp(-zz))/zz;
-      } else {
-        zz=alpha*exp(logF((keyLogFsta(0,j)),i))+natMor(i,j);
-        Catch_biomass(i)+=exp(logN(j,i))*stockMeanWeight_true(i,j)*alpha*exp(logF((keyLogFsta(0,j)),i))*(1-exp(-zz))/zz;
-        caa_est(j,i)=exp(logN(j,i))*alpha*exp(logF((keyLogFsta(0,j)),i))*(1-exp(-zz))/zz;
-      }
+      F_mean(i)+=faa_eff(j,i);
+        zz=faa_eff(j,i)+natMor(i,j);
+        Catch_biomass(i)+=exp(logN(j,i))*stockMeanWeight_true(i,j)*faa_eff(j,i)*(1-exp(-zz))/zz;
+        caa_est(j,i)=exp(logN(j,i))*faa_eff(j,i)*(1-exp(-zz))/zz;
     }
     F_mean(i)/=stateDimN;
     Exploitation_rate(i)=Catch_biomass(i)/B_total(i);
@@ -906,6 +885,7 @@ Type objective_function<Type>::operator() ()
   ADREPORT(scale_U);
   ADREPORT(stockMeanWeight_true);
   ADREPORT(caa_est);
+  ADREPORT(faa_eff);
 
   REPORT(logF);
   REPORT(logN);

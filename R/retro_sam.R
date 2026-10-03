@@ -186,7 +186,9 @@ calc_mase = function(samres,
   }
 
   convert_idx2tbl = function(x,value_name) {
-    x %>% rownames_to_column(var="idx") %>%
+    x %>%
+      # rownames_to_column(var="idx") %>%
+      mutate(idx = 1:n()) %>%
       pivot_longer(cols = -idx, names_to = "year", values_to = value_name) %>%
       mutate(idx = as.integer(idx), year = as.integer(year)) %>%
       mutate(index = index_name[idx]) %>%
@@ -247,17 +249,23 @@ calc_mase = function(samres,
     )
   }
 
+  cv_res = cv_res %>%
+    select(retro_id, everything())
+
+  cv_calc = cv_res
   if(isTRUE(log)) {
-    cv_res = cv_res %>%
+    cv_calc = cv_calc %>%
       mutate(obs = log(obs), obs_cond = log(obs_cond),
              pred_full = log(pred_full), pred_cond = log(pred_cond))
   }
-  cv_res = cv_res %>%
+  cv_calc = cv_calc %>%
     mutate(error_denom = obs - obs_cond,
-           error_numer = obs - pred_cond) %>%
-    select(retro_id, everything())
+           error_numer = obs - pred_cond)
 
-  mase_res = cv_res %>% group_by(idx, index) %>%
+  cv_res$error_denom = cv_calc$error_denom
+  cv_res$error_numer = cv_calc$error_numer
+
+  mase_res = cv_calc %>% group_by(idx, index) %>%
     summarise(denominator = mean(abs(error_denom), na.rm = TRUE),
               numerator = mean(abs(error_numer), na.rm = TRUE)) %>%
     ungroup() %>%

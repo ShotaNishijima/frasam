@@ -74,6 +74,8 @@
 #' @param w_link Link function for weight model.
 #' @param sep_omicron Whether to separate omicron parameters.
 #' @param growth_regime Growth regime setting.
+#' @param fix_zero_f 年齢 x 年の0/1行列。1のセルは対応する年齢・年の実効Fを0にする。
+
 #'
 #' @details
 #' \code{abund = "Bf"}は、\code{catch_prop}の対象Indexのスライスにomegaを指定し、
@@ -171,7 +173,8 @@ sam <- function(dat,
                 obj_overwrite=NULL,
                 ignore.parm.uncertainty = FALSE,
                 change_plusgroup = FALSE,
-                remove.abund = NULL
+                remove.abund = NULL,
+                fix_zero_f = NULL
 ){
 
   argname <- ls()
@@ -435,6 +438,16 @@ sam <- function(dat,
       data$use_remove_abund <- 1L
     } else {
       data$use_remove_abund <- 0L
+    }
+    if (!is.null(fix_zero_f)) {
+      if (!isTRUE(all(dim(fix_zero_f) == dim(waa)))) {
+        stop("The dimension of 'fix_zero_f' must be the same as that of catch-at-age data used in SAM.", call. = FALSE)
+      }
+      data$fix_zero_f <- as.matrix(fix_zero_f)
+      obs <- obs[obs[,"obs"]>0,]
+      data$obs <- obs
+    } else {
+      data$fix_zero_f <- matrix(0, nrow = nrow(waa), ncol = ncol(waa))
     }
 
     data$nlogF = max(data$keyLogFsta)+1
@@ -965,20 +978,21 @@ sam <- function(dat,
         tmp = rep$value[names(rep$value)=="stockMeanWeight_true"]
         waa_est = t(matrix(tmp,nrow=ncol(logN)))
         tmp = rep$value[names(rep$value)=="caa_est"]
-        caa_est = matrix(tmp, ncol = data$noYears)
+        caa_est = matrix(tmp, nrow = data$nlogN, ncol = data$noYears)
         naa <- exp(logN)
-        faa <- exp(logF)
+        faa <- exp(logF) * (1 - data$fix_zero_f)
       } else {
         # logN <- matrix(rep$unbiased$value[names(rep$unbiased$value)=="logN"],ncol=data$noYears)
         # logF <- matrix(rep$unbiased$value[names(rep$unbiased$value)=="logF"],ncol=data$noYears)
-        naa <- matrix(rep$unbiased$value[names(rep$unbiased$value)=="exp_logN"],ncol=data$noYears)
-        faa <- matrix(rep$unbiased$value[names(rep$unbiased$value)=="exp_logF"],ncol=data$noYears)
+        naa <- matrix(rep$unbiased$value[names(rep$unbiased$value)=="exp_logN"], nrow = data$nlogN, ncol = data$noYears)
+        faa <- matrix(rep$unbiased$value[names(rep$unbiased$value)=="exp_logF"], ncol=data$noYears)
         faa <- faa[data$keyLogFsta[1,]+1,]
         faa[nrow(faa),] <- data$alpha*faa[nrow(faa),]
+        faa <- faa * (1 - data$fix_zero_f)
         tmp = rep$unbiased$value[names(rep$unbiased$value)=="stockMeanWeight_true"]
         waa_est = t(matrix(tmp,nrow=ncol(naa)))
         tmp = rep$unbiased$value[names(rep$unbiased$value)=="caa_est"]
-        caa_est = matrix(tmp, ncol = data$noYears)
+        caa_est = matrix(tmp, nrow = data$nlogN, ncol = data$noYears)
         logN <- log(naa)
         logF <- log(faa)
       }

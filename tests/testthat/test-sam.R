@@ -55,6 +55,39 @@ test_that("test input",{
     fixed = TRUE
   )
 
+  input_fix_zero_f <- input
+  input_fix_zero_f$fix_zero_f <- matrix(
+    0,
+    nrow = nrow(input_fix_zero_f$dat$waa),
+    ncol = ncol(input_fix_zero_f$dat$waa),
+    dimnames = dimnames(input_fix_zero_f$dat$waa)
+  )
+  input_fix_zero_f$fix_zero_f[1, 1] <- 1
+  zero_caa_year <- as.numeric(colnames(input_fix_zero_f$dat$caa)[1])
+  input_fix_zero_f$dat$caa[1, 1] <- 0
+  testres_fix_zero_f <- safe_do_call(sam, input_fix_zero_f)
+  expect_equal(testres_fix_zero_f$data$fix_zero_f, input_fix_zero_f$fix_zero_f)
+  zero_caa_obs <- testres_fix_zero_f$data$obs[
+    testres_fix_zero_f$data$obs[, "fleet"] == 1 &
+      testres_fix_zero_f$data$obs[, "age"] == 0 &
+      testres_fix_zero_f$data$obs[, "year"] == zero_caa_year,
+    ,
+    drop = FALSE
+  ]
+  expect_equal(nrow(zero_caa_obs), 0)
+
+  bad_input <- input
+  bad_input$fix_zero_f <- matrix(
+    0,
+    nrow = nrow(bad_input$dat$waa),
+    ncol = ncol(bad_input$dat$waa) - 1
+  )
+  expect_error(
+    safe_do_call(sam, bad_input),
+    "The dimension of 'fix_zero_f'",
+    fixed = TRUE
+  )
+
   bad_input <- input
   bad_input$q.init <- rep(1, length(bad_input$abund) + 1)
   expect_error(safe_do_call(sam,bad_input), "'q.init' must have length")
