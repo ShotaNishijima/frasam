@@ -76,7 +76,8 @@ sam(
   loopnum = 2,
   obj_overwrite = NULL,
   ignore.parm.uncertainty = FALSE,
-  change_plusgroup = FALSE
+  change_plusgroup = FALSE,
+  remove.abund = NULL
 )
 }
 \arguments{

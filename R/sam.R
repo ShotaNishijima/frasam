@@ -170,7 +170,8 @@ sam <- function(dat,
                 loopnum = 2,
                 obj_overwrite=NULL,
                 ignore.parm.uncertainty = FALSE,
-                change_plusgroup = FALSE
+                change_plusgroup = FALSE,
+                remove.abund = NULL
 ){
 
   argname <- ls()
@@ -307,6 +308,23 @@ sam <- function(dat,
     obs[,"age"] <- obs[,"age"]+0
     obs[,"maxage"] <- obs[,"maxage"]+0
 
+    if(!is.null(remove.abund)) {
+      if (nrow(remove.abund) != nindex || ncol(remove.abund) != ncol(dat$caa)) {
+        stop("The dimension of 'remove.abund' must be the same as that of 'dat$index'.")
+      }
+      remove_abund <- as.data.frame(remove.abund) |>
+        mutate(fleet =  seq_len(n()) + 1) |>
+        pivot_longer(cols=-fleet,
+                     names_to = "year",
+                     values_to = "remove") %>%
+        mutate(year = as.numeric(year))
+
+      obs <- as.data.frame(obs) |>
+        left_join(as.data.frame(remove_abund), by = c("year", "fleet")) |>
+        mutate(remove = ifelse(is.na(remove),0,remove)) |>
+        as.matrix()
+    }
+
     if (tmb.run) {
       # library(TMB)
       compile(paste(cpp.file.name, ".cpp", sep = ""))
@@ -412,6 +430,11 @@ sam <- function(dat,
       data$b_random <- 1
     }else{
       data$b_random <- 0
+    }
+    if(!is.null(remove.abund)) {
+      data$use_remove_abund <- 1L
+    } else {
+      data$use_remove_abund <- 0L
     }
 
     data$nlogF = max(data$keyLogFsta)+1
@@ -1083,6 +1106,15 @@ sam <- function(dat,
           for (j in index.age[i]:max.age[i]) {
             pred.index[i,] <- pred.index[i,]+as.numeric(baa[j+1,]*obj$env$report()[["saa_f"]][j+1,,i+1])/scale
           }
+        }
+        if (!is.null(remove.abund)) {
+          remove_i <- as.numeric(remove.abund[i, ])
+          if (abund[i] == "N") {
+            pred.index[i, ] <- pred.index[i, ] - remove_i
+          } else {
+            pred.index[i, ] <- pred.index[i, ] - remove_i / scale
+          }
+          pred.index[i, ] <- pmax(pred.index[i, ], 1e-6)
         }
         if (is.na(b1[i])) {
           pred.index[i,] <- q1[i]*pred.index[i,]

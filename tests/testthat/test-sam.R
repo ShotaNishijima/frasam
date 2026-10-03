@@ -26,6 +26,35 @@ test_that("test input",{
   expect_equal(catch_obs[, "maxage"], catch_obs[, "age"])
   expect_equal(rownames(testres_age1$input$dat$caa), rownames(input_age1$dat$caa))
 
+  input_remove <- input
+  input_remove$remove.abund <- matrix(
+    0,
+    nrow = length(input_remove$abund),
+    ncol = ncol(input_remove$dat$caa),
+    dimnames = list(NULL, colnames(input_remove$dat$caa))
+  )
+  input_remove$remove.abund[2, ] <- 1
+  testres_remove <- safe_do_call(sam, input_remove)
+  expect_identical(testres_remove$data$use_remove_abund, 1L)
+  expect_equal(ncol(testres_remove$data$obs), ncol(testres$data$obs) + 1)
+  expect_true("remove" %in% colnames(testres_remove$data$obs))
+  expect_equal(
+    testres_remove$data$obs[testres_remove$data$obs[, "fleet"] == 1, "remove"],
+    rep(0, sum(testres_remove$data$obs[, "fleet"] == 1))
+  )
+  expect_equal(
+    testres_remove$data$obs[testres_remove$data$obs[, "fleet"] == 3, "remove"],
+    rep(1, sum(testres_remove$data$obs[, "fleet"] == 3))
+  )
+
+  bad_input <- input
+  bad_input$remove.abund <- matrix(0, nrow = length(bad_input$abund), ncol = ncol(bad_input$dat$caa) - 1)
+  expect_error(
+    safe_do_call(sam, bad_input),
+    "The dimension of 'remove.abund'",
+    fixed = TRUE
+  )
+
   bad_input <- input
   bad_input$q.init <- rep(1, length(bad_input$abund) + 1)
   expect_error(safe_do_call(sam,bad_input), "'q.init' must have length")
@@ -158,6 +187,24 @@ test_that("test output",{
   testres2 = safe_do_call(sam,input)
   expect_equal(sd(log(testres2$pred.index[3,]/colSums(testres2$naa))),0,tolerance = 1.0e-3)
   expect_equal(sd(log(testres2$pred.index[4,]/colSums(testres2$baa))),0,tolerance = 1.0e-3)
+
+  input_remove = input
+  input_remove$p0.list <- testres2$par_list
+  input_remove$remove.abund <- matrix(
+    0,
+    nrow = length(input_remove$abund),
+    ncol = ncol(input_remove$dat$caa),
+    dimnames = list(NULL, colnames(input_remove$dat$caa))
+  )
+  input_remove$remove.abund[3, ] <- 1
+  input_remove$remove.abund[4, ] <- input_remove$scale
+  testres_remove = safe_do_call(sam,input_remove)
+  expected_index3 <- testres_remove$q[3] *
+    pmax(colSums(testres_remove$naa) - input_remove$remove.abund[3, ], 1e-6)
+  expected_index4 <- testres_remove$q[4] *
+    pmax(colSums(testres_remove$baa) / input_remove$scale - input_remove$remove.abund[4, ] / input_remove$scale, 1e-6)
+  expect_equal(unname(as.numeric(testres_remove$pred.index[3, ])), unname(expected_index3), tolerance = 1.0e-6)
+  expect_equal(unname(as.numeric(testres_remove$pred.index[4, ])), unname(expected_index4), tolerance = 1.0e-6)
   # Bs, Bfに比例しているか
   input = testres$input
   input$abund[3] <- "Bs"
