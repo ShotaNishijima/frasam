@@ -164,10 +164,11 @@ shift_SRdata_rec_age <- function(SRdata, rec_age) {
 make_SRres <- function(res_sam, multi_ssb=1.3, get_rand=FALSE, nsim=10000){
   res_sam2 <- res_sam
   res_sam2$input$Pope <- FALSE
-  res_sam2$rec.par <- c(res_sam2$rec.par, sd=res_sam2$sigma.logN[1],rho=0,gamma=res_sam2$input$gamma)
+  res_sam2$rec.par <- c(res_sam2$rec.par, sd=res_sam2$sigma.logN[1],rho=res_sam2$phi[1],gamma=res_sam2$input$gamma) # rho=0になっていたのをSAMの推定値(phi)に修正
   res_SR <- list(pars=as.list(res_sam2$rec.par))
   res_SR$input <- res_sam2$input
   res_SR$input$type <- "L2"
+  res_SR$input$method <- "L2" # frasyrのfit.SRはinput$methodを参照する
   res_SR$input$SRdata <- get.SRdata(res_sam)
 
   res_SR$input$SRdata <- shift_SRdata_rec_age(
@@ -189,6 +190,7 @@ make_SRres <- function(res_sam, multi_ssb=1.3, get_rand=FALSE, nsim=10000){
 
 
   res_SR$AICc <- NA
+  class(res_SR) <- "fit.SR"
 
   return(res_SR)
 }
