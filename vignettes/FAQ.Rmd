@@ -3,12 +3,12 @@ title: "FAQ on how to use 'frasam'"
 author: "Shota Nishijima (FRA)"
 date: "`r format(Sys.Date())`"
 output:
-  rmarkdown::html_vignette:
-    css: style.css
-    toc: true
-    toc_depth: 3
   rmarkdown::md_document:
     variant: markdown_github
+    toc: true
+    toc_depth: 3
+  rmarkdown::html_vignette:
+    css: style.css
     toc: true
     toc_depth: 3
 vignette: >
@@ -703,6 +703,22 @@ g1 <- plot_SR_simple(res_bh_rec1) +
   ggplot2::labs(title = "Recruitment age 1")
 
 gridExtra::grid.arrange(g0, g1, nrow=1)
+```
+
+
+### レトロスペクティブ解析のデータをピールごとに置き換えたい
+
+- 単にIndexとcaaを変えるのではなく、最新のIndexやcaaをその時使える時点でのものに置き換えたい場合は、`retro_sam`の引数`dat_overwrite`を使う  
+- 一度、通常のレトロスペクティブ解析をしてから、データを置き換えるのが安全
+
+```{r replace-retro-data, echo = TRUE, eval = FALSE}
+retro_tmp <- retro_sam(res_rw)
+dat_overwrite <- lapply(retro_tmp$Res, function(x) {
+  tmp_dat <- x$input$dat
+  tmp_dat$index[1,ncol(tmp_dat$index)] <- rowMeans(tmp_dat$index[1,ncol(tmp_dat$index)-1:3]) #ここでは１本目のindexの最終年が、直近３年平均としている
+  return( tmp_dat )
+  })
+retro_res <- retro_sam(res_rw, dat_overwrite = dat_overwrite)
 ```
 
 

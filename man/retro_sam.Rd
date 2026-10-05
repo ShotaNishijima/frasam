@@ -11,13 +11,16 @@ retro_sam(
   b.fix = TRUE,
   remove_short_index = -1,
   map_add = NULL,
-  p0_retro_list = NULL
+  p0_retro_list = NULL,
+  dat_overwrite = NULL
 )
 }
 \arguments{
 \item{res}{SAM object}
 
 \item{n}{the number of peels}
+
+\item{dat_overwrite}{ピールごとにdatを置き換える場合に使用する}
 }
 \description{
 retrospective forecasting is also possible
