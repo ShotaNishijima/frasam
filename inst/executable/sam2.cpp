@@ -160,6 +160,7 @@ Type objective_function<Type>::operator() ()
   // DATA_VECTOR(fbarRange);
   DATA_INTEGER(sel_def); // selectivity definition: divided by maxF(0), meanF(1), maxage(2)
   DATA_INTEGER(b_random); // if 1, nonlinear coefficient b estimated by random effects
+  DATA_INTEGER(use_remove_abund); //if 1, fit index to abundance only from natural population by subtracting additive population (for torafugu Ise-Mikawa option)
 
   PARAMETER_VECTOR(logQ);
   PARAMETER_VECTOR(logB);
@@ -477,7 +478,7 @@ Type objective_function<Type>::operator() ()
   // Now finally match to observations
   int f, ft, a, y, amax;
   int minYear=CppAD::Integer((obs(0,0)));
-  Type predObs=0, zz, var;
+  Type predObs=0, predAbund=0, zz, var;
   vector<Type> pred_log(nobs); //
   vector<Type> ans_obs(nobs);
   ans_obs.setZero();
@@ -540,13 +541,16 @@ Type objective_function<Type>::operator() ()
           }
       }else{
         if(ft==2){// survey (biomass)
-          predObs=0.0;
+          predAbund=0.0;
           for(int j=a; j<amax+1; ++j){
-          // for(int j=0; j<stateDimN; ++j){
-            // predObs=+exp(logN(j,y))*stockMeanWeight(iy(i),j);
-            predObs+=exp(logN(j,y))*stockMeanWeight_true(iy(i),j); //
+            predAbund += exp(logN(j,y))*stockMeanWeight_true(iy(i),j); //
             }
-          predObs=log(predObs)-log(scale);
+          if(use_remove_abund==1){
+            predAbund -= obs(i,5);
+          }
+          predAbund = predAbund/scale;
+          predAbund = CppAD::CondExpLt(predAbund, Type(1e-6), Type(1e-6), predAbund);
+          predObs = log(predAbund);
           // predObs=logN(a,y)+log(stockMeanWeight(iy(i),a));
           if(CppAD::Integer(keyLogB(f-1,a))>(-1)){
             predObs*=exp(logB(CppAD::Integer(keyLogB(f-1,a))));
@@ -556,11 +560,16 @@ Type objective_function<Type>::operator() ()
           }
         }else{
           if(ft==3){// SSB survey
-            predObs=0.0;
+            predAbund=0.0;
             for(int j=0; j<stateDimN; ++j){
-              predObs+=exp(logN(j,y))*propMat2(iy(i),j)*stockMeanWeight_true(iy(i),j); //
+              predAbund+=exp(logN(j,y))*propMat2(iy(i),j)*stockMeanWeight_true(iy(i),j); //
             }
-            predObs=log(predObs)-log(scale);
+            if(use_remove_abund==1){
+              predAbund -= obs(i,5);
+            }
+            predAbund = predAbund/scale;
+            predAbund = CppAD::CondExpLt(predAbund, Type(1e-6), Type(1e-6), predAbund);
+            predObs = log(predAbund);
             if(CppAD::Integer(keyLogB(f-1,a))>(-1)){
               predObs*=exp(logB(CppAD::Integer(keyLogB(f-1,a))));
             }
@@ -569,11 +578,15 @@ Type objective_function<Type>::operator() ()
             }
           }else{
             if(ft==4){// Number (e.g.,Recruitment) survey
-              predObs=0.0;
+              predAbund=0.0;
               for(int j=a; j<amax+1; ++j){
-                predObs+=exp(logN(j,y));
+                predAbund+=exp(logN(j,y));
               }
-              predObs=log(predObs);
+              if(use_remove_abund==1){
+                predAbund -= obs(i,5);
+              }
+              predAbund = CppAD::CondExpLt(predAbund, Type(1e-6), Type(1e-6), predAbund);
+              predObs = log(predAbund);
               // predObs=logN(a,y)-zz*sampleTimes(f-1);
               if(CppAD::Integer(keyLogB(f-1,a))>(-1)){
                 predObs*=exp(logB(CppAD::Integer(keyLogB(f-1,a))));
@@ -595,13 +608,16 @@ Type objective_function<Type>::operator() ()
                 }
               }else{
                 if (ft==6){ // Biomass X selectivity
-                  predObs=0.0;
+                  predAbund=0.0;
                   for(int j=a; j<amax+1; ++j){
-                    // predObs=+exp(logN(j,y))*stockMeanWeight(iy(i),j)*saa(j,y);
-                    predObs+=exp(logN(j,y))*stockMeanWeight_true(iy(i),j)*saa(j,y); //
+                    predAbund+=exp(logN(j,y))*stockMeanWeight_true(iy(i),j)*saa(j,y); //
                   }
-                  predObs=log(predObs)-log(scale);
-                  // predObs=logN(a,y)+log(stockMeanWeight(iy(i),a));
+                  if(use_remove_abund==1){
+                    predAbund -= obs(i,5);
+                  }
+                  predAbund = predAbund/scale;
+                  predAbund = CppAD::CondExpLt(predAbund, Type(1e-6), Type(1e-6), predAbund);
+                  predObs = log(predAbund);
                   if(CppAD::Integer(keyLogB(f-1,a))>(-1)){
                     predObs*=exp(logB(CppAD::Integer(keyLogB(f-1,a))));
                   }
@@ -610,13 +626,17 @@ Type objective_function<Type>::operator() ()
                   }
                 }else{
                   if (ft==7){ // Biomass x fleet-specific selectivity
-                    predObs=0.0;
+                    predAbund=0.0;
                     for(int j=a; j<amax+1; ++j){
                       // predObs=+exp(logN(j,y))*stockMeanWeight(iy(i),j)*saa(j,y);
-                      predObs+=exp(logN(j,y))*stockMeanWeight_true(iy(i),j)*saa_f(j,y,f-1); //
+                      predAbund+=exp(logN(j,y))*stockMeanWeight_true(iy(i),j)*saa_f(j,y,f-1); //
                     }
-                    predObs=log(predObs)-log(scale);
-                    // predObs=logN(a,y)+log(stockMeanWeight(iy(i),a));
+                    if(use_remove_abund==1){
+                      predAbund -= obs(i,5);
+                    }
+                    predAbund = predAbund/scale;
+                    predAbund = CppAD::CondExpLt(predAbund, Type(1e-6), Type(1e-6), predAbund);
+                    predObs = log(predAbund);
                     if(CppAD::Integer(keyLogB(f-1,a))>(-1)){
                       predObs*=exp(logB(CppAD::Integer(keyLogB(f-1,a))));
                     }
