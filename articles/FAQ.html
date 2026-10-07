@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">frasam</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.5.999</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.6.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -56,9 +56,9 @@
                         <h4 data-toc-skip class="author">Shota Nishijima
 (FRA)</h4>
             
-            <h4 data-toc-skip class="date">2026-10-02</h4>
+            <h4 data-toc-skip class="date">2026-10-07</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/ShotaNishijima/frasam/blob/create_vignette/vignettes/FAQ.Rmd" class="external-link"><code>vignettes/FAQ.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/ShotaNishijima/frasam/blob/v1.0.6/vignettes/FAQ.Rmd" class="external-link"><code>vignettes/FAQ.Rmd</code></a></small>
       <div class="d-none name"><code>FAQ.Rmd</code></div>
     </div>
 
@@ -247,17 +247,17 @@
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fit_check</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/check_fit_sam.html">check_fit_sam</a></span><span class="op">(</span><span class="va">res_rw</span><span class="op">)</span></span>
 <span><span class="co">#&gt;                          check    ok             value       threshold</span></span>
-<span><span class="co">#&gt;          optimizer convergence FALSE                 1               0</span></span>
+<span><span class="co">#&gt;          optimizer convergence  TRUE                 0               0</span></span>
 <span><span class="co">#&gt;      positive definite Hessian  TRUE              TRUE            TRUE</span></span>
-<span><span class="co">#&gt;  maximum fixed-effect gradient  TRUE         0.0002187            0.01</span></span>
+<span><span class="co">#&gt;  maximum fixed-effect gradient  TRUE         2.982e-05            0.01</span></span>
 <span><span class="co">#&gt;    finite fixed effects and SE  TRUE             18/18             all</span></span>
-<span><span class="co">#&gt;        maximum fixed-effect SE  TRUE             22.54             Inf</span></span>
-<span><span class="co">#&gt;  maximum absolute fixed effect  TRUE             11.26             Inf</span></span>
-<span><span class="co">#&gt;           reported sigma range FALSE 1.29e-05 to 1.373     1e-04 to 10</span></span>
+<span><span class="co">#&gt;        maximum fixed-effect SE  TRUE             56.77             Inf</span></span>
+<span><span class="co">#&gt;  maximum absolute fixed effect  TRUE              9.89             Inf</span></span>
+<span><span class="co">#&gt;           reported sigma range FALSE 5.07e-05 to 1.373     1e-04 to 10</span></span>
 <span><span class="co">#&gt;             reported rho range  TRUE  0.9796 to 0.9796 1e-04 to 0.9999</span></span>
 <span><span class="co">#&gt;  parameters near finite bounds  TRUE                 0               0</span></span>
 <span><span class="co">#&gt;                                                                         message</span></span>
-<span><span class="co">#&gt;                                                           false convergence (8)</span></span>
+<span><span class="co">#&gt;                                                        relative convergence (4)</span></span>
 <span><span class="co">#&gt;                                                 sdreport reports pdHess = TRUE.</span></span>
 <span><span class="co">#&gt;                                         Maximum absolute fixed-effect gradient.</span></span>
 <span><span class="co">#&gt;                    Fixed-effect estimates and standard errors should be finite.</span></span>
@@ -281,17 +281,17 @@
 <span><span class="co">#&gt; [1] FALSE</span></span>
 <span><span class="va">fit_check</span><span class="op">$</span><span class="va">checks</span></span>
 <span><span class="co">#&gt;                           check    ok             value       threshold</span></span>
-<span><span class="co">#&gt; 1         optimizer convergence FALSE                 1               0</span></span>
+<span><span class="co">#&gt; 1         optimizer convergence  TRUE                 0               0</span></span>
 <span><span class="co">#&gt; 2     positive definite Hessian  TRUE              TRUE            TRUE</span></span>
-<span><span class="co">#&gt; 3 maximum fixed-effect gradient  TRUE         0.0002187            0.01</span></span>
+<span><span class="co">#&gt; 3 maximum fixed-effect gradient  TRUE         2.982e-05            0.01</span></span>
 <span><span class="co">#&gt; 4   finite fixed effects and SE  TRUE             18/18             all</span></span>
-<span><span class="co">#&gt; 5       maximum fixed-effect SE  TRUE             22.54             Inf</span></span>
-<span><span class="co">#&gt; 6 maximum absolute fixed effect  TRUE             11.26             Inf</span></span>
-<span><span class="co">#&gt; 7          reported sigma range FALSE 1.29e-05 to 1.373     1e-04 to 10</span></span>
+<span><span class="co">#&gt; 5       maximum fixed-effect SE  TRUE             56.77             Inf</span></span>
+<span><span class="co">#&gt; 6 maximum absolute fixed effect  TRUE              9.89             Inf</span></span>
+<span><span class="co">#&gt; 7          reported sigma range FALSE 5.07e-05 to 1.373     1e-04 to 10</span></span>
 <span><span class="co">#&gt; 8            reported rho range  TRUE  0.9796 to 0.9796 1e-04 to 0.9999</span></span>
 <span><span class="co">#&gt; 9 parameters near finite bounds  TRUE                 0               0</span></span>
 <span><span class="co">#&gt;                                                                          message</span></span>
-<span><span class="co">#&gt; 1                                                          false convergence (8)</span></span>
+<span><span class="co">#&gt; 1                                                       relative convergence (4)</span></span>
 <span><span class="co">#&gt; 2                                                sdreport reports pdHess = TRUE.</span></span>
 <span><span class="co">#&gt; 3                                        Maximum absolute fixed-effect gradient.</span></span>
 <span><span class="co">#&gt; 4                   Fixed-effect estimates and standard errors should be finite.</span></span>
@@ -337,8 +337,8 @@
 <span><span class="op">]</span></span>
 <span><span class="co">#&gt;                           check    ok             value   threshold</span></span>
 <span><span class="co">#&gt; 2     positive definite Hessian  TRUE              TRUE        TRUE</span></span>
-<span><span class="co">#&gt; 3 maximum fixed-effect gradient  TRUE         0.0002187        0.01</span></span>
-<span><span class="co">#&gt; 7          reported sigma range FALSE 1.29e-05 to 1.373 1e-04 to 10</span></span>
+<span><span class="co">#&gt; 3 maximum fixed-effect gradient  TRUE         2.982e-05        0.01</span></span>
+<span><span class="co">#&gt; 7          reported sigma range FALSE 5.07e-05 to 1.373 1e-04 to 10</span></span>
 <span><span class="co">#&gt;                                                                          message</span></span>
 <span><span class="co">#&gt; 2                                                sdreport reports pdHess = TRUE.</span></span>
 <span><span class="co">#&gt; 3                                        Maximum absolute fixed-effect gradient.</span></span>
@@ -353,39 +353,39 @@
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">fit_check</span><span class="op">$</span><span class="va">fixed</span><span class="op">)</span></span>
 <span><span class="co">#&gt;           name   estimate         se      gradient</span></span>
-<span><span class="co">#&gt; 1         logQ -5.3393491 0.17720032 -8.328050e-05</span></span>
-<span><span class="co">#&gt; 2         logQ -4.7404460 0.21985575  8.031707e-05</span></span>
-<span><span class="co">#&gt; 3         logQ -5.5526334 0.08310066 -1.600140e-04</span></span>
-<span><span class="co">#&gt; 4         logQ  0.3089121 0.06075912  1.730827e-04</span></span>
-<span><span class="co">#&gt; 5         logQ -4.0119932 0.11963210  9.267032e-06</span></span>
-<span><span class="co">#&gt; 6 logSdLogFsta -0.4669744 0.16208696 -1.857439e-04</span></span>
+<span><span class="co">#&gt; 1         logQ -5.3393476 0.17712460 -2.695133e-05</span></span>
+<span><span class="co">#&gt; 2         logQ -4.7404500 0.21984644 -9.203053e-09</span></span>
+<span><span class="co">#&gt; 3         logQ -5.5526326 0.08309919 -2.653748e-06</span></span>
+<span><span class="co">#&gt; 4         logQ  0.3089114 0.06075809  1.844782e-05</span></span>
+<span><span class="co">#&gt; 5         logQ -4.0119936 0.11963073 -1.240421e-06</span></span>
+<span><span class="co">#&gt; 6 logSdLogFsta -0.4669703 0.16208406 -1.126968e-05</span></span>
 <span></span>
 <span><span class="va">fit_check</span><span class="op">$</span><span class="va">fixed</span><span class="op">[</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/order.html" class="external-link">order</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">fit_check</span><span class="op">$</span><span class="va">fixed</span><span class="op">$</span><span class="va">gradient</span><span class="op">)</span>, decreasing <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
 <span><span class="op">]</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>, <span class="op">]</span></span>
-<span><span class="co">#&gt;            name    estimate         se      gradient</span></span>
-<span><span class="co">#&gt; 10  logSdLogObs -0.58834092 0.10542818 -0.0002187308</span></span>
-<span><span class="co">#&gt; 6  logSdLogFsta -0.46697441 0.16208696 -0.0001857439</span></span>
-<span><span class="co">#&gt; 4          logQ  0.30891205 0.06075912  0.0001730827</span></span>
-<span><span class="co">#&gt; 13  logSdLogObs  0.09393416 0.11460023 -0.0001727920</span></span>
-<span><span class="co">#&gt; 3          logQ -5.55263339 0.08310066 -0.0001600140</span></span></code></pre></div>
+<span><span class="co">#&gt;           name   estimate         se      gradient</span></span>
+<span><span class="co">#&gt; 14 logSdLogObs  0.3169780 0.11343026  2.982194e-05</span></span>
+<span><span class="co">#&gt; 1         logQ -5.3393476 0.17712460 -2.695133e-05</span></span>
+<span><span class="co">#&gt; 16 logSdLogObs -1.0831400 0.11898622 -2.041711e-05</span></span>
+<span><span class="co">#&gt; 15 logSdLogObs -0.7159744 0.12362971  1.900264e-05</span></span>
+<span><span class="co">#&gt; 4         logQ  0.3089114 0.06075809  1.844782e-05</span></span></code></pre></div>
 <p>診断のしきい値は引数で変更できます。
 例えば、勾配をより厳しく見る場合は <code>gradient_tol</code>
 を小さくします。</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/check_fit_sam.html">check_fit_sam</a></span><span class="op">(</span><span class="va">res_rw</span>, gradient_tol <span class="op">=</span> <span class="fl">1e-4</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">$</span><span class="va">checks</span></span>
 <span><span class="co">#&gt;                           check    ok             value       threshold</span></span>
-<span><span class="co">#&gt; 1         optimizer convergence FALSE                 1               0</span></span>
+<span><span class="co">#&gt; 1         optimizer convergence  TRUE                 0               0</span></span>
 <span><span class="co">#&gt; 2     positive definite Hessian  TRUE              TRUE            TRUE</span></span>
-<span><span class="co">#&gt; 3 maximum fixed-effect gradient FALSE         0.0002187           1e-04</span></span>
+<span><span class="co">#&gt; 3 maximum fixed-effect gradient  TRUE         2.982e-05           1e-04</span></span>
 <span><span class="co">#&gt; 4   finite fixed effects and SE  TRUE             18/18             all</span></span>
-<span><span class="co">#&gt; 5       maximum fixed-effect SE  TRUE             22.54             Inf</span></span>
-<span><span class="co">#&gt; 6 maximum absolute fixed effect  TRUE             11.26             Inf</span></span>
-<span><span class="co">#&gt; 7          reported sigma range FALSE 1.29e-05 to 1.373     1e-04 to 10</span></span>
+<span><span class="co">#&gt; 5       maximum fixed-effect SE  TRUE             56.77             Inf</span></span>
+<span><span class="co">#&gt; 6 maximum absolute fixed effect  TRUE              9.89             Inf</span></span>
+<span><span class="co">#&gt; 7          reported sigma range FALSE 5.07e-05 to 1.373     1e-04 to 10</span></span>
 <span><span class="co">#&gt; 8            reported rho range  TRUE  0.9796 to 0.9796 1e-04 to 0.9999</span></span>
 <span><span class="co">#&gt; 9 parameters near finite bounds  TRUE                 0               0</span></span>
 <span><span class="co">#&gt;                                                                          message</span></span>
-<span><span class="co">#&gt; 1                                                          false convergence (8)</span></span>
+<span><span class="co">#&gt; 1                                                       relative convergence (4)</span></span>
 <span><span class="co">#&gt; 2                                                sdreport reports pdHess = TRUE.</span></span>
 <span><span class="co">#&gt; 3                                        Maximum absolute fixed-effect gradient.</span></span>
 <span><span class="co">#&gt; 4                   Fixed-effect estimates and standard errors should be finite.</span></span>
@@ -410,41 +410,41 @@ sigma がしきい値の外にあるかを確認できます。</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fit_check</span><span class="op">$</span><span class="va">sigma</span></span>
 <span><span class="co">#&gt;             type index        value    ok   problem</span></span>
-<span><span class="co">#&gt; 1          sigma     1 1.098487e+00  TRUE          </span></span>
+<span><span class="co">#&gt; 1          sigma     1 1.098490e+00  TRUE          </span></span>
 <span><span class="co">#&gt; 2          sigma     2 1.372972e+00  TRUE          </span></span>
-<span><span class="co">#&gt; 3          sigma     3 4.887162e-01  TRUE          </span></span>
-<span><span class="co">#&gt; 4          sigma     4 3.385304e-01  TRUE          </span></span>
-<span><span class="co">#&gt; 5          sigma     5 7.328961e-01  TRUE          </span></span>
-<span><span class="co">#&gt; 6     sigma.logC     1 5.552477e-01  TRUE          </span></span>
-<span><span class="co">#&gt; 7     sigma.logC     2 5.552477e-01  TRUE          </span></span>
-<span><span class="co">#&gt; 8     sigma.logC     3 2.702573e-01  TRUE          </span></span>
-<span><span class="co">#&gt; 9     sigma.logC     4 2.702573e-01  TRUE          </span></span>
-<span><span class="co">#&gt; 10    sigma.logC     5 2.702573e-01  TRUE          </span></span>
-<span><span class="co">#&gt; 11    sigma.logC     6 4.575533e-01  TRUE          </span></span>
-<span><span class="co">#&gt; 12    sigma.logC     7 4.575533e-01  TRUE          </span></span>
-<span><span class="co">#&gt; 13 sigma.logFsta     1 6.268961e-01  TRUE          </span></span>
-<span><span class="co">#&gt; 14 sigma.logFsta     2 6.268961e-01  TRUE          </span></span>
-<span><span class="co">#&gt; 15 sigma.logFsta     3 3.127718e-01  TRUE          </span></span>
-<span><span class="co">#&gt; 16 sigma.logFsta     4 3.127718e-01  TRUE          </span></span>
-<span><span class="co">#&gt; 17 sigma.logFsta     5 3.127718e-01  TRUE          </span></span>
-<span><span class="co">#&gt; 18 sigma.logFsta     6 3.127718e-01  TRUE          </span></span>
-<span><span class="co">#&gt; 19 sigma.logFsta     7 3.127718e-01  TRUE          </span></span>
-<span><span class="co">#&gt; 20    sigma.logN     1 6.279338e-01  TRUE          </span></span>
-<span><span class="co">#&gt; 21    sigma.logN     2 1.289816e-05 FALSE too small</span></span>
-<span><span class="co">#&gt; 22    sigma.logN     3 1.289816e-05 FALSE too small</span></span>
-<span><span class="co">#&gt; 23    sigma.logN     4 1.289816e-05 FALSE too small</span></span>
-<span><span class="co">#&gt; 24    sigma.logN     5 1.289816e-05 FALSE too small</span></span>
-<span><span class="co">#&gt; 25    sigma.logN     6 1.289816e-05 FALSE too small</span></span>
-<span><span class="co">#&gt; 26    sigma.logN     7 1.289816e-05 FALSE too small</span></span>
+<span><span class="co">#&gt; 3          sigma     3 4.887157e-01  TRUE          </span></span>
+<span><span class="co">#&gt; 4          sigma     4 3.385309e-01  TRUE          </span></span>
+<span><span class="co">#&gt; 5          sigma     5 7.328951e-01  TRUE          </span></span>
+<span><span class="co">#&gt; 6     sigma.logC     1 5.552488e-01  TRUE          </span></span>
+<span><span class="co">#&gt; 7     sigma.logC     2 5.552488e-01  TRUE          </span></span>
+<span><span class="co">#&gt; 8     sigma.logC     3 2.702570e-01  TRUE          </span></span>
+<span><span class="co">#&gt; 9     sigma.logC     4 2.702570e-01  TRUE          </span></span>
+<span><span class="co">#&gt; 10    sigma.logC     5 2.702570e-01  TRUE          </span></span>
+<span><span class="co">#&gt; 11    sigma.logC     6 4.575532e-01  TRUE          </span></span>
+<span><span class="co">#&gt; 12    sigma.logC     7 4.575532e-01  TRUE          </span></span>
+<span><span class="co">#&gt; 13 sigma.logFsta     1 6.268987e-01  TRUE          </span></span>
+<span><span class="co">#&gt; 14 sigma.logFsta     2 6.268987e-01  TRUE          </span></span>
+<span><span class="co">#&gt; 15 sigma.logFsta     3 3.127729e-01  TRUE          </span></span>
+<span><span class="co">#&gt; 16 sigma.logFsta     4 3.127729e-01  TRUE          </span></span>
+<span><span class="co">#&gt; 17 sigma.logFsta     5 3.127729e-01  TRUE          </span></span>
+<span><span class="co">#&gt; 18 sigma.logFsta     6 3.127729e-01  TRUE          </span></span>
+<span><span class="co">#&gt; 19 sigma.logFsta     7 3.127729e-01  TRUE          </span></span>
+<span><span class="co">#&gt; 20    sigma.logN     1 6.279344e-01  TRUE          </span></span>
+<span><span class="co">#&gt; 21    sigma.logN     2 5.069765e-05 FALSE too small</span></span>
+<span><span class="co">#&gt; 22    sigma.logN     3 5.069765e-05 FALSE too small</span></span>
+<span><span class="co">#&gt; 23    sigma.logN     4 5.069765e-05 FALSE too small</span></span>
+<span><span class="co">#&gt; 24    sigma.logN     5 5.069765e-05 FALSE too small</span></span>
+<span><span class="co">#&gt; 25    sigma.logN     6 5.069765e-05 FALSE too small</span></span>
+<span><span class="co">#&gt; 26    sigma.logN     7 5.069765e-05 FALSE too small</span></span>
 <span></span>
 <span><span class="va">fit_check</span><span class="op">$</span><span class="va">sigma</span><span class="op">[</span><span class="op">!</span><span class="va">fit_check</span><span class="op">$</span><span class="va">sigma</span><span class="op">$</span><span class="va">ok</span>, <span class="op">]</span></span>
 <span><span class="co">#&gt;          type index        value    ok   problem</span></span>
-<span><span class="co">#&gt; 21 sigma.logN     2 1.289816e-05 FALSE too small</span></span>
-<span><span class="co">#&gt; 22 sigma.logN     3 1.289816e-05 FALSE too small</span></span>
-<span><span class="co">#&gt; 23 sigma.logN     4 1.289816e-05 FALSE too small</span></span>
-<span><span class="co">#&gt; 24 sigma.logN     5 1.289816e-05 FALSE too small</span></span>
-<span><span class="co">#&gt; 25 sigma.logN     6 1.289816e-05 FALSE too small</span></span>
-<span><span class="co">#&gt; 26 sigma.logN     7 1.289816e-05 FALSE too small</span></span></code></pre></div>
+<span><span class="co">#&gt; 21 sigma.logN     2 5.069765e-05 FALSE too small</span></span>
+<span><span class="co">#&gt; 22 sigma.logN     3 5.069765e-05 FALSE too small</span></span>
+<span><span class="co">#&gt; 23 sigma.logN     4 5.069765e-05 FALSE too small</span></span>
+<span><span class="co">#&gt; 24 sigma.logN     5 5.069765e-05 FALSE too small</span></span>
+<span><span class="co">#&gt; 25 sigma.logN     6 5.069765e-05 FALSE too small</span></span>
+<span><span class="co">#&gt; 26 sigma.logN     7 5.069765e-05 FALSE too small</span></span></code></pre></div>
 <p>しきい値を変えて確認したい場合は、<code>sigma_range</code>
 を指定します。
 例えば、以下では説明用にかなり狭い範囲を指定しています。</p>
@@ -459,7 +459,7 @@ sigma がしきい値の外にあるかを確認できます。</p>
 <span>  <span class="va">fit_check_strict_sigma</span><span class="op">$</span><span class="va">checks</span><span class="op">$</span><span class="va">check</span> <span class="op">==</span> <span class="st">"reported sigma range"</span>,</span>
 <span><span class="op">]</span></span>
 <span><span class="co">#&gt;                  check    ok             value threshold</span></span>
-<span><span class="co">#&gt; 7 reported sigma range FALSE 1.29e-05 to 1.373  0.5 to 1</span></span>
+<span><span class="co">#&gt; 7 reported sigma range FALSE 5.07e-05 to 1.373  0.5 to 1</span></span>
 <span><span class="co">#&gt;                                                                          message</span></span>
 <span><span class="co">#&gt; 7 Reported standard deviations should be finite and within the diagnostic range.</span></span>
 <span><span class="co">#&gt;   required</span></span>
@@ -467,26 +467,26 @@ sigma がしきい値の外にあるかを確認できます。</p>
 <span></span>
 <span><span class="va">fit_check_strict_sigma</span><span class="op">$</span><span class="va">sigma</span><span class="op">[</span><span class="op">!</span><span class="va">fit_check_strict_sigma</span><span class="op">$</span><span class="va">sigma</span><span class="op">$</span><span class="va">ok</span>, <span class="op">]</span></span>
 <span><span class="co">#&gt;             type index        value    ok   problem</span></span>
-<span><span class="co">#&gt; 1          sigma     1 1.098487e+00 FALSE too large</span></span>
+<span><span class="co">#&gt; 1          sigma     1 1.098490e+00 FALSE too large</span></span>
 <span><span class="co">#&gt; 2          sigma     2 1.372972e+00 FALSE too large</span></span>
-<span><span class="co">#&gt; 3          sigma     3 4.887162e-01 FALSE too small</span></span>
-<span><span class="co">#&gt; 4          sigma     4 3.385304e-01 FALSE too small</span></span>
-<span><span class="co">#&gt; 8     sigma.logC     3 2.702573e-01 FALSE too small</span></span>
-<span><span class="co">#&gt; 9     sigma.logC     4 2.702573e-01 FALSE too small</span></span>
-<span><span class="co">#&gt; 10    sigma.logC     5 2.702573e-01 FALSE too small</span></span>
-<span><span class="co">#&gt; 11    sigma.logC     6 4.575533e-01 FALSE too small</span></span>
-<span><span class="co">#&gt; 12    sigma.logC     7 4.575533e-01 FALSE too small</span></span>
-<span><span class="co">#&gt; 15 sigma.logFsta     3 3.127718e-01 FALSE too small</span></span>
-<span><span class="co">#&gt; 16 sigma.logFsta     4 3.127718e-01 FALSE too small</span></span>
-<span><span class="co">#&gt; 17 sigma.logFsta     5 3.127718e-01 FALSE too small</span></span>
-<span><span class="co">#&gt; 18 sigma.logFsta     6 3.127718e-01 FALSE too small</span></span>
-<span><span class="co">#&gt; 19 sigma.logFsta     7 3.127718e-01 FALSE too small</span></span>
-<span><span class="co">#&gt; 21    sigma.logN     2 1.289816e-05 FALSE too small</span></span>
-<span><span class="co">#&gt; 22    sigma.logN     3 1.289816e-05 FALSE too small</span></span>
-<span><span class="co">#&gt; 23    sigma.logN     4 1.289816e-05 FALSE too small</span></span>
-<span><span class="co">#&gt; 24    sigma.logN     5 1.289816e-05 FALSE too small</span></span>
-<span><span class="co">#&gt; 25    sigma.logN     6 1.289816e-05 FALSE too small</span></span>
-<span><span class="co">#&gt; 26    sigma.logN     7 1.289816e-05 FALSE too small</span></span></code></pre></div>
+<span><span class="co">#&gt; 3          sigma     3 4.887157e-01 FALSE too small</span></span>
+<span><span class="co">#&gt; 4          sigma     4 3.385309e-01 FALSE too small</span></span>
+<span><span class="co">#&gt; 8     sigma.logC     3 2.702570e-01 FALSE too small</span></span>
+<span><span class="co">#&gt; 9     sigma.logC     4 2.702570e-01 FALSE too small</span></span>
+<span><span class="co">#&gt; 10    sigma.logC     5 2.702570e-01 FALSE too small</span></span>
+<span><span class="co">#&gt; 11    sigma.logC     6 4.575532e-01 FALSE too small</span></span>
+<span><span class="co">#&gt; 12    sigma.logC     7 4.575532e-01 FALSE too small</span></span>
+<span><span class="co">#&gt; 15 sigma.logFsta     3 3.127729e-01 FALSE too small</span></span>
+<span><span class="co">#&gt; 16 sigma.logFsta     4 3.127729e-01 FALSE too small</span></span>
+<span><span class="co">#&gt; 17 sigma.logFsta     5 3.127729e-01 FALSE too small</span></span>
+<span><span class="co">#&gt; 18 sigma.logFsta     6 3.127729e-01 FALSE too small</span></span>
+<span><span class="co">#&gt; 19 sigma.logFsta     7 3.127729e-01 FALSE too small</span></span>
+<span><span class="co">#&gt; 21    sigma.logN     2 5.069765e-05 FALSE too small</span></span>
+<span><span class="co">#&gt; 22    sigma.logN     3 5.069765e-05 FALSE too small</span></span>
+<span><span class="co">#&gt; 23    sigma.logN     4 5.069765e-05 FALSE too small</span></span>
+<span><span class="co">#&gt; 24    sigma.logN     5 5.069765e-05 FALSE too small</span></span>
+<span><span class="co">#&gt; 25    sigma.logN     6 5.069765e-05 FALSE too small</span></span>
+<span><span class="co">#&gt; 26    sigma.logN     7 5.069765e-05 FALSE too small</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="以前の解析結果の初期値を利用したい">以前の解析結果の初期値を利用したい<a class="anchor" aria-label="anchor" href="#%E4%BB%A5%E5%89%8D%E3%81%AE%E8%A7%A3%E6%9E%90%E7%B5%90%E6%9E%9C%E3%81%AE%E5%88%9D%E6%9C%9F%E5%80%A4%E3%82%92%E5%88%A9%E7%94%A8%E3%81%97%E3%81%9F%E3%81%84"></a>
@@ -624,13 +624,13 @@ jitter する前の元の結果を表します。 <code>ID &gt; 0</code>
 <span></span>
 <span><span class="va">res_varNfix</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">sam</span>, <span class="va">input</span><span class="op">)</span></span>
 <span><span class="va">res_varNfix</span><span class="op">$</span><span class="va">sigma.logN</span> <span class="co">#1歳魚以上はSD=0.01に固定</span></span>
-<span><span class="co">#&gt; [1] 0.6276344 0.0100000 0.0100000 0.0100000 0.0100000 0.0100000 0.0100000</span></span>
+<span><span class="co">#&gt; [1] 0.6276343 0.0100000 0.0100000 0.0100000 0.0100000 0.0100000 0.0100000</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/check_fit_sam.html">check_fit_sam</a></span><span class="op">(</span><span class="va">res_varNfix</span>, verbose <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="co">#すべてOKになる</span></span>
 <span><span class="co">#&gt;                          check   ok            value       threshold</span></span>
 <span><span class="co">#&gt;          optimizer convergence TRUE                0               0</span></span>
 <span><span class="co">#&gt;      positive definite Hessian TRUE             TRUE            TRUE</span></span>
-<span><span class="co">#&gt;  maximum fixed-effect gradient TRUE        0.0004307            0.01</span></span>
+<span><span class="co">#&gt;  maximum fixed-effect gradient TRUE         0.000304            0.01</span></span>
 <span><span class="co">#&gt;    finite fixed effects and SE TRUE            17/17             all</span></span>
 <span><span class="co">#&gt;        maximum fixed-effect SE TRUE           0.6788             Inf</span></span>
 <span><span class="co">#&gt;  maximum absolute fixed effect TRUE            5.553             Inf</span></span>
@@ -698,9 +698,9 @@ ageの観測誤差とIndexの観測誤差（のSDのlog）が共にlogSdLogObs�
 <span><span class="va">idx_logC</span></span>
 <span><span class="co">#&gt; [1] 1 2 3</span></span>
 <span><span class="va">sigma_hat</span><span class="op">[</span><span class="va">idx_logC</span><span class="op">]</span></span>
-<span><span class="co">#&gt; [1] 0.5552562 0.2700810 0.4574318</span></span>
+<span><span class="co">#&gt; [1] 0.5552563 0.2700813 0.4574315</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">input</span><span class="op">$</span><span class="va">p0.list</span><span class="op">$</span><span class="va">logSdLogObs</span><span class="op">[</span><span class="va">idx_logC</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 0.5552562 0.2700810 0.4574318</span></span>
+<span><span class="co">#&gt; [1] 0.5552563 0.2700813 0.4574315</span></span>
 <span></span>
 <span><span class="co"># 例: すべてのsigma.logCを 0.2 に固定する</span></span>
 <span><span class="va">fix_pos</span> <span class="op">&lt;-</span> <span class="va">idx_logC</span><span class="op">[</span><span class="op">]</span></span>
@@ -724,7 +724,7 @@ ageの観測誤差とIndexの観測誤差（のSDのlog）が共にlogSdLogObs�
 <span><span class="co"># 固定したパラメータは opt$par には出てこない</span></span>
 <span><span class="va">res_sigma02</span><span class="op">$</span><span class="va">opt</span><span class="op">$</span><span class="va">par</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">res_sigma02</span><span class="op">$</span><span class="va">opt</span><span class="op">$</span><span class="va">par</span><span class="op">)</span> <span class="op">==</span> <span class="st">"logSdLogObs"</span><span class="op">]</span></span>
 <span><span class="co">#&gt; logSdLogObs logSdLogObs logSdLogObs logSdLogObs logSdLogObs </span></span>
-<span><span class="co">#&gt;   0.1326097   0.3298171  -0.6822938  -1.0575780  -0.2981353</span></span></code></pre></div>
+<span><span class="co">#&gt;   0.1326095   0.3298169  -0.6822940  -1.0575776  -0.2981344</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="vpaと同じような設定で解析したい">VPAと同じような設定で解析したい<a class="anchor" aria-label="anchor" href="#vpa%E3%81%A8%E5%90%8C%E3%81%98%E3%82%88%E3%81%86%E3%81%AA%E8%A8%AD%E5%AE%9A%E3%81%A7%E8%A7%A3%E6%9E%90%E3%81%97%E3%81%9F%E3%81%84"></a>
@@ -892,7 +892,7 @@ modelのほうがFや選択率がギザギザしており、SAMは平滑化さ�
 </ul>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">res_rw</span><span class="op">$</span><span class="va">sigma</span> <span class="co">#index毎に異なる</span></span>
-<span><span class="co">#&gt; [1] 1.0984874 1.3729718 0.4887162 0.3385304 0.7328961</span></span>
+<span><span class="co">#&gt; [1] 1.0984897 1.3729724 0.4887157 0.3385309 0.7328951</span></span>
 <span></span>
 <span><span class="va">input</span> <span class="op">&lt;-</span> <span class="va">res_rw</span><span class="op">$</span><span class="va">input</span></span>
 <span><span class="va">input</span><span class="op">$</span><span class="va">index.key</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">input</span><span class="op">$</span><span class="va">abund</span><span class="op">)</span><span class="op">)</span></span>
@@ -903,7 +903,7 @@ modelのほうがFや選択率がギザギザしており、SAMは平滑化さ�
 <span><span class="va">input</span><span class="op">$</span><span class="va">index.key</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">0</span>,<span class="fl">1</span>,<span class="fl">2</span>,<span class="fl">3</span><span class="op">)</span></span>
 <span><span class="va">res_rw2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">sam</span>, <span class="va">input</span><span class="op">)</span></span>
 <span><span class="va">res_rw2</span><span class="op">$</span><span class="va">sigma</span></span>
-<span><span class="co">#&gt; [1] 1.2438602 1.2438602 0.4909691 0.3384182 0.7341528</span></span>
+<span><span class="co">#&gt; [1] 1.2438603 1.2438603 0.4909690 0.3384183 0.7341531</span></span>
 <span></span>
 <span><span class="co">#AICの比較</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">res_rw</span><span class="op">$</span><span class="va">aic</span>, <span class="va">res_ls</span><span class="op">$</span><span class="va">aic</span>, <span class="va">res_rw2</span><span class="op">$</span><span class="va">aic</span><span class="op">)</span></span>
@@ -962,20 +962,20 @@ SAMの<code>scale</code>を<code>K * scale_vpa</code>にする方法でも指標
 <span><span class="va">input</span><span class="op">$</span><span class="va">p0.list</span> <span class="op">&lt;-</span> <span class="va">res_rw</span><span class="op">$</span><span class="va">par_list</span></span>
 <span><span class="va">res_estb_full</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">sam</span>, <span class="va">input</span><span class="op">)</span></span>
 <span><span class="va">res_estb_full</span><span class="op">$</span><span class="va">b</span> <span class="co">#すべてのindexでbが推定される</span></span>
-<span><span class="co">#&gt; [1] 0.9998667 0.9997609 1.0003231 0.9962767 0.9983365</span></span>
+<span><span class="co">#&gt; [1] 0.9775704 0.9484997 1.0082833 0.9249432 0.8870818</span></span>
 <span><span class="fu"><a href="../reference/check_fit_sam.html">check_fit_sam</a></span><span class="op">(</span><span class="va">res_estb_full</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">res_rw</span><span class="op">$</span><span class="va">aic</span>, <span class="va">res_estb_full</span><span class="op">$</span><span class="va">aic</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 976.4474 985.4785</span></span>
+<span><span class="co">#&gt; [1] 976.4474 982.5655</span></span>
 <span></span>
 <span><span class="va">input</span><span class="op">$</span><span class="va">b.fix</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="cn">NA</span><span class="op">)</span> <span class="co">#1-4番目のindexはb=1に固定し、5番目のindexはb推定を行う</span></span>
 <span><span class="va">res_estb_45</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">sam</span>, <span class="va">input</span><span class="op">)</span></span>
 <span><span class="va">res_estb_45</span><span class="op">$</span><span class="va">b</span> <span class="co">#</span></span>
-<span><span class="co">#&gt; [1] 1.0000000 1.0000000 1.0000000 1.0000000 0.8962075</span></span>
+<span><span class="co">#&gt; [1] 1.0000000 1.0000000 1.0000000 1.0000000 0.8962029</span></span>
 <span><span class="fu"><a href="../reference/check_fit_sam.html">check_fit_sam</a></span><span class="op">(</span><span class="va">res_estb_45</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">res_rw</span><span class="op">$</span><span class="va">aic</span>, <span class="va">res_estb_full</span><span class="op">$</span><span class="va">aic</span>, <span class="va">res_estb_45</span><span class="op">$</span><span class="va">aic</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 976.4474 985.4785 977.3648</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] 976.4474 982.5655 977.3648</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="加入年齢を1歳にしたい">加入年齢を1歳にしたい<a class="anchor" aria-label="anchor" href="#%E5%8A%A0%E5%85%A5%E5%B9%B4%E9%BD%A2%E3%82%921%E6%AD%B3%E3%81%AB%E3%81%97%E3%81%9F%E3%81%84"></a>
@@ -1001,6 +1001,23 @@ SAMの<code>scale</code>を<code>K * scale_vpa</code>にする方法でも指標
 <span><span class="fu">gridExtra</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/gridExtra/man/arrangeGrob.html" class="external-link">grid.arrange</a></span><span class="op">(</span><span class="va">g0</span>, <span class="va">g1</span>, nrow<span class="op">=</span><span class="fl">1</span><span class="op">)</span></span></code></pre></div>
 <p><img src="FAQ_files/figure-html/rec_age1-1.png" class="r-plt" alt="" width="100%"></p>
 </div>
+<div class="section level4">
+<h4 id="レトロスペクティブ解析のデータをピールごとに置き換えたい">レトロスペクティブ解析のデータをピールごとに置き換えたい<a class="anchor" aria-label="anchor" href="#%E3%83%AC%E3%83%88%E3%83%AD%E3%82%B9%E3%83%9A%E3%82%AF%E3%83%86%E3%82%A3%E3%83%96%E8%A7%A3%E6%9E%90%E3%81%AE%E3%83%87%E3%83%BC%E3%82%BF%E3%82%92%E3%83%94%E3%83%BC%E3%83%AB%E3%81%94%E3%81%A8%E3%81%AB%E7%BD%AE%E3%81%8D%E6%8F%9B%E3%81%88%E3%81%9F%E3%81%84"></a>
+</h4>
+<ul>
+<li>単にIndexとcaaを変えるのではなく、最新のIndexやcaaをその時使える時点でのものに置き換えたい場合は、<code>retro_sam</code>の引数<code>dat_overwrite</code>を使う<br>
+</li>
+<li>一度、通常のレトロスペクティブ解析をしてから、データを置き換えるのが安全</li>
+</ul>
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">retro_tmp</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/retro_sam.html">retro_sam</a></span><span class="op">(</span><span class="va">res_rw</span><span class="op">)</span></span>
+<span><span class="va">dat_overwrite</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">retro_tmp</span><span class="op">$</span><span class="va">Res</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">tmp_dat</span> <span class="op">&lt;-</span> <span class="va">x</span><span class="op">$</span><span class="va">input</span><span class="op">$</span><span class="va">dat</span></span>
+<span>  <span class="va">tmp_dat</span><span class="op">$</span><span class="va">index</span><span class="op">[</span><span class="fl">1</span>,<span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">tmp_dat</span><span class="op">$</span><span class="va">index</span><span class="op">)</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">rowMeans</a></span><span class="op">(</span><span class="va">tmp_dat</span><span class="op">$</span><span class="va">index</span><span class="op">[</span><span class="fl">1</span>,<span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">tmp_dat</span><span class="op">$</span><span class="va">index</span><span class="op">)</span><span class="op">-</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">]</span><span class="op">)</span> <span class="co">#ここでは１本目のindexの最終年が、直近３年平均としている</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span> <span class="va">tmp_dat</span> <span class="op">)</span></span>
+<span>  <span class="op">}</span><span class="op">)</span></span>
+<span><span class="va">retro_res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/retro_sam.html">retro_sam</a></span><span class="op">(</span><span class="va">res_rw</span>, dat_overwrite <span class="op">=</span> <span class="va">dat_overwrite</span><span class="op">)</span></span></code></pre></div>
+</div>
 </div>
 <div class="section level3">
 <h3 id="samの結果の出力">SAMの結果の出力<a class="anchor" aria-label="anchor" href="#sam%E3%81%AE%E7%B5%90%E6%9E%9C%E3%81%AE%E5%87%BA%E5%8A%9B"></a>
@@ -1017,7 +1034,7 @@ SAMの<code>scale</code>を<code>K * scale_vpa</code>にする方法でも指標
 <li><p>下の例では、加入量は元のスケールで表示し、資源量と親魚量は
 <code>10000</code> で割って表示しています。</p></li>
 </ul>
-<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">gg1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_samvpa.html">plot_samvpa</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">res_rw</span>, <span class="va">res_bh</span>, <span class="va">res_ri</span><span class="op">)</span>,</span>
 <span>  CI <span class="op">=</span> <span class="fl">0.8</span>,</span>
@@ -1031,7 +1048,7 @@ SAMの<code>scale</code>を<code>K * scale_vpa</code>にする方法でも指標
 <ul>
 <li>以下のやり方で、表示名を事後的に変えて、日本語表記や単位を含めることができます</li>
 </ul>
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">gg1</span> <span class="op">+</span></span>
 <span>    <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span></span>
 <span>      <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/vars.html" class="external-link">vars</a></span><span class="op">(</span><span class="va">stat_f</span><span class="op">)</span>,</span>
@@ -1060,7 +1077,7 @@ SSBのみ)に分解できます。これによって、どの要因が個体群�
 <li>VPAでも動くようになっているので、両方で比較するのもありかも。</li>
 <li>前の年と評価が大きく変わった際の要因分析にも使えるかなと思います。</li>
 </ul>
-<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co"># process errorが推定されるようなデータを作る（実際はこの手順は不要です）</span></span>
 <span><span class="va">input</span> <span class="op">&lt;-</span> <span class="va">res_rw</span><span class="op">$</span><span class="va">input</span></span>
@@ -1111,7 +1128,7 @@ SSBのみ)に分解できます。これによって、どの要因が個体群�
 <col width="2%">
 <col width="2%">
 <col width="2%">
-<col width="2%">
+<col width="3%">
 <col width="2%">
 <col width="2%">
 <col width="2%">
@@ -1198,24 +1215,24 @@ SSBのみ)に分解できます。これによって、どの要因が個体群�
 <td align="right">138938.18</td>
 <td align="right">199711.04</td>
 <td align="right">292524.987</td>
-<td align="right">205737.6661</td>
+<td align="right">205737.66624</td>
 <td align="right">99982.040</td>
 <td align="right">111996.28</td>
 <td align="right">101083.98</td>
 <td align="right">135624.18</td>
 <td align="right">154295.325</td>
-<td align="right">176931.993</td>
+<td align="right">176931.994</td>
 <td align="right">396692.745</td>
 <td align="right">286201.80</td>
 <td align="right">193078.11</td>
 <td align="right">312307.67</td>
-<td align="right">345682.394</td>
+<td align="right">345682.395</td>
 <td align="right">534583.09</td>
 <td align="right">454417.64</td>
 <td align="right">492902.79</td>
 <td align="right">994489.90</td>
-<td align="right">2377608.540</td>
-<td align="right">5744266.66</td>
+<td align="right">2377608.541</td>
+<td align="right">5744266.65</td>
 </tr>
 <tr class="even">
 <td align="left">growth</td>
@@ -1241,7 +1258,7 @@ SSBのみ)に分解できます。これによって、どの要因が個体群�
 <td align="right">397856.60</td>
 <td align="right">167573.76</td>
 <td align="right">164067.401</td>
-<td align="right">261992.4907</td>
+<td align="right">261992.49078</td>
 <td align="right">243683.396</td>
 <td align="right">161686.87</td>
 <td align="right">140261.49</td>
@@ -1253,7 +1270,7 @@ SSBのみ)に分解できます。これによって、どの要因が個体群�
 <td align="right">396328.14</td>
 <td align="right">315129.89</td>
 <td align="right">366280.712</td>
-<td align="right">407128.66</td>
+<td align="right">407128.67</td>
 <td align="right">584186.70</td>
 <td align="right">595141.45</td>
 <td align="right">621898.46</td>
@@ -1276,7 +1293,7 @@ SSBのみ)に分解できます。これによって、どの要因が個体群�
 <td align="right">-3971840</td>
 <td align="right">-6751157</td>
 <td align="right">-3867275.2</td>
-<td align="right">-3074836.892</td>
+<td align="right">-3074836.893</td>
 <td align="right">-363959.20</td>
 <td align="right">-138750.23</td>
 <td align="right">-95910.73</td>
@@ -1284,7 +1301,7 @@ SSBのみ)に分解できます。これによって、どの要因が個体群�
 <td align="right">-395303.83</td>
 <td align="right">-586778.97</td>
 <td align="right">-84041.516</td>
-<td align="right">-123693.4799</td>
+<td align="right">-123693.47983</td>
 <td align="right">-90354.420</td>
 <td align="right">-52479.45</td>
 <td align="right">-32235.53</td>
@@ -1327,7 +1344,7 @@ SSBのみ)に分解できます。これによって、どの要因が個体群�
 <td align="right">75481.98</td>
 <td align="right">-16910.22</td>
 <td align="right">-4386.015</td>
-<td align="right">-67.7688</td>
+<td align="right">-67.76879</td>
 <td align="right">-8384.765</td>
 <td align="right">-26008.78</td>
 <td align="right">-21719.40</td>
@@ -1356,7 +1373,7 @@ SSBのみ)に分解できます。これによって、どの要因が個体群�
 <td align="right">-1924587.2</td>
 <td align="right">-1887340.3</td>
 <td align="right">-2326641.1</td>
-<td align="right">-3163718.06</td>
+<td align="right">-3163718.07</td>
 <td align="right">-4040058.6</td>
 <td align="right">-5782191.2</td>
 <td align="right">-8104147</td>
@@ -1370,14 +1387,14 @@ SSBのみ)に分解できます。これによって、どの要因が個体群�
 <td align="right">-588922.31</td>
 <td align="right">-272911.29</td>
 <td align="right">-183299.363</td>
-<td align="right">-286408.6363</td>
+<td align="right">-286408.63644</td>
 <td align="right">-312806.598</td>
 <td align="right">-263513.97</td>
 <td align="right">-232711.28</td>
 <td align="right">-216189.53</td>
 <td align="right">-236533.754</td>
 <td align="right">-271412.356</td>
-<td align="right">-313776.415</td>
+<td align="right">-313776.416</td>
 <td align="right">-499894.96</td>
 <td align="right">-578513.28</td>
 <td align="right">-543000.31</td>
@@ -1413,7 +1430,7 @@ SSBのみ)に分解できます。これによって、どの要因が個体群�
 <td align="right">0.00</td>
 <td align="right">0.00</td>
 <td align="right">0.000</td>
-<td align="right">0.0000</td>
+<td align="right">0.00000</td>
 <td align="right">0.000</td>
 <td align="right">0.00</td>
 <td align="right">0.00</td>
@@ -1434,7 +1451,7 @@ SSBのみ)に分解できます。これによって、どの要因が個体群�
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># 前年のbiomass対する比率 (%)</span></span>
 <span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">factor_b</span><span class="op">$</span><span class="va">percent_aggregated</span><span class="op">)</span></span></code></pre></div>
 <table class="table">
@@ -1668,7 +1685,7 @@ SSBのみ)に分解できます。これによって、どの要因が個体群�
 <td align="right">2.288402</td>
 <td align="right">5.923280</td>
 <td align="right">7.972636</td>
-<td align="right">7.020242</td>
+<td align="right">7.020243</td>
 <td align="right">6.257183</td>
 <td align="right">0.1200842</td>
 <td align="right">-1.257561</td>
@@ -1710,7 +1727,7 @@ SSBのみ)に分解できます。これによって、どの要因が個体群�
 <td align="right">-55.9266495</td>
 <td align="right">-56.693507</td>
 <td align="right">-58.715303</td>
-<td align="right">-53.086067</td>
+<td align="right">-53.086066</td>
 <td align="right">-43.391835</td>
 <td align="right">-42.398796</td>
 <td align="right">-30.0736854</td>
@@ -1785,7 +1802,7 @@ SSBのみ)に分解できます。これによって、どの要因が個体群�
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">factor_s</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/decompose_biomass_factors.html">decompose_biomass_factors</a></span><span class="op">(</span></span>
 <span>    <span class="va">res_proc</span>,</span>
@@ -1812,7 +1829,7 @@ SSBのみ)に分解できます。これによって、どの要因が個体群�
 </h4>
 <p>Number at
 ageの過程誤差は、以下のようにプロットできる。ここでは、残差をそのまま示す方法と、Biomasssの対する影響をプロットする方法を示します。</p>
-<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span>  <span class="va">samres</span> <span class="op">=</span> <span class="va">res_proc</span></span>
 <span>  <span class="va">rept</span> <span class="op">=</span> <span class="va">samres</span><span class="op">$</span><span class="va">obj</span><span class="op">$</span><span class="va">env</span><span class="op">$</span><span class="fu">report</span><span class="op">(</span><span class="va">samres</span><span class="op">$</span><span class="va">obj</span><span class="op">$</span><span class="va">env</span><span class="op">$</span><span class="va">last.par.best</span><span class="op">)</span></span>
@@ -1839,7 +1856,7 @@ ageの過程誤差は、以下のようにプロットできる。ここでは�
 <span>      <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_gradient.html" class="external-link">scale_colour_gradient2</a></span><span class="op">(</span>high<span class="op">=</span><span class="st">"red"</span>,low<span class="op">=</span><span class="st">"blue"</span>,mid<span class="op">=</span><span class="st">"gray"</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span></code></pre></div>
 <p><img src="FAQ_files/figure-html/plot-process-error-1.png" class="r-plt" alt="" width="100%"></p>
-<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co"># Biomassレベルでの影響</span></span>
 <span><span class="va">logBresid</span> <span class="op">=</span> <span class="va">samres</span><span class="op">$</span><span class="va">baa</span><span class="op">*</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">logNresid</span><span class="op">)</span><span class="op">-</span><span class="fl">1</span><span class="op">)</span></span>
@@ -1867,7 +1884,7 @@ ageの過程誤差は、以下のようにプロットできる。ここでは�
 <h4 id="固定効果間の相関をプロットする">固定効果間の相関をプロットする<a class="anchor" aria-label="anchor" href="#%E5%9B%BA%E5%AE%9A%E5%8A%B9%E6%9E%9C%E9%96%93%E3%81%AE%E7%9B%B8%E9%96%A2%E3%82%92%E3%83%97%E3%83%AD%E3%83%83%E3%83%88%E3%81%99%E3%82%8B"></a>
 </h4>
 <p>固定効果の相関は以下のようなコードでプロットできます。</p>
-<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cor_mat</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/cor.html" class="external-link">cov2cor</a></span><span class="op">(</span><span class="va">samres</span><span class="op">$</span><span class="va">rep</span><span class="op">$</span><span class="va">cov.fixed</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">tmp</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>varname <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">cor_mat</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -1895,7 +1912,7 @@ ageの過程誤差は、以下のようにプロットできる。ここでは�
 log-likelihood;
 NLL）を、資源尾数Nの過程、漁獲死亡係数Fの過程、年齢別漁獲尾数、および各資源量指標に分けて確認できます。NLLが小さいほど、その成分について観測値または状態の変化がモデルの仮定の下で生じやすいことを表します。ただし、各成分ではデータ数、次元、分散、確率分布が異なるため、成分間のNLLの絶対値や正負をそのまま当てはまりの優劣として比較することはできません。特に、分散を小さな値に固定した正規分布では確率密度が1を超え、NLLが負になることがあります。また、ここで示す値はLaplace近似後の周辺負の対数尤度ではないことにも注意してください。</p>
 <p>以下では、1歳以上のNのプロセス誤差だけを小さく固定したモデル（varN-fix）と、さらに年齢別漁獲尾数の観測誤差を小さくし、Fのランダムウォークの年齢間相関をなくしたモデル（VPA-like）を比較します。この例では、1歳魚以上のNプロセス誤差が小さいのでProcess_Nのnllが非常に小さくなっています。VPA-likeモデルでは、年齢別漁獲尾数に強く適合するよう制約されるため、catch-at-ageのNLLは小さくなります。その一方で、年齢別漁獲尾数の年変動をFの変化として説明する必要が強くなるため、F過程のNLLは大きくなります。これは、観測への適合度とF過程の滑らかさの間のトレードオフを示しています。このようにモデル間のNLLを比較することで、それぞれのモデルの特徴を把握することができます。</p>
-<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">cond_nll1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_cond_nll.html">get_cond_nll</a></span><span class="op">(</span><span class="va">res_varNfix</span><span class="op">)</span></span>
 <span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">cond_nll1</span><span class="op">)</span></span></code></pre></div>
@@ -1907,15 +1924,15 @@ NLL）を、資源尾数Nの過程、漁獲死亡係数Fの過程、年齢別漁
 <tbody>
 <tr class="odd">
 <td align="left">Process_N</td>
-<td align="right">-827.21629</td>
+<td align="right">-827.21628</td>
 </tr>
 <tr class="even">
 <td align="left">Process_F</td>
-<td align="right">-290.70767</td>
+<td align="right">-290.70884</td>
 </tr>
 <tr class="odd">
 <td align="left">Catch_at_age</td>
-<td align="right">82.62537</td>
+<td align="right">82.62561</td>
 </tr>
 <tr class="even">
 <td align="left">Index_1</td>
@@ -1923,7 +1940,7 @@ NLL）を、資源尾数Nの過程、漁獲死亡係数Fの過程、年齢別漁
 </tr>
 <tr class="odd">
 <td align="left">Index_2</td>
-<td align="right">69.16650</td>
+<td align="right">69.16649</td>
 </tr>
 <tr class="even">
 <td align="left">Index_3</td>
@@ -1931,7 +1948,7 @@ NLL）を、資源尾数Nの過程、漁獲死亡係数Fの過程、年齢別漁
 </tr>
 <tr class="odd">
 <td align="left">Index_4</td>
-<td align="right">12.16784</td>
+<td align="right">12.16783</td>
 </tr>
 <tr class="even">
 <td align="left">Index_5</td>
@@ -1939,7 +1956,7 @@ NLL）を、資源尾数Nの過程、漁獲死亡係数Fの過程、年齢別漁
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">cond_nll2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_cond_nll.html">get_cond_nll</a></span><span class="op">(</span><span class="va">res_vpalike</span><span class="op">)</span></span>
 <span></span>

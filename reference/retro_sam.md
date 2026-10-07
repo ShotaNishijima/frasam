@@ -12,7 +12,8 @@ retro_sam(
   b.fix = TRUE,
   remove_short_index = -1,
   map_add = NULL,
-  p0_retro_list = NULL
+  p0_retro_list = NULL,
+  dat_overwrite = NULL
 )
 ```
 
@@ -25,3 +26,7 @@ retro_sam(
 - n:
 
   the number of peels
+
+- dat_overwrite:
+
+  ピールごとにdatを置き換える場合に使用する

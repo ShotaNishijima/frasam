@@ -9,17 +9,17 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/ShotaNishijima/frasam/blob/create_vignette/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/ShotaNishijima/frasam/blob/v1.0.6/DESCRIPTION)
 
 Nishijima S, Ichinokawa M (2026). *frasam: Fisheries Research Agency
 (FRA) provides an R package for analyzing the State-space Assessment
-Model (SAM)*. R package version 1.0.5.999,
+Model (SAM)*. R package version 1.0.6.0,
 <https://shotanishijima.github.io/frasam/>.
 
     @Manual{,
       title = {frasam: Fisheries Research Agency (FRA) provides an R package for analyzing the State-space Assessment Model (SAM)},
       author = {Shota Nishijima and Momoko Ichinokawa},
       year = {2026},
-      note = {R package version 1.0.5.999},
+      note = {R package version 1.0.6.0},
       url = {https://shotanishijima.github.io/frasam/},
     }
