@@ -1152,7 +1152,7 @@ fix_maxage_and_remove_na <- function(obs, fleet_id = 1, verbose = TRUE) {
 
   # 対象がなければ、そのまま返す
   if (length(idx_na) == 0) {
-    return(obs)
+    return(as.matrix(obs))
   }
 
   if (verbose) {

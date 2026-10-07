@@ -11,15 +11,13 @@ popsim_vpasam = function(Res,n=5,seed=1){
     Res0 <- Res
     dat.list <- list()
     pred.index <- Res$pred.index
-    pred.caa <- Res$caa
+    catch.sim <- sam_catch_simulation_inputs(Res)
+    pred.caa <- catch.sim$mean
     sigma.index = Res$sigma
     if(length(sigma.index)==1) {
       sigma.index <- rep(sigma.index, nrow(Res$input$dat$index))
     }
-    sigma.caa <- Res$sigma.logC
-    resid.index <- log(as.matrix(Res$input$dat$index))-log(as.matrix(Res$pred.index))
-    resid.caa <- log(Res$input$dat$caa)-log(Res$caa)
-    if (Res$input$last.catch.zero) resid.caa[,ncol(resid.caa)] <- NULL
+    sigma.caa <- catch.sim$sd
     for (j in 1:n) {
       sim.dat <- Res$input$dat
       for (i in 1:nrow(pred.index)) {
@@ -27,7 +25,9 @@ popsim_vpasam = function(Res,n=5,seed=1){
         sim.dat$index[i,!is.na(sim.dat$index[i,])] <- sim.index[!is.na(sim.dat$index[i,])]
       }
       for (i in 1:nrow(pred.caa)) {
-        sim.dat$caa[i,] <- exp(rnorm(ncol(pred.caa),log(pred.caa[i,]),sigma.caa[i]))
+        present <- catch.sim$present[i, ]
+        sim.dat$caa[i,present] <- exp(rnorm(sum(present),
+          log(pred.caa[i,present]),sigma.caa[i,present]))
       }
       if (Res$input$last.catch.zero) sim.dat$caa[,ncol(pred.caa)] <- 0
       dat.list[[j]] <- sim.dat

@@ -186,6 +186,7 @@ calc_mase = function(samres,
   }
 
   convert_idx2tbl = function(x,value_name) {
+    rownames(x) <- seq_len(nrow(x))
     x %>% rownames_to_column(var="idx") %>%
       pivot_longer(cols = -idx, names_to = "year", values_to = value_name) %>%
       mutate(idx = as.integer(idx), year = as.integer(year)) %>%

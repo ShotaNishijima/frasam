@@ -4,7 +4,7 @@
 
 #'
 #' @export
-#' 
+#'
 
 boo_sam <- function(Res,n=100,seed=1,est=TRUE,method="p",use_p0=TRUE){
 
@@ -20,12 +20,14 @@ boo_sam <- function(Res,n=100,seed=1,est=TRUE,method="p",use_p0=TRUE){
   if (isTRUE(est)) {
     boot.list <- list()
     pred.index <- Res$pred.index
-    pred.caa <- Res$caa
+    catch.sim <- sam_catch_simulation_inputs(Res)
+    pred.caa <- catch.sim$mean
     sigma.index <- Res$sigma
-    sigma.caa <- Res$sigma.logC
+    sigma.caa <- catch.sim$sd
+    catch.present <- catch.sim$present
     resid.index <- log(as.matrix(Res$input$dat$index))-log(as.matrix(Res$pred.index))
-    resid.caa <- log(Res$input$dat$caa)-log(Res$caa)
-    if (Res$input$last.catch.zero) resid.caa[,ncol(resid.caa)] <- NULL
+    resid.caa <- log(as.matrix(Res$input$dat$caa))-log(as.matrix(pred.caa))
+    if (Res$input$last.catch.zero) resid.caa <- resid.caa[, -ncol(resid.caa), drop = FALSE]
     for (j in 1:n) {
       sim.dat <- Res$input$dat
       for(k in 1:100) {
@@ -35,7 +37,9 @@ boo_sam <- function(Res,n=100,seed=1,est=TRUE,method="p",use_p0=TRUE){
             sim.dat$index[i,!is.na(sim.dat$index[i,])] <- sim.index[!is.na(sim.dat$index[i,])]
           }
           for (i in 1:nrow(pred.caa)) {
-            sim.dat$caa[i,] <- exp(rnorm(ncol(pred.caa),log(pred.caa[i,]),sigma.caa[i]))
+            present <- catch.present[i, ]
+            sim.dat$caa[i,present] <- exp(rnorm(sum(present),
+              log(pred.caa[i,present]),sigma.caa[i,present]))
           }
           if (Res$input$last.catch.zero) sim.dat$caa[,ncol(pred.caa)] <- 0
         }
@@ -48,9 +52,12 @@ boo_sam <- function(Res,n=100,seed=1,est=TRUE,method="p",use_p0=TRUE){
             )
           }
           for (i in 1:nrow(resid.caa)) {
-            sim.dat$caa[i,1:ncol(resid.caa)] <- exp(
-              log(Res$caa[i,1:ncol(resid.caa)]) + as.numeric(sample(resid.caa[i,]))
-            )
+            present <- which(!is.na(resid.caa[i, ]))
+            if (length(present)) {
+              residuals <- resid.caa[i,present]
+              sim.dat$caa[i,present] <- exp(log(pred.caa[i,present]) +
+                residuals[sample.int(length(residuals), replace=TRUE)])
+            }
           }
         }
 
@@ -92,4 +99,26 @@ boo_sam <- function(Res,n=100,seed=1,est=TRUE,method="p",use_p0=TRUE){
       list(naa=naa,baa=baa,ssb=ssb,faa=faa)
     })
   }
+}
+
+# Catch observation groups and their log-scale errors must match the SAM
+# likelihood in both bootstrap and population-simulation data.
+sam_catch_simulation_inputs <- function(Res) {
+  pred.caa <- as.matrix(Res$caa)
+  sigma.caa <- matrix(Res$sigma.logC, nrow(pred.caa), ncol(pred.caa))
+  if (isTRUE(Res$input$change_plusgroup)) {
+    catch.obs <- Res$data$obs[Res$data$obs[, "fleet"] == 1, , drop = FALSE]
+    for (i in seq_len(nrow(catch.obs))) {
+      ages <- seq.int(catch.obs[i, "age"], catch.obs[i, "maxage"]) + 1L
+      year <- match(as.character(catch.obs[i, "year"]), colnames(pred.caa))
+      if (length(ages) > 1L) {
+        catches <- Res$caa[ages, year]
+        pred.caa[ages[1L], year] <- sum(catches)
+        sigma.caa[ages[1L], year] <-
+          sqrt(sum((catches * sigma.caa[ages, year])^2)) / sum(catches)
+      }
+    }
+  }
+  list(mean = pred.caa, sd = sigma.caa,
+       present = !is.na(Res$input$dat$caa))
 }
