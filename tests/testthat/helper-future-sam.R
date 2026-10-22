@@ -1,4 +1,5 @@
 make_short_simulated_future_data <- function(n_sim = 2) {
+  needs_p_pope <- "p_pope" %in% names(formals(frasyr::future_vpa_R))
   sam_bh_prec <- readRDS(testthat::test_path("testdata", "sam_bh_prec.rds"))
   use_sam_tmb(TmbFile = sam_bh_prec$input$cpp.file.name, overwrite = FALSE)
 
@@ -16,6 +17,9 @@ make_short_simulated_future_data <- function(n_sim = 2) {
 
   future_list <- lapply(seq_along(sam_sim), function(i) {
     x <- sam_sim[[i]]
+    # New frasyr versions inherit p.pope from the assessment input, but
+    # SAM results do not normally contain this Pope-specific setting.
+    if (needs_p_pope && is.null(x$input$p.pope)) x$input$p.pope <- 0.5
     invisible(capture.output(
       result <- frasyr::make_future_data(
         x,
@@ -42,6 +46,7 @@ make_short_simulated_future_data <- function(n_sim = 2) {
         bias_correction = FALSE
       )
     ))
+    if (needs_p_pope && is.null(result$data$p_pope)) result$data$p_pope <- 0.5
     result
   })
 
