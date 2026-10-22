@@ -14,6 +14,12 @@ test_that("simulated SAM results can be combined and projected", {
   expect_equal(length(result$future_list), 2)
   expect_equal(result$future$data$nsim, 2)
   expect_equal(dim(result$future$data$faa_mat)[3], 2)
+  if ("p_pope" %in% names(formals(frasyr::future_vpa_R))) {
+    expect_equal(result$future$data$p_pope, 0.5)
+    expect_true(all(vapply(result$future_list, function(x) {
+      isTRUE(all.equal(x$data$p_pope, 0.5))
+    }, logical(1))))
+  }
 
   faa_last <- result$future$data$faa_mat[
     , dim(result$future$data$faa_mat)[2], , drop = FALSE

@@ -4,12 +4,27 @@
 \alias{fit2PSdata}
 \title{生成された疑似データにVPA/SAMを推定し、Self-test/Cross-testを実行}
 \usage{
-fit2PSdata(res, PSdata)
+fit2PSdata(
+  res,
+  PSdata,
+  reest_lambda = FALSE,
+  target_retro2 = NULL,
+  n_retro2 = NULL,
+  b_fix2 = NULL
+)
 }
 \arguments{
 \item{res}{フィットさせるSAM/VPAのオブジェクト}
 
 \item{PSdata}{\code{popsim_vpa()}で生成された疑似データ}
+
+\item{reest_lambda}{ridgeVPAで毎回lambdaを再推定するかどうか．TRUEの場合はlambda探索を実行する}
+
+\item{n_retro2}{lambda探索時のレトロスペクティブ解析で遡る年数}
+
+\item{b_fix2}{lambda探索時のレトロスペクティブ解析でbを固定するかどうか．固定する場合は"TRUE"}
+
+\item{terget_retro2}{lambda探索時にレトロスペクティブバイアスを何について計るか；"F", "B", "SSB", "N", "R"の中から選択する}
 }
 \description{
 生成された疑似データにVPA/SAMを推定し、Self-test/Cross-testを実行

@@ -26,7 +26,6 @@ if (!requireNamespace("devtools", quietly = TRUE)) {
   stop("Package 'devtools' is required. Install it with install.packages('devtools').")
 }
 
-
 devtools::load_all()
 devtools::document()
 
