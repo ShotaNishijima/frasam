@@ -300,6 +300,8 @@ SRdata_sim %>% ggplot(aes(x=SSB, y=R)) +
 - この場合は、Fcurrentの値もSAMのシミュレーションごとに違うことに注意
 
 
+`frasyr` のバージョンによっては、`Pope = FALSE` でも `p_pope` が必要です。SAMには通常 `input$p.pope` がないため、未設定の場合は標準値の0.5を補います。Popeの近似式は使用しません。
+
 ```{r projection-simsam, echo = TRUE}
 
 input_orig <- data_future_test2$input
@@ -309,6 +311,7 @@ base_seed <- 20260706
 
 data_future_test3_list <- lapply(seq_along(sam_bh_sim), function(i) {
     x <- sam_bh_sim[[i]]
+    if (is.null(x$input$p.pope)) x$input$p.pope <- 0.5
 
     input <- input_orig
     input$res_vpa <- x
@@ -318,6 +321,8 @@ data_future_test3_list <- lapply(seq_along(sam_bh_sim), function(i) {
 
     # make_future_data() が表示する表だけを knit 結果から除外する
     invisible(capture.output(result <- do.call(make_future_data, input)))
+    if ("p_pope" %in% names(formals(frasyr::future_vpa_R)) &&
+        is.null(result$data$p_pope)) result$data$p_pope <- 0.5
     result
   })
 
@@ -410,6 +415,7 @@ base_seed <- 20260706
 
 data_future_MSY_list <- lapply(seq_along(sam_bh_sim), function(i) {
     x <- sam_bh_sim[[i]]
+    if (is.null(x$input$p.pope)) x$input$p.pope <- 0.5
 
     input <- input_orig
     input$res_vpa <- x
@@ -418,6 +424,8 @@ data_future_MSY_list <- lapply(seq_along(sam_bh_sim), function(i) {
     input$more_process_error <- x$sigma.logN[-1]
     
     invisible(capture.output(result <- do.call(make_future_data, input)))
+    if ("p_pope" %in% names(formals(frasyr::future_vpa_R)) &&
+        is.null(result$data$p_pope)) result$data$p_pope <- 0.5
     result
   })
 
@@ -521,6 +529,7 @@ base_seed <- 20260706
 
 data_future_HCR_list <- lapply(seq_along(sam_bh_sim), function(i) {
     x <- sam_bh_sim[[i]]
+    if (is.null(x$input$p.pope)) x$input$p.pope <- 0.5
 
     input <- input_orig
     input$res_vpa <- x
@@ -530,6 +539,8 @@ data_future_HCR_list <- lapply(seq_along(sam_bh_sim), function(i) {
 
     # make_future_data() が表示する表だけを knit 結果から除外する
     invisible(capture.output(result <- do.call(make_future_data, input)))
+    if ("p_pope" %in% names(formals(frasyr::future_vpa_R)) &&
+        is.null(result$data$p_pope)) result$data$p_pope <- 0.5
     result
   })
 

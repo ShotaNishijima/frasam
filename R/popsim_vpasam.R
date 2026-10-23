@@ -61,26 +61,51 @@ popsim_vpasam = function(Res,n=5,seed=1){
 #' @param res フィットさせるSAM/VPAのオブジェクト
 #' @param PSdata \code{popsim_vpa()}で生成された疑似データ
 #' @param reest_lambda ridgeVPAで毎回lambdaを再推定するかどうか．TRUEの場合はlambda探索を実行する
-#' @param terget_retro2 lambda探索時にレトロスペクティブバイアスを何について計るか；"F", "B", "SSB", "N", "R"の中から選択する
-#' @param n_retro2 lambda探索時のレトロスペクティブ解析で遡る年数
-#' @param b_fix2 lambda探索時のレトロスペクティブ解析でbを固定するかどうか．固定する場合は"TRUE"
+#' @inheritParams frasyr::autocalc_ridgevpa target_retro n_retro b_fix
+#' @param ... frasyr::autocalc_ridgevpaで設定可能な引数
 #'
 #' @export
-fit2PSdata = function(res, PSdata, reest_lambda = FALSE, target_retro2 = NULL, n_retro2 = NULL, b_fix2 = NULL) {
-  if (reest_lambda) {
-    missing_args <- c(
-     if (is.null(target_retro2)) "target_retro2",
-     if (is.null(n_retro2)) "n_retro2",
-     if (is.null(b_fix2)) "b_fix2"
-    )
-     if (length(missing_args) > 0) {
-            stop(
-                "When 'reest_lambda = TRUE', the following arguments must be specified: ",
-                paste(missing_args, collapse = ", ")
-            )
-     }
+fit2PSdata = function(res,
+                      PSdata,
+                      reest_lambda = FALSE,
+                      target_retro = NULL,
+                      n_retro = 5,
+                      b_fix = TRUE,
+                      ...) {
+
+  if (!isTRUE(reest_lambda) && ...length() > 0L) {
+    warning("'...' is ignored when reest_lambda = FALSE")
+  }
+
+  if (isTRUE(reest_lambda)) {
+    if (inherits(res, "vpa")) {
+      missing_args <- c(
+        if (is.null(target_retro)) "target_retro",
+        if (is.null(n_retro)) "n_retro",
+        if (is.null(b_fix)) "b_fix"
+      )
+      if (length(missing_args) > 0) {
+        stop(
+          "When 'reest_lambda = TRUE', the following arguments must be specified: ",
+          paste(missing_args, collapse = ", ")
+        )
+      }
     }
-	
+    if (inherits(res, "sam")) {
+        warning("The 'reest_lambda' option is only for vpa so will be ignored")
+      }
+  }
+
+  if (isTRUE(reest_lambda) &&
+      inherits(res, "vpa") &&
+      !is.null(res$input$eta)) {
+    stop(
+      "fit2PSdata() does not support re-estimating lambda ",
+      "when eta is specified.",
+      call. = FALSE
+    )
+  }
+
   res_list <- lapply(1:length(PSdata), function(i){
     input <- res$input
     input$dat <- PSdata[[i]]
@@ -90,20 +115,28 @@ fit2PSdata = function(res, PSdata, reest_lambda = FALSE, target_retro2 = NULL, n
                 res1 <- try(
                     do.call(vpa, input)
                 )
-
-                ridge_res <- try(
+                if(class(res1)[1]=="try-error"){
+                  res2 <- res1
+                } else {
+                  ridge_res <- try(
                     frasyr::autocalc_ridgevpa(
-                        input = res1$input,
-                        target_retro = target_retro2,
-                        n_retro = n_retro2,
-                        b_fix = b_fix2
+                      input = res1$input,
+                      target_retro = target_retro,
+                      n_retro = n_retro,
+                      b_fix = b_fix,
+                      ...
                     )
-                )
-                lambda1 <- ridge_res$min_penalty
-                input$lambda <- lambda1
-                res2 <- try(
-                    do.call(vpa, input)
-                )
+                  )
+                  if (class(ridge_res)[1]=="try-error") {
+                    res2 <- ridge_res
+                  } else {
+                    lambda1 <- ridge_res$min_penalty
+                    input$lambda <- lambda1
+                    res2 <- try(
+                      do.call(vpa, input)
+                    )
+                  }
+                }
       } else {
                 res2 <- try(
                     do.call(vpa, input)

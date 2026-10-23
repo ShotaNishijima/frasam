@@ -48,7 +48,13 @@ devtools::check()
 devtools::load_all()
 
 rmarkdown::render("vignettes/sam.Rmd", output_format = "rmarkdown::html_vignette")
+
 rmarkdown::render("vignettes/FAQ.Rmd", output_format = "rmarkdown::html_vignette")
+
+rmarkdown::render(
+  "vignettes/future_sam.Rmd",
+  output_format = "rmarkdown::html_vignette"
+)
 
 # pkgdown サイト全体を GitHub Actions に近い形で確認するなら:
 pkgdown::build_site(new_process = FALSE, install = FALSE)

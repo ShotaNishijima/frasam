@@ -42,3 +42,5 @@ res_sam.Rmd
 Rplots.pdf
 
 vignettes/*_files
+vignettes/*.html
+

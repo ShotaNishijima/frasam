@@ -8,9 +8,10 @@ fit2PSdata(
   res,
   PSdata,
   reest_lambda = FALSE,
-  target_retro2 = NULL,
-  n_retro2 = NULL,
-  b_fix2 = NULL
+  target_retro = NULL,
+  n_retro = 5,
+  b_fix = TRUE,
+  ...
 )
 }
 \arguments{
@@ -20,11 +21,13 @@ fit2PSdata(
 
 \item{reest_lambda}{ridgeVPAで毎回lambdaを再推定するかどうか．TRUEの場合はlambda探索を実行する}
 
-\item{n_retro2}{lambda探索時のレトロスペクティブ解析で遡る年数}
+\item{target_retro}{ペナルティλの選択に用いるmohn's rhoのパラメータ}
 
-\item{b_fix2}{lambda探索時のレトロスペクティブ解析でbを固定するかどうか．固定する場合は"TRUE"}
+\item{n_retro}{レトロスペクティブ解析で遡る年数。デフォルトは`5`}
 
-\item{terget_retro2}{lambda探索時にレトロスペクティブバイアスを何について計るか；"F", "B", "SSB", "N", "R"の中から選択する}
+\item{b_fix}{レトロスペクティブ解析内でbを固定するか。デフォルトは`TRUE`}
+
+\item{...}{frasyr::autocalc_ridgevpaで設定可能な引数}
 }
 \description{
 生成された疑似データにVPA/SAMを推定し、Self-test/Cross-testを実行
