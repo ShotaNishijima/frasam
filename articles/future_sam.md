@@ -122,30 +122,30 @@ sam_bh <- safe_call(sam, input)
 
 # sigma.logNが固定されていることの確認
 sam_bh$sigma.logN
-#> [1] 0.6983398 0.0100000 0.0100000 0.0100000 0.0100000 0.0100000 0.0100000
+#> [1] 0.6983396 0.0100000 0.0100000 0.0100000 0.0100000 0.0100000 0.0100000
 summary(sam_bh$rep, "fixed") #logSdlogNはひとつだけ
 #>                Estimate Std. Error
-#> logQ         -5.3289971 0.18229816
-#> logQ         -4.7301006 0.21874289
-#> logQ         -5.5536318 0.08551862
-#> logQ          0.3038535 0.06107456
-#> logQ         -4.0057561 0.12202780
-#> logSdLogFsta -0.4379190 0.15944646
-#> logSdLogFsta -1.1649181 0.15605508
-#> logSdLogN    -0.3590495 0.13702750
-#> logSdLogObs  -0.5988746 0.10850675
+#> logQ         -5.3289981 0.18229816
+#> logQ         -4.7300983 0.21874290
+#> logQ         -5.5536319 0.08551860
+#> logQ          0.3038536 0.06107456
+#> logQ         -4.0057561 0.12202781
+#> logSdLogFsta -0.4379191 0.15944647
+#> logSdLogFsta -1.1649180 0.15605507
+#> logSdLogN    -0.3590498 0.13702748
+#> logSdLogObs  -0.5988747 0.10850675
 #> logSdLogObs  -1.3124138 0.10996351
-#> logSdLogObs  -0.7868366 0.10799882
+#> logSdLogObs  -0.7868367 0.10799883
 #> logSdLogObs   0.1230129 0.11605372
 #> logSdLogObs   0.3112459 0.11401101
-#> logSdLogObs  -0.6851367 0.12586740
+#> logSdLogObs  -0.6851369 0.12586738
 #> logSdLogObs  -1.0759372 0.11894704
-#> logSdLogObs  -0.2896771 0.11527645
-#> rec_loga     -4.0722955 0.16793139
-#> rec_logb     -6.9657614 0.69853306
-#> logit_rho     3.8553644 0.68077303
+#> logSdLogObs  -0.2896770 0.11527645
+#> rec_loga     -4.0722957 0.16793135
+#> rec_logb     -6.9657622 0.69853332
+#> logit_rho     3.8553636 0.68077292
 sam_bh$par_list$logSdLogN %>% exp
-#> [1] 0.6983398 0.0100000
+#> [1] 0.6983396 0.0100000
 
 plot_SR_simple(sam_bh) #BH stock-recruit relationship
 ```
@@ -322,6 +322,10 @@ SRdata_sim %>% ggplot(aes(x=SSB, y=R)) +
 `seed_number`も変えたほうがベター -
 この場合は、Fcurrentの値もSAMのシミュレーションごとに違うことに注意
 
+`frasyr` のバージョンによっては、`Pope = FALSE` でも `p_pope`
+が必要です。SAMには通常 `input$p.pope`
+がないため、未設定の場合は標準値の0.5を補います。Popeの近似式は使用しません。
+
 ``` r
 
 
@@ -332,6 +336,7 @@ base_seed <- 20260706
 
 data_future_test3_list <- lapply(seq_along(sam_bh_sim), function(i) {
     x <- sam_bh_sim[[i]]
+    if (is.null(x$input$p.pope)) x$input$p.pope <- 0.5
 
     input <- input_orig
     input$res_vpa <- x
@@ -341,6 +346,8 @@ data_future_test3_list <- lapply(seq_along(sam_bh_sim), function(i) {
 
     # make_future_data() が表示する表だけを knit 結果から除外する
     invisible(capture.output(result <- do.call(make_future_data, input)))
+    if ("p_pope" %in% names(formals(frasyr::future_vpa_R)) &&
+        is.null(result$data$p_pope)) result$data$p_pope <- 0.5
     result
   })
 
@@ -442,6 +449,7 @@ base_seed <- 20260706
 
 data_future_MSY_list <- lapply(seq_along(sam_bh_sim), function(i) {
     x <- sam_bh_sim[[i]]
+    if (is.null(x$input$p.pope)) x$input$p.pope <- 0.5
 
     input <- input_orig
     input$res_vpa <- x
@@ -450,6 +458,8 @@ data_future_MSY_list <- lapply(seq_along(sam_bh_sim), function(i) {
     input$more_process_error <- x$sigma.logN[-1]
     
     invisible(capture.output(result <- do.call(make_future_data, input)))
+    if ("p_pope" %in% names(formals(frasyr::future_vpa_R)) &&
+        is.null(result$data$p_pope)) result$data$p_pope <- 0.5
     result
   })
 
@@ -468,8 +478,8 @@ res_MSY <- est_MSYRP(data_future=data_future_MSY,
                      select_Bban=0,
                      multi_upper_PGY=10)
 #>         RP_name obj_value catch.mean  ssb.mean
-#> 1 PGY_0.1_lower   52255.6   52254.52  28907.66
-#> 2 PGY_0.6_lower  313533.6  313535.16 325662.95
+#> 1 PGY_0.1_lower  52255.62   52254.54  28907.68
+#> 2 PGY_0.6_lower 313533.70  313535.29 325663.19
 
 # 要約表
 knitr::kable(res_MSY$summary)
@@ -477,10 +487,10 @@ knitr::kable(res_MSY$summary)
 
 | RP_name | RP.definition | SSB | SSB2SSB0 | B | cB | U | Catch | Catch.CV | Fref/Fcur | Fref2Fcurrent | F0 | F1 | F2 | F3 | F4 | F5 | F6 | perSPR |
 |:---|:---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| MSY | Btarget0 | 1265095.92 | 0.3597909 | 4473746.6 | 4473746.6 | 0.1168050 | 522555.96 | 0.8515082 | 0.6588835 | 0.6588835 | 0.0647628 | 0.0754407 | 0.2636584 | 0.3936814 | 0.4604478 | 0.6782157 | 0.6782157 | 0.5522814 |
-| B0 | NA | 3516197.81 | 1.0000000 | 8714286.7 | 8714286.7 | 0.0000000 | 0.00 | NaN | 0.0000000 | 0.0000000 | 0.0000000 | 0.0000000 | 0.0000000 | 0.0000000 | 0.0000000 | 0.0000000 | 0.0000000 | 1.0000000 |
-| PGY_0.1_lower | Bban0 | 28907.66 | 0.0082213 | 191153.2 | 191153.2 | 0.2733646 | 52254.52 | 1.6179199 | 2.6369647 | 2.6369647 | 0.2591919 | 0.3019266 | 1.0552063 | 1.5755806 | 1.8427910 | 2.7143357 | 2.7143357 | 0.2076991 |
-| PGY_0.6_lower | Blimit0 | 325662.95 | 0.0926179 | 1609910.5 | 1609910.5 | 0.1947532 | 313535.16 | 1.1779415 | 1.4847573 | 1.4847573 | 0.1459394 | 0.1700014 | 0.5941396 | 0.8871392 | 1.0375935 | 1.5283215 | 1.5283215 | 0.3418850 |
+| MSY | Btarget0 | 1265096.78 | 0.3597909 | 4473749.3 | 4473749.3 | 0.1168050 | 522556.17 | 0.8515082 | 0.6588833 | 0.6588833 | 0.0647628 | 0.0754407 | 0.2636584 | 0.3936813 | 0.4604476 | 0.6782155 | 0.6782155 | 0.5522815 |
+| B0 | NA | 3516199.92 | 1.0000000 | 8714292.0 | 8714292.0 | 0.0000000 | 0.00 | NaN | 0.0000000 | 0.0000000 | 0.0000000 | 0.0000000 | 0.0000000 | 0.0000000 | 0.0000000 | 0.0000000 | 0.0000000 | 1.0000000 |
+| PGY_0.1_lower | Bban0 | 28907.68 | 0.0082213 | 191153.3 | 191153.3 | 0.2733646 | 52254.54 | 1.6179194 | 2.6369639 | 2.6369639 | 0.2591918 | 0.3019265 | 1.0552060 | 1.5755801 | 1.8427905 | 2.7143349 | 2.7143349 | 0.2076992 |
+| PGY_0.6_lower | Blimit0 | 325663.19 | 0.0926179 | 1609911.4 | 1609911.4 | 0.1947531 | 313535.29 | 1.1779413 | 1.4847568 | 1.4847568 | 0.1459394 | 0.1700014 | 0.5941395 | 0.8871389 | 1.0375932 | 1.5283210 | 1.5283210 | 0.3418851 |
 
 ``` r
 
@@ -576,6 +586,7 @@ base_seed <- 20260706
 
 data_future_HCR_list <- lapply(seq_along(sam_bh_sim), function(i) {
     x <- sam_bh_sim[[i]]
+    if (is.null(x$input$p.pope)) x$input$p.pope <- 0.5
 
     input <- input_orig
     input$res_vpa <- x
@@ -585,6 +596,8 @@ data_future_HCR_list <- lapply(seq_along(sam_bh_sim), function(i) {
 
     # make_future_data() が表示する表だけを knit 結果から除外する
     invisible(capture.output(result <- do.call(make_future_data, input)))
+    if ("p_pope" %in% names(formals(frasyr::future_vpa_R)) &&
+        is.null(result$data$p_pope)) result$data$p_pope <- 0.5
     result
   })
 

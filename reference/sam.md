@@ -78,7 +78,8 @@ sam(
   obj_overwrite = NULL,
   ignore.parm.uncertainty = FALSE,
   change_plusgroup = FALSE,
-  remove.abund = NULL
+  remove.abund = NULL,
+  fix_zero_f = NULL
 )
 ```
 
@@ -378,6 +379,10 @@ sam(
 - change_plusgroup:
 
   プラスグループが途中で変わるか
+
+- fix_zero_f:
+
+  年齢 x 年の0/1行列。1のセルは対応する年齢・年の実効Fを0にする。
 
 - varNfix:
 
