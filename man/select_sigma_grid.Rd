@@ -8,7 +8,7 @@ select_sigma_grid(
   samres,
   grid = expand.grid(var = c("varC", "varF", "varN", "index.key")[1:2], X = 1:2),
   stopAIC = TRUE,
-  check_converge = FALSE,
+  check_converge = TRUE,
   SEmax = 10
 )
 }
@@ -18,7 +18,21 @@ select_sigma_grid(
 \item{grid}{'var'と'X'からなるdata.frame}
 
 \item{stopAIC}{AICが小さくならなかった時点で計算をやめるか（default: TRUE)}
+
+\item{check_converge}{TRUE（既定値）の場合、\code{check_fit_sam}を通ったモデルのみ選択する。}
+
+\item{SEmax}{固定効果の標準誤差の上限。\code{check_fit_sam}の\code{se_max}に渡す。}
+}
+\value{
+\code{tbl_sigma}（\code{fit_ok}に適合チェックの合否を記録）、
+  \code{bestres}、各ステップの候補を保存する\code{reslist}からなるリスト。
 }
 \description{
 \code{devide_sigma}関数を順々に実行し、AIC規準で最適なモデルを探索
+}
+\details{
+各ステップで適合チェックを通り、AICが有限の候補から最小AICのモデルを選ぶ。
+  候補がなければ探索を終了する。初期モデルも同じ基準で判定し、合格モデルが
+  一つもない場合は\code{bestres}を\code{NULL}とする。最適化の収束コードは
+  \code{check_fit_sam}の既定動作と同様、合否判定には使わない。
 }

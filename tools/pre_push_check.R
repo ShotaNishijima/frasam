@@ -47,7 +47,12 @@ devtools::check()
 
 devtools::load_all()
 
-rmarkdown::render("vignettes/sam.Rmd", output_format = "rmarkdown::html_vignette")
+# ggplot2::theme_set(ggplot2::theme_bw())
+
+rmarkdown::render(
+  "vignettes/sam.Rmd",
+  output_format = "rmarkdown::html_vignette"
+)
 
 rmarkdown::render("vignettes/FAQ.Rmd", output_format = "rmarkdown::html_vignette")
 
